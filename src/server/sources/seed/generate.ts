@@ -157,7 +157,7 @@ function behaviour(ctx: Ctx, i: number) {
   return { weekend, tags, workouts, hardness };
 }
 
-type Stage = "AWAKE" | "LIGHT" | "DEEP" | "REM";
+type Stage = "awake" | "light" | "deep" | "rem";
 type Segment = { start: number; end: number; stage: Stage };
 
 /** ~90-minute cycles: deep early, REM growing later, short wakes between. Alcohol halves early REM. */
@@ -170,16 +170,16 @@ function sleepStages(r: Rng, bed: number, wake: number, restless: number, alcoho
     parts.push([stage, minutes]);
     planned += minutes;
   };
-  plan("AWAKE", r.u(4, 14) + 10 * restless);
+  plan("awake", r.u(4, 14) + 10 * restless);
   for (let k = 0; planned < total; k++) {
     const deep = Math.max(0, 34 - 9 * k) * r.u(0.7, 1.2);
     const rem = Math.min(35, 8 + 7 * k) * r.u(0.75, 1.25) * (alcohol && k < 2 ? 0.5 : 1);
     const light = r.u(85, 100) - deep - rem;
-    plan("LIGHT", light * 0.6);
-    plan("DEEP", deep);
-    plan("LIGHT", light * 0.4);
-    plan("REM", rem);
-    if (r.chance(0.35 + 0.4 * restless)) plan("AWAKE", r.u(1, 4) + 6 * restless);
+    plan("light", light * 0.6);
+    plan("deep", deep);
+    plan("light", light * 0.4);
+    plan("rem", rem);
+    if (r.chance(0.35 + 0.4 * restless)) plan("awake", r.u(1, 4) + 6 * restless);
   }
   const segments: Segment[] = [];
   let t = 0;
@@ -191,7 +191,7 @@ function sleepStages(r: Rng, bed: number, wake: number, restless: number, alcoho
     t += minutes;
   };
   for (const [stage, minutes] of parts) push(stage, Math.min(Math.round(minutes), total - finalAwake - t));
-  push("AWAKE", total - t);
+  push("awake", total - t);
   return segments;
 }
 
@@ -218,11 +218,11 @@ function night(ctx: Ctx, i: number) {
   const segments = sleepStages(r, bed, wake, restless, alcohol);
   const minutesIn = (stage: Stage) => segments.reduce((n, s) => n + (s.stage === stage ? (s.end - s.start) / 60 : 0), 0);
   const summary = {
-    asleepMin: minutesIn("LIGHT") + minutesIn("DEEP") + minutesIn("REM"),
-    awakeMin: minutesIn("AWAKE"),
-    deepMin: minutesIn("DEEP"),
-    lightMin: minutesIn("LIGHT"),
-    remMin: minutesIn("REM"),
+    asleepMin: minutesIn("light") + minutesIn("deep") + minutesIn("rem"),
+    awakeMin: minutesIn("awake"),
+    deepMin: minutesIn("deep"),
+    lightMin: minutesIn("light"),
+    remMin: minutesIn("rem"),
   };
 
   // Couplings: short sleep lowers HRV and raises RHR; yesterday's training and alcohol carry into tonight.
@@ -285,7 +285,7 @@ function workoutIntensity(w: Workout, k: number) {
 const HR_CADENCE_S = 15;
 const BMR_KCAL = 1700;
 /** Sleep HR relative to the night's resting HR, by stage. */
-const STAGE_HR: Record<Stage, number> = { AWAKE: 6, LIGHT: -2, DEEP: -4, REM: 1 };
+const STAGE_HR: Record<Stage, number> = { awake: 6, light: -2, deep: -4, rem: 1 };
 const NO_NIGHT = { hrvMs: null, hrvDeepMs: null, rhrBpm: null, rhrMethod: null, respBpm: null, nightlyTempC: null, spo2Pct: null, vo2maxDaily: null };
 
 /** Everything that happens on local day i, before any "now" cut. Pure: same inputs, same output. */

@@ -87,7 +87,7 @@ describe("openDb", () => {
     db.insert(schema.sleepSessions)
       .values({ id: "s1", day: "2026-10-01", startTs: 0, endTs: 100, isMain: true, processed: true, source: "seed" })
       .run();
-    db.insert(schema.sleepSegments).values({ sessionId: "s1", startTs: 0, endTs: 100, stage: "DEEP" }).run();
+    db.insert(schema.sleepSegments).values({ sessionId: "s1", startTs: 0, endTs: 100, stage: "deep" }).run();
     db.delete(schema.sleepSessions).run();
     expect(db.select().from(schema.sleepSegments).all()).toHaveLength(0);
     db.$client.close();
