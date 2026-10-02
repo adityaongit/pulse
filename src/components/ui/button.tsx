@@ -31,6 +31,11 @@ const buttonVariants = cva(
         "icon-sm":
           "size-7 rounded-[min(var(--radius-md),12px)] in-data-[slot=button-group]:rounded-lg",
         "icon-lg": "size-9",
+        // Pulse touch sizes (spec §5.0): every text button in content and sheets, and every icon button.
+        touch:
+          "h-11 gap-2 rounded-lg px-4 text-[13px] font-bold tracking-[0.06em] uppercase transition-[background-color,color,scale] duration-150 ease-standard active:scale-[0.96] [&_svg:not([class*='size-'])]:size-5",
+        "icon-touch":
+          "size-11 rounded-full transition-[background-color,color,scale] duration-150 ease-standard active:scale-[0.96] [&_svg:not([class*='size-'])]:size-5",
       },
     },
     defaultVariants: {
