@@ -15,6 +15,8 @@ import { getActivity } from "@/server/queries/activity"
 import type { ActivityVM } from "@/server/queries/types"
 import { CAPTION, hrSeries, LABEL, statProps } from "../../_lib/view"
 
+export const metadata = { title: "Activity", description: "Activity strain, heart rate, zones and recovery after the workout." }
+
 /** Activity `/activity/[id]` (spec §7.4). No date switcher; back falls back to that day's Strain. */
 export default async function ActivityPage({ params }: PageProps<"/activity/[id]">) {
   const { id } = await params

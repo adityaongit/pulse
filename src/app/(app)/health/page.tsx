@@ -13,7 +13,7 @@ import { SectionShell } from "@/components/shells/SectionShell"
 import { Skeleton } from "@/components/ui/skeleton"
 import { ageDelta, categoryTone, categoryWord, ordinal } from "./format"
 
-export const metadata = { title: "Health · Pulse" }
+export const metadata = { title: "Health" }
 
 const LABEL = "text-xs leading-4 font-bold tracking-[0.08em] uppercase"
 const CAPTION = "text-xs leading-4 font-medium text-muted-foreground"

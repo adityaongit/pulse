@@ -26,6 +26,8 @@ import { ENERGY_INFO, TONIGHT_INFO } from "./_lib/info"
 import { TonightPlan } from "./_lib/TonightPlan"
 import { CAPTION, energySeries, LABEL, statProps } from "./_lib/view"
 
+export const metadata = { title: "Today", description: "Today's Sleep, Recovery and Strain at a glance." }
+
 const STRESS_TONE: Record<StressLevel, { chip: string; text: string; word: string }> = {
   low: { chip: "bg-stress-low/15 text-stress-low", text: "text-stress-low", word: "Low" },
   medium: { chip: "bg-stress-medium/15 text-stress-medium", text: "text-stress-medium", word: "Medium" },

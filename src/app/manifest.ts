@@ -4,9 +4,9 @@ import type { MetadataRoute } from "next";
 // would redirect the manifest fetch and Chrome would see no manifest (plan U12).
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Pulse",
+    name: "Pulse: recovery, strain and sleep",
     short_name: "Pulse",
-    description: "Personal recovery, strain and sleep",
+    description: "Recovery, strain and sleep from your Fitbit Air, scored the WHOOP way.",
     start_url: "/",
     display: "standalone",
     background_color: "#0f1113",

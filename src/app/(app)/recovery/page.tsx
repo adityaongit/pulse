@@ -18,6 +18,8 @@ import { pageDay, type SearchParams } from "../_lib/day"
 import { RECOVERY_INFO } from "../_lib/info"
 import { CAPTION, LEGEND, trendProps } from "../_lib/view"
 
+export const metadata = { title: "Recovery", description: "What shaped your Recovery: HRV, resting heart rate, breathing, sleep and skin temperature against your baseline." }
+
 const ICON: Record<Contributor["key"], React.ReactNode> = { hrv: <Activity />, rhr: <Heart />, resp: <Wind />, sleep: <Moon />, skinTemp: <Thermometer /> }
 const FORMAT: Record<Contributor["key"], FormatKey> = { hrv: "int", rhr: "int", resp: "decimal1", sleep: "int", skinTemp: "signed1" }
 

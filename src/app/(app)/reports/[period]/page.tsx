@@ -31,7 +31,7 @@ const SEGMENT =
 
 export async function generateMetadata({ params }: PageProps<"/reports/[period]">) {
   const { period } = await params
-  return { title: `${WEEK.test(period) ? "Weekly" : "Monthly"} report · Pulse` }
+  return { title: `${WEEK.test(period) ? "Weekly" : "Monthly"} report` }
 }
 
 const FORMAT: Record<string, { format: FormatKey; unit?: string; scale?: number }> = {

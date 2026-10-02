@@ -8,7 +8,7 @@ import { PageShell } from "@/components/shells/PageShell"
 import { SectionShell } from "@/components/shells/SectionShell"
 import { Card } from "@/components/ui/card"
 
-export const metadata = { title: "More · Pulse" }
+export const metadata = { title: "More" }
 
 type Row = { icon: LucideIcon; label: string; caption?: string; href: string }
 

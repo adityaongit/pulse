@@ -22,6 +22,8 @@ import { pageDay, type SearchParams } from "../_lib/day"
 import { STRAIN_INFO, STRAIN_TARGET_INFO } from "../_lib/info"
 import { CAPTION, hrSeries, LABEL, LEGEND, statProps, trendProps } from "../_lib/view"
 
+export const metadata = { title: "Strain", description: "Day Strain, your Strain Target, heart-rate zones and activities." }
+
 /** Strain `/strain?d=` (spec §7.3). */
 export default async function StrainPage({ searchParams }: PageProps<"/strain">) {
   const { d, today, timeZone } = await pageDay(searchParams as SearchParams, "/strain")
