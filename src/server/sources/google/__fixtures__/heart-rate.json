@@ -1,0 +1,18 @@
+{
+  "dataPoints": [
+    { "dataSource": { "platform": "FITBIT", "recordingMethod": "PASSIVELY_MEASURED", "device": { "displayName": "<device>" } },
+      "heartRate": { "beatsPerMinute": "72", "sampleTime": { "physicalTime": "2026-09-30T12:00:00Z", "utcOffset": "19800s" } } },
+    { "dataSource": { "platform": "FITBIT", "recordingMethod": "PASSIVELY_MEASURED", "device": { "displayName": "<device>" } },
+      "heartRate": { "beatsPerMinute": "52", "sampleTime": { "physicalTime": "2026-10-01T00:00:00Z", "utcOffset": "19800s" } } },
+    { "dataSource": { "platform": "FITBIT", "recordingMethod": "PASSIVELY_MEASURED", "device": { "displayName": "<device>" } },
+      "heartRate": { "beatsPerMinute": "53", "sampleTime": { "physicalTime": "2026-10-01T00:00:00.400Z", "utcOffset": "19800s" } } },
+    { "dataSource": { "platform": "FITBIT", "recordingMethod": "PASSIVELY_MEASURED", "device": { "displayName": "<device>" } },
+      "heartRate": { "beatsPerMinute": "51", "sampleTime": { "physicalTime": "2026-10-01T00:00:02Z", "utcOffset": "19800s" } } },
+    { "dataSource": { "platform": "FITBIT", "recordingMethod": "PASSIVELY_MEASURED", "device": { "displayName": "<device>" } },
+      "heartRate": { "beatsPerMinute": "150", "sampleTime": { "physicalTime": "2026-10-01T12:45:00Z", "utcOffset": "19800s" } } },
+    { "dataSource": { "platform": "HEALTH_CONNECT", "recordingMethod": "PASSIVELY_MEASURED", "application": { "packageName": "<app>" } },
+      "heartRate": { "beatsPerMinute": "99", "sampleTime": { "physicalTime": "2026-10-01T12:45:01Z", "utcOffset": "19800s" } } },
+    { "dataSource": { "platform": "FITBIT", "recordingMethod": "PASSIVELY_MEASURED", "device": { "displayName": "<device>" } },
+      "heartRate": { "beatsPerMinute": "66", "sampleTime": { "physicalTime": "2026-10-02T05:50:00Z", "utcOffset": "19800s" } } }
+  ]
+}

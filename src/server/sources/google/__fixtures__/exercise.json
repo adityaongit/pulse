@@ -1,0 +1,25 @@
+{
+  "dataPoints": [
+    {
+      "name": "users/me/dataTypes/exercise/dataPoints/exercise-a",
+      "dataSource": { "platform": "FITBIT", "recordingMethod": "ACTIVELY_MEASURED", "device": { "displayName": "<device>", "formFactor": "WATCH" } },
+      "exercise": {
+        "exerciseType": "RUNNING",
+        "displayName": "Run",
+        "interval": { "startTime": "2026-10-01T12:30:00Z", "startUtcOffset": "19800s", "endTime": "2026-10-01T13:10:00Z", "endUtcOffset": "19800s" },
+        "activeDuration": "2400s",
+        "metricsSummary": {
+          "caloriesKcal": 410.5,
+          "distanceMillimeters": 6543000,
+          "averageHeartRateBeatsPerMinute": "152",
+          "steps": "6100",
+          "activeZoneMinutes": "38",
+          "heartRateZoneDurations": { "lightTime": "60s", "moderateTime": "600s", "vigorousTime": "1500s", "peakTime": "240s" }
+        },
+        "exerciseMetadata": { "hasGps": false },
+        "createTime": "2026-10-01T13:15:00Z",
+        "updateTime": "2026-10-01T13:15:00Z"
+      }
+    }
+  ]
+}

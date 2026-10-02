@@ -1,0 +1,9 @@
+{
+  "dataPoints": [
+    {
+      "name": "users/me/dataTypes/body-fat/dataPoints/body-fat-1",
+      "dataSource": { "platform": "HEALTH_CONNECT", "recordingMethod": "MANUAL", "application": { "packageName": "<app>" } },
+      "bodyFat": { "sampleTime": { "physicalTime": "2026-09-30T02:00:00Z", "utcOffset": "19800s" }, "percentage": 18.2 }
+    }
+  ]
+}
