@@ -1,17 +1,18 @@
 import { connection } from "next/server"
 import { Activity, Check, Droplet, Heart, Thermometer, TriangleAlert, Wind } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { AGE_LABEL, formatValue, hmm } from "@/lib/format"
+import { formatValue, hmm } from "@/lib/format"
 import type { ChipTone } from "@/lib/bands"
 import { getHealthHub } from "@/server/queries/health"
 import type { HealthHubVM, VitalKey } from "@/server/queries/types"
 import { StressChart } from "@/components/charts/StressChart"
-import { MetricTags, StatusChip, ValueUnit } from "@/components/metrics/primitives"
+import { StatusChip, ValueUnit } from "@/components/metrics/primitives"
+import { WhoopAgeOrb } from "@/components/metrics/WhoopAgeOrb"
 import { MetricState } from "@/components/shells/MetricState"
 import { PageShell } from "@/components/shells/PageShell"
 import { SectionShell } from "@/components/shells/SectionShell"
 import { Skeleton } from "@/components/ui/skeleton"
-import { ageDelta, categoryTone, categoryWord, ordinal } from "./format"
+import { categoryTone, categoryWord, ordinal } from "./format"
 
 export const metadata = { title: "Health" }
 
@@ -35,28 +36,18 @@ const skeleton = <Skeleton className="h-16 w-full" />
 function Healthspan({ m }: { m: HealthHubVM["healthspan"] }) {
   return (
     <MetricState metric={m} skeleton={skeleton} renderReason={() => <p className={EMPTY}>Healthspan needs 20 days of data.</p>}>
-      {(v, meta) => {
-        const d = ageDelta(v.deltaYears)
-        return (
-          <div className="space-y-3">
-            <div className="flex items-start justify-between gap-4">
-              <div className="min-w-0 space-y-1">
-                <p className="flex flex-wrap items-baseline gap-x-2">
-                  <span className={cn(TILE, "tabular-nums")}>{formatValue("decimal1", v.whoopAge)}</span>
-                  <span className={LABEL}>{AGE_LABEL}</span>
-                </p>
-                <p className={cn("text-base leading-[22px] font-semibold", d.tone)}>{d.text}</p>
-                <MetricTags provisional={meta.provisional} className="justify-start" />
-              </div>
-              <div className="shrink-0 text-right">
-                <p className={LABEL}>Pace of Aging</p>
-                <ValueUnit value={formatValue("decimal1", v.pace)} unit="x" className="mt-1 block font-numeric text-xl leading-6 font-bold" />
-              </div>
+      {(v, meta) => (
+        <div className="flex flex-col items-center gap-4">
+          <WhoopAgeOrb age={v.whoopAge} deltaYears={v.deltaYears} provisional={meta.provisional} size={200} />
+          <div className="flex w-full items-end justify-between gap-4">
+            <div>
+              <p className={LABEL}>Pace of Aging</p>
+              <ValueUnit value={formatValue("decimal1", v.pace)} unit="x" className="mt-1 block font-numeric text-xl leading-6 font-bold" />
             </div>
             <p className={CAPTION}>Updated weekly</p>
           </div>
-        )
-      }}
+        </div>
+      )}
     </MetricState>
   )
 }
