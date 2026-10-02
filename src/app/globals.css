@@ -49,6 +49,7 @@
 
   /* Pulse extensions (WHOOP data language) */
   --color-background-top: var(--background-top);
+  --color-background-mid: var(--background-mid);
   --color-foreground-secondary: var(--foreground-secondary);
   --color-inset: var(--inset);
   --color-recovery-green: var(--recovery-green);

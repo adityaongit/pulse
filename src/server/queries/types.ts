@@ -369,3 +369,10 @@ export type MoreVM = {
   version: string;
   scoringVersion: number;
 };
+
+// ── Calendar (DateSwitcher month panel) ─────────────────────────────────────
+
+/** One day's three headline scores; null when the day has none. Strain is on the 0–21 scale. */
+export type CalendarDayVM = { day: string; recovery: number | null; strain: number | null; sleep: number | null };
+/** Every day of `month` ("YYYY-MM"), first to last. */
+export type CalendarMonthVM = { month: string; days: CalendarDayVM[] };
