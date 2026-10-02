@@ -52,7 +52,8 @@ function Strip({ indicator, days }: DayStripProps) {
   }, [value, reduced])
 
   return (
-    <ScrollArea className="w-full touch-manipulation [&_[data-slot=scroll-area-scrollbar]]:hidden">
+    // py-1 / -my-1: room for the 3 px focus ring inside the scroll viewport, which clips.
+    <ScrollArea className="-my-1 w-full touch-manipulation [&_[data-slot=scroll-area-scrollbar]]:hidden">
       <ToggleGroup
         type="single"
         value={value}
@@ -63,7 +64,7 @@ function Strip({ indicator, days }: DayStripProps) {
         }}
         aria-label="Choose a day"
         spacing={1}
-        className="w-max gap-1 px-4"
+        className="w-max gap-1 px-4 py-1"
       >
         {days.map((day) => {
           const date = parseISO(day.date)
@@ -81,7 +82,7 @@ function Strip({ indicator, days }: DayStripProps) {
               aria-label={label}
               className="h-15 w-11 flex-col gap-1 rounded-xl p-0 transition-[background-color,scale] duration-150 ease-standard hover:bg-white/6 active:scale-[0.96] data-[state=on]:bg-white/10"
             >
-              <span aria-hidden className="text-[11px] leading-[14px] font-semibold text-muted-foreground">
+              <span aria-hidden className="text-[11px] leading-3 font-semibold text-muted-foreground">
                 {format(date, "EEEEE")}
               </span>
               <span aria-hidden className="font-numeric text-[17px] leading-5 font-semibold tabular-nums">

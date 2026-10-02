@@ -106,7 +106,7 @@ function Dials({ vm }: { vm: ReportVM }) {
         const f = DIAL_FORMAT[dl.key]
         const tone = dl.delta === null || dl.key === "strain" || Math.round(dl.delta * 10) === 0 ? "text-muted-foreground" : dl.delta > 0 ? "text-optimal" : "text-warning"
         return (
-          <div key={dl.key} className="flex min-w-0 flex-1 basis-0 flex-col items-center gap-1.5">
+          <div key={dl.key} className="flex min-w-0 flex-1 basis-0 flex-col items-center gap-1.5 text-center">
             <ScoreDial variant={dl.key} size="md" value={dl.metric.value} reason={dl.metric.reason} label={dl.label} />
             {dl.delta !== null && (
               <p className={cn(CAPTION, "text-center tabular-nums", tone)}>

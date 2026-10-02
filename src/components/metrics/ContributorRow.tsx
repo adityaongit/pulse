@@ -47,7 +47,7 @@ const MARKER: Record<Tone, string> = { good: "bg-optimal", bad: "bg-warning", ne
 function Header({ p, value, right }: { p: Common; value: number | null; right?: React.ReactNode }) {
   return (
     <span className="flex items-center gap-3">
-      {p.icon && <span className="grid size-5 shrink-0 place-items-center text-muted-foreground [&_svg]:size-5">{p.icon}</span>}
+      {p.icon && <span className="grid size-5 shrink-0 place-items-center text-muted-foreground [&_svg]:size-5 [&_svg]:stroke-[1.75]">{p.icon}</span>}
       <span className={cn(LABEL, "line-clamp-2 min-w-0 flex-1")}>{p.label}</span>
       <span className="flex shrink-0 items-center gap-2">
         <ValueUnit
