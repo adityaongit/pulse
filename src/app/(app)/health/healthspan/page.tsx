@@ -8,12 +8,11 @@ import { getHealthspan } from "@/server/queries/health"
 import type { HealthspanVM } from "@/server/queries/types"
 import { TrendChart } from "@/components/charts/TrendChart"
 import { InsightCard } from "@/components/metrics/InsightCard"
-import { MetricTags } from "@/components/metrics/primitives"
 import { TickScale } from "@/components/metrics/TickScale"
+import { WhoopAgeOrb } from "@/components/metrics/WhoopAgeOrb"
 import { DetailShell } from "@/components/shells/DetailShell"
 import { EmptyState } from "@/components/shells/EmptyState"
 import { SectionShell } from "@/components/shells/SectionShell"
-import { ageDelta } from "../format"
 import { ContributorCard } from "./ContributorCard"
 
 export const metadata = { title: "Healthspan" }
@@ -31,33 +30,12 @@ const INFO = {
   ),
 }
 
-/** The one glow in the app (spec §2.6): the WHOOP Age orb. */
+/** The one glow in the app (spec §2.6, docs/design/orb.md): the WHOOP Age orb. */
 function Orb({ vm }: { vm: HealthspanVM }) {
   const r = vm.result.value
-  const d = r ? ageDelta(r.deltaYears) : null
   return (
     <div className="flex flex-col items-center gap-3">
-      <div
-        role="img"
-        aria-label={r ? `${AGE_LABEL} ${formatValue("decimal1", r.whoopAge)}, ${d!.text}` : `${AGE_LABEL} unavailable`}
-        className={cn(
-          "relative mx-auto grid size-60 place-content-center justify-items-center rounded-full text-center md:size-70",
-          r ? "bg-radial from-transparent from-45% via-optimal/10 to-optimal/35 ring-1 ring-optimal/60" : "ring-1 ring-dial-track"
-        )}
-      >
-        <span aria-hidden className={cn("font-numeric text-[64px] leading-none font-bold tracking-[-0.01em] tabular-nums md:text-[72px]", !r && "text-muted-foreground")}>
-          {formatValue("decimal1", r?.whoopAge)}
-        </span>
-        <span aria-hidden className="mt-2 text-xs leading-4 font-bold tracking-[0.08em] uppercase">
-          {AGE_LABEL}
-        </span>
-        {d && (
-          <span aria-hidden className={cn("mt-2 text-[15px] leading-5 font-semibold", d.tone)}>
-            {d.text}
-          </span>
-        )}
-        {vm.result.provisional && <MetricTags provisional className="mt-2" />}
-      </div>
+      <WhoopAgeOrb age={r?.whoopAge ?? null} deltaYears={r?.deltaYears ?? null} provisional={vm.result.provisional} reason={vm.result.reason} size={300} />
       <p className={cn(CAPTION, "text-center tabular-nums")}>
         {r ? `Your age: ${formatValue("decimal1", vm.age)}` : "Healthspan needs 20 days of data."}
       </p>
