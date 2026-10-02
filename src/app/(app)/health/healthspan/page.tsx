@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation"
 import { Rabbit, Turtle } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { AGE_LABEL, formatValue } from "@/lib/format"
+import { AGE_LABEL, formatValue, MISSING } from "@/lib/format"
 import { parseDay, todayIn } from "@/lib/url"
 import { getConfig } from "@/server/config"
 import { getHealthspan } from "@/server/queries/health"
@@ -30,9 +30,16 @@ const INFO = {
   ),
 }
 
-/** The one glow in the app (spec §2.6, docs/design/orb.md): the WHOOP Age orb. */
-function Orb({ vm }: { vm: HealthspanVM }) {
+/** The one glow in the app (spec §2.6, docs/design/orb.md): the WHOOP Age orb. `compact`: the collapsed header's 108 px orb. */
+function Orb({ vm, compact }: { vm: HealthspanVM; compact?: boolean }) {
   const r = vm.result.value
+  if (compact)
+    // Hangs 8 px below the stats' centre line, about 30 px past the band, as in [latest-healthspan-collapsed-2].
+    return (
+      <div className="translate-y-2">
+        <WhoopAgeOrb compact age={r?.whoopAge ?? null} deltaYears={r?.deltaYears ?? null} reason={vm.result.reason} />
+      </div>
+    )
   return (
     <div className="flex flex-col items-center gap-3">
       <WhoopAgeOrb age={r?.whoopAge ?? null} deltaYears={r?.deltaYears ?? null} provisional={vm.result.provisional} reason={vm.result.reason} size={300} />
@@ -55,6 +62,16 @@ export default async function HealthspanPage({ searchParams }: PageProps<"/healt
   const hasHistory = vm.history.some((p) => p.value !== null)
   const group = (g: "sleep" | "strain" | "fitness") => vm.contributors.filter((c) => c.group === g)
   const n = vm.nextUpdateInDays
+  // Collapsed header stats ([latest-healthspan-collapsed-1..5]): years younger in green, older in amber; pace in white.
+  const older = !!r && r.deltaYears > 0
+  const stats = {
+    left: {
+      value: r ? formatValue("decimal1", Math.abs(r.deltaYears)) : MISSING,
+      label: older ? "Years older" : "Years younger",
+      tone: r ? (older ? "warning" : "optimal") : undefined,
+    },
+    right: { value: r ? `${formatValue("decimal1", r.pace)}x` : MISSING, label: "Pace of aging" },
+  } as const
 
   return (
     <DetailShell
@@ -63,6 +80,8 @@ export default async function HealthspanPage({ searchParams }: PageProps<"/healt
       dateSwitcher={{ mode: "week" }}
       info={INFO}
       hero={<Orb vm={vm} />}
+      stats={stats}
+      collapse
       summary={
         <SectionShell variant="card" title="Pace of Aging">
           <TickScale

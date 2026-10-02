@@ -146,7 +146,7 @@ export function HeaderRow({ left, center, right, className }: { left?: React.Rea
 export function TitleHeader({ title, dateSwitcher }: { title: string; dateSwitcher?: DateSwitcherProps }) {
   return (
     <HeaderFrame>
-      <HeaderRow center={<h1 className={cn(HEADER_TITLE, "truncate")}>{title}</h1>} right={<SyncStatus />} className="px-4 md:px-6 xl:px-8" />
+      <HeaderRow center={<h1 className={cn(HEADER_TITLE, "truncate")}>{title}</h1>} right={<SyncStatus />} className="px-4 md:px-6 xl:mx-auto xl:max-w-[1120px] xl:px-8" />
       {dateSwitcher && (
         <div className="flex justify-center pt-1">
           <DateSwitcher {...dateSwitcher} />

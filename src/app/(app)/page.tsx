@@ -13,7 +13,7 @@ import { SleepCard } from "@/components/metrics/SleepCard"
 import { TickScale } from "@/components/metrics/TickScale"
 import { MetricTags } from "@/components/metrics/primitives"
 import { EmptyState } from "@/components/shells/EmptyState"
-import { HEADER_SENTINEL } from "@/lib/header-state"
+import { HEADER_SENTINEL, HOME_DIALS, HOME_DIALS_CLASS } from "@/lib/header-state"
 import { MetricState } from "@/components/shells/MetricState"
 import { PageShell } from "@/components/shells/PageShell"
 import { SectionShell } from "@/components/shells/SectionShell"
@@ -62,7 +62,8 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
                 <p aria-hidden className="text-center text-[13px] leading-4 font-semibold tracking-[0.35em] text-foreground-secondary uppercase">
                   Pulse
                 </p>
-                <div className="grid grid-cols-3 items-start justify-items-center">
+                {/* The dials shrink into the header's ring row as this row scrolls under it (spec §4.3, HomeHeader). */}
+                <div {...{ [HOME_DIALS]: "" }} className={cn("grid grid-cols-3 items-start justify-items-center", HOME_DIALS_CLASS)}>
                   <ScoreDial variant="sleep" size="md" value={dials.sleep.value} reason={dials.sleep.reason} provisional={dials.sleep.provisional} tags={dials.sleep.tags} href={at("/sleep")} />
                   <ScoreDial
                     variant="recovery"
@@ -84,7 +85,7 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
                     href={at("/strain")}
                   />
                 </div>
-                {/* The header's ring row appears once this passes under it (spec §4.3). */}
+                {/* The end of the collapse distance: the dial labels' bottom (spec §4.3). */}
                 <div aria-hidden {...{ [HEADER_SENTINEL]: "" }} />
                 {dials.reason && (
                   <p className="text-center">
@@ -112,7 +113,7 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
               <Link
                 href={checkIn}
                 aria-label="Add to today"
-                className="-my-2 grid size-12 place-items-center rounded-[14px] bg-foreground text-primary-foreground transition-[scale,background-color] duration-150 ease-standard outline-none hover:bg-foreground/90 focus-visible:ring-3 focus-visible:ring-ring/50 active:scale-[0.96]"
+                className="-my-3 grid size-12 place-items-center rounded-[14px] bg-foreground text-primary-foreground transition-[scale,background-color] duration-150 ease-standard outline-none hover:bg-foreground/90 focus-visible:ring-3 focus-visible:ring-ring/50 active:scale-[0.96]"
               >
                 <Plus aria-hidden className="size-[26px]" strokeWidth={2} />
               </Link>

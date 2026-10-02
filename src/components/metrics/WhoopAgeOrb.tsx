@@ -15,9 +15,14 @@ export type WhoopAgeOrbProps = {
   /** WHOOP Age minus chronological age; positive is older. */
   deltaYears: number | null
   provisional?: boolean
-  /** Box size in CSS px. Below 160 it drops the delta line (Health hub, collapsed header). */
+  /** Box size in CSS px (default 300, compact 108). Below 160 it drops the delta line (Health hub, collapsed header). */
   size?: number
   reason?: ReasonCode | null
+  /**
+   * The sticky header's mini orb (docs/design/sticky.md B2, [latest-healthspan-collapsed-1..5]): same colours,
+   * the age and label inside, one settled frame (no loop, no touch), `aria-hidden` and `inert`.
+   */
+  compact?: boolean
 }
 
 /** Canvas overhang on each side, as a share of `size`, so the glow can bleed past the box. */
@@ -56,7 +61,8 @@ function sprite(color: RGB, soft: boolean) {
  * older or younger WHOOP Age is. Particles gather in on mount, drift at idle, and pull inward and swirl while pressed.
  * Server render and no-canvas fallback: a static gradient blob with the same numerals.
  */
-export function WhoopAgeOrb({ age, deltaYears, provisional = false, size = 300, reason }: WhoopAgeOrbProps) {
+export function WhoopAgeOrb({ age, deltaYears, provisional = false, size: sizeProp, reason, compact = false }: WhoopAgeOrbProps) {
+  const size = sizeProp ?? (compact ? 108 : 300)
   const boxRef = useRef<HTMLDivElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const fallbackRef = useRef<HTMLDivElement>(null)
@@ -232,7 +238,8 @@ export function WhoopAgeOrb({ age, deltaYears, provisional = false, size = 300, 
     }
 
     const hideFallback = () => fallbackRef.current?.style.setProperty("opacity", "0")
-    if (reduced) {
+    // The compact orb lives in the header beside the full one: a settled frame costs nothing per scroll frame.
+    if (reduced || compact) {
       draw(10, 0) // One settled frame, no loop.
       hideFallback()
       return
@@ -306,13 +313,15 @@ export function WhoopAgeOrb({ age, deltaYears, provisional = false, size = 300, 
       box.removeEventListener("pointermove", move)
       for (const type of ["pointerup", "pointercancel", "pointerleave"] as const) box.removeEventListener(type, up)
     }
-  }, [delta, size, small])
+  }, [delta, size, small, compact])
 
   return (
     <div
       ref={boxRef}
-      role="img"
-      aria-label={label}
+      role={compact ? undefined : "img"}
+      aria-label={compact ? undefined : label}
+      aria-hidden={compact || undefined}
+      inert={compact}
       className="relative isolate shrink-0 touch-pan-y select-none [-webkit-tap-highlight-color:transparent]"
       style={
         {
@@ -343,7 +352,7 @@ export function WhoopAgeOrb({ age, deltaYears, provisional = false, size = 300, 
             "font-numeric leading-none font-bold tracking-[-0.01em] tabular-nums motion-safe:delay-200",
             small ? "text-[calc(var(--s)*0.25)]" : "text-[calc(18px+var(--s)*0.07)]",
             !has && "text-muted-foreground",
-            ENTER
+            !compact && ENTER
           )}
         >
           {formatValue("decimal1", has ? age : null)}
@@ -352,7 +361,7 @@ export function WhoopAgeOrb({ age, deltaYears, provisional = false, size = 300, 
           className={cn(
             "font-bold tracking-[0.08em] text-muted-foreground uppercase motion-safe:delay-300",
             small ? "mt-0.5 text-[max(9px,calc(var(--s)*0.09))] leading-none" : "mt-1.5 text-[calc(7px+var(--s)*0.023)] leading-tight",
-            ENTER
+            !compact && ENTER
           )}
         >
           {AGE_LABEL}
