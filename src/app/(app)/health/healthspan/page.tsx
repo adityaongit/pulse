@@ -16,7 +16,7 @@ import { SectionShell } from "@/components/shells/SectionShell"
 import { ageDelta } from "../format"
 import { ContributorCard } from "./ContributorCard"
 
-export const metadata = { title: "Healthspan · Pulse" }
+export const metadata = { title: "Healthspan" }
 
 const CAPTION = "text-xs leading-4 font-medium text-muted-foreground"
 
