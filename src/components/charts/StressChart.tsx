@@ -58,7 +58,7 @@ function Chart({ s, variant }: { s: StressSeries; variant: "full" | "spark" }) {
           hide={!full}
           ticks={full ? hourTicks(first, last, 4, tz) : undefined}
           tickFormatter={(v: number) => clock(v, tz)}
-          interval="preserveStartEnd"
+          interval="equidistantPreserveStart"
           minTickGap={24}
           {...AXIS}
         />

@@ -82,7 +82,7 @@ function Item({ i, max, p }: { i: DriverItem; max: number; p: DriverListProps })
       <span className="sr-only">{sentence(i, p.variant, p.unit, p.outcome)}</span>
       <span aria-hidden className="block space-y-2">
         <span className="flex items-baseline justify-between gap-3">
-          <span className="min-w-0 truncate text-xs leading-4 font-bold tracking-[0.08em] uppercase">{i.label}</span>
+          <span className="min-w-0 text-xs leading-4 font-bold tracking-[0.08em] text-pretty uppercase">{i.label}</span>
           <span className={cn("font-numeric text-base font-bold tabular-nums", e === "positive" ? "text-optimal" : e === "negative" ? "text-warning" : "text-foreground-secondary")}>
             {fmt(i.delta, p.unit)}
           </span>
@@ -93,7 +93,7 @@ function Item({ i, max, p }: { i: DriverItem; max: number; p: DriverListProps })
               className={cn(
                 "absolute inset-y-0 rounded-sm",
                 i.delta > 0 ? "left-1/2" : "right-1/2",
-                e === "positive" ? "bg-optimal" : e === "negative" ? "bg-warning" : "bg-foreground-secondary/60"
+                e === "positive" ? "bg-optimal" : e === "negative" ? "bg-warning" : "bg-muted-foreground"
               )}
               style={{ width }}
             />

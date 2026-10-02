@@ -150,8 +150,8 @@ export function DetailSkeleton({ title, chart = "trend", dateSwitcher = true }: 
           {chart === "hr" ? <IntradayHrChartSkeleton /> : chart === "stages" ? <HypnogramSkeleton /> : <TrendChartSkeleton />}
         </CardSkeleton>
       }
-      secondary={(SECONDARY[title] ?? ["", ""]).map((t) => (
-        <CardSkeleton key={t} title={t}>
+      secondary={(SECONDARY[title] ?? ["", ""]).map((t, i) => (
+        <CardSkeleton key={`${i}-${t}`} title={t}>
           {t === "Time in zones" ? (
             <ZoneBarsSkeleton variant="rows" />
           ) : t === "Activities" ? (

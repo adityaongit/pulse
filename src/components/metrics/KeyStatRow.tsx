@@ -99,7 +99,7 @@ function Row({ p, c }: { p: KeyStatRowProps; c: Computed }) {
   return (
     <Frame p={c.loading ? { ...p, href: undefined, onSelect: undefined } : p} sentence={sentence} className={rowClass(p)}>
       <span aria-hidden className="contents">
-        {p.icon && <span className="grid size-5 shrink-0 place-items-center text-muted-foreground [&_svg]:size-5">{p.icon}</span>}
+        {p.icon && <span className="grid size-5 shrink-0 place-items-center text-muted-foreground [&_svg]:size-5 [&_svg]:stroke-[1.75]">{p.icon}</span>}
         <span className="min-w-0 flex-1">
           {p.label ? <span className={cn(LABEL, "block truncate")}>{p.label}</span> : <SkeletonText className={cn(LABEL, "w-32")} />}
           {(c.reason || p.caption) && <span className={cn(CAPTION, "mt-0.5 block truncate")}>{c.reason ?? p.caption}</span>}
@@ -156,7 +156,7 @@ function Tile({ p, c }: { p: KeyStatRowProps; c: Computed }) {
     >
       <span aria-hidden className="contents">
         <span className="flex items-start gap-2">
-          {p.icon && <span className="grid size-5 shrink-0 place-items-center text-muted-foreground [&_svg]:size-5">{p.icon}</span>}
+          {p.icon && <span className="grid size-5 shrink-0 place-items-center text-muted-foreground [&_svg]:size-5 [&_svg]:stroke-[1.75]">{p.icon}</span>}
           {p.label ? <span className={cn(LABEL, "line-clamp-3 min-w-0 pt-0.5")}>{p.label}</span> : <SkeletonText className={cn(LABEL, "w-24 pt-0.5")} />}
         </span>
         <span className="mt-auto flex flex-col items-start gap-2">

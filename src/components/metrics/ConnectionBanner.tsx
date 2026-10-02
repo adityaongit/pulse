@@ -75,7 +75,7 @@ export function ConnectionBanner({ className }: { className?: string }) {
       aria-live={view.role === "status" ? "polite" : undefined}
       className={cn(
         CARD_MATERIAL,
-        "grid-cols-[auto_minmax(0,1fr)] gap-x-3 gap-y-0.5 border-0 px-4 py-3 *:[svg]:size-5 *:[svg]:translate-y-px md:grid-cols-[auto_minmax(0,1fr)_auto]",
+        "grid-cols-[auto_minmax(0,1fr)] gap-x-3 gap-y-0.5 border-0 px-4 py-3 *:[svg]:size-5 *:[svg]:translate-y-px *:[svg]:stroke-[1.75] md:grid-cols-[auto_minmax(0,1fr)_auto]",
         className
       )}
     >
