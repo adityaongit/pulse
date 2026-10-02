@@ -1,39 +1,71 @@
 ---
-title: "Pulse design spec: the build contract for U12 and U13"
-status: frozen for U12/U13 (change it here first, then in code)
+title: "Pulse design spec v2: the build contract for U17 (latest WHOOP glass UI)"
+status: v2, frozen for U17 (change it here first, then in code)
 date: 2026-10-02
+supersedes: v1 of the same date (U11). §0 lists every change; v1 values that still apply are carried forward unchanged.
 plan: docs/plans/2026-10-02-001-feat-whoop-style-fitbit-webapp-plan.md
-references: docs/design/reference/README.md
+references: docs/design/reference/README.md ("Latest (2025-26)" section)
 theme: src/app/globals.css (tokens), src/app/layout.tsx (fonts)
 ---
 
-# Pulse design spec
+# Pulse design spec v2
 
-This document is the contract for the interface. U12 builds the shells and the component kit from §4 and §5. U13 builds every screen from §7 and makes every journey in §8 work. Neither unit redesigns: a change goes into this file first.
+This document is the contract for the interface. U17 rebuilds the visual layer from it: tokens (§2), shells (§4), the component kit (§5) and every screen (§7). Data, queries and screen structure stay as U12 and U13 built them. Nobody redesigns in code: a change goes into this file first.
 
-It also serves as the project's design-system record (what Impeccable calls DESIGN.md). There is no second copy.
+It is also the project's design-system record (what Impeccable calls DESIGN.md). There is no second copy.
 
-**How to read it.** Values in `code` are exact. "WHOOP" means the reference screenshots in `docs/design/reference/`, named in brackets like [recovery-detail]. Where WHOOP has no screen, the section says "derived" and names what it was derived from.
+**How to read it.** Values in `code` are exact. A reference in brackets is a file in `docs/design/reference/` without its extension: `[latest-home-collapsed-1]` is `latest-home-collapsed-1.jpg`. Every `latest-*` file is dated in the reference README; all of them postdate WHOOP's October 2025 redesign. Older references (no `latest-` prefix) are cited only where the current app did not change, and that is said. **Inferred** marks a decision no reference shows; each one is listed again in §12.
 
 Contents
 
+0. Changelog v1 → v2
 1. Direction
-2. Tokens
+2. Tokens (including the glass material system, §2.6)
 3. Typography
-4. Shells
-5. Components
+4. Shells (tab bar, collapsing Home header, detail header, overlays, calendar)
+5. Components (including the WHOOP Age orb, §5.17)
 6. Copy and formatting
 7. Screens
 8. Journeys
 9. Accessibility
 10. Do not
 11. Deviations from the plan
+12. Inferred decisions and coverage gaps
+
+---
+
+## 0. Changelog v1 → v2
+
+v1 copied WHOOP's 2024-25 look from App Store frames and pre-redesign posts. v2 follows the app as members post it from October 2025 to October 2026 (48 dated captures and 3 screen recordings, README "Latest"). What changed, and the evidence:
+
+| # | Area | v1 | v2 | Evidence |
+|---|---|---|---|---|
+| C1 | Materials | Flat: no shadows, no rings, no translucency; "no glass" in Do not | A restrained glass system (§2.6): translucent blurred chrome (tab bar, rail, sidebar, floating action), opaque content cards with a 1 px top highlight. Content never turns to glass | Tab bar shows content through it [latest-home-collapsed-2], [latest-home-collapsed-3], [latest-tabbar-1]; card top hairline sampled `#2c2f34` over `#252a2d` [latest-recovery-1] |
+| C2 | Page ground | Gradient that scrolls with the page | Gradient fixed to the viewport, so the sticky header and the page share one ground | Header region reads `#242b32` → `#1d252a` in both scrolled and unscrolled states [latest-home-sticky-header-user-2025], [latest-home-collapsed-1] |
+| C3 | Home top bar | Demo chip, date pill, sync dot; solid fill | Collapsing header (§4.3): avatar, streak flame + count, `‹ TODAY ›` pill, sync status (WHOOP's band battery). It gains a row of mini Sleep / Recovery / Strain rings once the dials scroll away, and the avatar row hides on scroll down and returns on scroll up | [latest-home-sticky-header-user-2025], [latest-home-collapsing-1], [latest-home-collapsed-1..3], [latest-home-dashboard-1] |
+| C4 | Home day strip | DayStrip under the top bar | Removed from Home. Days change with the pill's chevrons and the top calendar; the DayStrip stays on Journal only | No current Home capture has a day strip [latest-home-top-1..3], [latest-home-pastday-1] |
+| C5 | Navigation, phone | Opaque pill, 4 items, `bg-muted/95` | Floating glass tab bar (4 destinations) plus a separate round glass action button on its right, as WHOOP's coach button. Tab roots only: detail screens show the round button alone | [latest-tabbar-1], [latest-home-top-1]; detail screens without a tab bar [latest-recovery-1], [latest-strain-1], [latest-activity-2] |
+| C6 | Navigation, tablet and laptop | shadcn Sidebar, opaque | The same glass material as a floating rail (tablet, 88 px) and floating sidebar (laptop, 232 px). **Inferred** (WHOOP has no desktop app) | Material from [latest-tabbar-1] |
+| C7 | Detail header | Title = metric name, date pill below | Recovery, Strain and Sleep: the title is the date ("TODAY", "MON, JUL 27"); the metric name lives in the dial. Monitors and Healthspan keep their name as title with the date switcher below | [latest-recovery-1], [latest-strain-1], [latest-sleep-1]; [latest-stress-monitor-1], [latest-whoop-age-amber-1] |
+| C8 | Calendar | Bottom sheet with shadcn Calendar | `CalendarPanel` (§5.16, built and committed): a flat, opaque panel that drops from the top edge over a 65 % black dim with no blur, month header `‹ MAY ›`, day numbers in band colours, legend bottom right. Flat, not glass, because that is what the May 2026 captures show | README "Calendar references" (May 2026); rows CAL1-CAL7 |
+| C9 | Info sheets | Bottom drawer / right sheet | Centred info card over an 85% dim with a close button and an outline action, on every width | [latest-popover-info-1] |
+| C10 | Edit sheets | Drawer, `rounded-t-2xl` | Drawer with 28 px top corners, a 1 px top highlight, white primary and outline secondary buttons, 56 px tall | [latest-sheet-edit-1], [latest-sheet-behaviors-1] |
+| C11 | Healthspan hero | Static ringed circle with a radial glow | Living WHOOP Age orb (§5.17): organic blob, particle field, inner rim glow, colour by years younger or older, entry and idle animation, pointer swirl | [latest-whoop-age-green-1], [latest-whoop-age-green-2], [latest-whoop-age-touch-frames], [latest-whoop-age-cyan-1], [latest-whoop-age-mixed-1], [latest-whoop-age-mixed-2], [latest-whoop-age-amber-1] |
+| C12 | Healthspan scroll | Static | The orb shrinks into a sticky header flanked by years younger and Pace of Aging | [latest-healthspan-collapsed-1] |
+| C13 | Health hub ground | Same as every page | Near-black ground with a teal glow at the top | Sampled `#0b3625` / `#112a2e` top centre over `#090909` edges [latest-health-tab-1], [latest-whoop-age-mixed-2] |
+| C14 | Stress gauge | 240° arc in three flat segments | 240° arc in one continuous gradient (blue → teal → green → yellow → orange), thin, with a white needle | [latest-stress-monitor-1] |
+| C15 | Home sections | Key statistics, weekly teaser at the bottom | Order and names follow WHOOP: monitors, My Day (outlook, activities, journal week, Tonight's sleep), My Dashboard (renamed from Key statistics), the week-in-review banner styled as WHOOP's "Your Day In Review" | [latest-home-top-1], [latest-home-collapsed-1], [latest-home-dashboard-1] |
+| C16 | Motion | Dial sweep only; sheets use library defaults | Adds the header collapse, tab press, sheet and calendar entrances, the orb, and tooltips that follow the pointer; still no page-load choreography (§2.7) | Collapse frames [latest-home-collapsing-1] → [latest-home-collapsed-1]; orb [latest-whoop-age-touch-frames] |
+| C17 | Skeletons | Each kit component exports a `.Skeleton` | Same, plus a rule set (§5.19): skeletons reuse the component's own box, so nothing moves when data arrives; the header and tab bar never skeleton | User review 2026-10-02 (plan U16) |
+| C18 | Radii | Cards 12, sheets 16, tab bar 22 | Cards 16, rows inside cards 10, chips 8, sheets 28, tab bar full | Card corners measured 16 pt on [latest-home-top-1]; sheet 28 pt on [latest-sheet-edit-1]; tab bar is a capsule [latest-tabbar-1] |
+
+Unchanged from v1 and still binding: the data colours and their single meanings (§2.3), the text tiers (§2.2), the faces and type roles (§3), the reason-code states (§4.9, §5.14), the copy rules (§6), every kit component's data behaviour (§5.2-5.15), the equal Home dials (D1), and every deviation row in §11.
 
 ---
 
 ## 1. Direction
 
-**Design read.** A personal health product UI (Impeccable mode: Operate) for one daily user, copying WHOOP's 2025 app: a dark slate ground, flat charcoal cards, white DIN-style numerals, uppercase tracked labels, and colour used only for data meaning. Bevel-only features (Energy Bank, Journal Insights) are drawn in WHOOP's language, not Bevel's light glass style.
+**Design read.** A personal health product UI (Impeccable mode: Operate) for one daily user, copying the current WHOOP app (iOS, 2025-26): a dark slate ground that stays put while content scrolls, opaque charcoal cards with a faint top light, translucent glass only on the chrome that floats over content, white DIN-style numerals, uppercase tracked labels, and colour used only for data meaning. One living moment per screen at most: the dial sweep, or the WHOOP Age orb.
 
 **Use scene.** Checked in bed in the morning and again at night, on a phone, often in a dark room; occasionally on a laptop at a desk. Dark is required by the scene and by WHOOP. There is no light theme.
 
@@ -41,194 +73,265 @@ Contents
 
 | Question | Decided by |
 |---|---|
-| Visual direction: palette, type character, layout, density, component look, copy voice | WHOOP references. Where the skills' taste rules disagree (uppercase labels, near-black ground, a full data palette), WHOOP wins |
-| Craft: spacing rhythm, states, motion, hit areas, contrast, focus, numerals, wrapping, reduced motion | The skills (`design-taste-frontend`, `frontend-design`, `impeccable`, `web-design-guidelines`, `make-interfaces-feel-better`, `better-ui`) |
-| Anything WHOOP does not show | Derived from the nearest WHOOP screen, never invented in a new style |
+| Look: palette, materials, type character, layout, density, component shape, copy voice | The `latest-*` references. Where the skills' taste rules disagree (uppercase labels, near-black ground, a full data palette, glass chrome), WHOOP wins |
+| Craft: spacing rhythm, states, motion curves, hit areas, contrast, focus, numerals, wrapping, reduced motion and transparency | The skills (`impeccable`, `better-ui`, `make-interfaces-feel-better`, `web-design-guidelines`, `frontend-design`, `design-taste-frontend`) |
+| Anything WHOOP does not show (laptop, tablet, Bevel-only features) | Extrapolated from the nearest WHOOP screen in the same material, marked inferred, never a new style |
 
-**Taste dials** (from `design-taste-frontend`, set for a dashboard rather than a landing page): `DESIGN_VARIANCE 3`, `MOTION_INTENSITY 3`, `VISUAL_DENSITY 6`. Symmetric, centred-hero detail screens; motion only for state; dense data in plain rows.
+**Taste dials** (`design-taste-frontend`, set for a product UI): `DESIGN_VARIANCE 3`, `MOTION_INTENSITY 4`, `VISUAL_DENSITY 6`. v1 had motion 3; the header collapse and the orb add one step, and nothing else moves without a cause.
 
-**Colour strategy.** Full palette for data (recovery green, yellow, red; strain blue; sleep steel blue; teal "optimal"; orange "attention"; stress light blue) on a restrained neutral ground. Each hue has one meaning everywhere. Chrome (nav, buttons, focus) is white and grey only.
+**Glass is a specific effect, not a style.** Impeccable's craft floor refuses "glass and blur as decoration". Here glass has one job: chrome that floats over scrolling content (tab bar, rail, sidebar, floating action) shows that the content continues underneath. Cards, rows, charts and dials are content and stay opaque. This is how the references draw it: content cards are solid [latest-home-top-1]; only the tab bar lets text show through [latest-home-collapsed-2].
 
-**Principles.**
+**Colour strategy.** Unchanged: a full palette for data (recovery green, yellow, red; strain blue; sleep steel blue; teal "optimal"; orange "attention"; stress light blue) on a restrained neutral ground. Chrome is white and grey only, with one exception taken from WHOOP: the round action button carries an indigo-to-blue rim [latest-tabbar-1].
 
-1. **The number is the hero.** Each detail screen opens on one dial and one number. Everything after it explains that number.
-2. **Colour is a data channel.** Never use a data colour for decoration, and never show a data colour without the word or number it encodes.
-3. **Three tiers of disclosure** (WHOOP): overview (Home dials), trends (detail screens), raw biometrics (rows, charts, sheets).
-4. **Honest states.** A score that cannot be computed says why, in plain words. No fake zeros.
-5. **One vocabulary.** The same row, card, chip, dial and sheet on every screen. If two screens draw the same thing differently, one is wrong.
+**Principles.** v1's five hold (the number is the hero; colour is a data channel; three tiers of disclosure; honest states; one vocabulary), plus:
+
+6. **Depth by layer, not by decoration.** Ground (fixed) → cards (opaque, top light) → chrome (glass) → overlays (dimmed). Each layer has one material (§2.6), and nothing skips a layer.
+7. **The header follows the content.** When the dials leave the screen, their state stays in the header as mini rings, so the day's three numbers are always one glance away.
+
+**Critique of the v1 build against the latest references** (Impeccable `critique`, heuristic pass). What v2 fixes, by severity:
+
+1. *High.* Wrong era of chrome: an opaque pill tab bar and a solid top bar with a Demo chip read as WHOOP 2024. The current app's identity lives in its chrome (glass bar, round action, collapsing header), so v1 looked "basic" even where the content matched (C1, C3, C5).
+2. *High.* State is lost on scroll: once the dials leave the screen, v1 shows no score until the user scrolls back. WHOOP keeps the three rings in the header (principle 7).
+3. *Medium.* Healthspan's hero is a static ring with a CSS glow; WHOOP's is the screen's one living object and changes colour with the result (C11). Without it the Health tab has no focal point.
+4. *Medium.* Explanations open as tall bottom sheets; WHOOP uses a compact centred card, faster to dismiss (C9).
+5. *Low.* Radii (12) and row heights (52) are a step tighter than the current app's 16 / 56, which makes v1 feel denser than WHOOP (C18, V11).
+6. *Low.* The Home day strip duplicates the pill's job and pushes the dials down (C4).
 
 ---
 
 ## 2. Tokens
 
-All tokens live in `src/app/globals.css` under `:root`, and are mapped in `@theme inline` so Tailwind classes exist for them (`bg-card`, `text-recovery-green`, `fill-strain`…). Components use the classes, never raw hex.
+All tokens live in `src/app/globals.css` under `:root` and are mapped in `@theme inline`, so Tailwind classes exist for them (`bg-card`, `text-recovery-green`, `bg-glass-bar`...). Components use the classes, never raw hex. The only new CSS beyond token definitions is the base-layer ground (§2.1) and the two fallback media blocks (§2.6), which redefine tokens and nothing else.
 
-Sampling method: dominant-colour and median probes with PIL on the full-resolution originals (`docs/design/reference/raw/sample.py`). The "Sampled" column gives the raw reading; "Token" gives the value shipped, which differs only where a contrast fix was needed (marked ◆).
+Sampling: dominant-colour and median probes with PIL on the full-resolution captures in `raw/` (`raw/sample.py`, and inline probes listed in the README). "Sampled" gives the reading; "Token" gives the value shipped (◆ = contrast fix or rounding).
 
 ### 2.1 Ground and surfaces
 
-| Token (CSS var) | Tailwind | Token value | Sampled from | Use |
+| Token (CSS var) | Tailwind | Value | Sampled from | Use |
 |---|---|---|---|---|
-| `--background-top` | `bg-background-top` | `#262e33` | `#262E33` top of [home-device-planner-nav], `#232C32` [trend-view-recovery], `#252C34` [health-tab] | Gradient start; sticky top bar fill |
-| `--background-mid` | (gradient stop only) | `#1b2024` | `#1B2024` at 267 px [home-device-planner-nav], `#1B2126` [recovery-detail] | Gradient stop at 270 px |
-| `--background` | `bg-background` | `#0f1113` | `#0F1113` at 733 px [home-device-planner-nav], `#101215` [trend-view-recovery] | Page ground below 740 px; manifest `background_color` |
-| `--card` | `bg-card` | `#2b2f32` | `#2E3135` [home-device-planner-nav] HM card, `#292D30` [activity-detail-zones] tiles, `#292E31` zone rows | Every card. Flat: no shadow, no ring (see §2.6) |
-| `--secondary` | `bg-secondary` | `#34393d` | `#323435` "Set alarm" button, `#2E3337` rows inside cards | Rows inside a card (activity rows), secondary buttons, selected toggle |
-| `--popover` | `bg-popover` | `#34393d` | `#32373D` to `#40474E` action menu | Popovers, dropdowns, tooltips |
-| `--accent` | `bg-accent` | `#34393d` | as secondary | Hover fill for rows and ghost buttons |
-| `--muted` | `bg-muted` | `#22282c` | `#1F272B` W/M/6M toggle track [trend-view-recovery], `#1D2328` floating tab bar | Skeletons, toggle-group track, tab bar pill |
-| `--inset` | `bg-inset` | `#0c0f11` | `#090C0D` legend inset [recovery-detail], `#111619` insight card fill | Legend strips and insight-card fill: darker than the card they sit in |
-| `--border` | `border-border` | `rgb(255 255 255 / 0.1)` | `#393E40` divider on `#24292C` [recovery-detail] (white about 10%) | Row dividers, input outlines, sheet edges |
-| `--input` | `border-input` | `rgb(255 255 255 / 0.15)` | derived | Input outlines |
-| `--sidebar` | `bg-sidebar` | `#14181b` | derived: one step below `--background-mid` | Sidebar column (≥ 768 px) |
-| `--sidebar-accent` | `bg-sidebar-accent` | `#2b2f32` | = card | Active sidebar item |
-| `--sidebar-border` | `border-sidebar-border` | `rgb(255 255 255 / 0.08)` | derived | Sidebar edge |
+| `--background-top` | `bg-background-top` | `#262e33` | v1; `#242b32` at the top of [latest-home-sticky-header-user-2025] | Ground gradient start |
+| `--background-mid` | (gradient stop) | `#1b2024` | v1; `#1d252a` at 150 pt [latest-home-sticky-header-user-2025] | Ground stop at 270 px |
+| `--background` | `bg-background` | `#0f1113` | v1 | Ground below 740 px; manifest `background_color` |
+| `--ground` | `bg-(image:--ground)` | `linear-gradient(180deg, var(--background-top) 0, var(--background-mid) 270px, var(--background) 740px)` | as v1 | The fixed page ground and the header fill (§4.3) |
+| `--ground-health` | `bg-(image:--ground-health)` | `radial-gradient(120% 55% at 50% 0, #0f2c2a 0, transparent 70%), linear-gradient(180deg, #0a0b0c 0, #14171c 60%)` | `#0b3625` / `#112a2e` top centre, `#090909` → `#14171c` edges [latest-health-tab-1], [latest-whoop-age-mixed-2] | Health hub ground (C13) |
+| `--ground-healthspan` | `bg-ground-healthspan` | `#050607` | `#000000` around the orb [latest-whoop-age-amber-1], `#101518` lower [latest-healthspan-collapsed-1] ◆ (not pure black) | Healthspan detail ground |
+| `--card` | `bg-card` | `#2b2f32` | v1; `#2b2e33` Daily Outlook, `#2c3236` activities card [latest-home-sticky-header-user-2025] | Every card |
+| `--card-top` | `from-card-top` | `#2f3337` | `#2c2f34` top hairline over `#252a2d` body [latest-recovery-1]; cards lighten 2-4 % toward their top edge | Top stop of the card's vertical gradient (§2.6) |
+| `--secondary` | `bg-secondary` | `#3b4244` ◆ | `#3b4244` activity rows inside the activities card [latest-home-sticky-header-user-2025] (v1 `#34393d`) | Rows inside a card, secondary buttons, selected toggle |
+| `--popover` | `bg-popover` | `#252c32` | `#2a373f` → `#1a2129` info card gradient [latest-popover-info-1] | Info cards, dropdowns, tooltips (solid part of §2.6 "overlay") |
+| `--accent` | `bg-accent` | `#41484b` | one step above secondary | Hover fill for rows and ghost buttons |
+| `--muted` | `bg-muted` | `#22282c` | v1 | Skeletons, toggle-group track |
+| `--inset` | `bg-inset` | `#111619` | `#111619` insight card fill [latest-sleep-1] (v1 `#0c0f11`) | Legend strips, insight-card fill |
+| `--sheet` | `bg-sheet` | `#14181c` | `#14181c` → `#0f1316` edit sheet [latest-sheet-edit-1] | Bottom sheets and the right sheet |
+| `--sheet-bottom` | `to-sheet-bottom` | `#0f1316` | same | Sheet gradient end |
+| `--border` | `border-border` | `rgb(255 255 255 / 0.1)` | v1 | Row dividers, input outlines |
+| `--input` | `border-input` | `rgb(255 255 255 / 0.15)` | v1 | Input outlines |
+| `--field` | `bg-field` | `#32393e` | `#32393e` time fields [latest-sheet-edit-1] | Inputs and read-only value fields in sheets |
 
-The body ground is `linear-gradient(180deg, var(--background-top) 0, var(--background-mid) 270px, var(--background) 740px) no-repeat, var(--background)`, set once in the base layer. It scrolls with the page (WHOOP's gradient is anchored to the top of the screen). No component sets its own page background.
+**Ground.** The base layer paints `html { background: var(--background) }` and `body::before { content: ""; position: fixed; inset: 0; z-index: -1; background: var(--ground) }`. It no longer scrolls with the page (C2): in every current capture the top of the screen has the same slate whether the page is at rest or scrolled [latest-home-top-1], [latest-home-collapsed-3]. `position: fixed` on a pseudo-element works on iOS Safari, where `background-attachment: fixed` does not. The Health hub and Healthspan swap the ground through a `data-ground="health" | "healthspan"` attribute on `<main>`, which PageShell / DetailShell set; the base layer maps the attribute to `--ground-health` / `--ground-healthspan`. That is the only page-level background switch.
 
 ### 2.2 Text tiers
+
+Unchanged from v1 (values and contrast checks hold on the v2 surfaces; `--secondary` rows at `#3b4244` give `--foreground` 10.8 : 1 and `--muted-foreground` 4.6 : 1).
 
 | Token | Tailwind | Value | Sampled | Contrast on `--card` / on `--background-top` | Use |
 |---|---|---|---|---|---|
 | `--foreground` | `text-foreground` | `#ffffff` | `#FCFCFC` row labels and body [recovery-detail], [trend-view-recovery] | 13.5 / 13.8 | Numbers, titles, labels, body |
 | `--foreground-secondary` | `text-foreground-secondary` | `#babac0` | `#BABAC0` "Recommended bedtime", `#B4B4B4` "vs. prior 30 days", `#C0C0C0` "5/5 Metrics" | 7.0 / 7.2 | Supporting lines under a value, times in activity rows |
-| `--muted-foreground` ◆ | `text-muted-foreground` | `#999ea3` | `#8A9090` WHOOP's grey body and "Refreshed daily" | 5.0 / 5.1 (sampled grey was 4.2 on cards) | Captions, 30-day averages, axis ticks, placeholders |
+| `--muted-foreground` ◆ | `text-muted-foreground` | `#999ea3` | `#8A9090` WHOOP's grey body and "Refreshed daily"; `#888d92` header battery % [latest-home-sticky-header-user-2025] | 5.0 / 5.1 (sampled grey was 4.2 on cards) | Captions, 30-day averages, axis ticks, placeholders, header sync text |
 | `--primary-foreground` | `text-primary-foreground` | `#0f1113` | derived | 18.9 on white | Text on white primary buttons |
 
 `#5A5A60` (WHOOP's chart axis grey) is **not** a text token: at 2.0 : 1 it fails. Axis ticks use `--muted-foreground`.
 
 ### 2.3 Data colours
 
+Every v1 data token is unchanged in value and meaning (recovery green / yellow / red and the red text variant, strain, strain text, strain deep, sleep, sleep deep, optimal, warning, the three stress levels, coach, insight hairline, banner gradient, dial track, dial target, destructive, hypnogram stages, the chart variables and the band rules for Energy Bank, Health Monitor and training load). The current app still uses the same hues: recovery ring `#19ec06`-family green [latest-recovery-1], strain `#0093e7`-family blue [latest-strain-1], sleep steel blue [latest-sleep-1], `#00ec9c` "years younger" = `--optimal` [latest-whoop-age-green-2].
+
 | Token | Tailwind | Value | Sampled | Meaning (and only this meaning) |
 |---|---|---|---|---|
 | `--recovery-green` | `*-recovery-green` | `#19ec06` | `#19EC06` ring [recovery-detail], `#19EB06` dots [trend-view-recovery] | Recovery ≥ 67. Energy ≥ 67 |
-| `--recovery-yellow` | `*-recovery-yellow` | `#ffde00` | `#FEDD00` [trend-view-recovery] | Recovery 34-66. Energy 34-66 |
+| `--recovery-yellow` | `*-recovery-yellow` | `#ffde00` | `#FEDD00` [trend-view-recovery]; `#fcd855` mini ring [latest-home-sticky-header-user-2025] | Recovery 34-66. Energy 34-66 |
 | `--recovery-red` | `*-recovery-red` | `#ff0026` | `#FE0025` [trend-view-recovery] | Recovery ≤ 33. Energy ≤ 33. Fills and rings only |
 | `--recovery-red-text` ◆ | `text-recovery-red-text` | `#ff5a6a` | derived (red lifted to 4.5 : 1 on cards) | The word "Red" and red values set as text |
 | `--strain` | `*-strain` | `#0093e7` | `#0093E7` ring [strain-detail], `#0092E7` [home-dials] | Strain fill, HR line and area |
 | `--strain-text` ◆ | `text-strain-text` | `#1fa0f0` | derived (4.7 : 1 on cards) | Strain values as text below 24 px |
 | `--strain-deep` | `bg-strain-deep` | `#0d48be` | `#0D48BE` activity chip [home-device-today] | Activity chip fill, workout spans in charts (25%) |
-| `--sleep` | `*-sleep` | `#7ba1bb` | `#7BA1BB` ring [sleep-detail], `#7BA0BB` [home-dials] | Sleep performance fill |
+| `--sleep` | `*-sleep` | `#7ba1bb` | `#7BA1BB` ring [sleep-detail]; `#7d9aa9` mini ring [latest-home-sticky-header-user-2025] | Sleep performance fill |
 | `--sleep-deep` | `bg-sleep-deep` | `#39597b` | `#39597B` sleep chip [home-device-today] | Sleep and nap chip fill, sleep spans in charts (15%) |
-| `--optimal` | `*-optimal` | `#00f19f` | `#00F19F` "optimal" bars [sleep-detail], "helps" bars [journal-insights], `#02FEAD` range chips [health-monitor] | Good: in range, helps, optimal, positive delta, improving |
+| `--optimal` | `*-optimal` | `#00f19f` | `#00F19F` "optimal" bars [sleep-detail]; `#00ec9c` "years younger" [latest-whoop-age-green-2] | Good: in range, helps, optimal, positive delta, improving, years younger |
 | `--warning` | `*-warning` | `#ffa722` | `#FFA722` "poor" bars, "hurts" bars, `#FEA622` high stress | Attention: out of range, hurts, poor, negative delta |
 | `--stress-low` | `*-stress-low` | `#67aee6` | `#67AEE5` [stress-scale] | Stress < 1.0 |
 | `--stress-medium` | `*-stress-medium` | `#00f19f` | `#00F09E` [stress-scale] | Stress 1.0-1.9 |
 | `--stress-high` | `*-stress-high` | `#ffa722` | `#FEA622` [stress-scale] | Stress ≥ 2.0 |
-| `--coach` | `text-coach` | `#7095fe` | `#7095FE` "Break down my Recovery" link [recovery-detail] | Insight-card links only |
-| `--insight-from` → `--insight-to` | `from-insight-from to-insight-to` | `#4b418c` → `#346e8c` | `#4B418C` / `#346E8C` insight hairline [recovery-detail] | The 1 px gradient hairline of `InsightCard` |
-| `--banner-from` → `--banner-to` | `from-banner-from to-banner-to` | `#2e2c4f` → `#2b3f50` | `#2E2C4F` / `#2B3F50` "Your Day in Review" banner [home-device-planner-nav] | The report teaser banner |
-| `--dial-track` | `fill-dial-track` | `#33383c` | `#33383C` [home-dials] | Unfilled dial track, empty meter ticks |
+| `--coach` | `text-coach` | `#7095fe` | `#7095FE` "Break down my Recovery" link [recovery-detail]; same blue "EXPLORE YOUR RECOVERY INSIGHTS" [latest-recovery-1] | Insight-card links only |
+| `--insight-from` → `--insight-to` | `from-insight-from to-insight-to` | `#4b418c` → `#346e8c` | `#4B418C` / `#346E8C` insight hairline [recovery-detail]; `#111231` → `#111717` edge [latest-sleep-1] | The 1 px gradient hairline of `InsightCard` |
+| `--banner-from` → `--banner-to` | `from-banner-from to-banner-to` | `#2e2c4f` → `#2b3f50` | `#2E2C4F` / `#2B3F50` "Your Day in Review" banner [home-device-planner-nav], unchanged in [latest-home-top-1] | The week-in-review banner |
+| `--outlook-from` → `--outlook-to` | `from-outlook-from to-outlook-to` | `#6a5a45` → `#2f4a5e` | warm-to-steel gradient of "Your Daily Outlook" [latest-home-collapsing-1] | The Daily Outlook row on Home (morning variant) |
+| `--dial-track` | `fill-dial-track` | `#33383c` | `#33383C` [home-dials]; `#31393b` mini ring track [latest-home-sticky-header-user-2025] | Unfilled dial track, empty meter ticks, mini ring track |
 | `--dial-target` | `fill-dial-target` | `#5a5e61` | `#5A5E61` strain target arc [home-dials] | Strain Target range on the dial track |
 | `--destructive` | `*-destructive` | `#ff0026` | = recovery red | Destructive buttons and form errors (text uses `--recovery-red-text`) |
 
-**Energy Bank** has no hue of its own: its value is banded exactly like Recovery (≥ 67 green, 34-66 yellow, ≤ 33 red), as Bevel's battery changes colour by level. This keeps green, yellow and red meaning "readiness" everywhere.
+**Unchanged rules from v1:** Energy Bank bands like Recovery; Health Monitor in range `--optimal`, out of range `--warning`, illness `--recovery-red`; training load 0.8-1.3 optimal, 1.3-1.5 warning, > 1.5 red, < 0.8 muted; hypnogram lanes `--stage-awake #e6edf2`, `--stage-rem #a6c3d7`, `--stage-light #7ba1bb`, `--stage-deep #48708c`; chart variables `--chart-1` … `--chart-5`, `--chart-grid`, `--chart-band`, `--chart-cursor` as v1.
 
-**Health Monitor statuses** follow WHOOP's support article: in range = `--optimal`, out of range = `--warning`, illness signal = `--recovery-red` (with `--recovery-red-text` for words).
+**WHOOP Age orb palette (new).** Four hue stops, each a rim / glow / particle / text quadruple, interpolated by §5.17's rule. Sampled across the radius of each capture:
 
-**Training load** status: 0.8-1.3 `--optimal`, 1.3-1.5 `--warning`, > 1.5 `--recovery-red`, < 0.8 `--muted-foreground` (detraining is not alarming).
+| Stop | `--orb-*-rim` | `--orb-*-glow` | `--orb-*-particle` | `--orb-*-text` | Sampled from |
+|---|---|---|---|---|---|
+| `green` (≥ 3 years younger) | `#21c76b` | `#13733d` | `#80f0c0` | `#00ec9c` (= `--optimal`) | rim `#21c76b` 2 px, glow `#13733d` → black at 46 % of the radius, particle cores `#80f0c0`, soft particles `#58c090` [latest-whoop-age-green-2] |
+| `cyan` (about the same age) | `#75cadf` | `#2a5462` | `#9cc8f0` | `#7cc8e8` | rim `#75cadf`, glow `#2a5462` → `#1b343b` [latest-whoop-age-cyan-1] |
+| `ice` (cool half of a mixed orb) | `#5f8fb8` | `#305070` | `#a0c0e0` | `#c0d8e0` | top third `#306080` / `#305070`, particles `#a0c0e0`, text `#c0d8e0` [latest-whoop-age-mixed-2] |
+| `amber` (≥ 2.5 years older) | `#c98a2a` ◆ | `#895315` | `#f0c070` | `#e0b080` | rim `#895315`-`#93640a` (lifted for a visible 2 px edge), glow → black at 55 % of the radius, particles `#f0c070` [latest-whoop-age-amber-1] |
 
-**Hypnogram lanes** (derived, no WHOOP capture): a sleep-blue ramp, lighter for lighter sleep. `--stage-awake #e6edf2`, `--stage-rem #a6c3d7`, `--stage-light #7ba1bb`, `--stage-deep #48708c`.
-
-**Chart variables** (shadcn names, used by `ChartConfig` keys):
-
-| Var | Value | Default series |
-|---|---|---|
-| `--chart-1` | `#0093e7` | strain, CTL (fitness), HR |
-| `--chart-2` | `#00f19f` | optimal, TSB (form) |
-| `--chart-3` | `#7ba1bb` | sleep, sleep debt |
-| `--chart-4` | `#ffa722` | warning, ATL (fatigue) |
-| `--chart-5` | `#67aee6` | stress low, secondary line |
-| `--chart-grid` | `rgb(255 255 255 / 0.08)` | `CartesianGrid` stroke (sampled `#31373C` on `#1A2126`) |
-| `--chart-band` | `rgb(255 255 255 / 0.05)` | Baseline band, HR zone bands |
-| `--chart-cursor` | `rgb(255 255 255 / 0.4)` | Tooltip cursor line, "now" line |
+These eight tokens per stop are used only by `WhoopAgeOrb` and its mini variant. They are data colours: they encode years younger or older and nothing else.
 
 ### 2.4 Radii
 
-Explicit scale in `@theme inline` (shadcn's multiplier scale is replaced):
+Explicit scale in `@theme inline` (shadcn's multiplier scale stays replaced):
 
-| Token | Value | Use |
-|---|---|---|
-| `rounded-sm` | 4 px | Meter segments, legend swatches |
-| `rounded-md` | 6 px | Activity chips, badges inside rows |
-| `rounded-lg` | 8 px | Rows inside cards, buttons, inputs, toggle items |
-| `rounded-xl` | 12 px | Cards, alerts, banners, insight cards (measured 12 pt on [home-device-planner-nav]) |
-| `rounded-2xl` | 16 px | Sheets (top corners), popovers |
-| `rounded-[22px]` | 22 px | The floating tab bar pill only |
-| `rounded-full` | pill | Date switcher pill, tags, dials, dots |
+| Token | Value | Use | Evidence |
+|---|---|---|---|
+| `rounded-sm` | 4 px | Meter segments, legend swatches | v1 |
+| `rounded-md` | 8 px | Status chips, activity chips' inner badge | chips [latest-health-monitor-1] |
+| `rounded-lg` | 10 px | Rows inside cards (activity rows, zone rows), inputs, fields | activity rows 10 pt inside a 16 pt card with a 6 pt inset [latest-home-collapsed-1] |
+| `rounded-xl` | 12 px | Buttons inside cards and sheets, segmented tracks | "ADD ACTIVITY" button [latest-home-collapsed-1] |
+| `rounded-2xl` | 16 px | Cards, alerts, banners, insight cards | 16 pt measured on [latest-home-top-1] (v1 12) |
+| `rounded-3xl` | 24 px | Info card | [latest-popover-info-1] |
+| `rounded-[28px]` | 28 px | Sheet top corners, the top calendar panel's bottom corners, the laptop sidebar | [latest-sheet-edit-1]; panel corners inferred to match |
+| `rounded-full` | pill | Tab bar, rail items, date pill, streak pill, tags, dials, dots, primary buttons in sheets | [latest-tabbar-1], [latest-sheet-edit-1] |
 
-Concentric rule: a row inset 4 px inside a 12 px card is 8 px (`rounded-lg`); a 1 px gradient hairline around an `rounded-xl` card has an inner `rounded-[11px]`. Rows inset 16 px are separate surfaces and keep 8 px.
+Concentric rule: a row inset 6 px inside a 16 px card is 10 px (`rounded-lg`); a 1 px gradient hairline around a `rounded-2xl` card has an inner `rounded-[15px]`; the tab bar's active lens inset 4 px inside a 31 px half-height capsule is `rounded-full`. Surfaces inset more than 16 px are separate and keep their own radius.
 
 ### 2.5 Spacing and layout metrics
 
-Tailwind's 4 px scale. Measured on the device captures at 3×.
+Tailwind's 4 px scale. Measured on the device captures (1 pt = 1 CSS px at 390).
 
-| Metric | Phone < 768 | Tablet 768-1279 | Laptop ≥ 1280 |
-|---|---|---|---|
-| Page gutter | 16 px (`px-4`, measured 16 pt) | 24 px (`px-6`) | 32 px (`px-8`) |
-| Content max width | full | 720 px centred (WHOOP iPad column) | 1200 px |
-| Card padding | 16 px (`p-4`) | 16 px | 20 px (`xl:p-5`) |
-| Gap between cards in a group | 12 px (`gap-3`, measured 13 pt) | 12 px | 16 px (`xl:gap-4`) |
-| Section gap (title block to title block) | 32 px (`space-y-8`) | 32 px | 40 px |
-| Section title to its content | 12 px (`mb-3`) | 12 px | 16 px |
-| List row height | 52 px (measured 52.5 pt) | 52 px | 52 px |
-| Activity row height | 56 px | 56 px | 56 px |
-| Top bar | 52 px + `env(safe-area-inset-top)` | 56 px | 56 px |
-| Bottom tab bar | 64 px pill, inset 12 px, above `max(env(safe-area-inset-bottom), 12px)` | none | none |
-| Minimum hit area | 44 × 44 px | 44 × 44 | 40 × 40 (pointer) but keep 44 where cheap |
+| Metric | Phone < 768 | Tablet 768-1279 | Laptop ≥ 1280 | Evidence |
+|---|---|---|---|---|
+| Page gutter | 16 px (`px-4`) | 24 px | 32 px | v1, unchanged in [latest-home-top-1] |
+| Content max width | full | 720 px centred in the space right of the rail | 1120 px | v1 |
+| Card padding | 16 px (`p-4`) | 16 px | 20 px (`xl:p-5`) | v1 |
+| Gap between cards in a group | 12 px | 12 px | 16 px | v1 |
+| Section gap | 32 px | 32 px | 40 px | v1 |
+| List row height | 56 px | 56 px | 56 px | dashboard rows 56 pt [latest-home-dashboard-1] (v1 52) |
+| Activity row height | 56 px | 56 px | 56 px | v1 |
+| Home header, top row | 44 px + `env(safe-area-inset-top)` | 52 px | 52 px | [latest-home-sticky-header-user-2025] |
+| Home header, ring row | 40 px | 40 px | 40 px | same |
+| Header bottom fade | 24 px | 24 px | 24 px | same ("My Day" fades over about 24 pt) |
+| Detail header | 52 px + safe area | 56 px | 56 px | [latest-recovery-1] |
+| Tab bar | 62 px capsule, inset 12 px from the left, `bottom = max(env(safe-area-inset-bottom) - 6px, 12px)` | n/a | n/a | 62 pt tall, bottom edge 29 pt above the screen bottom [latest-tabbar-1] |
+| Round action button | 62 px circle, 8 px right of the tab bar, 12 px from the right edge | 56 px, bottom-right, 24 px insets | 56 px, bottom-right, 32 px insets | [latest-tabbar-1]; larger widths inferred |
+| Rail (tablet) | n/a | 88 px wide, floating, 12 px from the top, left and bottom | n/a | inferred |
+| Sidebar (laptop) | n/a | n/a | 232 px wide, floating, 12 px insets | inferred |
+| Minimum hit area | 44 × 44 px | 44 × 44 | 40 × 40, keep 44 where cheap | v1 |
+| Content bottom padding | `calc(62px + max(env(safe-area-inset-bottom) - 6px, 12px) + 24px)` on tab roots; `calc(62px + 24px + env(safe-area-inset-bottom))` on detail screens (round button) | 96 px | 40 px | derived |
 
-### 2.6 Elevation
+### 2.6 Materials and depth (the glass system)
 
-WHOOP is flat. Depth comes from surface steps (`background` → `card` → `secondary`), not shadows.
+Five materials. Each surface uses exactly one, named here and as a utility recipe. **Liquid Glass is Apple's native material; there is no web package.** This is a labelled web approximation, matched to what the references show of WHOOP's dark glass: a dark, nearly opaque fill, a soft but legible show-through, a bright top edge and a dark lower edge.
 
-- **Cards:** no shadow and no ring. shadcn `Card` ships `ring-1 ring-foreground/10`; every Pulse card passes `ring-0`. Measured: WHOOP cards have no edge line (edge pixels go straight from ground to fill).
-- **Exceptions with a hairline:** `InsightCard` (1 px gradient), selected rows (`ring-1 ring-foreground/60`), Health Monitor vital tiles when out of range (`ring-1 ring-warning/50`).
-- **Overlays** (popover, dropdown, sheet, drawer, dialog): `shadow-[0_12px_32px_rgb(0_0_0/0.5)]` plus `ring-1 ring-border`. In dark mode the ring does the visible work.
-- **Glow:** one only, the Healthspan orb (§7.8): `bg-radial from-optimal/35 via-optimal/10 to-transparent`. No other glows, no neon, no coloured shadows.
+**Measured.** Tab bar over the Home page [latest-tabbar-1]: fill `#20252b` at the top edge → `#181d21` at the bottom (a vertical gradient, lighter on top); a 1 px top edge `#22252b`; a dark band `#0a090c` under the lower edge (the shadow). Text behind the bar stays recognisable but soft ("Upload lab tests and connect your..." through the bar in [latest-home-collapsed-3]), which puts the fill near 80 % opacity with a small blur. Round button: fill `#232735` → `#1e2333`, rim `#2e3053` (indigo, upper left) to `#4c94db` (blue, lower right), inner icon ring `#7778dd`. Active tab: a lighter pool `#2d3238` against `#181d21` under the active item. Alpha and blur cannot be measured from a still; the values below are fitted to the show-through and marked inferred where they are.
+
+| Token | Value | Notes |
+|---|---|---|
+| `--glass-top` | `rgb(34 39 45 / 0.80)` | sampled `#20252b` plus show-through; alpha inferred |
+| `--glass-bottom` | `rgb(22 27 31 / 0.88)` | sampled `#181d21`; alpha inferred |
+| `--glass-edge` | `rgb(255 255 255 / 0.10)` | top highlight (sampled `#22252b` on `#20252b` plus the rim visible on the round button) |
+| `--glass-rim` | `rgb(255 255 255 / 0.06)` | 1 px ring around the whole capsule |
+| `--glass-lens` | `rgb(255 255 255 / 0.07)` | active tab pool, sampled `#2d3238` over `#181d21` |
+| `--glass-shadow` | `0 10px 30px rgb(0 0 0 / 0.5), 0 2px 6px rgb(0 0 0 / 0.35)` | the dark lower band |
+| `--glass-action-top` → `--glass-action-bottom` | `rgb(35 39 53 / 0.82)` → `rgb(30 35 51 / 0.9)` | sampled `#232735` → `#1e2333` |
+| `--action-rim-from` → `--action-rim-to` | `#7778dd` → `#4c94db` | sampled rim and icon ring |
+| `--dim` | `rgb(0 0 0 / 0.65)` | calendar dim, as built `bg-black/65` (README calendar findings) |
+| `--dim-strong` | `rgb(0 0 0 / 0.85)` | info card and sheet dim: `#020204` over the dark page [latest-popover-info-1], `#040505` [latest-sheet-edit-1] |
+| `--card-edge` | `rgb(255 255 255 / 0.06)` | card top hairline, sampled `#2c2f34` over `#252a2d` [latest-recovery-1] |
+| `--sheet-edge` | `rgb(255 255 255 / 0.14)` | sheet top hairline, sampled `#4e565a` [latest-sheet-edit-1]; coach sheet `#535760` [latest-coach-sheet-1] |
+
+Blur radii use Tailwind's scale: `backdrop-blur-md` = 12 px, `backdrop-blur-xl` = 24 px.
+
+| Material | Used by | Utility recipe |
+|---|---|---|
+| **Ground** | page | §2.1, fixed, opaque |
+| **Card** (opaque) | cards, banners, monitor cards, chart cards | `rounded-2xl bg-linear-to-b from-card-top to-card shadow-[inset_0_1px_0_var(--card-edge)]` (no ring, no drop shadow: cards sit on the ground) |
+| **Glass bar** | tab bar, rail, sidebar, floating action | `bg-linear-to-b from-glass-top to-glass-bottom backdrop-blur-md backdrop-saturate-150 shadow-(--glass-shadow) ring-1 ring-(--glass-rim) [box-shadow:inset_0_1px_0_var(--glass-edge),var(--glass-shadow)]` |
+| **Flat panel** (opaque) | the top calendar panel (§5.16), the header sync popover | calendar as built: `bg-background-mid border-b-[1.5px] border-background-top` over `bg-black/65` with no blur (README calendar: fill about `#1a2129`, a lighter 1.3 pt band along the bottom edge, no blur on the dim). Sync popover: `rounded-2xl bg-popover ring-1 ring-white/8` |
+| **Overlay** (opaque) | info card, bottom sheet, right sheet, dropdowns, tooltips | info card `rounded-3xl bg-linear-to-b from-[#2a373f] to-popover ring-1 ring-white/8`; sheet `bg-linear-to-b from-sheet to-sheet-bottom shadow-[inset_0_1px_0_var(--sheet-edge)]`; tooltip `rounded-xl bg-popover ring-1 ring-white/10 shadow-[0_8px_24px_rgb(0_0_0/0.45)]` |
+
+Write the arbitrary box-shadow once per material inside the component's `cva` base, never per call site.
+
+**Fallbacks** (token redefinitions only; the recipes do not change):
+
+```css
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  :root { --glass-top: #22272d; --glass-bottom: #181d21; --glass-action-top: #232735; --glass-action-bottom: #1e2333; }
+}
+@media (prefers-reduced-transparency: reduce) {
+  :root { --glass-top: #22272d; --glass-bottom: #181d21; --glass-action-top: #232735; --glass-action-bottom: #1e2333;
+          --dim: rgb(0 0 0 / 0.8); }
+}
+```
+
+With opaque glass tokens the blur has nothing to show and the bar reads as the sampled solid colours. Contrast never depends on the blur: tab labels are checked against the opaque `#181d21` (white 15.6 : 1, `--muted-foreground` 6.0 : 1). Add `@custom-variant reduced-transparency (@media (prefers-reduced-transparency: reduce))` so components that also blur content (none in v2) could opt out.
+
+**Depth order (z-index).** Ground `-z-10` (the pseudo-element), content `z-0`, sticky headers `z-20`, glass bar and floating action `z-30`, overlays including the calendar panel `z-50` (Radix / shadcn), toasts: Sonner default. Nothing else sets `z-*`.
+
+**Glow.** One family only: the WHOOP Age orb's inner rim glow (§5.17), drawn in its canvas. The v1 CSS radial glow on the Healthspan orb is retired. No other glows, no neon, no coloured drop shadows.
 
 ### 2.7 Motion
 
 | Token | Value | Use |
 |---|---|---|
-| `ease-standard` | `cubic-bezier(0.2, 0, 0, 1)` (in `@theme`) | All CSS transitions |
-| Fast | 150 ms | Hover, press, colour, focus ring |
-| Base | 200 ms | Sheet and sidebar width (shadcn default), toggle thumb |
-| Dial fill | 700 ms, Recharts `animationEasing="ease-out"` | `ScoreDial` sweep on first mount and on day change |
-| Chart draw | 500 ms, `ease-out` | Recharts series on first mount |
-| Press | `active:scale-[0.96]`, 150 ms | Buttons, dials, chips, tab items. Not rows (rows use `active:bg-accent`) |
+| `--ease-standard` | `cubic-bezier(0.2, 0, 0, 1)` | Every interactive CSS transition (hover, press, colour, lens move) |
+| `--ease-out-expo` | `cubic-bezier(0.16, 1, 0.3, 1)` | Arrivals: header ring row, sheets, info card, orb entry |
+| `--ease-in-quick` | `cubic-bezier(0.4, 0, 1, 1)` | Exits |
+| Fast | 150 ms | Hover, press, colour, focus ring, tab lens |
+| Base | 220 ms | Header ring row in and out, top row slide, toggle thumb |
+| Overlay in / out | 320 ms / 200 ms | Sheet, info card (the calendar keeps its built 200 ms, §5.16) |
+| Dial fill | 700 ms, Recharts `animationEasing="ease-out"` | `ScoreDial` sweep (unchanged) |
+| Mini ring fill | 500 ms | First appearance of the ring row only |
+| Chart draw | 500 ms | Recharts series on first mount (unchanged) |
+| Orb entry | 1100 ms | §5.17 |
+| Press | `active:scale-[0.96]`, 150 ms | Buttons, dials, chips, tab items, the round action, the date pill's segments. Rows use `active:bg-accent` |
+
+**Motion thesis** (Impeccable): the focal moment is the WHOOP Age orb on Health and Healthspan, and the dial sweep on Home and the score details. Continuity: the dials hand their state to the header's mini rings; the calendar comes from the pill that opened it. Feedback: press scale and the tab lens. Nothing else moves.
+
+| Interaction | Spec | Evidence |
+|---|---|---|
+| Header collapse | §4.3: ring row fades in (`opacity 0 → 1`) and rises 6 px, 220 ms `--ease-out-expo`; mini rings fill 0 → value in 500 ms the first time they appear in a page view, instantly afterwards | Mid-collapse frame [latest-home-collapsing-1] shows rings already filled under a still-visible top row |
+| Top row hide / show | `translate-y-[-100%]` + `opacity-0`, 220 ms; shows on any upward scroll of 8 px or more | [latest-home-collapsed-2] (hidden) vs [latest-home-collapsed-3] (shown, deep in the page). Thresholds inferred |
+| Tab change | Active lens slides between items: a single absolutely positioned lens with `transition-[translate,width] duration-150 ease-standard`; icon and label colour cross-fade 150 ms | Lens [latest-tabbar-1]; movement inferred |
+| Calendar open | As built (§5.16): slides down 200 ms `ease-standard` (tw-animate `slide-in-from-top`), the dim fades; reduced motion: appears at once (CAL7) | Opens from the top (user; README) |
+| Sheet open | vaul default spring kept; the dim uses `--dim-strong` | [latest-sheet-edit-1] |
+| Info card open | `opacity 0 → 1`, `scale 0.96 → 1`, `blur(4px) → 0`, 320 ms `--ease-out-expo`; close 200 ms, no blur | [latest-popover-info-1]; timing inferred |
+| Day change | Content swaps with no slide; the dials re-sweep from their previous value (700 ms); the date pill label cross-fades 150 ms | Screen recording of day stepping [latest-home-top-1] source video: content swaps between frames with no transition |
+| Loading a past day | The pill label shows a 16 px spinner in place of the date until data arrives (the one spinner in the app); content below keeps the previous day dimmed to 60 % until replaced | [latest-home-pastday-1] (spinner where the pill sits, streak hidden) |
+| Hover (pointer devices) | Rows and cards: `hover:bg-accent` / card `hover:from-[#33383c]`, 150 ms; never lift or move | v1 rule |
+| Chart tooltip | Appears at the pointer, follows it, snaps to the nearest point, clamps inside the plot; no position animation (`isAnimationActive={false}` on `Tooltip`, `animationDuration={0}`); touch: tap or drag to scrub | Plan U16; WHOOP scrub cursor [latest-trends-2] |
+| Dial sweep, chart draw | unchanged | v1 |
 
 Rules:
 
-- Transitions name their properties (`transition-[background-color,color]`, `transition-transform`). Never `transition-all`.
-- No page-load choreography, no staggered section entrances, no counting-up numbers. The dial sweep is the one authored moment.
-- `prefers-reduced-motion: reduce`: every Recharts series gets `isAnimationActive={false}` (read with a `useReducedMotion` hook in the chart wrapper); the base layer in `globals.css` collapses CSS animation and transition durations; skeleton pulse stops.
-- Sheets use vaul and Radix defaults; do not restyle their motion.
+- Transitions name their properties (`transition-[opacity,translate]`, `transition-transform`). Never `transition-all`.
+- No page-load choreography, no staggered section entrances, no counting-up numbers.
+- No `window.addEventListener("scroll")` for the header: §4.3 uses two `IntersectionObserver` sentinels plus one passive `scroll` listener read through `requestAnimationFrame` for direction only, writing a `data-*` attribute, never React state per frame. (The taste skill bans raw scroll listeners that set state each frame; this one sets an attribute at most once per direction change.)
+- `prefers-reduced-motion: reduce`: every Recharts series `isAnimationActive={false}`; CSS durations collapse in the base layer; the header switches states with opacity only (no translate); the calendar and sheets appear without movement (opacity 120 ms); the orb renders its static frame (§5.17); skeleton pulse stops.
 
 ### 2.8 Icons
 
-- lucide-react only (already a dependency). One stroke: `strokeWidth={1.75}` everywhere (beside 600-700 weight labels). Sizes: 16 px inline with captions, 20 px in rows and buttons, 24 px in the tab bar and sidebar.
-- Icons inherit `currentColor`. Outline at rest; the active tab uses the same glyph at full white (lucide has no filled variants, so active = white + label white; inactive = `text-muted-foreground`).
-- Decorative icons get `aria-hidden`. Icon-only buttons get `aria-label`.
-- Map (one glyph per meaning):
+Unchanged from v1 (lucide-react, `strokeWidth={1.75}`, sizes 16 / 20 / 24, `currentColor`, outline at rest, `aria-hidden` on decorative icons, the meaning-to-glyph map), with these v2 additions and changes:
 
-| Meaning | lucide |
-|---|---|
-| Home, Health, Journal, More | `House`, `HeartPulse`, `NotebookPen`, `Menu` |
-| Recovery, Strain, Sleep | `Gauge`, `Flame`, `Moon` |
-| HRV, resting HR, respiratory rate, SpO2, skin temperature | `Activity`, `Heart`, `Wind`, `Droplet`, `Thermometer` |
-| Steps, calories, VO2 max, strength | `Footprints`, `Zap`, `CircleGauge`, `Dumbbell` |
-| Run, ride, walk, generic workout | `PersonStanding`, `Bike`, `Footprints`, `Timer` |
-| Energy Bank, Stress, Healthspan, Fitness | `BatteryMedium`, `Brain`, `Infinity`, `TrendingUp` |
-| Info, back, next, expand, close | `Info`, `ChevronLeft`, `ChevronRight`, `Maximize2`, `X` |
-| Good, attention, alert | `Check`, `TriangleAlert`, `CircleAlert` |
-| Pace slow / fast | `Turtle`, `Rabbit` |
-| Journal behaviours | alcohol `Wine`, late caffeine `Coffee`, late meal `Utensils`, screen in bed `Smartphone`, meditation `Flower2`, stretching `StretchHorizontal`, sauna `Bath`, travel `Plane`, illness `Thermometer`, custom `Tag` |
-| Sync, Google, demo | `RefreshCw`, `Plug` / `Unplug`, `FlaskConical` |
-| Insights | `Sparkles` |
+| Meaning | lucide | Note |
+|---|---|---|
+| Tab bar (phone), rail and sidebar | `House`, `HeartPulse`, `NotebookPen`, `Menu` at 26 px, `strokeWidth={1.6}` | WHOOP's tab icons are 26 pt thin outlines [latest-tabbar-1] |
+| Avatar (no photo) | `CircleUserRound` 28 px, `strokeWidth={1.5}` | WHOOP's default avatar is this outline [latest-home-collapsed-1], [latest-home-top-3] |
+| Streak | `Flame` 16 px, `fill-current` | WHOOP's flame is filled orange [latest-home-sticky-header-user-2025] |
+| Sync status (in place of band battery) | `Watch` 22 px with an 8 px status dot at its top right | WHOOP draws the band outline with a green dot [latest-home-sticky-header-user-2025] |
+| Round action | the Pulse monogram "P" in a 30 px ring, not an icon | WHOOP's "W" in a ring [latest-tabbar-1] |
+| Daily Outlook, Day in Review | `Sun`, `Moon` | [latest-home-collapsing-1], [latest-home-top-1] |
+| Close (sheets, info card, calendar has none) | `X` 22 px | [latest-popover-info-1] |
 
 ### 2.9 Pattern
 
-`--pattern-hatch` is WHOOP's diagonal hatched track (zone rows, journal impact rows [activity-detail-zones], [journal-insights]). Use it as `bg-(image:--pattern-hatch)` on the track element. It is the only background image besides the page gradient, the banner gradient and the Healthspan orb.
+Unchanged: `--pattern-hatch` (WHOOP's diagonal hatched track) on zone rows, journal impact rows and, new in v2, the sleep stage rows (stage time drawn as solid blocks on a hatched track) [latest-sleep-stages-1]. It is the only background image besides the grounds, the banner and outlook gradients, and the orb canvas.
 
 ---
 
@@ -300,126 +403,255 @@ Rem values assume 16 px root. "Caps" means the source string is sentence case an
 - No data: `--` in the same role as the value would have been, `text-muted-foreground`.
 - Large text: never below `tracking-[-0.04em]`; `text-balance` on titles; `text-pretty` on body; `truncate` with `min-w-0` on every flex child holding a name.
 
+### 3.4 Roles added in v2
+
+Same faces. Sizes measured at 390 on the `latest-*` captures.
+
+| Role | Face | Size / line | Weight | Tracking | Case | Class string | Evidence |
+|---|---|---|---|---|---|---|---|
+| Header streak count | Barlow | 17 / 20 | 700 | 0 | n/a | `font-numeric text-[17px] leading-5 font-bold tabular-nums` | "2128" [latest-home-sticky-header-user-2025] |
+| Date pill label | Figtree | 13 / 16 | 700 | 0.1em | caps | `text-[13px] leading-4 font-bold tracking-[0.1em] uppercase tabular-nums` | "TODAY", "JUL 16 TO TODAY" [latest-home-top-3] |
+| Header sync text | Barlow | 15 / 20 | 600 | 0 | n/a | `font-numeric text-[15px] leading-5 font-semibold tabular-nums text-muted-foreground` | "69%" `#888d92` [latest-home-sticky-header-user-2025] |
+| Mini ring label | Figtree | 13 / 16 | 700 | 0.1em | caps | `text-[13px] leading-4 font-bold tracking-[0.1em] uppercase` | "SLEEP RECOVERY STRAIN" [latest-home-sticky-header-user-2025] |
+| Detail header title (date) | Figtree | 15 / 20 | 700 | 0.1em | caps | `text-[15px] leading-5 font-bold tracking-[0.1em] uppercase` | "TODAY" [latest-recovery-1], "MON, JUL 27" [latest-strain-1] |
+| Tab label | Figtree | 11 / 13 | 600 | 0 | sentence | `text-[11px] leading-[13px] font-semibold` | [latest-tabbar-1] |
+| Rail / sidebar label | Figtree | 12 / 16 (rail), 15 / 20 (sidebar) | 600 | 0 | sentence | `text-xs font-semibold` / `text-[15px] font-semibold` | inferred from the tab label |
+| Orb value | Barlow | 52 / 52 (Health hub orb: 40 / 40; mini orb: 26 / 26) | 700 | -0.01em | n/a | `font-numeric text-[52px] leading-none font-bold tracking-[-0.01em] tabular-nums` | "46.9" cap height 31 pt on a 335 pt orb [latest-whoop-age-green-2] |
+| Orb label | Figtree | 15 / 18 (hub 12, mini 10) | 700 | 0.12em | caps | `text-[15px] leading-[18px] font-bold tracking-[0.12em] uppercase text-muted-foreground` | "WHOOP AGE" `#747474` [latest-whoop-age-green-2]; lifted to the muted token |
+| Orb delta | Barlow + Figtree | 17 / 22 | 600 | 0 | sentence | `font-numeric text-[17px] leading-[22px] font-semibold` in the orb's text token | "6.6 years younger" [latest-whoop-age-green-2] |
+| Sheet primary button | Figtree | 15 / 20 | 700 | 0.08em | caps | `h-14 rounded-full text-[15px] font-bold tracking-[0.08em] uppercase` | "SAVE" [latest-sheet-edit-1] |
+| Info card title | Figtree | 15 / 20 | 700 | 0.08em | caps | `text-[15px] leading-5 font-bold tracking-[0.08em] uppercase` | "HRV" [latest-popover-info-1] |
+| Section title on Home | unchanged (22 / 28, 600) | | | | | | "My Day", "My Dashboard", "My Plan" [latest-home-collapsed-1], [latest-home-dashboard-1] |
+
 ---
 
 ## 4. Shells
 
-Shells own layout and every breakpoint. Feature components never contain `md:`, `lg:` or `xl:` classes; they fill the width their shell gives them. The only exceptions are the type roles in §3.2 that step up at 768 px, which are part of the role, not layout.
+Shells own layout, every breakpoint and every piece of chrome. Feature components never contain `md:`, `lg:` or `xl:` classes; they fill the width their shell gives them. Exceptions, as in v1: the type roles that step up at 768 px, ScoreDial's size map, and the orb's size map.
 
 ```mermaid
 flowchart TB
-  RL["app/layout.tsx<br/>fonts, dark, viewport-fit=cover"] --> AL["app/(app)/layout.tsx"]
-  AL --> AS["AppShell<br/>SidebarProvider + Sidebar (≥768)<br/>BottomTabs (<768)<br/>ShellStatus context: demo, sync, connection"]
-  AS --> PS["PageShell<br/>TopBar (title or DateSwitcher)<br/>ConnectionBanner<br/>responsive grid"]
-  AS --> DS["DetailShell<br/>DetailHeader (back, title, info)<br/>DateSwitcher, hero, insight<br/>primary chart, secondary grid"]
-  PS --> SS["SectionShell<br/>section or card variant"]
+  RL["app/layout.tsx<br/>fonts, dark, viewport-fit=cover, fixed ground"] --> AL["app/(app)/layout.tsx"]
+  AL --> AS["AppShell<br/>GlassNav: tab bar (<768), rail (768-1279), sidebar (≥1280)<br/>FloatingAction (check-in)<br/>ShellStatus context: demo, sync, streak, connection"]
+  AS --> PS["PageShell (tab roots)<br/>HomeHeader (/) or TitleHeader<br/>ConnectionBanner, grid"]
+  AS --> DS["DetailShell (detail routes)<br/>DetailHeader (back, date or title, info)<br/>hero, insight, primary, secondary"]
+  PS --> SS["SectionShell"]
   DS --> SS
-  SS --> MS["MetricState<br/>loading, empty, reason, provisional, value"]
-  MS --> K["Kit components<br/>ScoreDial, KeyStatRow, charts…"]
-  PS -.-> RS["ResponsiveSheet<br/>Drawer < 768, Sheet ≥ 768"]
-  DS -.-> RS
+  SS --> MS["MetricState"]
+  MS --> K["Kit components"]
+  PS -.-> OV["Overlays<br/>CalendarPanel (top), ResponsiveSheet (bottom / right), InfoDialog (centre)"]
+  DS -.-> OV
 ```
 
 ### 4.1 Breakpoints
 
 | Name | Range | Tailwind | Navigation | Content column |
 |---|---|---|---|---|
-| Phone | < 768 px | base | Floating bottom tab bar | Full width, 16 px gutters |
-| Tablet | 768-1279 px | `md:` | shadcn `Sidebar` as icon rail (48 px) | 720 px, centred in the remaining width |
-| Laptop | ≥ 1280 px | `xl:` | shadcn `Sidebar` expanded (256 px) | Up to 1200 px, 32 px gutters, multi-column grids |
+| Phone | < 768 px | base | Floating glass tab bar + round action [latest-tabbar-1] | Full width, 16 px gutters |
+| Tablet | 768-1279 px | `md:` | Floating glass rail, 88 px (**inferred**) | 720 px, centred in the space right of the rail |
+| Laptop | ≥ 1280 px | `xl:` | Floating glass sidebar, 232 px (**inferred**) | Up to 1120 px, 32 px gutters, multi-column grids |
 
-`lg:` (1024) is used only by DetailShell's secondary grid (§4.5).
+`lg:` (1024) is used only by DetailShell's secondary grid (§4.6). The rail and sidebar are an extrapolation: WHOOP has no tablet or laptop layout after the redesign. They reuse the tab bar's material, icons and active lens so they read as the same object turned on its side.
 
-### 4.2 AppShell (`src/components/shells/AppShell.tsx`)
+### 4.2 AppShell and GlassNav (`shells/AppShell.tsx`, `shells/AppNav.tsx`)
 
-Server component wrapper rendered by `app/(app)/layout.tsx`, with client islands for the sidebar and tab bar.
+Server component wrapper rendered by `app/(app)/layout.tsx`, with client islands for the nav (active state from `usePathname`) and the floating action.
 
-- Wraps children in `SidebarProvider`. The open state is driven by the viewport, not by the user: `open = matchMedia("(min-width: 1280px)")`. No `SidebarTrigger`, no `⌘B` shortcut, no cookie. `Sidebar` uses `collapsible="icon"`.
-- Provides a `ShellStatus` React context: `{ mode: "demo" | "google", sync: { state: "ok" | "syncing" | "stale" | "error", lastSuccessAt, }, connection: "connected" | "not_connected" | "importing" | "auth_revoked" | "stale", importProgress?: { done, total } }`. The top bar, sync dot, demo chip and `ConnectionBanner` read it. This is how the "top bar with the date switcher, sync-status dot and Demo data chip" stays global while each page shell decides the top bar's left and centre content (see §11, D2).
-- Main element: `<main id="main" className="min-h-svh min-w-0 flex-1">`. A skip link "Skip to content" is the first focusable element (`sr-only focus:not-sr-only`, top-left, `bg-primary text-primary-foreground rounded-lg px-3 py-2`).
+- **shadcn `Sidebar` is retired** (and with it the `matchMedia` open state). `AppNav` renders one `<nav aria-label="Primary">` whose three forms are switched by CSS only: tab bar `md:hidden`, rail `hidden md:flex xl:hidden`, sidebar `hidden xl:flex`. No JS reads the viewport here.
+- `ShellStatus` context (v1 fields) gains `streak: { days: number; asOf: string } | null`, read by the Home header (§4.3).
+- Main element: `<main id="main" data-ground={…} className="min-h-svh min-w-0 md:pl-[112px] xl:pl-[256px]">`; the skip link stays first.
+- **Destinations and routes.** WHOOP's current tabs are Home, Health, Community, More, plus the round coach button [latest-tabbar-1]. Pulse has no community or coach, so:
 
-**Bottom tab bar (< 768 px).** WHOOP's 2025 floating pill [home-device-planner-nav].
+| WHOOP slot | Pulse | Route | Active for | Why |
+|---|---|---|---|---|
+| Home | Home | `/` | `/`, `/recovery`, `/strain`, `/sleep`, `/activity/*`, `/reports/*` | same |
+| Health | Health | `/health` | `/health/*` | same |
+| Community | Journal | `/journal` | `/journal/*` | Pulse's third daily surface; no community exists (§11 V5) |
+| More | More | `/more` | `/more`, `/settings` | same |
+| round coach button | round **Check in** button | opens the Journal check-in sheet for the current `?d=` | n/a | The one daily action Pulse asks of the user; WHOOP's button opens its assistant (**inferred** mapping, §11 V6) |
 
-```
-         ╭──────────────────────────────────────────╮
-         │  [House]    [HeartPulse]  [NotebookPen]   [Menu]  │  64 px
-         │   Home        Health        Journal        More   │
-         ╰──────────────────────────────────────────╯
- 12 px inset each side; bottom = max(env(safe-area-inset-bottom), 12px)
-```
-
-- `nav aria-label="Primary"`, `fixed inset-x-3 bottom-[max(env(safe-area-inset-bottom),12px)] z-30 h-16 rounded-[22px] bg-muted/95 ring-1 ring-border md:hidden`.
-- Four equal `Link`s, each a 44+ px column: icon 24 px above label (tab label role). Active (route starts with the tab's root; detail routes map to their parent: `/recovery`, `/strain`, `/sleep`, `/activity/*`, `/reports/*` → Home; `/health/*` → Health; `/journal/*` → Journal; `/settings` → More): `text-foreground`, `aria-current="page"`. Inactive: `text-muted-foreground`. Press: `active:scale-[0.96]`.
-- Main content gets `pb-[calc(64px+max(env(safe-area-inset-bottom),12px)+24px)] md:pb-10` so the last card clears the bar.
-
-**Sidebar (≥ 768 px).**
-
-- `Sidebar collapsible="icon"` with `bg-sidebar`, right edge `border-sidebar-border`.
-- Header: icon rail shows a 32 px "P" monogram (`font-numeric text-xl font-bold`); expanded shows the wordmark "PULSE" (wordmark role, white).
-- `SidebarMenu` items, same four destinations plus (expanded only, after a `SidebarSeparator`) "Reports" and "Settings": `SidebarMenuButton size="lg"` (48 px), icon 24 px, label sidebar-item role. Active: `isActive` → `bg-sidebar-accent text-sidebar-accent-foreground`. Collapsed items show a `Tooltip` with the label (shadcn does this via `tooltip` prop).
-- Footer: Demo chip (when `mode = demo`) and the sync status (dot + "Synced 12 min ago" when expanded; dot only on the rail).
-
-**Z-index scale.** Top bar `z-20`, bottom tab bar `z-30`, sidebar `z-10` (shadcn), overlays `z-50` (shadcn), toasts: Sonner default. Nothing else sets `z-*`.
-
-### 4.3 TopBar (part of the shell kit, rendered by PageShell)
+**Tab bar (< 768 px)** [latest-tabbar-1], [latest-home-top-1].
 
 ```
- ┌──────────────────────────────────────────────┐
- │ [DEMO DATA]       ‹   TODAY   ›          ●   │  52 px (+ safe-area-top)
- └──────────────────────────────────────────────┘
-   left 44+ px       centre: title or DateSwitcher   right: sync dot (44 px button)
+  ╭────────────────────────────────────────────────╮ ╭──────╮
+  │ ╭──────╮                                        │ │ ╭──╮ │   62 px tall
+  │ │(home)│   (health)    (journal)     (more)     │ │ │P │ │   glass bar  +  round action
+  │ │ Home │    Health      Journal       More      │ │ ╰──╯ │
+  │ ╰──────╯ ← lens                                 │ ╰──────╯
+  ╰────────────────────────────────────────────────╯
+  12 px ┆                                      8 px ┆     ┆ 12 px
+  bottom = max(env(safe-area-inset-bottom) - 6px, 12px)
 ```
 
-- `header sticky top-0 z-20 bg-background-top pt-[env(safe-area-inset-top)]`, inner `h-13 md:h-14 grid grid-cols-[1fr_auto_1fr] items-center px-4 md:px-6 xl:px-8`. Solid fill (no blur): at scroll 0 it equals the gradient's first stop, so the seam is invisible.
-- **Left:** `mode = demo` → Demo chip: `Badge variant="outline"` `h-6 rounded-full border-border px-2.5 text-[11px] font-bold tracking-[0.08em] uppercase text-foreground-secondary` with `FlaskConical` 12 px, text "Demo data". Otherwise empty.
-- **Centre:** either the page title (top-bar title role) or the `DateSwitcher`.
-- **Right:** `SyncStatus`: a 44 px ghost icon button containing an 8 px dot. Dot colour: ok `bg-optimal`, syncing `bg-coach animate-pulse`, stale (> 2 h) `bg-warning`, error or auth revoked `bg-recovery-red`. `aria-label`: "Synced 12 minutes ago", "Syncing", "Last sync 3 hours ago", "Sync failed". Opens a `Popover` (w-64): title "Sync", one line per state ("Last sync 09:42", "Demo data refreshes every 15 minutes" in demo mode), and a link "Sync settings" → `/settings#sync`. On ≥ 1280 the sidebar footer also shows the status, and the top bar keeps the dot.
+- Wrapper: `fixed inset-x-3 bottom-[max(calc(env(safe-area-inset-bottom)-6px),12px)] z-30 flex gap-2 md:hidden`, `touch-action: manipulation` (`touch-manipulation`).
+- Capsule: glass bar material (§2.6), `relative flex h-[62px] flex-1 items-stretch rounded-full p-1`.
+- Items: four equal `Link`s, `relative z-10 flex flex-1 flex-col items-center justify-center gap-0.5 rounded-full`, icon 26 px over the tab label role. Active: `text-foreground`, `aria-current="page"`; inactive `text-muted-foreground`; hover (pointer) `hover:text-foreground-secondary`; press `active:scale-[0.96]`.
+- Active lens: one `span` behind the items, `absolute inset-y-1 left-1 w-[calc((100%-8px)/4)] rounded-full bg-(--glass-lens) transition-[translate] duration-150 ease-standard`, translated by `translate-x-[calc(var(--tab)*100%)]` with `style={{ "--tab": index }}` (a data-driven position, allowed). The sampled pool is lighter toward its bottom [latest-tabbar-1]; add `bg-linear-to-b from-white/4 to-white/9` instead of the flat lens if it reads flat at 3×. No lens on routes outside the four roots' trees (there are none).
+- Round action: `FloatingAction` (§4.2.1) sits in the wrapper after the capsule.
+- Content padding: tab-root `<main>` gets `pb-[calc(62px+max(env(safe-area-inset-bottom)-6px,12px)+24px)]` (§2.5) so the last card clears the bar. Detail routes do not render the tab bar (C5).
 
-**DateSwitcher.** WHOOP's date pill [home-overview-marketing].
-
-```
-   ‹   TODAY   ›        ‹  MON, SEP 28  ›        ‹  SEP 22 - SEP 28  ›   (week mode)
-```
-
-- Three parts in one pill `inline-flex h-9 items-center rounded-full bg-secondary`: prev button, label button, next button. Prev/next are 44 × 44 hit areas (visual 36 px) with `ChevronLeft`/`ChevronRight` 18 px; `aria-label` "Previous day" / "Next day" (or week).
-- Label: top-bar title role, `min-w-24 px-3 text-center tabular-nums`. "Today", "Yesterday", else `EEE, MMM d` ("Mon, Sep 28"); week mode `MMM d - MMM d`.
-- Next is `disabled` (opacity 40%) on today (or the current week). Prev is disabled at the first stored day.
-- Tapping the label opens the date-jump `ResponsiveSheet` (§4.7) with shadcn `Calendar` (`mode="single"`, `disabled={{ after: today, before: firstDay }}`), title "Go to date", and a "Today" button.
-- Changing the day calls `router.replace` with `?d=` (omitted for today) so the back gesture leaves the screen instead of stepping through days (§8).
-- Keyboard (any pointer device): on day-aware screens, `ArrowLeft` / `ArrowRight` go to the previous / next day when focus is not in an input, textarea, `[role=slider]` or open sheet. One listener lives in the DateSwitcher.
-
-### 4.4 PageShell (`src/components/shells/PageShell.tsx`)
-
-For tab roots: Home `/`, Health `/health`, Journal `/journal`, More `/more`.
-
-Props: `{ title?: string; dateSwitcher?: { mode: "day" | "week" }; actions?: ReactNode; layout?: "stack" | "home" | "grid-2"; children }`.
-
-- Renders `TopBar` (centre = `dateSwitcher` if given, else `title`), then `ConnectionBanner` (from context), then the content container: `mx-auto w-full px-4 pt-4 md:max-w-[720px] md:px-6 xl:max-w-[1200px] xl:px-8 xl:pt-6`.
-- `actions` render right-aligned on the first row of content (e.g. Journal's "Insights" button). They never go in the top bar (the top bar's right slot is the sync dot everywhere).
-- `layout`:
-  - `stack`: `flex flex-col gap-8 xl:gap-10`.
-  - `grid-2`: `grid grid-cols-1 gap-3 md:grid-cols-2 xl:gap-4` (Health hub cards).
-  - `home`: phone and tablet = `stack`; laptop = `xl:grid xl:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] xl:gap-x-6 xl:gap-y-10` with named children `top` (spans both columns), `left`, `right`, `bottom` (spans both).
-
-### 4.5 DetailShell (`src/components/shells/DetailShell.tsx`)
-
-For `/recovery`, `/strain`, `/sleep`, `/activity/[id]`, `/health/healthspan`, `/health/monitor`, `/health/stress`, `/health/fitness`, `/journal/insights`, `/reports/[period]`, `/settings`.
-
-Props: `{ title: string; subtitle?: string; info?: { title: string; body: ReactNode }; dateSwitcher?: { mode: "day" | "week" }; hero?: ReactNode; summary?: ReactNode; insight?: ReactNode; primary?: ReactNode; secondary?: ReactNode[]; footer?: ReactNode }`.
-
-**DetailHeader** (replaces TopBar on detail routes, same sticky frame and z-index):
+**Rail (768-1279 px), inferred.**
 
 ```
- ┌──────────────────────────────────────────────┐
- │ [‹]             RECOVERY                (i)  │   52 px (+ safe-area-top)
- │              Next update in 6 days           │   optional subtitle (caption)
- └──────────────────────────────────────────────┘
+ ╭──────╮
+ │  P   │   monogram 40 px, links to /
+ │      │
+ │╭────╮│
+ ││(h) ││   64 px item: icon 26 over rail label, lens behind the active one
+ ││Home││
+ │╰────╯│
+ │ (+)  │
+ │Health│
+ │ (j)  │
+ │Journal
+ │ (m)  │
+ │ More │
+ │      │
+ │  ●   │   sync status (§4.3 SyncStatus, icon variant)
+ ╰──────╯   88 px wide, fixed left-3 top-3 bottom-3, rounded-[28px], glass bar material
 ```
 
-- Left: back button, 44 px, `ChevronLeft` 24 px, `aria-label="Back"`. Behaviour: `router.back()` when `window.history.length > 1` and the referrer is same-origin; otherwise `router.push(parentHref)` where `parentHref` is `/` (Home details, keeping `?d=`), `/health` (Health details), `/journal`, `/more`.
-- Centre: title (top-bar title role) and optional subtitle (caption role).
-- Right: info button (44 px, `Info` 22 px, `aria-label="About {title}"`) when `info` is set; it opens `ResponsiveSheet` with `info.title` and `info.body`. Otherwise the sync dot.
-- The parent tab stays active in the tab bar and sidebar.
+- `fixed inset-y-3 left-3 z-30 hidden w-[88px] flex-col items-center rounded-[28px] py-4 md:flex xl:hidden`, glass bar material. Items `h-16 w-[72px] rounded-[20px]`; lens moves vertically (`translate-y-[calc(var(--tab)*(100%+8px))]`).
+- No Reports or Settings items on the rail (they are reached from More, as on phone).
+
+**Sidebar (≥ 1280 px), inferred.**
+
+- `fixed inset-y-3 left-3 z-30 hidden w-[232px] flex-col rounded-[28px] p-3 xl:flex`, glass bar material.
+- Header: wordmark "PULSE" (wordmark role, white) at `h-14 px-3`.
+- Items: `h-12 rounded-full px-4 flex items-center gap-3`, icon 24 + sidebar label role; lens as on the tab bar, vertical. After a `h-px bg-white/8 my-2` separator: "Reports" (`CalendarRange`) and "Settings" (`Settings`).
+- Footer: Demo chip (demo mode) and the sync status line ("Synced 12 min ago" with the dot), caption role.
+- Collapsed items never exist, so no tooltips.
+
+#### 4.2.1 FloatingAction (`shells/FloatingAction.tsx`)
+
+The round glass button [latest-tabbar-1]; on detail screens it floats alone at the bottom right [latest-recovery-1], [latest-strain-1], [latest-activity-2].
+
+- Phone on tab roots: `size-[62px]` inside the tab-bar wrapper. Phone on detail routes and every route ≥ 768: `fixed right-3 bottom-[max(calc(env(safe-area-inset-bottom)-6px),12px)] z-30 size-[62px] md:right-6 md:bottom-6 md:size-14 xl:right-8 xl:bottom-8`.
+- Material: `rounded-full bg-linear-to-b from-(--glass-action-top) to-(--glass-action-bottom) backdrop-blur-md` plus a 1.5 px gradient rim drawn as a wrapper `p-[1.5px] rounded-full bg-linear-to-br from-action-rim-from/70 to-action-rim-to/80` around the fill (sampled rim `#2e3053` → `#4c94db`), and the glass shadow.
+- Content: a 30 px circle `rounded-full ring-[1.5px] ring-action-rim-from` holding "P" (`font-numeric text-[15px] font-bold`), as WHOOP's ringed "W".
+- `aria-label="Check in for {date label}"`; opens the check-in `ResponsiveSheet` (§7.11). When today's check-in is done the button stays and opens the sheet in edit mode. Press `active:scale-[0.96]`; hover `hover:brightness-110` (filter, 150 ms).
+- Hidden on `/settings` and while any overlay is open (`data-overlay-open` on `<body>` hides it, so it never sits over a sheet).
+
+### 4.3 HomeHeader (`shells/HomeHeader.tsx`), the collapsing header
+
+Home's top of screen in three states [latest-home-top-1] → [latest-home-collapsing-1] → [latest-home-collapsed-1] / [latest-home-collapsed-2], with the top row returning on upward scroll [latest-home-collapsed-3].
+
+```
+ State "top" (scroll 0)                        State "rings" (dials scrolled away)          State "rings-only" (scrolling down, deep)
+┌──────────────────────────────────────────┐  ┌──────────────────────────────────────────┐  ┌──────────────────────────────────────────┐
+│ (av) [(flame) 70]   ‹ [ TODAY ] ›     55% (⌚•)│  │ (av) [(flame) 70]   ‹ [ TODAY ] ›     55% (⌚•)│  │  ◯ SLEEP     ◯ RECOVERY     ◯ STRAIN     │ 40
+└──────────────────────────────────────────┘  │  ◯ SLEEP     ◯ RECOVERY     ◯ STRAIN     │  └───────────── 24 px fade ────────────────┘
+               P U L S E                      └───────────── 24 px fade ────────────────┘
+     ◯ 96%       ◯ 53%       ◯ 12.1           (content scrolls under, fading in)
+    SLEEP >    RECOVERY >   STRAIN >
+```
+
+**Frame.** `header sticky top-0 z-20 pt-[env(safe-area-inset-top)]` with the ground as its fill: `bg-(image:--ground) bg-no-repeat [background-size:100%_740px]`. Because the header is pinned to the top of the viewport and the ground is fixed to the viewport, the two gradients line up pixel for pixel (C2). Its lower 24 px fade: `mask-b-from-[calc(100%-24px)]` (Tailwind v4 mask utility: an alpha gradient from opaque to transparent over the bottom 24 px), with `pb-6` so no control sits in the fade. Content passing under it fades in, as "My Day" does in [latest-home-sticky-header-user-2025]. No blur: the captures show a fade, not frosted text.
+
+**Top row** (`h-11 md:h-13`, `grid grid-cols-[1fr_auto_1fr] items-center px-4 md:px-6 xl:px-8`):
+
+| Slot | Element | Spec | Evidence |
+|---|---|---|---|
+| Left | Avatar | 32 px circle `rounded-full bg-white/6 grid place-items-center`, `CircleUserRound` 28 px, links to `/more`, `aria-label="More and settings"`; hit area 44 px via `after:absolute after:-inset-1.5` | default avatar outline [latest-home-collapsed-1] |
+| Left | Streak pill | Directly right of the avatar, overlapping it by 4 px as in the capture: `-ml-1 inline-flex h-8 items-center gap-1.5 rounded-full bg-white/[0.05] pl-2.5 pr-3`; `Flame` 16 px `text-warning fill-warning`; count in the header streak role. Hidden when `streak` is null or 0, and on past days (the capture of a past day shows no flame [latest-home-pastday-1]). `aria-label="{n}-day streak"`, `title` "Days in a row with your band worn" | `#293132` pill [latest-home-sticky-header-user-2025] |
+| Centre | DateSwitcher | §4.3.1 | [latest-home-top-1..3] |
+| Right | SyncStatus | text + device icon, §4.3.2 | "69%" + band icon + green dot [latest-home-sticky-header-user-2025] |
+
+**Streak (data mapping).** WHOOP's streak counts consecutive days of continuous data ("A 365-day streak of continuous data", [latest-streak-1]). Pulse's equivalent is consecutive **worn days**: days ending today (or yesterday, before today has 6 hours of data) where the band was worn, using the same per-day rule that keeps `band_not_worn` off that day's Strain (heart-rate coverage over the day's threshold). That needs one small query, `getWearStreak()` in `server/queries`, feeding `ShellStatus.streak`. The rule is WHOOP's; the threshold reuse is **inferred**. Milestone tiers that recolour WHOOP's flame (blue at 365, gold past 2000 [latest-streak-1]) are not adopted (§12 gap).
+
+**Ring row** (`h-10 grid grid-cols-3 items-center px-4 md:px-6 xl:px-8`): three `MiniRing` links (§5.1, size `mini`): Sleep, Recovery, Strain, in WHOOP's order, each `inline-flex items-center justify-center gap-2` with the ring (22 px, 3 px stroke) and its label in the mini ring label role. Ring colour: Sleep `--sleep`, Recovery the band colour, Strain `--strain` filled to strain / 21. No numbers inside, as in every capture. Reason or no data: track only. Each links to its detail with `?d=`, `aria-label="Recovery 53 percent, yellow. Open Recovery"`. The rings are **always** today's (or the selected day's) values, the same view model the dials use.
+
+**States and thresholds.** Pure helper `src/lib/header-state.ts`, unit-tested (plan U17 test scenario):
+
+```ts
+type HeaderState = "top" | "rings" | "rings-only";
+export function nextHeaderState(i: {
+  dialsVisible: boolean;      // IntersectionObserver on the dial row (labels included), rootMargin = -(top row height) px
+  y: number;                  // scroll position
+  dy: number;                 // y minus the y at the last direction change
+  hideAfter: number;          // y where the top row may start hiding: dial row bottom + 160 px
+}): HeaderState
+// top        while dialsVisible
+// rings      when !dialsVisible and (y < hideAfter or dy <= -8)   (scrolled up 8 px or more since the last change)
+// rings-only when !dialsVisible and y >= hideAfter and dy >= 8   (scrolled down 8 px or more)
+// otherwise keep the previous state (hysteresis)
+```
+
+Thresholds: the ring row appears when the bottom of the dial labels passes under the top row (the moment the dials' state would otherwise be lost); the top row hides only after 160 px more and only while moving down. The mid-collapse capture shows both rows together while My Day's first cards are on screen [latest-home-collapsing-1]; deep captures show both behaviours [latest-home-collapsed-2] (hidden), [latest-home-collapsed-3] (shown). The 160 px and 8 px values are **inferred**.
+
+**Wiring.** One client island owns the header. An `IntersectionObserver` watches a zero-height sentinel placed after the dial labels; a passive `scroll` listener (rAF-throttled) tracks `y` and `dy` in refs; the island writes `data-state` on the header only when `nextHeaderState` returns a new state. CSS does the rest:
+
+- Ring row: `grid-rows-[0fr] opacity-0 translate-y-1.5` → `group-data-[state=rings]:grid-rows-[1fr] group-data-[state=rings]:opacity-100 group-data-[state=rings]:translate-y-0` (same for `rings-only`), `transition-[grid-template-rows,opacity,translate] duration-220 ease-out-expo`.
+- Top row: in `rings-only`, `-translate-y-full opacity-0 h-0` with the same transition; the ring row then sits under the status bar ([latest-home-collapsed-2] shows the rings directly under the status bar).
+- Mini rings animate their fill only on first reveal in a page view (500 ms), then stay static; under reduced motion no translate, no fill animation, opacity 120 ms.
+- Focus: if focus is inside the top row when it would hide, it stays shown (`:focus-within` keeps `data-state` at `rings`).
+
+**Other tab roots** (Health, Journal, More) use `TitleHeader`: the same sticky ground frame and fade, a centred page title in the detail header title role ("HEALTH", "JOURNAL", "MORE"), SyncStatus on the right; Journal also centres its DateSwitcher under the title. [latest-health-tab-1] shows "HEALTH" centred; [latest-more-1] shows "MORE" centred with icons on both sides.
+
+#### 4.3.1 DateSwitcher (restyled)
+
+WHOOP's date pill, current form [latest-home-sticky-header-user-2025], [latest-home-top-3].
+
+```
+   ‹  [  TODAY  ]  ›          ‹  [ MON, SEP 28 ]  ›          ‹  [ SEP 22 - SEP 28 ]  ›   (week mode)
+   outer h-8 track, inner h-7 selected segment
+```
+
+- One group: `inline-flex h-8 items-center rounded-full bg-white/[0.04] p-0.5` (sampled `#2a3235` on the `#222930` header ground); prev button, label button, next button.
+- Label: `h-7 min-w-24 rounded-full bg-white/[0.08] px-4` (sampled `#3b4348`) in the date pill label role. "Today", "Yesterday", else `EEE, MMM d`; week mode `MMM d - MMM d`. The "MMM d to Today" form WHOOP shows when one physiological day spans dates [latest-home-top-3] is not adopted (Pulse days are calendar days).
+- Prev / next: 32 px visual inside 44 px hit areas, `ChevronLeft` / `ChevronRight` 18 px, white; next disabled on today with `text-foreground/35` (sampled grey chevron); prev disabled at the first stored day.
+- While the next day loads, the label shows a 16 px spinner (the app's only spinner) and is `aria-busy` [latest-home-pastday-1].
+- Tapping the label opens `CalendarPanel` (§5.16) dropping from the top [calendar-recovery-current-2026-05, calendar-trigger-pill-2026-05]. The label is the Radix `Dialog.Trigger`, so focus returns to it on close. No title bar, no "Today" button, no close button.
+- Changing the day calls `router.replace` with `?d=` (omitted for today), as v1.
+- Keyboard: ArrowLeft / ArrowRight step days on day-aware screens, as v1. Press `active:scale-[0.96]` on each segment.
+
+#### 4.3.2 SyncStatus (WHOOP's band battery)
+
+WHOOP shows the band's battery ("69%") and a band outline with a green connection dot [latest-home-sticky-header-user-2025]. Pulse has no battery data, so the same slot shows sync freshness:
+
+- `inline-flex h-11 items-center gap-1.5` button: text in the header sync text role, then `Watch` 22 px with an 8 px dot at its top right (`absolute -right-0.5 -top-0.5 size-2 rounded-full ring-2 ring-background-top`).
+- Text: "Demo" in demo mode; else the age of the last successful sync, short: "Now", "12m", "3h", "2d". Dot: ok `bg-optimal`, syncing `bg-coach animate-pulse motion-reduce:animate-none`, stale (> 2 h) `bg-warning`, error or auth revoked `bg-recovery-red`. `aria-label` as v1 ("Synced 12 minutes ago"...).
+- Opens the v1 sync popover, now in the flat panel material (§2.6), anchored under the button.
+
+### 4.4 DetailHeader (`shells/DetailHeader.tsx`)
+
+[latest-recovery-1], [latest-strain-1], [latest-sleep-1], [latest-stress-monitor-1], [latest-whoop-age-amber-1].
+
+```
+ Recovery / Strain / Sleep                       Monitors, Healthspan, everything else
+┌──────────────────────────────────────────┐   ┌──────────────────────────────────────────┐
+│ [<]        ‹  TODAY  ›               (i) │   │ [<]          STRESS MONITOR          (i) │  52 + safe area
+└──────────── 24 px fade ──────────────────┘   │              ‹ MON, SEP 14 ›             │  date switcher in the body (DetailShell)
+                                               └──────────── 24 px fade ──────────────────┘
+```
+
+- Same sticky ground frame and 24 px fade as HomeHeader. `grid grid-cols-[1fr_auto_1fr] items-center h-13 md:h-14 px-2 md:px-4`.
+- Left: back, 44 px, `ChevronLeft` 26 px, stroke 1.75 (v1 behaviour: `router.back()` with the same-origin check, else the parent).
+- Centre, **Recovery, Strain, Sleep**: the date as title (detail header title role) between two small chevrons (`ChevronLeft` / `ChevronRight` 16 px in 36 px hit areas, `text-foreground/70`), i.e. a borderless DateSwitcher (`variant="bare"`). The metric name moves into the dial, as WHOOP does (C7). The chevrons are **inferred** (WHOOP's header shows only the date; Pulse keeps day stepping on detail screens for journey 2).
+- Centre, **everything else**: the screen name in the same role, optional subtitle under it (caption role, e.g. "NEXT UPDATE IN 6 DAYS" for Healthspan [latest-whoop-age-cyan-1]).
+- Right: info button, 44 px hit, a 28 px outline circle `rounded-full ring-[1.5px] ring-foreground/70` holding `Info` 16 px (WHOOP's ringed "i" [latest-recovery-1]), opening `InfoDialog` (§4.8); Stress Monitor's right slot is its settings gear in WHOOP [latest-stress-monitor-1] and stays the info button in Pulse. No sync dot on detail screens.
+- The detail screen badge WHOOP shows top right on some details (a hexagon with a count [latest-recovery-weekly-1]) is not adopted (§12 gap).
+- No tab bar on detail routes; the FloatingAction floats alone (§4.2.1).
+
+### 4.5 PageShell (`shells/PageShell.tsx`)
+
+For tab roots: Home `/`, Health `/health`, Journal `/journal`, More `/more`. v1 props and layouts stay (`stack`, `grid-2`, `home`), with:
+
+- Header: `HomeHeader` on `/`, `TitleHeader` elsewhere (§4.3). The v1 TopBar (Demo chip, centred switcher, sync dot) is retired; the Demo state shows as "Demo" in SyncStatus.
+- `ground` prop: `"default" | "health"` → `data-ground` on `<main>` (§2.1).
+- Container: `mx-auto w-full px-4 pt-2 md:max-w-[720px] md:px-6 xl:max-w-[1120px] xl:px-8 xl:pt-4` plus the tab-bar padding (§2.5).
+- `home` layout on laptop: `xl:grid xl:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] xl:gap-x-6 xl:gap-y-10` with `top`, `left`, `right`, `bottom` areas, as v1 (§7.1 fills them differently).
+
+### 4.6 DetailShell (`shells/DetailShell.tsx`)
+
+v1 props, slots and grid are unchanged (hero, summary, insight, primary, secondary, footer; laptop hero | summary in `xl:grid-cols-[minmax(360px,max-content)_minmax(0,1fr)]` per B8), with:
+
+- Header: `DetailHeader` (§4.4). `dateSwitcher` now means: in the header (`placement="header"`, Recovery, Strain, Sleep) or in the body under the header (`placement="body"`, monitors, Healthspan in week mode), as WHOOP places them.
+- `ground` prop: `"default" | "healthspan"`.
+- Summary card under the hero gets WHOOP's pointer: a 12 px rotated square `size-3 rotate-45 bg-card-top` centred on the card's top edge, pointing at the dial (the "speech bubble" notch in [latest-recovery-1], [latest-strain-1], [latest-sleep-1]); laptop, where the summary sits beside the dial, points left instead.
+- Bottom padding for the FloatingAction (§2.5).
+
+v1 slot arrangement (still binding):
 
 **Body slots** in order: DateSwitcher (centred, `mt-3`), hero, summary, insight, primary, secondary, footer.
 
@@ -433,7 +665,11 @@ Props: `{ title: string; subtitle?: string; info?: { title: string; body: ReactN
 
 Container widths are PageShell's. Vertical rhythm: 24 px between hero and summary, 32 px between the other slots (`space-y-8`).
 
-### 4.6 SectionShell (`src/components/shells/SectionShell.tsx`)
+### 4.7 SectionShell (`shells/SectionShell.tsx`)
+
+Unchanged from v1 except that the `card` variant uses the card material (§2.6, `rounded-2xl`, gradient, top hairline) and its info button opens `InfoDialog`. Section titles on Home read "My Day", "My Plan", "My Dashboard" [latest-home-collapsed-1], [latest-home-dashboard-1].
+
+v1 text (still binding):
 
 Props: `{ variant: "section" | "card"; title: string; info?: { title; body }; action?: { label: string; href: string } | ReactNode; aside?: ReactNode; children; id?: string }`.
 
@@ -441,22 +677,50 @@ Props: `{ variant: "section" | "card"; title: string; info?: { title; body }; ac
 - `card`: shadcn `Card` with `ring-0 gap-0 py-0`, inner `p-4 xl:p-5`. Header row `flex min-h-6 items-center justify-between gap-2 mb-3`; `<h2>` (or `<h3>` inside a section) in the card-title role; then optional info button (32 px visual inside a 44 px hit area via `after:absolute after:-inset-1.5`, `Info` 16 px, `text-muted-foreground`), then the action on the right.
 - Action as a link: `Link` in the link-action role but white (`text-foreground-secondary hover:text-foreground`), label + `ChevronRight` 14 px, e.g. "View all". When the whole card navigates (Health hub, Home monitor cards), the card itself is the link and the header shows only `ChevronRight` 18 px.
 
-### 4.7 ResponsiveSheet (`src/components/shells/ResponsiveSheet.tsx`)
+### 4.8 Overlays: ResponsiveSheet, InfoDialog, CalendarPanel
 
-Props: `{ open; onOpenChange; title: string; description?: string; children; footer?: ReactNode; size?: "default" | "tall" }`. Uses `useIsMobile()` (768 px, `src/hooks/use-mobile.ts`), the one breakpoint read allowed in JS.
+| Overlay | When | Phone | ≥ 768 | Evidence |
+|---|---|---|---|---|
+| `CalendarPanel` | Date jump | Flat panel from the top, `bg-black/65` dim, no blur (§5.16, built) | Hangs under the header beside the rail / sidebar | README calendar |
+| `ResponsiveSheet` | Tasks: journal check-in, vital detail, contributor detail, impact detail | Bottom drawer (vaul) | Right sheet, floating | [latest-sheet-edit-1], [latest-sheet-behaviors-1] |
+| `InfoDialog` (new) | Explanations: every "How X works", "About X", tag explanations, the Strain Target note, an HRV-style vital explainer | Centred card | Centred card | [latest-popover-info-1] |
 
-| | Phone (< 768) | Tablet / laptop (≥ 768) |
-|---|---|---|
-| Primitive | shadcn `Drawer` (vaul), bottom | shadcn `Sheet` `side="right"` |
-| Size | `max-h-[90svh]`; `tall` = `h-[90svh]` | `w-full sm:max-w-[420px] xl:max-w-[440px]` |
-| Corners | `rounded-t-2xl` | none on the screen edge |
-| Header | handle (vaul), `DrawerTitle` (sheet-title role), `DrawerDescription` (caption) | `SheetTitle`, `SheetDescription`, close `X` 44 px |
-| Body | `overflow-y-auto overscroll-contain px-4 pb-4` | `overflow-y-auto overscroll-contain px-6 pb-6` |
-| Footer | sticky, `border-t border-border px-4 pt-3 pb-[max(env(safe-area-inset-bottom),16px)]`, full-width buttons | sticky, `px-6 py-4`, buttons right-aligned |
+**ResponsiveSheet** (v1 props and behaviour kept: focus in on open, back to the trigger on close, `overscroll-contain`):
 
-Uses: metric info sheets, the date jump, the journal check-in, Health Monitor vital detail, Healthspan contributor detail. Focus moves into the sheet on open and returns to the trigger on close (Radix and vaul handle this; do not override).
+- Phone: shadcn `Drawer`. Content `rounded-t-[28px] bg-linear-to-b from-sheet to-sheet-bottom shadow-[inset_0_1px_0_var(--sheet-edge)] max-h-[92svh]`; `tall` = `h-[92svh]`. Grabber `mx-auto mt-2.5 h-1.5 w-10 rounded-full bg-white/25`. Overlay `bg-(--dim-strong)`.
+- Header row: `X` close (44 px) at the left, the title centred in the info card title role, an optional action at the right; description under it in caption role [latest-sheet-edit-1], [latest-sheet-behaviors-1].
+- Body sections are labelled with a caption-role caps label followed by a hairline that runs to the right edge ("TIME" followed by a rule in [latest-sheet-edit-1]): `flex items-center gap-3 text-xs font-bold tracking-[0.08em] uppercase text-muted-foreground after:h-px after:flex-1 after:bg-white/10`.
+- Footer: stacked full-width buttons, primary `h-14 rounded-full bg-foreground text-primary-foreground` (sheet primary button role), secondary `h-14 rounded-full ring-1 ring-foreground/70 text-foreground` [latest-sheet-edit-1]; `gap-3 px-4 pt-3 pb-[max(env(safe-area-inset-bottom),16px)]`, no top border.
+- ≥ 768: shadcn `Sheet side="right"`, content `inset-y-3 right-3 h-auto w-[420px] rounded-[28px]` with the same fill (a floating sheet, **inferred**, matching the floating rail), header with `X` at the right.
+- Fields inside sheets: `h-11 rounded-lg bg-field px-3` read-only value fields and inputs ("22 Sep at 22:57" [latest-sheet-edit-1]).
 
-### 4.8 MetricState (`src/components/shells/MetricState.tsx`)
+**InfoDialog** (`shells/InfoDialog.tsx`, Radix Dialog):
+
+```
+        ┌────────────────────────────────┐
+        │ (icon)                       ✕ │   icon 28 px, close 44 px hit
+        │ [✓] HRV                        │   status chip + title (info card title role), optional
+        │     WITHIN 24 - 28             │
+        │ Body paragraphs, 15/22, max    │
+        │ 6 short paragraphs, scrolls    │
+        │ inside past 70svh.             │
+        │ Fine print (caption role).     │
+        │ ┌────────────────────────────┐ │
+        │ │       OPEN TREND VIEW      │ │   optional outline action, h-12 rounded-full
+        │ └────────────────────────────┘ │
+        └────────────────────────────────┘
+         dim rgb(0 0 0 / 0.85), page barely visible
+```
+
+- Content `fixed left-1/2 top-1/2 -translate-1/2 w-[calc(100%-32px)] max-w-[360px] max-h-[80svh] overflow-y-auto overscroll-contain rounded-3xl bg-linear-to-b from-[#2a373f] to-popover p-6 ring-1 ring-white/8`. Overlay `bg-(--dim-strong)`, no blur.
+- Props: `{ title; icon?; chip?: { tone; text }; body: ReactNode; action?: { label; href } }`. Every v1 info sheet's copy moves here unchanged (§7.15 and each screen's "Info sheet" paragraph).
+- Motion §2.7; focus trapped; Esc and tapping the dim close; focus returns to the trigger.
+
+**CalendarPanel ≥ 768 offset.** With the rail and sidebar replacing the shadcn Sidebar, the panel's left offset becomes `md:left-[112px] xl:left-[256px]` (was `left-12`, `xl:left-64`; CAL6 updated in §11).
+
+### 4.9 MetricState (`shells/MetricState.tsx`)
+
+Unchanged from v1:
 
 The only place that branches on data state. Every metric on every screen renders through it.
 
@@ -506,9 +770,18 @@ Files: `src/components/metrics/*` (dials, rows, lists, cards) and `src/component
 - exports `.Skeleton` in its final shape;
 - has no breakpoint classes (§4).
 
+**v2 changes to §5** (everything else in §5.0-5.16 below is carried from v1 and still binding):
+
+- **Cards** are the card material (§2.6): `rounded-2xl`, top-light gradient, 1 px top hairline. shadcn `Card` keeps `ring-0`; its base class gets the material once.
+- **Rows inside cards** (activity rows, zone rows, monitor value tiles): `rounded-lg bg-secondary` (10 px, `#3b4244`) [latest-home-collapsed-1], [latest-activity-2].
+- **Buttons.** `default` stays white with dark text for the one primary action (WHOOP "+", "SAVE", "COMMIT" [latest-sheet-edit-1], [latest-coach-sheet-1]); `secondary` is `bg-secondary`; new `outline-pill` variant `rounded-full ring-1 ring-foreground/70 bg-transparent` for the second action in sheets and the info card ("DELETE", "OPEN TREND VIEW"). The "+" on Home is a 48 px `rounded-[14px] bg-foreground text-primary-foreground` square with `Plus` 26 px [latest-home-collapsed-1]. Press scale 0.96 everywhere, as v1.
+- **Tags and status chips** keep v1's look; chips get `rounded-md` (8 px).
+- **Insight card** keeps the 1 px gradient hairline; inner radius `rounded-[15px]` (§2.4), fill `--inset` `#111619` [latest-sleep-1].
+- **The Home "Ask"/coach row and WHOOP's floating coach pill** are not adopted (Pulse has no assistant). Insight text stays in `InsightCard`.
+
 ### 5.0 Shared conventions
 
-**shadcn primitives used** (all already in `src/components/ui`): `Sidebar`, `Card`, `Button`, `Badge`, `ToggleGroup`, `Tabs` (not used; `ToggleGroup` covers segmented controls), `Drawer`, `Sheet`, `Dialog`, `Popover`, `Tooltip`, `Calendar`, `ScrollArea`, `Skeleton`, `Progress`, `Alert`, `Switch`, `Input`, `Label`, `Separator`, `Sonner`, `Chart` (`ChartContainer`, `ChartTooltip`, `ChartTooltipContent`, `ChartLegend`, `ChartLegendContent`).
+**shadcn primitives used** (all already in `src/components/ui`; v2 retires `Sidebar`, §4.2, and adds nothing): `Card`, `Button`, `Badge`, `ToggleGroup`, `Tabs` (not used; `ToggleGroup` covers segmented controls), `Drawer`, `Sheet`, `Dialog`, `Popover`, `Tooltip`, `Calendar`, `ScrollArea`, `Skeleton`, `Progress`, `Alert`, `Switch`, `Input`, `Label`, `Separator`, `Sonner`, `Chart` (`ChartContainer`, `ChartTooltip`, `ChartTooltipContent`, `ChartLegend`, `ChartLegendContent`).
 
 **One edit to the generated `button.tsx` in U12** (theme-level, not a component style): add two sizes and use them for every touch action.
 
@@ -577,7 +850,7 @@ Variants and colour:
 Recharts construction (no SVG maths):
 
 - `RadialBarChart` sized to the diameter, `data={[{ value }]}`, `startAngle={90} endAngle={-270}`, `innerRadius = r - ring`, `outerRadius = r`, `barSize = ring`; `PolarAngleAxis type="number" domain={[0, max]} tick={false}`; `RadialBar dataKey="value" background={{ fill: "var(--color-dial-track)" }} cornerRadius={0}` with `fill` from the variant.
-- **Strain target:** a `PieChart` stacked underneath (same box, `absolute inset-0`) with one `Pie` of three slices `[lo, hi - lo, 21 - hi]`, same radii, `startAngle={90} endAngle={-270}`, fills `transparent`, `var(--color-dial-target)`, `transparent`, `stroke="none"`, `isAnimationActive={false}`. The tick: a second `Pie` with slices `[mid - 0.1, 0.2, 21 - mid - 0.1]` where `mid = (lo + hi) / 2`, middle slice `fill="var(--color-foreground)"`, outer radius `r + 2`, inner `r - ring - 2`. The blue fill draws above both, so once Strain passes the target the band is covered, as in WHOOP [home-dials].
+- **Strain target:** a `PieChart` stacked underneath (same box, `absolute inset-0`) with one `Pie` of three slices `[lo, hi - lo, 21 - hi]`, same radii, `startAngle={90} endAngle={-270}`, fills `transparent`, `var(--color-dial-target)`, `transparent`, `stroke="none"`, `isAnimationActive={false}`. The tick: a second `Pie` with slices `[mid - 0.1, 0.2, 21 - mid - 0.1]` where `mid = (lo + hi) / 2`, middle slice `fill="var(--color-foreground)"`, same radii as the ring (it stays inside the track, as in WHOOP). The blue fill draws above both, so once Strain passes the target the band is covered, as in WHOOP [home-dials].
 - **Gauge:** `startAngle={210} endAngle={-30}`; the arc is a `Pie` with three slices `[1, 1, 1]` in the three stress colours (with `paddingAngle={2}`), and the marker is a second `Pie` like the strain tick at the value.
 - Centre content is an absolutely positioned HTML block over the chart (`absolute inset-0 grid place-content-center text-center`), not SVG text.
 
@@ -593,6 +866,12 @@ States:
 
 Accessibility: the dial root is `role="img"` with `aria-label` built in `src/lib/format.ts`: "Recovery 72 percent, green", "Recovery provisional, 58 percent, yellow", "Strain 9.4 of 21 so far, target 12.0 to 15.0", "Sleep performance 84 percent", "Stress 1.5, medium", "Recovery unavailable: calibrating, 4 nights left". When the dial is a link (Home), the `Link` wraps dial and label and carries `aria-label="{dial label}. Open {Recovery} details"`; the inner `role="img"` is then `aria-hidden`. Hit area: the whole dial + label column (≥ 96 × 132 px). Press: `active:scale-[0.96]`.
 
+**v2 additions to ScoreDial.**
+
+- **Hero (`lg`) anatomy** [latest-recovery-1], [latest-strain-1], [latest-sleep-1]: the wordmark sits inside the ring above the value, the label under it ("RECOVERY", "STRAIN", "SLEEP PERFORMANCE" on two lines). The band word ("GREEN") under the label stays (accessibility, v1 principle 2); WHOOP omits it, so it is set in the dial-label role at `text-foreground-secondary` rather than the band colour, to keep the ring the only colour. Sleep `lg` adds WHOOP's three-segment status bar under the label (`Poor / Sufficient / Optimal`, 16 × 4 px segments, active one coloured) [latest-sleep-1]. Ring thickness at `lg` becomes 14 (`md:` 16), measured 14 pt on a 300 pt dial [latest-recovery-1] (v1 11 / 13).
+- **Gap at 12 o'clock.** Every current ring starts after a small gap at the top (the track does not close) [latest-recovery-1], [latest-home-top-1]: `startAngle={86} endAngle={-266}` for track and fill (4° gap each side of 12 o'clock).
+- **`mini` size (new)**, for the header ring row: 22 px diameter, 3 px ring, no centre content, `isAnimationActive` only on first reveal (§4.3), `role="img"` hidden when inside a labelled link. Same Recharts construction.
+- **Gauge (Stress), v2** [latest-stress-monitor-1]: still `startAngle={210} endAngle={-30}` (240°), but drawn as one continuous gradient: a `Pie` of 24 equal slices with `paddingAngle={0}` whose fills step through `--stress-low` → `--stress-medium` → `--stress-high` (slices 1-8 low → medium blend, 9-16 medium, 17-24 medium → high blend), `innerRadius = r - 4`, `outerRadius = r` (a thin 4 px arc, as captured), and the white needle as a second `Pie` slice 0.6° wide extending 6 px beyond both radii. Value centre: value, level word in its level colour, time of reading in caption role. End labels "0.0" and "3.0" under the arc ends. No SVG maths: slices only.
 ### 5.2 KeyStatRow (`metrics/KeyStatRow.tsx`)
 
 Purpose: one metric with label, value, unit, 30-day average and a good/bad arrow. Two variants.
@@ -737,6 +1016,8 @@ States: loading (header skeleton + `h-[200px] rounded-lg` skeleton); empty "No d
 
 ### 5.6 Hypnogram (`charts/Hypnogram.tsx`)
 
+**v2:** replaced on the Sleep screen by the stage rows of §7.5 (V8). The v1 text is kept for the data rules (lanes, tooltip copy, empty and reason states), which the stage rows reuse.
+
 Purpose: last night's stages as a step chart over four lanes, top to bottom Awake, REM, Light, Deep (plan order; derived design).
 
 ```
@@ -847,6 +1128,8 @@ Purpose: intraday stress 0-3 with level-coloured line and sleep/workout markers 
 States: loading (skeleton at the height); empty: "No still minutes to score yet today. Stress is measured only while you are not moving."; reason `band_not_worn` via ReasonPlaceholder; provisional: "Provisional" tag on the parent card when the daytime baseline is young; value as anatomy.
 
 ### 5.11 DayStrip (`metrics/DayStrip.tsx`)
+
+**v2:** used on Journal only (V2). Selected item `data-[state=on]:bg-white/10`, items `rounded-xl`.
 
 Purpose: scrub the last 30 days; no future days.
 
@@ -968,6 +1251,81 @@ Two components the screens need that the plan's table does not list (§11, D4).
 - End labels: caption role with `font-numeric`, `flex justify-between mt-1`. Leading/trailing slots hold "Slow"/"Fast" with `Turtle`/`Rabbit` 16 px.
 - `role="meter"` with `aria-valuemin`, `aria-valuemax`, `aria-valuenow`, `aria-valuetext` ("Pace of Aging 0.8 times: aging slower than your 6-month average"; "Energy 62 percent").
 - States: loading (`h-8` skeleton bar); reason: all ticks `bg-dial-track`, no marker, value label "--"; provisional: "Provisional" tag after the value label; value as anatomy.
+### 5.16 CalendarPanel (`shells/CalendarPanel.tsx`)
+
+WHOOP's current calendar [calendar-recovery-current-2026-05, calendar-recovery-current-2026-05-nodata-today, calendar-recovery-current-2026-05-monday, calendar-strain-dropdown-user-2yr-old]. Opened from the DateSwitcher label (§4.3). Logic in `src/lib/calendar.ts`; data from `getCalendarMonth("YYYY-MM")` (`server/queries/calendar.ts`) through the Server Function `loadCalendarMonth` (`server/actions/calendar.ts`), fetched per month on open and on month change, cached for the session.
+
+```
+ ┌──────────────────────────────────────────────┐  ← viewport top, over the status bar and top bar
+ │ ‹                    MAY                   › │  h-14; chevrons 44 px at the edges
+ │ MON  TUE  WED  THU  FRI  SAT  SUN            │  text-xs semibold caps, muted-foreground
+ │                     1    2    3              │  rows h-12, columns 1/7, no outside days
+ │  4    5    6    7    8    9   10             │  numerals in band colours
+ │ …                             (30)  31       │  selected day: 32 px circle; future grey
+ │                 • <34%  • 34% - 66%  • >66%  │  legend, text-xs semibold, right
+ └──────────────────────────────────────────────┘  1.5 px band, border-background-top
+          page below dimmed bg-black/65, no blur
+```
+
+- Radix `Dialog` with its own overlay and content (not shadcn's `DialogContent`, whose overlay blurs). Panel `fixed inset-x-0 top-0 bg-background-mid pt-[env(safe-area-inset-top)] border-b-[1.5px] border-background-top`, square corners, no shadow. Overlay `bg-black/65`, no blur. Tap the dim or press Esc to close.
+- ≥ 768: the same panel hangs under the top bar (`top: safe-area + 56 px`), beside the rail / sidebar (`md:left-[112px]`, `xl:left-[256px]`; v2, follows V1), the overlay covering the same region; the grid is `max-w-[560px]` centred (CAL6).
+- Header: month in the top-bar title role at 14 px (`text-sm font-bold tracking-[0.1em] uppercase`), "May"; outside the current year "December 2025" (CAL2). Chevrons `ChevronLeft`/`ChevronRight` 32 px, stroke 1.5, white; disabled `text-foreground/50` when the month would be after today's or before `firstDay`'s.
+- Weekdays: three-letter caps, Monday first (`WEEK_STARTS_ON`, a `weekStartsOn` prop overrides) (CAL3).
+- Day: `<button>` filling the cell (≥ 44 × 48 px), numeral `font-numeric text-[17px] font-bold tabular-nums`. Colour by context:
+  - Recovery: band text tokens (`text-recovery-red-text` below 34, `text-recovery-yellow` 34-66, `text-recovery-green` 67+).
+  - Strain: `text-strain-text`, a 4 px `bg-strain` dot under days with Day Strain ≥ 10.0.
+  - Sleep: `text-sleep`, a 4 px `bg-sleep` dot under days with Sleep performance ≥ 85% (CAL4).
+  - No score, future days and days before `firstDay`: `text-foreground/40` (WHOOP `#707579`). Future and pre-`firstDay` days are disabled.
+- Context from the route: `/strain` and `/activity` Strain, `/sleep` Sleep, else Recovery; `DateSwitcher calendar=` overrides.
+- Selected day (`?d=`, default today): `size-8 rounded-full bg-dial-track ring-2 ring-background`; the numeral keeps its colour (grey when there is no score) (CAL5).
+- Legend: Recovery `• <34%  • 34% - 66%  • >66%` in the band colours; Strain `• Day Strain 10+`; Sleep `• Sleep 85%+` (CAL4).
+- Choosing a day: `router.replace(dayHref(…))` and close. Keyboard: arrows move a roving focus by day / week, crossing months and clamped to `[firstDay, today]`; Enter selects; Esc closes; focus is trapped, opens on the selected day, returns to the pill.
+- Motion: slides down 200 ms `ease-standard` (tw-animate `slide-in-from-top`), overlay fades. Reduced motion: the base layer's duration collapse makes it appear at once (CAL7).
+- While a month loads, numerals are grey and still selectable; a failed fetch leaves them grey and retries on the next open.
+
+### 5.17 WhoopAgeOrb (`metrics/WhoopAgeOrb.tsx`)
+
+**The contract for the orb is `docs/design/orb.md`**, written by the agent building it from the `latest-whoop-age-*` references. This section records the evidence and the interface the screens rely on; where orb.md is more specific, orb.md wins.
+
+Evidence, measured on the captures (all 2026):
+
+- **Shape.** An organic blob, never a circle: low-frequency outline wobble of a few percent of the radius, slowly changing; it squashes toward a dragging finger [latest-whoop-age-touch-frames] (from the 2026-09-14 recording "Anyone else use the Whoop Age bubbles thingy as a fidget spinner?").
+- **Edge.** A crisp 2 px rim in the stop's rim colour; pure black outside, no outer glow [latest-whoop-age-green-2].
+- **Fill.** Inner glow from the rim inward: `#13733d` at the rim to black by about 46 % of the radius (green), 55 % (amber); the centre stays dark behind the number.
+- **Particles.** Roughly 150-250 dots, two populations: small sharp cores and larger soft (bokeh) discs at 30-60 % alpha; denser toward the rim, sparse in the centre; colour a light tint of the stop (`#80f0c0`, `#f0c070`, `#9cc8f0`, plus a few near-white).
+- **Colour by years younger (+) or older (−)**, captures in brackets: ≥ +3 green (+10.5 [latest-whoop-age-green-1], +6.6 [latest-whoop-age-green-2], +3.5); +0.5 to +3 green blending to cyan (+3.4 teal-green, +2.1 green-blue); about 0 cyan (+1.0 [latest-whoop-age-cyan-1], +0.5 teal-blue); 0 to −2.5 two-tone, cool on top and amber at the bottom, the amber share growing with age (−0.8 [latest-whoop-age-mixed-1], −1.3, −1.5, −1.8 [latest-whoop-age-mixed-2]); ≤ −2.5 amber (−2.7, −5.6 [latest-whoop-age-amber-1], −6.1). Palette tokens in §2.3.
+- **Type inside.** Value in the orb value role, "WHOOP AGE" in the orb label role, delta "6.6 years younger" in the stop's text colour (§3.4).
+- **Motion.** Particles swirl with a dragging pointer and the outline deforms toward it [latest-whoop-age-touch-frames]. The idle drift and the entry animation are not in any capture (**inferred**: a slow drift and an outward bloom on mount). Reduced motion: a single static frame.
+- **Collapsed form.** On scroll the Healthspan header shows a mini orb (about 104 px) with the number and label, flanked by "3.4 / YEARS YOUNGER" on the left and "−0.8x / PACE OF AGING" on the right [latest-healthspan-collapsed-1].
+
+Interface used by §7: `<WhoopAgeOrb age={29.9} deltaYears={+2.3} size="hero" | "hub" | "mini" state="value" | "provisional" | "calibrating" | "no_data" />`, sizes 300 / 200 / 104 px (phone; `md:` 340 / 220 / 104). Hub and hero sizes from [latest-health-tab-1] and [latest-whoop-age-amber-1]. Accessibility: `role="img"`, `aria-label="WHOOP Age 29.9, 2.3 years younger than your age"`; the canvas is `aria-hidden` and the number is real text over it. The v1 CSS orb (§7.7 hero, B1) is replaced.
+
+### 5.18 HealthspanHeader (part of DetailShell for `/health/healthspan`)
+
+[latest-healthspan-collapsed-1]. When the hero orb scrolls under the DetailHeader, the header grows a row: `grid grid-cols-[1fr_auto_1fr] items-center h-28`: left "3.4" (stat value row role, `text-optimal` when younger, `text-warning` when older) over "YEARS YOUNGER" / "YEARS OLDER" (stat-label); centre the `mini` orb; right "−0.8x" over "PACE OF AGING". Same sentinel and helper as §4.3 (only the `top` / `rings` states; no `rings-only`).
+
+### 5.19 Skeletons (rules for every `.Skeleton`)
+
+Plan U16 asks that nothing moves when data arrives. Every kit component's `.Skeleton` follows these rules; U17 audits each one in `/dev/kit` side by side with the loaded component.
+
+| Rule | Spec |
+|---|---|
+| Same box | The skeleton renders the component's own outer element with its real classes (size, padding, radius, gap), and swaps only the content for bars. Implement as one component with a `loading` branch, not a second layout. |
+| Same text metrics | A text bar is the role's line height tall and its cap height filled: `h-[1lh]` wrapper with an inner `h-[0.72em] rounded-sm bg-muted`; width from the expected content (labels at their real length class, numbers `w-[3ch]`-`w-[5ch]`). |
+| Dials | Track drawn as the real Recharts track (not a CSS border ring), no fill, centre bars; the label text is real (labels are static). |
+| Charts | The chart card, its title, its toggle (real, disabled) and a plot-sized `bg-muted/60` block at the chart's fixed height; axis labels omitted. |
+| Rows | Real icons and labels (they are static); only values are bars. |
+| Never skeleton | Headers, the tab bar, the rail, the FloatingAction, section titles, card titles, static copy. |
+| Motion | `animate-pulse` at 2 s, stopped under reduced motion. No shimmer gradient. |
+| Orb | Rim track only (2 px `--dial-track` circle at the orb size), no particles, number bar in the centre. |
+| Route `loading.tsx` | Composes the same component skeletons in the page's real layout, so the swap is in place (A8 still applies). |
+
+### 5.20 Chart tooltips (every Recharts chart)
+
+- `ChartTooltip` gets `isAnimationActive={false}` and `animationDuration={0}` (no slide-in from the left), `cursor` as v1, `allowEscapeViewBox={{ x: false, y: false }}` and `wrapperStyle={{ pointerEvents: "none" }}`.
+- Position follows the pointer (`position` unset); bars snap to the hovered category, lines and areas snap to the nearest point (`ComposedChart` default with `accessibilityLayer`).
+- Touch: `onTouchMove` scrubs (Recharts default); the header readout switches to the scrubbed point, as v1 TrendChart.
+- Look: tooltip material (§2.6), label in caption role, values in the chart text role.
 
 ---
 
@@ -1008,6 +1366,20 @@ Voice (WHOOP's): plain, second person, present tense, calm. Say what the number 
 | Loading text (rare, buttons only) | ends with `…` | "Saving…", "Connecting…" |
 | Toasts | past tense of the action | "Check-in saved", "Google disconnected" |
 
+**v2 copy additions** (same voice rules):
+
+| Thing | Copy | Evidence |
+|---|---|---|
+| Home sections | "My Day", "My Dashboard", "My journal", "Behaviour insights" (button), "Strain & recovery" | [latest-home-collapsed-1], [latest-home-dashboard-1], [latest-home-collapsed-2] |
+| Day banners | "Your daily outlook", "Your day in review", "Your week in review" | [latest-home-collapsing-1], [latest-home-top-1] |
+| Streak | count only; `aria-label` "{n}-day streak"; title "Days in a row with your band worn" | [latest-home-sticky-header-user-2025] |
+| Sync status | "Now", "12m", "3h", "2d", "Demo" | battery slot [latest-home-sticky-header-user-2025] |
+| FloatingAction | `aria-label` "Check in for {Today / Mon, Sep 28}" | inferred |
+| Journal insights title | "Behaviour insights" (WHOOP's term, in Pulse's existing British spelling: one spelling everywhere) | [latest-journal-insights-1] |
+| Healthspan calibrating notice | "Your Healthspan is calibrating, so changes in your WHOOP Age are normal. It settles as Pulse collects more data." | [latest-whoop-age-amber-1] |
+| Pace of Aging chip | "Slower vs. last week" / "Faster vs. last week" / "No change vs. last week" | [latest-whoop-age-green-1], [latest-whoop-age-mixed-2] |
+| Dashboard aside | "vs. 30-day average" (unchanged) | |
+
 ---
 
 ## 7. Screens
@@ -1018,140 +1390,132 @@ Every screen below lists its shell, its sections in order, the components and ex
 
 **Every screen** has a `loading.tsx` that renders the same shell with each section's `.Skeleton`, and an `error.tsx` that keeps the shell, shows an EmptyState ("Couldn't load this screen." + button "Try again" → `reset()`), and on a failed fetch caused by an expired Access session performs one guarded full reload (`sessionStorage` flag) as the plan's U13 describes.
 
+**v2 conventions for every screen below.**
+
+- Tab roots (`/`, `/health`, `/journal`, `/more`) have the tab bar and FloatingAction on phone; detail screens have only the FloatingAction (C5). In the v1 phone wireframes that are carried forward, read any `╭ tab bar ╮` line on a detail screen as the FloatingAction alone at the bottom right.
+- In the carried tablet and laptop wireframes, the left column (`│ P │`, `│ PULSE │`) is now the floating glass rail / sidebar (§4.2), and the top line is the v2 header (§4.3, §4.4), not the v1 top bar with its Demo chip and sync dot.
+- Cards are 16 px radius with the card material; info buttons open `InfoDialog`; every "Info sheet" below is an info card.
+- Detail headers: Recovery, Strain and Sleep show the date as title (`‹ TODAY ›`), and the v1 body `DateSwitcher` line under the header is removed on those three.
+
 ### 7.1 Home `/`
 
-Shell: `PageShell layout="home" dateSwitcher={{ mode: "day" }}`. References: [home-overview-marketing], [home-device-today], [home-device-planner-nav], [home-tablet], [home-dials].
+Shell: `PageShell layout="home"` with `HomeHeader` (§4.3). References: [latest-home-top-1], [latest-home-top-2], [latest-home-top-3], [latest-home-collapsing-1], [latest-home-collapsed-1], [latest-home-collapsed-2], [latest-home-collapsed-3], [latest-home-dashboard-1], [latest-home-pastday-1], [latest-plan-1], [latest-home-sticky-header-user-2025].
 
-| # | Section | Component(s) | Copy | Empty / reason |
-|---|---|---|---|---|
-| 1 | Top bar | TopBar: Demo chip, DateSwitcher, SyncStatus | "Demo data"; "Today" | n/a |
-| 2 | Connection | ConnectionBanner | §5.13 | hidden when connected or demo |
-| 3 | Day strip | DayStrip `indicator="recovery"` | n/a | n/a |
-| 4 | Wordmark and dials | wordmark "Pulse"; ScoreDial `sleep md`, `recovery md`, `strain md` (with target), three equal dials as in WHOOP, as links | labels "Sleep", "Recovery", "Strain"; "So far" tag under Strain for today | Any dial in reason: track only, centre `--`; one centred ReasonPlaceholder `sm` line under the row with the most important reason (Recovery's, else Sleep's, else Strain's), e.g. "Calibrating: 4 nights left" |
-| 5 | Health Monitor alert (only when flagged) | `Alert` (bg-card, `ring-1 ring-warning/50`; illness: `ring-recovery-red/60`), icon `TriangleAlert` warning / `CircleAlert` red | Flagged: title "{n} vitals outside your normal range", body "{Names} are outside your usual range. This can be an early sign of illness or heavy strain.", link "View Health Monitor". Illness: title "Your body may be fighting something", body "Several vitals moved away from your normal range together, a pattern that often comes before feeling unwell. Consider an easier day.", same link | hidden when nothing is flagged |
-| 6 | Monitor row | two linked cards (SectionShell `card`, whole card is the link) | **Health Monitor**: in range → chip `Check` on `bg-optimal/15` + "Within range" (`text-optimal`, stat-label) over "5/5 metrics" (caption); flagged → `TriangleAlert` on `bg-warning/15` + "Out of range" (`text-warning`) over "3/5 metrics". **Stress Monitor**: value chip (`font-numeric text-lg font-bold`, `rounded-md px-1.5` on the level colour at 15%, text in level colour) + level word (stat-label, level colour) over the time of the reading (caption, `HH:mm`) | Health Monitor reason (no vitals last night): chip `--`, "No readings" / reason short copy. Stress no data: chip `--`, "No still minutes yet" |
-| 7 | My Day | SectionShell `section` "My Day" | | |
-| 7a | Today's activities | SectionShell `card` "Today's activities", action icon link `Maximize2` → `/strain?d=` (`aria-label` "Open Strain"); SleepCard / ActivityCard rows `space-y-1.5` | For past days the title reads "Activities" | "No activities yet today. Workouts appear after Fitbit syncs them." (past: "No activities on this day.") |
-| 7b | Energy Bank | SectionShell `card` "Energy Bank" + info; TickScale `meter`; caption; EnergyBankChart; two mini stats; drains list | value `62%`; caption "Started at 81% at 06:40"; mini stats "Charged" `+12` (`text-optimal`), "Drained" `−31` (`text-warning`) in a `grid grid-cols-2 gap-3` of `bg-secondary rounded-lg p-3` tiles; drains (caption role, one line each): "Run at 07:02 · −18", "Stress at 14:10 · −9", "Commute at 18:30 · −4" | before wake: reason `awaiting_sleep_sync` md; no Recovery: same reason as Recovery |
-| 7c | Tonight's sleep | SectionShell `card` "Tonight's sleep" + info + link → `/sleep?d=`; times row; ToggleGroup | left `22:40` (`font-numeric text-[32px] font-bold`) + "Recommended bedtime" (stat-label, `text-foreground-secondary`); a dashed rule `border-t border-dashed border-border flex-1`; right `06:45` + "Typical wake"; ToggleGroup items "Peak", "Perform", "Get by" (default Peak; switches the bedtime shown; aria "Peak, 100 percent of need"); caption "Need tonight: 8:24". The card's `aria-label` reads "Bed by 22:40 for peak" | fewer than 7 nights: reason `calibrating` md with "Sleep Planner needs 7 nights to learn your wake time." |
-| 8 | Key statistics | SectionShell `section` "Key statistics", aside "vs. 30-day average"; a `Card ring-0 px-4 py-1` holding KeyStatRow rows with `divide-y` | rows in order: "Heart rate variability" ms, "Resting heart rate" bpm, "Respiratory rate" rpm, "Sleep performance" %, "Calories" kcal, "Steps", "Blood oxygen" %, "Skin temperature" °C (from baseline); each row links to its detail (`/recovery`, `/recovery`, `/health/monitor`, `/sleep`, `/strain`, `/strain`, `/health/monitor`, `/health/monitor`) | per-row reason copy |
-| 9 | Weekly report teaser | banner link | `rounded-xl bg-linear-to-r from-banner-from to-banner-to h-14 px-4 flex items-center gap-3`; `CalendarRange` 20 px; "Your week in review" (body-strong); right caption "Sep 22 - Sep 28" + `ChevronRight`; → `/reports/2026-W39` (latest complete ISO week) | hidden until the first complete week exists |
+| # | Section | Component(s) | Copy | Empty / reason | Evidence |
+|---|---|---|---|---|---|
+| 1 | Header | HomeHeader: avatar, streak, DateSwitcher, SyncStatus; ring row when collapsed | "Today", "{n}" streak, "12m" / "Demo" | streak hidden at 0 and on past days | §4.3 |
+| 2 | Connection | ConnectionBanner (card material) | §5.13 | hidden when connected or demo | v1 |
+| 3 | Wordmark and dials | wordmark "Pulse" (wordmark role) over three equal ScoreDial `md` links (Sleep, Recovery, Strain with target), labels with `ChevronRight` 12 | "Sleep", "Recovery", "Strain"; "So far" tag under Strain today | as v1 (track only, one ReasonPlaceholder line) | dials equal, wordmark centred [latest-home-top-1] |
+| 4 | Insight (today only) | InsightCard compact: title body-strong, 3 lines max, a "1"/check counter at the right in a `rounded-lg bg-white/8` 32 × 48 pill when there are several (swipe, **inferred** as tap to cycle) | U10's top insight, e.g. title "Reaching optimal strain", body "You're inside today's target of 12.6. More strain from here adds load faster than benefit." | hidden when none | "Reaching Optimal Strain" card [latest-home-top-1], "Heart Rate Zones Updated" [latest-home-top-3] |
+| 5 | Health Monitor alert | v1 `Alert` (card material, warning / red ring) | v1 copy | only when flagged | v1 |
+| 6 | Monitor row | two linked cards, `grid grid-cols-2 gap-3` | v1 copy (Health Monitor "Within range / 5/5 Metrics"; Stress Monitor value chip + level + time) | v1 + A1 | [latest-home-top-1], [latest-home-top-3] |
+| 7 | My Day | SectionShell `section` "My Day" with the white "+" square at the right (opens the check-in sheet, the FloatingAction's twin; `aria-label="Add to today"`) | "My Day" | | [latest-home-collapsed-1] |
+| 7a | Daily outlook / Day in review | 56 px banner row, `rounded-2xl`, icon 22 + text body-strong + `ChevronRight`: morning (before 17:00) "Your daily outlook" on `bg-linear-to-r from-outlook-from to-outlook-to` with `Sun`; evening "Your day in review" on the banner gradient with `Moon`. Tap opens an InfoDialog with U10's day summary text | as left | hidden when U10 has no text | [latest-home-collapsing-1], [latest-home-top-1] |
+| 7b | Today's activities | SectionShell `card` "Today's activities" (past: "Activities"), `Maximize2` → `/strain?d=`; Sleep / Activity rows `space-y-2`; footer buttons `grid grid-cols-1 gap-2` "+ Add activity" is **not** adopted (Pulse imports activities); instead a caption "Workouts appear after Fitbit syncs them." when today has only sleep | v1 row copy | v1 empty copy | rows and buttons [latest-home-collapsed-1], [latest-home-collapsing-1] |
+| 7c | My journal (week) | SectionShell `card` "My journal" + `ChevronRight` → `/journal`; seven columns: weekday caps (stat-label, `text-muted-foreground`, today white) over a 28 px circle: done `bg-optimal text-background` with `Check` 16, not done `ring-1 ring-white/25`, future none; footer button `h-12 rounded-xl bg-secondary` with `Sparkles` "Behaviour insights" → `/journal/insights` | "My journal", "Behaviour insights" | first week: circles only | [latest-home-collapsed-1], [latest-home-top-1] video |
+| 7d | Energy Bank | v1 card | v1 | v1 | Bevel-only, WHOOP language (v1) |
+| 7e | Tonight's sleep | v1 card, restyled as WHOOP's: two time blocks with icons (`Sunset`-style `Moon` left "Recommended bedtime", `AlarmClock` right "Typical wake") joined by a dashed rule; the Peak / Perform / Get by toggle stays | v1 | v1 | "TONIGHT'S SLEEP 11:20 ----- 8:30" [latest-home-top-1] |
+| 8 | My Dashboard | SectionShell `section` "My Dashboard" (renamed from Key statistics; the aside "vs. 30-day average" stays); each metric is its **own** 56 px card-material row (not rows in one card): icon 22 left, label stat-label, value right (stat value row role) with the 30-day average under it and the delta arrow right of it | v1 rows, same order and links | per-row reason copy | separate row cards [latest-home-dashboard-1] |
+| 9 | Strain & Recovery chart | new card "Strain & recovery" + info: 7-day dual line: Strain on the left axis 0-21 (`--strain`, labels in blue), Recovery on the right axis 0-100 % (dots and labels in band colours), today's column highlighted `bg-white/6` | header "Strain & recovery" | hidden with fewer than 2 days | [latest-home-collapsed-2], [latest-home-collapsed-3] |
+| 10 | Week in review | v1 teaser, restyled as the 56 px banner row of 7a with `CalendarRange` | v1 copy | v1 | v1 + banner style |
 
-Info sheets on Home: Energy Bank, Tonight's sleep (copy in §7.15). Dials link to their detail screens with `?d=`.
+Day change: pill chevrons or the calendar; past days hide 1 (streak), 4 and 5, and title 7b "Activities", as [latest-home-pastday-1] shows (no insight, no monitors row on a past day: WHOOP shows the monitors only for today; Pulse keeps them for past days because the data exists, **deviation V7**).
 
 Phone, 390:
 
 ```
 ┌────────────────────────────────────────────┐
-│ [DEMO DATA]      ‹   TODAY   ›          ●  │ top bar 52 + safe area
-├────────────────────────────────────────────┤
-│ (!) Importing history                      │ banner (if any)
-│     42 of 180 days. ▓▓▓▓▓▓░░░░░░░░░░░░     │
-│  S   M   T   W   T   F  [S]  M   T   W   T │ day strip, selected centred
-│ 20  21  22  23  24  25  26  27  28  29  30 │
-│  ▬   ▬   ▬   ▬   ▬   ▬   ▬   ▬   ▬   ▬   ▬ │
+│ (av)[(flame)70]     ‹ [ TODAY ] ›     12m (⌚•) │ header top row 44 + safe area
 │                  P U L S E                 │
-│    ◯           ◯◯◯            ◯            │ 96 / 116 / 96
-│   74%          85%          14.2           │
+│     ◯◯           ◯◯           ◯◯          │ three 96 dials, equal
+│    96%          53%          12.1          │
 │  SLEEP >     RECOVERY >     STRAIN >       │
 │                              [SO FAR]      │
+│ ┌────────────────────────────────────[✓]┐ │ insight (today)
+│ │Reaching optimal strain             [1]│ │
+│ │You're inside today's target of 12.6…  │ │
+│ └────────────────────────────────────────┘ │
 │ ┌──────────────────┐ ┌───────────────────┐ │
-│ │HEALTH MONITOR   >│ │STRESS MONITOR    >│ │ 2-up, gap 12
-│ │[✓] WITHIN RANGE  │ │[1.5] MEDIUM       │ │
-│ │    5/5 metrics   │ │      16:31        │ │
+│ │HEALTH MONITOR   >│ │STRESS MONITOR    >│ │
+│ │[✓] WITHIN RANGE  │ │[0.7] LOW          │ │
+│ │    5/5 Metrics   │ │      21:44        │ │
 │ └──────────────────┘ └───────────────────┘ │
-│ My Day                                     │
+│ My Day                                [+]  │
+│ [(sun) Your daily outlook               >] │ gradient banner row
 │ ┌────────────────────────────────────────┐ │
 │ │TODAY'S ACTIVITIES                  [⤢] │ │
-│ │[(moon) 6:29] SLEEP             00:51   │ │
-│ │                                07:38   │ │
-│ │[(run) 10.3] RUNNING            11:16   │ │
+│ │[(moon) 8:30] SLEEP           [Wed]23:06│ │
+│ │                                  08:28 │ │
+│ │[(run) 8.5]  RUNNING             13:35  │ │
 │ └────────────────────────────────────────┘ │
 │ ┌────────────────────────────────────────┐ │
-│ │ENERGY BANK (i)                         │ │
-│ │62% ||||||||||||||||||||::::::::::::::  │ │
-│ │Started at 81% at 06:40                 │ │
-│ │[energy chart, 140]                     │ │
-│ │[CHARGED +12]       [DRAINED −31]       │ │
-│ │Run at 07:02 · −18                      │ │
+│ │MY JOURNAL                            > │ │
+│ │ MON TUE WED THU FRI SAT SUN            │ │
+│ │ (✓) (✓) (✓) (✓) (✓) ( )  ( )           │ │
+│ │[(✦) BEHAVIOUR INSIGHTS                ]│ │
 │ └────────────────────────────────────────┘ │
-│ ┌────────────────────────────────────────┐ │
-│ │TONIGHT'S SLEEP (i)                   > │ │
-│ │22:40 - - - - - - - - - - - - - - 06:45 │ │
-│ │RECOMMENDED BEDTIME      TYPICAL WAKE   │ │
-│ │[ PEAK | PERFORM | GET BY ]             │ │
-│ │Need tonight: 8:24                      │ │
-│ └────────────────────────────────────────┘ │
-│ Key statistics        vs. 30-day average   │
-│ ┌────────────────────────────────────────┐ │
-│ │(hrv) HEART RATE VARIABILITY   124 ▲    │ │
-│ │                                98      │ │
-│ │ ... 8 rows, 52 px each                 │ │
-│ └────────────────────────────────────────┘ │
-│ [(cal) Your week in review  Sep 22 - 28 >] │
-│                                            │
-│ ╭────────────────────────────────────────╮ │ floating tab bar
-│ │ (home)    (health)   (journal)  (more) │ │
-│ │  Home      Health     Journal    More  │ │
-│ ╰────────────────────────────────────────╯ │
+│ [ENERGY BANK card, v1]                     │
+│ [TONIGHT'S SLEEP 22:40 - - - - 06:45]      │
+│ My Dashboard         vs. 30-day average    │
+│ [(hrv) HEART RATE VARIABILITY    41 ▲ ]    │ one card per row, 56 px
+│ [          37                         ]    │
+│ [(rhr) RESTING HEART RATE        47 ▼ ]    │
+│ ... 6 more rows                            │
+│ [STRAIN & RECOVERY 7-day dual line]        │
+│ [(cal) Your week in review   Sep 22-28 >]  │
+│ ╭──────────────────────────────────╮ ╭───╮ │ glass tab bar + round action
+│ │(home)  (health)  (journal) (more)│ │ P │ │
+│ ╰──────────────────────────────────╯ ╰───╯ │
 └────────────────────────────────────────────┘
+
+ Scrolled past the dials ("rings"), then deeper while scrolling down ("rings-only"):
+┌────────────────────────────────────────────┐   ┌────────────────────────────────────────────┐
+│ (av)[(flame)70]     ‹ [ TODAY ] ›     12m (⌚•) │   │  ◯ SLEEP     ◯ RECOVERY      ◯ STRAIN      │
+│  ◯ SLEEP     ◯ RECOVERY      ◯ STRAIN      │   │░░░░░░░░ fade: content fading in ░░░░░░░░░░░│
+│░░░░░░░░ My Day (fading under) ░░░░░░░░░░░░░│   │ [(rhr) RESTING HEART RATE        47 ▼ ]    │
+│ [(sun) Your daily outlook               >] │   │ ...                                        │
 ```
 
-Tablet, 820 (icon rail 48 px, 720 px column):
+Tablet, 820 (rail 88 + insets; 720 px column; dials 120 px):
 
 ```
-┌───┬──────────────────────────────────────────────────────────────┐
-│ P │ [DEMO DATA]              ‹   TODAY   ›                     ● │
-│   ├──────────────────────────────────────────────────────────────┤
-│(h)│   S  M  T  W  T  F [S] M  T  W  T  F  S  M  T  W  T  F  S    │
-│(+)│                          P U L S E                           │
-│(j)│        ◯ 74%            ◯◯ 85%             ◯ 14.2            │ 120 / 144 / 120
-│(m)│       SLEEP >         RECOVERY >          STRAIN >           │
-│   │  ┌────────────────────────────┐ ┌────────────────────────────┐│
-│   │  │HEALTH MONITOR             >│ │STRESS MONITOR             >││
-│   │  └────────────────────────────┘ └────────────────────────────┘│
-│   │  My Day                                                       │
-│   │  [TODAY'S ACTIVITIES ......................................]  │
-│   │  [ENERGY BANK ..............................................]  │
-│   │  [TONIGHT'S SLEEP ..........................................]  │
-│   │  Key statistics                          vs. 30-day average   │
-│   │  [8 rows ....................................................]  │
-│   │  [Your week in review ......................................]  │
-└───┴──────────────────────────────────────────────────────────────┘
+╭──────╮┌──────────────────────────────────────────────────────────────┐
+│  P   ││ (av)[(flame)70]           ‹ [ TODAY ] ›                12m (⌚•) │
+│╭────╮││                         P U L S E                            │
+││Home│││        ◯ 96%             ◯ 53%              ◯ 12.1           │
+│╰────╯││       SLEEP >          RECOVERY >          STRAIN >          │
+│Health││  [insight .................................................] │
+│Journal│  [HEALTH MONITOR ...........] [STRESS MONITOR ..............] │
+│ More ││  My Day                                                  [+] │
+│      ││  [daily outlook] [TODAY'S ACTIVITIES] [MY JOURNAL] [ENERGY]  │ stacked
+│  ●   ││  [TONIGHT'S SLEEP] My Dashboard [rows] [STRAIN & RECOVERY]   │
+╰──────╯└──────────────────────────────────────────────────────────────┘   round action bottom-right 56 px
 ```
 
-Laptop, 1440 (sidebar 256 px, content 1120 px, grid 5fr / 7fr, gap 24):
+Laptop, 1440 (sidebar 232 + insets; content 1120; grid 5fr / 7fr), **inferred**:
 
 ```
-┌───────────────┬──────────────────────────────────────────────────────────────────────────────────┐
-│ PULSE         │ [DEMO DATA]                       ‹   TODAY   ›                               ●  │
-│               ├──────────────────────────────────────────────────────────────────────────────────┤
-│ (h) Home  ◄   │  S  M  T  W  T  F  S  M  T  W  T  F  S  M  T  W  T  F  S  M  T  W  T  F [S] M    │ top
-│ (+) Health    │            P U L S E               ┌───────────────────┐ ┌───────────────────┐   │
-│ (j) Journal   │    ◯ 74%     ◯◯ 85%     ◯ 14.2     │HEALTH MONITOR    >│ │STRESS MONITOR    >│   │
-│ (m) More      │   SLEEP >  RECOVERY >  STRAIN >    │[✓] WITHIN RANGE   │ │[1.5] MEDIUM       │   │
-│ ───────────   │                                    └───────────────────┘ └───────────────────┘   │
-│ (c) Reports   │  [Health Monitor alert, full width, only when flagged]                           │
-│ (s) Settings  │  Key statistics   vs. 30-day avg  │ My Day                                       │ left │ right
-│               │  ┌─────────────────────────────┐  │ ┌──────────────────────────────────────────┐ │
-│               │  │HRV                  124 ▲   │  │ │TODAY'S ACTIVITIES                     [⤢]│ │
-│               │  │RESTING HEART RATE    49 ▲   │  │ │[6:29] SLEEP                              │ │
-│               │  │RESPIRATORY RATE    14.5 ●   │  │ │[10.3] RUNNING                            │ │
-│               │  │SLEEP PERFORMANCE    84% ▲   │  │ └──────────────────────────────────────────┘ │
-│               │  │CALORIES          2,214      │  │ ┌───────────────────┐ ┌────────────────────┐ │
-│               │  │STEPS            12,459 ▲    │  │ │ENERGY BANK     (i)│ │TONIGHT'S SLEEP  (i)│ │ 2-up inside right
-│               │  │BLOOD OXYGEN         97%     │  │ │62% |||||||:::::   │ │22:40 - - - - 06:45 │ │
-│               │  │SKIN TEMPERATURE  +0.2 °C    │  │ │[chart]            │ │[PEAK|PERFORM|GET BY]││
-│               │  └─────────────────────────────┘  │ └───────────────────┘ └────────────────────┘ │
-│ [DEMO] ● 12m  │  [Your week in review ............................................ Sep 22 - 28 >] │ bottom
-└───────────────┴──────────────────────────────────────────────────────────────────────────────────┘
+╭────────────────╮ ┌──────────────────────────────────────────────────────────────────────────────┐
+│ PULSE          │ │ (av)[(flame)70]                     ‹ [ TODAY ] ›                       12m (⌚•) │
+│╭──────────────╮│ │            P U L S E               ┌──────────────────┐┌──────────────────┐ │
+││(h) Home      ││ │  ◯ 96%     ◯ 53%     ◯ 12.1        │HEALTH MONITOR   >││STRESS MONITOR   >│ │ top
+│╰──────────────╯│ │ SLEEP >  RECOVERY >  STRAIN >      └──────────────────┘└──────────────────┘ │
+│ (+) Health     │ │  [insight, full width ....................................................] │
+│ (j) Journal    │ │  My Dashboard       vs. 30-day avg │ My Day                              [+] │ left | right
+│ (m) More       │ │  [HRV            41 ▲]             │ [daily outlook ...........................]│
+│ ────────────── │ │  [RESTING HR     47 ▼]             │ [TODAY'S ACTIVITIES ......................]│
+│ (c) Reports    │ │  [... 8 row cards]                 │ [MY JOURNAL ........] [ENERGY BANK .......]│
+│ (s) Settings   │ │  [STRAIN & RECOVERY chart]         │ [TONIGHT'S SLEEP .........................]│
+│ [DEMO] ● 12m   │ │  [Your week in review ...................................... Sep 22 - 28 >]│ bottom
+╰────────────────╯ └──────────────────────────────────────────────────────────────────────────────┘
 ```
 
-On laptop the `top` area is a `grid grid-cols-[minmax(0,5fr)_minmax(0,7fr)] items-center`: wordmark and dials left, the monitor row right. Dials keep their tablet sizes (120 / 144 / 120). The right column's Energy Bank and Tonight's sleep sit in `grid grid-cols-2 gap-4`.
-
+On laptop the header ring row works the same; because the dials sit in the `top` area, it appears after about 260 px of scroll.
 ### 7.2 Recovery `/recovery?d=`
 
 Shell: `DetailShell title="Recovery" dateSwitcher={{ mode: "day" }} info={How Recovery works}`. Reference: [recovery-detail], [trend-view-recovery].
+
+**v2 deltas** [latest-recovery-1], [latest-recovery-2], [latest-recovery-weekly-1]: header title is the date (`‹ TODAY ›`), the body DateSwitcher line goes; the hero is ScoreDial `lg` v2 (wordmark inside, 4° top gap, ring 14) with the summary card's notch pointing at it; the summary card keeps the v1 contributors (A5) with WHOOP's inset legend strip at its foot; the insight card keeps its gradient hairline and the coach-blue action ("Explore your recovery insights" in WHOOP; Pulse keeps "See what shaped it"). The trend card is titled "Weekly trends" when the range is W, matching WHOOP's section [latest-recovery-weekly-1]. A red day shows the ring nearly empty with only a red tip, as [latest-recovery-2]; no other change for low scores.
 
 | Slot | Component | Copy | Empty / reason |
 |---|---|---|---|
@@ -1168,9 +1532,7 @@ Phone, 390:
 
 ```
 ┌────────────────────────────────────────────┐
-│ [<]              RECOVERY               (i)│
-├────────────────────────────────────────────┤
-│               ‹   TODAY   ›                │
+│ [<]            ‹  TODAY  ›             (i)│
 │              ╭───────────╮                 │
 │            ╭─╯  P U L S E ╰─╮              │
 │            │      72%       │              │ 240 dial
@@ -1241,6 +1603,8 @@ Laptop, 1440:
 
 Shell: `DetailShell title="Strain" dateSwitcher={{ mode: "day" }} info={How Strain works}`. Reference: [strain-detail], [home-dials], [activity-detail-hr].
 
+**v2 deltas** [latest-strain-1]: header title is the date; hero ScoreDial `strain lg` v2 with the target band and the tick inside the ring (as built); summary rows as v1 + A4 with the inset "▲▼ Today vs. last 30 days" strip; the Strain Coach insight sits under the summary as an InsightCard. No other change.
+
 | Slot | Component | Copy | Empty / reason |
 |---|---|---|---|
 | hero | ScoreDial `strain lg` with target | value; "Day strain"; today adds tag "So far" | reason `insufficient_hr_data` / `band_not_worn` |
@@ -1257,8 +1621,7 @@ Phone, 390:
 
 ```
 ┌────────────────────────────────────────────┐
-│ [<]               STRAIN                (i)│
-│               ‹   TODAY   ›                │
+│ [<]            ‹  TODAY  ›             (i)│
 │            ◯◯◯ 9.4 (target arc + tick)     │ 240 dial
 │              DAY STRAIN [SO FAR]           │
 │ ┌────────────────────────────────────────┐ │
@@ -1318,6 +1681,24 @@ Laptop, 1440:
 ### 7.4 Activity `/activity/[id]`
 
 Shell: `DetailShell title={activity name} subtitle="07:02 to 07:44"` (no date switcher; back returns to the previous screen, fallback `/strain?d={activity day}`). Reference: [activity-detail-hr], [activity-detail-zones], [activity-detail-stats].
+
+**v2 deltas** [latest-activity-1], [latest-activity-2]: the header is left-aligned, as WHOOP's: back, then a 24 px activity icon, then the name (detail header title role) over "Today 15:32 to 16:42" (caption role), all left-aligned; no centred title, no info button. The hero becomes a left-aligned stat pair: activity strain `font-numeric text-[44px] font-bold text-strain-text` over "Activity strain" (stat-label) and, beside it, duration in white over "Duration"; the HR chart follows full-bleed inside the 16 px gutters without a card (WHOOP draws it on the ground); then the zone rows (ZoneBars `rows`, each zone a `rounded-lg bg-secondary` row with the hatched track, as v1); then "Key statistics" tiles with the aside "vs. 30 day average". The InsightCard moves to the end (WHOOP shows its coach note as a pill at the bottom, which Pulse does not adopt).
+
+```
+┌────────────────────────────────────────────┐
+│ [<] (run) RUNNING                          │ left-aligned header
+│           Today 07:02 to 07:44             │
+│ 10.3              0:42                     │
+│ ACTIVITY STRAIN   DURATION                 │
+│ [HR area chart on the ground, 180]         │
+│ [ZONE 5 173+ BPM 0%            0:00:00]    │ rows, hatched tracks
+│ [ZONE 4 ...                           ]    │
+│ Key statistics           vs. 30 day average│
+│ [CALORIES 512 kcal] [AVG HR 148 bpm]       │
+│ [MAX HR 176 bpm]   [HR RECOVERY 32 bpm]    │
+│ ╭ insight ╮                          ( P ) │ floating action
+└────────────────────────────────────────────┘
+```
 
 | Slot | Component | Copy | Empty / reason |
 |---|---|---|---|
@@ -1394,6 +1775,8 @@ Laptop, 1440:
 
 Shell: `DetailShell title="Sleep" dateSwitcher={{ mode: "day" }} info={How Sleep works}`. Reference: [sleep-detail], [home-device-planner-nav].
 
+**v2 deltas** [latest-sleep-1], [latest-sleep-stages-1]: header title is the date; hero ScoreDial `sleep lg` v2 with "SLEEP / PERFORMANCE" on two lines and the three-segment status bar under it; summary rows with status segments and the "Poor · Sufficient · Optimal" legend strip (A3). The "Sleep stages" card becomes WHOOP's **Last night's sleep** card: title "Last night's sleep" with "Today vs. prior 30 days" caption and an "Edit" link (not adopted: Pulse cannot edit Fitbit sleep), the hours hero (`font-numeric text-[32px] font-bold` "6:40" with ▲ and the 30-day value under it), the overnight HR chart, then the four stage rows as the hypnogram itself: each row has a radio-style 22 px circle, the stage name and share ("AWAKE 20%"), the duration right, and below it a hatched track on which the stage's intervals are drawn as solid `bg-foreground/80` blocks positioned by time; selecting a row (radio) emphasises its blocks and dims the others to 35 % (DOM meters, inline `left`/`width` from the data). "Typical range" and "Duration" sit above the rows as captions. This replaces the v1 Recharts step chart (§11 V8).
+
 | Slot | Component | Copy | Empty / reason |
 |---|---|---|---|
 | hero | ScoreDial `sleep lg` | value; "Sleep performance" | `awaiting_sleep_sync` (today before sync), `band_not_worn` (past) |
@@ -1413,8 +1796,7 @@ Phone, 390:
 
 ```
 ┌────────────────────────────────────────────┐
-│ [<]               SLEEP                 (i)│
-│               ‹   TODAY   ›                │
+│ [<]            ‹  TODAY  ›             (i)│
 │              ◯◯◯ 84% (240)                 │
 │             SLEEP PERFORMANCE              │
 │ ┌────────────────────────────────────────┐ │
@@ -1470,6 +1852,28 @@ Laptop, 1440:
 ### 7.6 Health hub `/health`
 
 Shell: `PageShell title="Health" layout="grid-2"`. Shows today's values. Reference: [health-tab].
+
+**v2 deltas** [latest-health-tab-1], [latest-whoop-age-green-1], [latest-whoop-age-mixed-2]: `PageShell ground="health"` (teal glow at the top, C13) with `TitleHeader` "HEALTH". The Healthspan card is replaced by an un-carded hero: the WhoopAgeOrb `hub` (200 px) centred, then a "Pace of aging" card (TickScale marker, "Slow" / "Fast", the "slower vs. last week" chip at the right of its title) with a full-width secondary button "Go to Healthspan"; then the Health Monitor card (five vital icons over status squares, v1), the Stress Monitor card (v1), the Fitness card (v1). The 2 × 2 grid becomes a single column on tablet too, matching the phone order; laptop keeps two columns under the hero row (orb + pace card side by side).
+
+```
+┌────────────────────────────────────────────┐
+│                 HEALTH                     │ teal glow at the top
+│               ╭~~~~~~~~╮                   │
+│              (  29.9    )                  │ hub orb 200, particles
+│              ( WHOOP AGE)                  │
+│               ╰~2.3 yrs younger~╯          │
+│ ┌ PACE OF AGING         [▼ slower vs. last week] ┐
+│ │ Slow           0.8x            Fast     │ │
+│ │ ||||||||||||||█|||||||||||||||||||||||  │ │
+│ │ −1.0x          1.0x            3.0x     │ │
+│ │ [          GO TO HEALTHSPAN           ] │ │
+│ └────────────────────────────────────────┘ │
+│ [HEALTH MONITOR: 5 vital icons, 5/5]       │
+│ [STRESS MONITOR: today's high stress]      │
+│ [FITNESS: VO2 max, training load]          │
+│ ╭ tab bar ╮                        ╭ P ╮   │
+└────────────────────────────────────────────┘
+```
 
 Four cards, each a SectionShell `card` whose whole surface links to the detail screen (header shows `ChevronRight`):
 
@@ -1547,6 +1951,36 @@ Laptop, 1440: the same 2 × 2 grid at 1120 px, cards `xl:p-5`, gap 16.
 ### 7.7 Healthspan `/health/healthspan?d=`
 
 Shell: `DetailShell title="Healthspan" subtitle="Next update in {n} days" dateSwitcher={{ mode: "week" }} info={About Healthspan}`. The week shown is the ISO week containing `d`. Reference: [healthspan], [healthspan-contributors].
+
+**v2 deltas** [latest-whoop-age-amber-1], [latest-whoop-age-cyan-1], [latest-whoop-age-mixed-1], [latest-healthspan-collapsed-1]: `DetailShell ground="healthspan"` (near-black); header "HEALTHSPAN" with subtitle "NEXT UPDATE IN {n} DAYS"; the week switcher `‹ JUL 26 - AUG 1 ›` in the body; the hero is WhoopAgeOrb `hero` (300 px, §5.17, contract in `docs/design/orb.md`), replacing the v1 ring and B1; "Your age: 32.2" caption under it stays. The provisional state shows WHOOP's calibrating notice as a card under the orb: `Hourglass` icon, "Your Healthspan is calibrating, so fluctuations in your WHOOP Age are normal. As WHOOP collects more data, it will stabilize." adapted to Pulse ("...as Pulse collects more data, it settles."), with a dismiss `X` (dismissal kept in `localStorage`) [latest-whoop-age-amber-1], [latest-whoop-age-mixed-2]. The Pace of Aging block sits on the ground without a card, as captured. Scrolling past the orb collapses it into §5.18's header. Contributor sections ("Sleep", "Strain", "Fitness") get WHOOP's per-section legend "▼ 6 month avg.  ▲ 30 day avg." on the section title line and one card per contributor; ContributorRow `healthspan` draws its track as 12 segments (`flex gap-0.5`, `h-2`, colours stepping `--warning` → `--dial-target` → `--optimal`) instead of a smooth gradient, keeping the v1 markers and the "+0.7 years" value at the right [latest-healthspan-collapsed-1].
+
+```
+┌────────────────────────────────────────────┐
+│ [<]            HEALTHSPAN              (i) │
+│           NEXT UPDATE IN 6 DAYS            │
+│           ‹  SEP 22 - SEP 28  ›            │
+│            ╭~~~~~~~~~~~~~~~╮               │ hero orb 300 on near-black
+│           (      29.9       )              │
+│           (   WHOOP AGE     )              │
+│           ( 2.3 years younger)             │
+│            ╰~~~~~~~~~~~~~~~╯               │
+│              Your age: 32.2                │
+│ PACE OF AGING                              │ on the ground
+│ Slow            0.8x               Fast    │
+│ |||||||||||||||||█|||||||||||||||||||||    │
+│ ╭ Steady and healthy. Your Pace of… ────╮ │
+│ [WHOOP AGE HISTORY]                        │
+│ Sleep          ▼ 6 month avg. ▲ 30 day avg.│
+│ [HOURS OF SLEEP  ▮▮▮▮▮▮▮▮▮▮▮▮  +0.3 years] │
+│                                    ( P )   │
+└────────────────────────────────────────────┘
+ Collapsed (scrolled):
+┌────────────────────────────────────────────┐
+│ [<]            HEALTHSPAN              (i) │
+│   2.3            (29.9)            0.8x    │ mini orb 104
+│ YEARS YOUNGER   WHOOP AGE     PACE OF AGING│
+└──────────── 24 px fade ────────────────────┘
+```
 
 | Slot | Component | Copy | Empty / reason |
 |---|---|---|---|
@@ -1626,6 +2060,8 @@ Laptop, 1440:
 
 Shell: `DetailShell title="Health Monitor" dateSwitcher={{ mode: "day" }} info={About Health Monitor}`. Reference: [health-monitor], [health-tab].
 
+**v2 deltas** [latest-health-monitor-1]: header "HEALTH MONITOR" with the body DateSwitcher; vital tiles follow WHOOP's: icon 20 + caps label on one line, value `font-numeric text-[34px] font-bold` + unit, then the status chip ("✓ near 15.7", "! elevated > 72") in the chip style (§5.0 v2), in a 2-column grid of card-material tiles; skin temperature spans both columns on phone. WHOOP's live heart-rate hero and "Share your health report" are not adopted (no live HR; no report export). No other change.
+
 | Slot | Component | Copy | Empty / reason |
 |---|---|---|---|
 | hero | count block: `4/5` (dial-hero role; the "/5" at 0.55em, `text-foreground-secondary`) + "Metrics within range" (dial-label) + status chip "Within range" (optimal) / "1 out of range" (warning) / "Possible illness signal" (alert) | n/a | no readings: `--/5`, reason `band_not_worn` or `awaiting_sleep_sync` long copy below |
@@ -1694,6 +2130,8 @@ Laptop, 1440 (`grid-cols-5`, the ranges note moves under the grid as a caption):
 ### 7.9 Stress Monitor `/health/stress?d=`
 
 Shell: `DetailShell title="Stress Monitor" dateSwitcher={{ mode: "day" }} info={About Stress Monitor}`. Reference: [stress-monitor], [stress-monitor-device], [stress-scale].
+
+**v2 deltas** [latest-stress-monitor-1]: header "STRESS MONITOR"; body DateSwitcher; hero gauge v2 (§5.1, continuous gradient arc, needle, level word in its colour, time under it); the stress chart carries activity and sleep icons above the plot at their start times (lucide icons 16 px, `text-foreground-secondary`) and a zoom button is not adopted; "Time in each level" becomes WHOOP's "Total day" card: two stacked three-segment bars, the selected day over "typical {weekday}" (`opacity-50`), with the three durations under them in level colours.
 
 | Slot | Component | Copy | Empty / reason |
 |---|---|---|---|
@@ -1765,6 +2203,8 @@ On laptop, with no summary slot, DetailShell puts the insight in the hero's righ
 
 Shell: `DetailShell title="Fitness" info={About Fitness}` (latest values; no date switcher). Derived screen (no WHOOP equivalent; built from [healthspan] and [trend-view-line]).
 
+**v2 deltas**: shell only (DetailHeader with title, card material, InfoDialog). Derived screen, unchanged.
+
 | Slot | Component | Copy | Empty / reason |
 |---|---|---|---|
 | hero | value block: `48.2` (dial-hero role) + " ml/kg/min" (stat unit) + "VO2 max" (dial-label) + category word (dial-label, coloured as §7.6); caption "From a run on Sep 21" or "Daily estimate from Fitbit" | n/a | "No VO2 max yet. Fitbit estimates it from runs and resting heart rate." |
@@ -1830,6 +2270,8 @@ Laptop, 1440:
 ### 7.11 Journal `/journal?d=`
 
 Shell: `PageShell dateSwitcher={{ mode: "day" }} actions={Insights button}` . The actions row shows the page title "Journal" (section-title role) on the left and `Button variant="secondary" size="touch"` with `Sparkles` "Insights" → `/journal/insights` on the right. References: [bevel-journal] for structure, WHOOP surfaces and type.
+
+**v2 deltas** [latest-sheet-behaviors-1]: `TitleHeader` "JOURNAL" with the DateSwitcher under it; the actions row keeps "Insights". The FloatingAction is the main way into the check-in; the card's "Check in" button stays. The check-in sheet gets the v2 sheet anatomy (X at the left, centred title, caps section labels with a running hairline, white "Save" pill). The No / Yes toggles stay (Bevel-derived, B3).
 
 | # | Section | Component | Copy | Empty / reason |
 |---|---|---|---|---|
@@ -1920,6 +2362,8 @@ Laptop, 1440:
 
 Shell: `DetailShell title="Journal insights"` (parent `/journal`). Reference: [journal-insights].
 
+**v2 deltas** [latest-journal-insights-1]: header title "BEHAVIOUR INSIGHTS" (WHOOP's name; copy change, §6); every DriverList `impact` row is its own card-material row with the label, a coach-blue sparkle when the behaviour is a custom one (not adopted: Pulse has no custom flag), a `ChevronRight`, and the hatched track with the centre dot (v1). "Keep logging to unlock" section title for the "Needs more data" group, as WHOOP.
+
 | Slot | Component | Copy | Empty / reason |
 |---|---|---|---|
 | hero | intro block, left-aligned: "Recovery impact analysis" (section-title role), body "How each behaviour changed your next-day {metric} over the last 90 days. Tap a behaviour for details.", caption "Updated daily" | metric word follows the toggle: "Recovery", "HRV", "sleep performance" | n/a |
@@ -1986,6 +2430,8 @@ Laptop, 1440 (intro and toggle left in the hero column, list right):
 ### 7.13 Reports `/reports/[period]`
 
 `period` is `YYYY-Www` (ISO week, "2026-W39") or `YYYY-MM` ("2026-09"). Shell: `DetailShell title="Weekly report" | "Monthly report"` with a period switcher in the date-switcher slot (`DateSwitcher mode="week"` for weeks; a month variant `‹ SEPTEMBER 2026 ›` for months; the next arrow is disabled at the latest complete period, and an in-progress period opens with the tag "Partial week" / "Partial month"). Derived (WHOOP's in-app reports were removed in May 2025; see [trend-view-recovery]).
+
+**v2 deltas**: shell only.
 
 | Slot | Component | Copy | Empty / reason |
 |---|---|---|---|
@@ -2054,6 +2500,8 @@ Laptop, 1440:
 ### 7.14 More `/more` and Settings `/settings`
 
 **More.** Shell: `PageShell title="More" layout="stack"`. Derived (WHOOP's More tab is a plain list).
+
+**v2 deltas** [latest-more-1], [latest-settings-1]: More uses `TitleHeader` "MORE"; its rows become WHOOP's settings rows: one card-material row per item, 56 px, icon 22 left, label in the card-title role (caps), `ChevronRight`; groups under caps section labels ("REPORTS", "APP"). Settings opens with an `X` at the left of its header instead of a back chevron (WHOOP presents Settings as a modal screen [latest-settings-1]); it is still the `/settings` route. Shop, referral and gift sections are not adopted.
 
 | Section | Rows (Card `ring-0 px-4 py-1`, `divide-y`, each row a 52 px `Link` with icon 20 px, label body role, `ChevronRight`) |
 |---|---|
@@ -2141,6 +2589,8 @@ Laptop, 1440 (Settings: two columns; More: the same lists at max 720 px, left-al
 ### 7.15 Remaining info-sheet copy
 
 - **Energy Bank:** "Energy Bank estimates how much energy you have left today, from 0 to 100. It starts each morning from your Recovery and Sleep, drains with exertion and stressful stretches, and recharges during calm, still periods and naps. It is an estimate, not a measurement." Then the band rows: "67-100: plenty in reserve." "34-66: pace yourself." "0-33: running low."
+
+**v2 delta**: every paragraph below is shown in an `InfoDialog` (§4.8), not a sheet.
 - **Strain Target (sheet from the summary row):** "Your Strain Target is a range for today, set from your Recovery and your training load over the last 28 days. Inside it, training builds fitness without digging a recovery hole."
 - **Provisional tag (tooltip and sheet line):** "Based on fewer than 14 nights. It firms up as your baseline fills in."
 - **Baseline stale tag:** "Your baseline has 14 nights or more missing. Scores firm up as new nights arrive."
@@ -2170,13 +2620,13 @@ flowchart LR
   MO --> RP
 ```
 
-1. **Morning check.** Open `/` → TopBar "Today", dials animate once. Tap the Recovery dial → `/recovery` (no `d`). Read the contributors, then "See what shaped it" scrolls to the drivers card. Back → `/`, scroll position restored by Next.
-2. **Browse the past.** On `/`, tap Sat 26 in the DayStrip → `router.replace("/?d=2026-09-26")`; dials, monitor cards and My Day re-render for that day; Strain shows no "So far" tag. Tap Recovery → `/recovery?d=2026-09-26` (DateSwitcher reads "Sat, Sep 26"). Back → `/?d=2026-09-26`. Tap Strain → `/strain?d=2026-09-26`; back; tap Sleep → `/sleep?d=2026-09-26`. On laptop, ←/→ steps days on any of these.
+1. **Morning check.** Open `/` → header pill "Today", dials animate once; scroll down and the mini rings appear in the header. Tap the Recovery dial → `/recovery` (no `d`). Read the contributors, then "See what shaped it" scrolls to the drivers card. Back → `/`, scroll position restored by Next (the header state is recomputed from the restored position).
+2. **Browse the past.** On `/`, tap the pill's ‹ twice, or open the calendar from the pill and tap 26 → `router.replace("/?d=2026-09-26")`; dials, monitor cards and My Day re-render for that day; Strain shows no "So far" tag. Tap Recovery → `/recovery?d=2026-09-26` (DateSwitcher reads "Sat, Sep 26"). Back → `/?d=2026-09-26`. Tap Strain → `/strain?d=2026-09-26`; back; tap Sleep → `/sleep?d=2026-09-26`. On laptop, ←/→ steps days on any of these.
 3. **Workout review.** `/` → Strain dial → `/strain?d=`. Scroll to "Activities", tap "Running" → `/activity/[id]`: hero strain, key stat tiles, HR chart with zones, zone rows, HR recovery. Back → `/strain?d=`.
 4. **Bedtime plan.** `/` → "Tonight's sleep" card shows "22:40 Recommended bedtime" (Peak). Switch to "Perform" (client state only). Tap the card's chevron → `/sleep?d=#planner`, which scrolls to the "Tonight's sleep" card listing all three goals.
-5. **Healthspan.** Tab "Health" → `/health` → Healthspan card → `/health/healthspan` (current week). Tap "VO2 max" → contributor ResponsiveSheet (drawer on phone, right sheet on laptop) with value, target, years, explanation and trend. Close → focus returns to the row.
-6. **Illness week (seeded).** Choose a day in the illness week (DateSwitcher label → calendar sheet → pick the date) → `/?d=…`: the Health Monitor alert shows above the monitor row, and the Health Monitor card reads "Out of range, 3/5 metrics". Tap "View Health Monitor" → `/health/monitor?d=…`: hero "2/5", illness alert, flagged tiles ringed in warning. Tap "Resting heart rate" → vital sheet with the 30-day line and the shaded normal range.
-7. **Journal.** Tab "Journal" → `/journal`. "Check in" opens the sheet; set Alcohol "Yes", Stretching "No"; "Save" → toast "Check-in saved", card shows "Checked in" with the Alcohol tag, today's strip mark turns optimal. "Insights" → `/journal/insights`: Alcohol is near the top with a negative (orange) bar and "14 days with, 52 without".
+5. **Healthspan.** Tab "Health" → `/health` → Healthspan card → `/health/healthspan` (current week). Tap "VO2 max" → contributor ResponsiveSheet (drawer on phone, floating right sheet on laptop) with value, target, years, explanation and trend. Close → focus returns to the row.
+6. **Illness week (seeded).** Choose a day in the illness week (tap the date pill → the calendar panel drops from the top → pick the date) → `/?d=…`: the Health Monitor alert shows above the monitor row, and the Health Monitor card reads "Out of range, 3/5 metrics". Tap "View Health Monitor" → `/health/monitor?d=…`: hero "2/5", illness alert, flagged tiles ringed in warning. Tap "Resting heart rate" → vital sheet with the 30-day line and the shaded normal range.
+7. **Journal.** Tab "Journal" → `/journal`. "Check in" (or the round FloatingAction from any screen) opens the sheet; set Alcohol "Yes", Stretching "No"; "Save" → toast "Check-in saved", card shows "Checked in" with the Alcohol tag, today's strip mark turns optimal. "Insights" → `/journal/insights`: Alcohol is near the top with a negative (orange) bar and "14 days with, 52 without".
 8. **Weekly report.** `/` → scroll to "Your week in review" → `/reports/2026-W39`. Switch to "Month" → `/reports/2026-09`; ‹ › step periods. Tap "Best day" → `/?d=` that day.
 9. **First real connect** (Google mode, runbook-checked). `/more` → "Settings" → `/settings#source` "Not connected" → "Connect Google" → `/oauth/start` → Google consent → `/oauth/callback` → redirect to `/`. ConnectionBanner shows "Importing history, 0 of 180 days" with a Progress bar; each page load advances it; dials show reasons until enough nights exist; the banner disappears when import completes.
 10. **Token revoked.** Sync returns `auth_revoked` → the sync dot turns red and every screen shows the "Reconnect Google" banner (`role="alert"`). "Reconnect Google" → `/oauth/start` → consent → back on `/`; the next sync succeeds, dot turns green, banner hides.
@@ -2195,26 +2645,37 @@ flowchart LR
 - Reduced motion: §2.7. Zoom is never disabled (no `maximum-scale`). `touch-action: manipulation` on the tab bar and DayStrip.
 - `viewport` export in the root layout (U12): `{ viewportFit: "cover", themeColor: "#262e33" }`; manifest `theme_color` and `background_color` `#0f1113`, `display: "standalone"`.
 
+**v2 additions to accessibility.**
+
+- **Transparency.** No text sits on glass without the opaque fallback passing contrast (§2.6): tab labels are checked against `#181d21`. `prefers-reduced-transparency: reduce` and missing `backdrop-filter` both make the glass opaque.
+- **Header collapse.** The ring row is real links with full labels; hiding the top row never hides a focused element (`:focus-within`). The sticky headers and the tab bar never cover the focused element: `<main>` keeps `scroll-pt-[120px]` (header with ring row) and `scroll-pb-[110px]` on phone tab roots.
+- **Orb.** Real text over an `aria-hidden` canvas; the motion stops under reduced motion, when the tab is hidden (`visibilitychange`) and when the orb is offscreen (IntersectionObserver), per the web interface guidelines' rule on decorative loops.
+- **InfoDialog and sheets.** `role="dialog"`, labelled by their title, focus trapped, Esc closes, focus returns to the trigger; `overscroll-behavior: contain` on scrolling bodies.
+- **FloatingAction.** `aria-label` names the action and the day; it is in the tab order after the tab bar.
+- `viewport` export: `themeColor: "#262e33"` unchanged; `color-scheme: dark` on `<html>`.
+
 ---
 
 ## 10. Do not
 
-- Do not write CSS outside `globals.css`, and do not add rules to it beyond tokens. No `style` props except data-driven widths and positions (meters, markers).
-- Do not use raw hex, `zinc-*`, `slate-*`, `gray-*` or any Tailwind palette colour in components. Tokens only.
-- Do not give cards shadows, rings or borders (§2.6). Do not nest cards; a card holds rows (`bg-secondary`), not cards.
-- Do not mix radii: cards 12, rows and buttons 8, chips 6, pills full. Inner radius follows the concentric rule.
-- Do not build generic dashboard tiles (icon square + heading + number + sparkline in a grid of equal cards). WHOOP uses rows, dials and purpose-built cards.
-- Do not use a data colour for chrome (no green buttons, no blue links except `text-coach` in insight cards), and do not put a data colour on a value without its meaning.
-- Do not add eyebrows or kickers above headings (the uppercase role is the card title itself), section numbers, decorative dots (the sync dot and band bars are data), gradient text, glass, glows other than the Healthspan orb, or emoji.
+- Do not write CSS outside `globals.css`, and do not add rules to it beyond tokens, the fixed ground (§2.1) and the two fallback blocks (§2.6). No `style` props except data-driven widths and positions (meters, markers, the tab lens index, the orb's canvas size).
+- Do not use raw hex, `zinc-*`, `slate-*`, `gray-*` or any Tailwind palette colour in components. Tokens only. (Recipes in §2.6 that show a hex are written once into a token or a `cva` base, never at call sites.)
+- **Do not put content on glass.** Glass is for chrome that floats over scrolling content: tab bar, rail, sidebar, FloatingAction. Cards, rows, charts, dials, sheets, the info card and the calendar are opaque.
+- Do not blur the page behind an overlay. Dims are plain black at 65 % (calendar) or 85 % (sheets, info card).
+- Do not give cards drop shadows, rings or borders. Their depth is the material's top light (§2.6). Do not nest cards: a card holds rows (`bg-secondary`), not cards.
+- Do not mix radii: cards 16, rows 10, buttons in cards 12, chips 8, sheets 28, pills full. Inner radius follows the concentric rule.
+- Do not build generic dashboard tiles. WHOOP uses rows, dials and purpose-built cards; My Dashboard rows are rows that happen to be separate cards.
+- Do not use a data colour for chrome. The one exception is the FloatingAction's indigo-to-blue rim (§2.6), taken from WHOOP.
+- Do not add eyebrows above headings, section numbers, decorative dots (the sync dot, band bars and journal circles are data), gradient text, glows other than the orb's inner glow, or emoji.
 - Do not use em dashes in UI copy; numeric ranges use a spaced hyphen ("12.0 - 15.0"). One middle dot per line at most.
-- Do not fake numbers: no zero for missing data, no interpolation across gaps, no counting-up animation.
-- Do not put breakpoint classes in kit components (§4). Do not read the viewport in JS except in AppShell (sidebar open state) and ResponsiveSheet.
-- Do not animate on page load beyond the dial sweep; no staggered entrances; no `transition-all`; no animation that ignores reduced motion.
-- Do not use d3, hand-written SVG paths or SVG angle maths; use Recharts primitives (charts) and DOM meters (§5.8, §5.15).
-- Do not use spinners in content; use the component's `.Skeleton`.
-- Do not use a modal where a sheet works; dialogs are only for destructive confirmation and unsaved-changes prompts.
-- Do not put actions in the top bar's right slot (it is the sync status everywhere).
+- Do not fake numbers: no zero for missing data, no interpolation across gaps, no counting-up animation, no fake battery percentage.
+- Do not put breakpoint classes in kit components (§4). Do not read the viewport in JS except in ResponsiveSheet.
+- Do not animate on page load beyond the dial sweep and the orb's entry; no staggered entrances; no `transition-all`; no animation that ignores reduced motion; no scroll handler that sets React state per frame.
+- Do not use d3, hand-written SVG paths or SVG angle maths. Charts are Recharts; meters are DOM; the orb is a canvas (the one drawing surface, owned by orb.md).
+- Do not use spinners in content; use the component's `.Skeleton`. The date pill's loading spinner is the one exception (§4.3.1).
+- Do not use a modal where a sheet works; the info card is a dialog because WHOOP's is, and it carries no task.
 - Do not rename WHOOP-style labels per screen: one label per metric, as in §5 and §7.
+- Do not adopt WHOOP features Pulse has no data for: band battery, community, coach chat, shop, referral, Advanced Labs, achievements, edit sleep.
 
 ---
 
@@ -2232,5 +2693,98 @@ flowchart LR
 | D8 | Text tokens ≥ 4.5 : 1 against black | Also ≥ 4.5 on cards; WHOOP's grey `#8A9090` lifted to `#999ea3`, red and strain blue get text variants | WHOOP's grey is 4.2 : 1 on its own cards |
 | D9 | Home section order lists the weekly teaser last | Kept last; Health Monitor and Stress cards sit directly under the dials (WHOOP position), the alert above them | Matches WHOOP; plan order otherwise unchanged |
 | D10 | DESIGN.md (Impeccable) | This file is the design record; no root DESIGN.md (U11 may only write under `docs/design/`) | One contract |
+| B1 | §7.7 orb `bg-radial from-optimal/35 via-optimal/10 to-transparent` | `from-transparent from-45% via-optimal/10 to-optimal/35` (glow at the rim, dark centre) | Matches [healthspan], where the colour sits on the rim; keeps the hero numeral on a dark ground |
+| B2 | §7.10 percentile ticks in five category tints | Two tints from TickScale's `bands`: Poor and Fair `warning`, Good the plain track, Excellent and Superior `optimal`; the five category words sit under the scale | TickScale has two band tones; five opacity steps would need a new kit API for one card |
+| B3 | §7.11 check-in "No" on-state `bg-secondary` | `bg-foreground/15` plus `border-foreground/50` | `bg-secondary` equals the sheet's `bg-popover`, so a selected "No" was invisible |
+| B4 | §5.2 tile label "2 lines max" | 3 lines max | "Skin temp (from baseline)" needs three lines in a 390 px two-column grid |
+| B5 | §5.0 status chip `h-6` | `min-h-6 py-1` | Long chips ("Elevated, above 16.0") wrap inside a phone tile instead of overflowing |
+| B6 | §7.7 history and §7.8 vital sheet as a TrendChart line | Both use TrendChart with `fixedRange="6m"` (the line mode) for weekly or 30-day series; a single-hue 6M line gets a data-fitted y-axis; WHOOP Age history adds a dashed "Your age" reference line | Line mode is TrendChart's only line; a zero-based axis flattened a 37-39 series to a straight line |
+| B7 | §7.13 period switcher in the date-switcher slot | A link pill in the hero, above the Week/Month toggle and the dials (on laptop: hero column, insight beside) | DateSwitcher works on `?d=`; report periods are path segments, so prev/next are links |
+| B8 | §4.5 laptop hero column 360 px, `items-center` | `minmax(360px, max-content)`; hero content can opt into top alignment with `data-hero-align="start"` (Journal Insights) | Three `md` dials (3 × 120 px) overflow 360 px; the Insights intro floated mid-column beside a long list |
+| B9 | §7.14 connected: "Connected as {email}." | No email line; Disconnect removes the stored grant (`settings/actions.ts`), then toasts "Google disconnected" | The settings query exposes no email; spec allows omitting it |
+| B10 | §7.7 contributor sheet "and a TrendChart M for the input" | No per-input chart | The Healthspan view model carries no per-input history ("when history exists") |
+| A1 | Home Health Monitor card: in range or out of range | When no vital has been judged yet (every baseline still calibrating), the card reads "No readings" over "Calibrating" | "Within range, 0/5 metrics" on a calibrating day would claim a result that does not exist (U13, half A) |
+| A2 | Time in zones empty copy "No heart-rate zones yet today." | Past days read "No heart-rate zones on this day."; Activity reads "No heart-rate zones for this activity." | "Yet today" is wrong off today; mirrors the activities empty copy (U13, half A) |
+| A3 | Sleep summary: KeyStatRow rows with status segments | Status segments and value only, no 30-day average or arrow | Matches [sleep-detail]; the segments already carry the judgement (U13, half A) |
+| A4 | Strain summary row "Strain Target 12.0 - 15.0" as a KeyStatRow | A page-level row in the same metrics (icon `Flame`, value column aligned), with the Strain Target info button (§7.15) and the "Estimate" tag | KeyStatRow formats single numbers only; a range needs its own row (U13, half A) |
+| A5 | Recovery contributor rows always show the value | A contributor without a usable baseline reads "Calibrating: {n} nights left" | ContributorRow needs a baseline band; a bare number with no band would misread as normal (U13, half A) |
+| A7 | Energy Bank chart annotates the three biggest drains | Only drains at least 90 minutes apart are labelled (the list below the chart still shows the top three) | Close drains overlapped their labels at phone width (U13, half A) |
+| A8 | Every route has its own `loading.tsx` | `(app)/loading.tsx` is the Home skeleton; Recovery, Strain, Sleep and Activity have their own. Any `(app)` route without one inherits the Home skeleton | Home is `(app)/page.tsx`, so its loading file is the group's (U13, half A) |
+| A9 | Next's hash scroll for `/sleep?d=#planner` | A small client `HashScroll` re-scrolls to the hash once the page renders | Next scrolls while the route's loading skeleton shows, before `#planner` exists (journey 4) (U13, half A) |
+| CAL1 | Date jump in a `ResponsiveSheet` titled "Go to date" with a "Today" button | WHOOP's top-dropping month panel (§5.16), no title or buttons | Matches the current app [calendar-recovery-current-2026-05] |
+| CAL2 | n/a | The year is appended outside the current year ("December 2025") | Inferred: every reference shows a current-year month |
+| CAL3 | n/a | Weeks start on Monday (the app's ISO weeks; Asia/Kolkata default), `weekStartsOn` prop to change | WHOOP follows the phone's region (SUN-first and MON-first captures); one configurable default keeps it simple |
+| CAL4 | n/a | Sleep context: `text-sleep` numerals, dot at Sleep performance ≥ 85%, legend "Sleep 85%+"; Strain context from the old Strain capture | Inferred: no Sleep calendar reference exists; Strain's is about two years old |
+| CAL5 | n/a | The circle marks the selected day (`?d=`), not only today | Inferred: every capture was taken on today, where the two coincide |
+| CAL6 | n/a | ≥ 768: the panel hangs under the top bar beside the sidebar, grid max 560 px centred | Inferred: WHOOP has no laptop app |
+| CAL7 | Reduced motion: the panel fades | It appears at once | The base layer collapses every animation duration under reduced motion (§2.7); a fade would need an exception there |
+
+**v2 rows.** Earlier rows stay in force unless a v2 row below names them as overridden.
+
+| # | Plan or v1 says | v2 does | Why |
+|---|---|---|---|
+| V1 | Plan: AppShell with shadcn `Sidebar` on tablet and laptop | Floating glass rail (tablet) and sidebar (laptop), custom `AppNav`; shadcn Sidebar retired | Same object as the phone tab bar; WHOOP has no desktop (inferred) |
+| V2 | Plan: Home `DayStrip` then dials | No DayStrip on Home; pill chevrons and the calendar change days. Journal keeps its strip | No current Home capture has a strip [latest-home-top-1..3] |
+| V3 | Plan: top bar with the date switcher, sync dot and "Demo data" chip | HomeHeader / TitleHeader / DetailHeader (§4.3, §4.4); the Demo state is "Demo" in SyncStatus | Matches [latest-home-sticky-header-user-2025]; overrides v1 D2's TopBar half (D2's ShellStatus context stays) |
+| V4 | Plan and v1: `ResponsiveSheet` for metric explanations | `InfoDialog` (centred card) for explanations; sheets for tasks | [latest-popover-info-1] |
+| V5 | WHOOP: Community tab | Journal in that slot | Pulse has no community |
+| V6 | WHOOP: round coach button | Round "Check in" FloatingAction | No assistant; check-in is the daily action (inferred mapping) |
+| V7 | WHOOP shows the monitor cards and the insight only for today | Pulse shows the monitor cards on past days too (the insight stays today-only) | The data exists for past days; journey 6 relies on it |
+| V8 | v1 §5.6 Hypnogram as a Recharts step chart | Stage rows with hatched tracks and time blocks, radio-selectable (DOM), at every width | [latest-sleep-stages-1] |
+| V9 | v1 key statistics in one card; title "Key statistics" | "My Dashboard", one card per row | [latest-home-dashboard-1] |
+| V10 | v1 Healthspan orb (and B1) | WhoopAgeOrb canvas, contract in `docs/design/orb.md` | C11; B1 is overridden |
+| V11 | v1 radii and row height 52 | Radii §2.4, rows 56 | Measured on the latest captures |
+| V12 | v1 detail titles = metric name | Date as title on Recovery, Strain, Sleep | C7 |
+| CAL6 (updated) | ≥ 768 panel beside the sidebar at `left-12` / `xl:left-64` | Beside the rail / sidebar at `md:left-[112px]` / `xl:left-[256px]` | Follows V1 |
+
+Rows overridden by v2: **D2** (TopBar part only, V3), **B1** (V10), **CAL6** (offset only). All other D, B, A and CAL rows stand.
+
 
 Open items for U12/U13 (not design changes): the `button.tsx` sizes edit (§5.0), `src/hooks/use-reduced-motion.ts`, `src/lib/charts.ts` (`splitByBand`), the root `viewport` export, and "WHOOP Age" as the label (the plan's name; swap the one constant in `src/lib/format.ts` for "Pulse Age" if preferred).
+
+Open items for U17 (not design changes): `src/lib/header-state.ts` with its unit test, `getWearStreak()`, the `--glass-*` and orb tokens, retiring shadcn `Sidebar` from `AppShell`, and `InfoDialog`.
+
+---
+
+## 12. Inferred decisions and coverage gaps
+
+### 12.1 Inferred (no reference shows it; flag to the user)
+
+| # | Decision | Section | Basis |
+|---|---|---|---|
+| I1 | Glass alpha (0.80 / 0.88) and blur (12 px) | §2.6 | Fitted to the show-through and the sampled solids; a still cannot measure them |
+| I2 | Tablet rail (88 px) and laptop sidebar (232 px), floating, in the tab bar's material | §4.2 | WHOOP has no tablet or laptop layout after the redesign |
+| I3 | FloatingAction opens the check-in (WHOOP's opens the coach) | §4.2.1 | Pulse has no assistant |
+| I4 | Streak = consecutive worn days, using the `band_not_worn` coverage rule | §4.3 | WHOOP's "continuous data" wording [latest-streak-1]; the threshold is Pulse's |
+| I5 | Sync freshness in the battery slot ("12m", dot colours) | §4.3.2 | Pulse has no battery data |
+| I6 | Header thresholds: ring row when the dial labels pass under the top row; top row hides 160 px later on downward scroll, returns on 8 px upward scroll | §4.3 | Behaviour is in the captures; the numbers are not |
+| I7 | Tab lens slides between items (150 ms) | §2.7 | The lens is captured, its motion is not |
+| I8 | Detail header keeps small chevrons beside the date | §4.4 | WHOOP shows only the date; journey 2 needs stepping |
+| I9 | Info card motion (scale 0.96 + blur 4 px → 0, 320 ms) | §2.7 | Card captured, motion not |
+| I10 | Floating right sheet on ≥ 768 | §4.8 | No WHOOP tablet sheet capture |
+| I11 | Orb idle drift and entry bloom | §5.17, orb.md | Only the drag interaction is recorded |
+| I12 | Orb colour thresholds between captures (exact blend points) | §2.3, §5.17 | 17 dated captures bracket them; the curve between is interpolated |
+| I13 | Home insight counter acts as tap-to-cycle | §7.1 | WHOOP's counter is captured, its gesture is not |
+| I14 | Laptop Home arrangement (dials and monitors on top, Dashboard left, My Day right) | §7.1 | Extrapolated from the phone order |
+| I15 | Daily outlook gradient switches to Day in review at 17:00 | §7.1 | Both banners are captured at different times of day; the switch time is not |
+| I16 | Health hub tint is constant teal (not tied to the orb colour) | §2.1 | Green and mixed orbs both sit on a teal glow; the dependence, if any, is unclear |
+| CAL2-CAL6 | Calendar year label, week start, Sleep context, selected-day ring, ≥ 768 placement | §5.16 | as listed in §11 |
+
+### 12.2 Coverage gaps (screens or interactions with no current reference)
+
+| Gap | What Pulse does instead |
+|---|---|
+| Weekly / monthly report (WHOOP removed it in May 2025; email only) | v1 derived layout in the v2 materials (§7.13) |
+| Fitness / VO2 max detail (WHOOP shows VO2 max inside Trends and Healthspan only) | v1 derived screen (§7.10) |
+| Energy Bank (Bevel-only) | v1 card in WHOOP's v2 card material |
+| Journal check-in questionnaire as WHOOP draws it (only the behaviour picker sheet is captured, [latest-sheet-behaviors-1]) | v1 Bevel-style No / Yes rows in the v2 sheet |
+| Calendar in Strain and Sleep contexts (current) | CAL4 |
+| The opening (entry) animation of the WHOOP Age orb | I11 |
+| Page and detail transitions (push / pop) | Browser default navigation; no custom transition |
+| Pull to refresh | Not adopted |
+| Laptop and tablet anything | I2, I14 |
+| Streak flame tiers (blue at 365, gold past 2000 [latest-streak-1]) | Single orange flame |
+| The hexagon count badge in some detail headers [latest-recovery-weekly-1] | Not adopted (meaning unclear: likely achievements) |
+| The "MMM d TO TODAY" pill label [latest-home-top-3] | Not adopted (Pulse days are calendar days) |
+| WHOOP's in-app coach pill, Ask row, Plan (custom plans with goal rings [latest-plan-1]) | Not adopted (no data); My Plan is out of scope |
+| Light mode | None (v1) |
