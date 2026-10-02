@@ -16,7 +16,7 @@ import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { CheckIn, TAG_CLASS } from "./CheckIn"
 
-export const metadata = { title: "Journal · Pulse" }
+export const metadata = { title: "Journal" }
 
 /** Journal `/journal?d=` (spec §7.11, journey 7). */
 export default async function JournalPage({ searchParams }: PageProps<"/journal">) {

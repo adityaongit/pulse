@@ -17,10 +17,18 @@ const barlow = Barlow({
   subsets: ["latin"],
 });
 
+const DESCRIPTION =
+  "Recovery, strain and sleep from your Fitbit Air, scored the WHOOP way: Healthspan, Energy Bank, stress and a journal, all on your own server.";
+
 export const metadata: Metadata = {
-  title: "Pulse",
-  description: "Personal recovery, strain and sleep",
+  title: { default: "Pulse", template: "%s · Pulse" },
+  description: DESCRIPTION,
+  applicationName: "Pulse",
   appleWebApp: { capable: true, title: "Pulse", statusBarStyle: "black-translucent" },
+  formatDetection: { telephone: false, email: false, address: false },
+  // Private, single-user app behind Cloudflare Access: keep it out of search indexes.
+  robots: { index: false, follow: false, nocache: true },
+  openGraph: { title: "Pulse", description: DESCRIPTION, siteName: "Pulse", type: "website" },
 };
 
 // viewport-fit=cover for the safe-area insets; zoom is never disabled (spec §9).

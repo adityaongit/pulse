@@ -5,7 +5,7 @@ import { DetailShell } from "@/components/shells/DetailShell"
 import { SectionShell } from "@/components/shells/SectionShell"
 import { ImpactList, MetricToggle } from "./Impacts"
 
-export const metadata = { title: "Journal insights · Pulse" }
+export const metadata = { title: "Journal insights" }
 
 const WORD: Record<ImpactMetricKey, string> = { recovery: "Recovery", hrv: "HRV", sleep: "sleep performance" }
 const parseMetric = (raw: string | string[] | undefined): ImpactMetricKey => {

@@ -17,6 +17,8 @@ import { HashScroll } from "../_lib/HashScroll"
 import { SLEEP_INFO, TONIGHT_INFO } from "../_lib/info"
 import { CAPTION, LABEL, LEGEND, mapMetric, statProps, trendProps } from "../_lib/view"
 
+export const metadata = { title: "Sleep", description: "Sleep performance, stages, need and debt, plus tonight's bedtime plan." }
+
 const STAGE_SWATCH = { awake: "bg-stage-awake", rem: "bg-stage-rem", light: "bg-stage-light", deep: "bg-stage-deep" } as const
 const STATUS_LEGEND = [
   ["bg-warning", "Poor"],

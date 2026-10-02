@@ -16,7 +16,7 @@ import { MetricState } from "@/components/shells/MetricState"
 import { SectionShell } from "@/components/shells/SectionShell"
 import { Skeleton } from "@/components/ui/skeleton"
 
-export const metadata = { title: "Stress Monitor · Pulse" }
+export const metadata = { title: "Stress Monitor" }
 
 const EMPTY = "No still minutes to score yet today."
 const LEVELS = [

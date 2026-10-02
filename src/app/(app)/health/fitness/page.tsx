@@ -14,7 +14,7 @@ import { SectionShell } from "@/components/shells/SectionShell"
 import { categoryTone, categoryWord, ordinal } from "../format"
 import { LoadChart } from "./LoadChart"
 
-export const metadata = { title: "Fitness · Pulse" }
+export const metadata = { title: "Fitness" }
 
 const LABEL = "text-xs leading-4 font-bold tracking-[0.08em] uppercase"
 const CAPTION = "text-xs leading-4 font-medium text-muted-foreground"

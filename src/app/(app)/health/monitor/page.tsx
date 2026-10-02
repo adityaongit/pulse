@@ -12,7 +12,7 @@ import { SectionShell } from "@/components/shells/SectionShell"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { VitalTiles } from "./VitalTiles"
 
-export const metadata = { title: "Health Monitor · Pulse" }
+export const metadata = { title: "Health Monitor" }
 
 const INFO = {
   title: "About Health Monitor",

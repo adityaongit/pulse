@@ -7,7 +7,7 @@ import { SettingsView } from "./SettingsView"
 /** The request time; relative sync ages are computed against it on the server. */
 const requestTime = () => Date.now()
 
-export const metadata = { title: "Settings · Pulse" }
+export const metadata = { title: "Settings" }
 
 /** Settings `/settings` (spec §7.14, journeys 9 and 10). Google's callback lands here with `?oauth=`. */
 export default async function SettingsPage() {
