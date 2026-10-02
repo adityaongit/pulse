@@ -29,6 +29,8 @@ export type DriverListProps = {
   onSelect?: (key: string) => void
   /** Impact empty state's "Check in" target. */
   checkInHref?: string
+  /** Impact variant: the next-day outcome in the spoken sentence ("Recovery", "HRV", "sleep performance"). */
+  outcome?: string
 }
 
 const fmt = (v: number, unit: DriverListProps["unit"]) =>
@@ -36,19 +38,20 @@ const fmt = (v: number, unit: DriverListProps["unit"]) =>
 const effectOf = (i: DriverItem) => i.effect ?? (i.delta > 0 ? "positive" : i.delta < 0 ? "negative" : "none")
 const unitWord = { pts: "points", "%": "percent", SD: "standard deviations" }
 
-function sentence(i: DriverItem, variant: DriverListProps["variant"], unit: DriverListProps["unit"]) {
+function sentence(i: DriverItem, variant: DriverListProps["variant"], unit: DriverListProps["unit"], outcome = "Recovery") {
   const e = effectOf(i)
   const size = `${formatValue(unit === "SD" ? "decimal1" : "int", Math.abs(i.delta))} ${unitWord[unit]}`
   if (variant === "recovery")
     return e === "none" ? `${i.label}: no clear effect` : `${i.label} ${e === "positive" ? "raised" : "lowered"} Recovery by ${size}`
-  const ci = i.ci ? `, 90 percent confidence ${formatValue("int", Math.min(Math.abs(i.ci[0]), Math.abs(i.ci[1])))} to ${formatValue("int", Math.max(Math.abs(i.ci[0]), Math.abs(i.ci[1])))}` : ""
+  const k = unit === "SD" ? "decimal1" : "int"
+  const ci = i.ci ? `, 90 percent confidence ${formatValue(k, Math.min(Math.abs(i.ci[0]), Math.abs(i.ci[1])))} to ${formatValue(k, Math.max(Math.abs(i.ci[0]), Math.abs(i.ci[1])))}` : ""
   const n = i.yes !== undefined && i.no !== undefined ? `, from ${i.yes} days with and ${i.no} without` : ""
-  const verb = e === "none" ? "had no clear effect on next-day Recovery" : `${e === "positive" ? "raised" : "lowered"} next-day Recovery by ${size}`
+  const verb = e === "none" ? `had no clear effect on next-day ${outcome}` : `${e === "positive" ? "raised" : "lowered"} next-day ${outcome} by ${size}`
   return `${i.label} ${verb}${ci}${n}`
 }
 
-function Header({ variant, provisional }: { variant: DriverListProps["variant"]; provisional: boolean }) {
-  const [left, mid, right] = variant === "recovery" ? ["Lowered", "Points", "Raised"] : ["Hurts", "% Impact", "Helps"]
+function Header({ variant, unit, provisional }: { variant: DriverListProps["variant"]; unit: DriverListProps["unit"]; provisional: boolean }) {
+  const [left, mid, right] = variant === "recovery" ? ["Lowered", "Points", "Raised"] : ["Hurts", unit === "SD" ? "Impact (SD)" : "% Impact", "Helps"]
   return (
     <div aria-hidden className="mb-2 grid grid-cols-[1fr_auto_1fr] items-center gap-2 text-xs leading-4 font-bold tracking-[0.08em] uppercase">
       <span className="flex items-center gap-2 text-warning">
@@ -76,7 +79,7 @@ function Item({ i, max, p }: { i: DriverItem; max: number; p: DriverListProps })
   const width = `${(Math.abs(i.delta) / (max || 1)) * 50}%`
   const content = (
     <>
-      <span className="sr-only">{sentence(i, p.variant, p.unit)}</span>
+      <span className="sr-only">{sentence(i, p.variant, p.unit, p.outcome)}</span>
       <span aria-hidden className="block space-y-2">
         <span className="flex items-baseline justify-between gap-3">
           <span className="min-w-0 truncate text-xs leading-4 font-bold tracking-[0.08em] uppercase">{i.label}</span>
@@ -146,7 +149,7 @@ export function DriverList(p: DriverListProps) {
         const max = Math.max(...items.map((i) => Math.abs(i.delta)))
         return (
           <div>
-            <Header variant={p.variant} provisional={meta.provisional} />
+            <Header variant={p.variant} unit={p.unit} provisional={meta.provisional} />
             <ul role="list" className="space-y-2">
               {items.map((i) => (
                 <Item key={i.key} i={i} max={max} p={p} />

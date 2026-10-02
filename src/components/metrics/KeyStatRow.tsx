@@ -140,7 +140,7 @@ function Tile({ p, c }: { p: KeyStatRowProps; c: Computed }) {
       <span aria-hidden className="contents">
         <span className="flex items-start gap-2">
           {p.icon && <span className="grid size-5 shrink-0 place-items-center text-muted-foreground [&_svg]:size-5">{p.icon}</span>}
-          <span className={cn(LABEL, "line-clamp-2 min-w-0 pt-0.5")}>{p.label}</span>
+          <span className={cn(LABEL, "line-clamp-3 min-w-0 pt-0.5")}>{p.label}</span>
         </span>
         <span className="mt-auto flex flex-col items-start gap-2">
           <ValueUnit

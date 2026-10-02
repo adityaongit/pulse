@@ -69,7 +69,7 @@ export function getHealthHub(ctx: QueryCtx = defaultCtx()): HealthHubVM {
               highMin: st.highMin,
               typicalHighMin: sameDays.length ? meanSd(sameDays).mean : null,
               weekday: WEEKDAY[weekdayOf(today)],
-              spark: minutePoints(loadSeries(ctx, today, "stress"), dayStartOf(ctx, today), 10),
+              spark: minutePoints(loadSeries(ctx, today, "stress"), dayStartOf(ctx, today), 2),
             },
             st.provisional,
           )

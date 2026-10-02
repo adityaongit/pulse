@@ -8,10 +8,10 @@ import { InfoButton, type InfoContent } from "./InfoButton"
 import { useShellStatus } from "./ShellStatus"
 import { SyncStatus, TopBarFrame } from "./TopBar"
 
-export type DetailHeaderProps = { title: string; subtitle?: string; info?: InfoContent }
+export type DetailHeaderProps = { title: string; subtitle?: string; info?: InfoContent; /** Back target without history (default: the parent tab root). */ backHref?: string }
 
 /** Detail-route top bar: back, title (+ subtitle), info or sync (spec §4.5). */
-export function DetailHeader({ title, subtitle, info }: DetailHeaderProps) {
+export function DetailHeader({ title, subtitle, info, backHref }: DetailHeaderProps) {
   const router = useRouter()
   const pathname = usePathname()
   const { today } = useShellStatus()
@@ -19,6 +19,7 @@ export function DetailHeader({ title, subtitle, info }: DetailHeaderProps) {
   const back = () => {
     const sameOrigin = document.referrer.startsWith(window.location.origin)
     if (window.history.length > 1 && sameOrigin) return router.back()
+    if (backHref) return router.push(backHref)
     const parent = parentHref(pathname)
     // Home details return to Home on the same day.
     const d = new URLSearchParams(window.location.search).get("d")

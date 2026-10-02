@@ -3,7 +3,7 @@
 import * as React from "react"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { format, parseISO } from "date-fns"
-import { Bar, CartesianGrid, ComposedChart, LabelList, Line, ReferenceArea, XAxis, YAxis } from "recharts"
+import { Bar, CartesianGrid, ComposedChart, LabelList, Line, ReferenceArea, ReferenceLine, XAxis, YAxis } from "recharts"
 import { cn } from "@/lib/utils"
 import { DATA_COLORS, deltaTone, recoveryColor, STRESS_COLOR, stressLevel, type GoodDirection } from "@/lib/bands"
 import { dayLabel, formatValue, spoken, type FormatKey } from "@/lib/format"
@@ -38,6 +38,10 @@ export type TrendChartProps = {
   target?: [number, number] | null
   /** Pins one range and hides the toggle (Stress 30-day trend). */
   fixedRange?: TrendRange
+  /** Range when `?r=` is absent (default `m`; Fitness VO2 max uses `6m`). */
+  defaultRange?: TrendRange
+  /** A labelled horizontal line ("Your age" on WHOOP Age history). */
+  reference?: { y: number; label: string }
 }
 
 const RANGE_ARIA: Record<TrendRange, string> = { w: "1 week", m: "1 month", "6m": "6 months" }
@@ -59,7 +63,8 @@ function Trend({ points, p }: { points: TrendPoint[]; p: TrendChartProps }) {
   const params = useSearchParams()
   const today = useOptionalShellStatus()?.today ?? points.at(-1)?.date ?? ""
   const anim = useSeriesAnimation()
-  const urlRange = parseRange(params.get("r") ?? undefined)
+  const fallback = p.defaultRange ?? "m"
+  const urlRange = params.get("r") ? parseRange(params.get("r") ?? undefined) : fallback
   const [range, setRange] = React.useState<TrendRange>(p.fixedRange ?? urlRange)
   const [active, setActive] = React.useState<number | null>(null)
   // Follow `?r=` when it changes elsewhere (another chart, back/forward) without an effect.
@@ -81,14 +86,16 @@ function Trend({ points, p }: { points: TrendPoint[]; p: TrendChartProps }) {
   const tone = delta === null || !p.direction || delta === 0 ? null : deltaTone(p.direction, delta, 0).tone
   const scrubbed = active !== null ? rows[active] : null
   const line = range === "6m"
-  const domain: [number, number | "auto"] = p.colorBy === "band" ? [0, 100] : p.colorBy === "stress" ? [0, 3] : [0, "auto"]
+  // A single-hue 6M line (WHOOP Age, VO2 max, vitals) fits its data; bars always start at zero.
+  const domain: [number | "auto", number | "auto"] =
+    p.colorBy === "band" ? [0, 100] : p.colorBy === "stress" ? [0, 3] : line && p.colorBy === "single" ? ["auto", "auto"] : [0, "auto"]
 
   const ticks =
     range === "w"
       ? rows.map((r) => r.date)
       : range === "m"
         ? rows.filter((_, i) => (rows.length - 1 - i) % 7 === 0).map((r) => r.date)
-        : rows.filter((r) => r.date.endsWith("-01")).map((r) => r.date)
+        : rows.filter((r, i) => i > 0 && r.date.slice(0, 7) !== rows[i - 1].date.slice(0, 7)).map((r) => r.date)
   const tickFormat = (d: string) => format(parseISO(d), range === "w" ? "EEEEE" : range === "m" ? "MMM d" : "MMM")
 
   const summary = values.length
@@ -99,7 +106,7 @@ function Trend({ points, p }: { points: TrendPoint[]; p: TrendChartProps }) {
     if (!v) return
     setRange(v as TrendRange)
     setActive(null)
-    router.replace(`${pathname}${withParam(params.toString(), "r", v === "m" ? null : v)}`, { scroll: false })
+    router.replace(`${pathname}${withParam(params.toString(), "r", v === fallback ? null : v)}`, { scroll: false })
   }
 
   return (
@@ -160,8 +167,18 @@ function Trend({ points, p }: { points: TrendPoint[]; p: TrendChartProps }) {
             {p.baseline && (
               <ReferenceArea y1={p.baseline.mean - p.baseline.sd} y2={p.baseline.mean + p.baseline.sd} fill="var(--chart-band)" fillOpacity={1} ifOverflow="extendDomain" />
             )}
+            {p.reference && (
+              <ReferenceLine
+                y={p.reference.y}
+                stroke="var(--chart-cursor)"
+                strokeDasharray="4 4"
+                ifOverflow="extendDomain"
+                label={{ value: p.reference.label, position: "insideTopLeft", fill: "var(--muted-foreground)", fontSize: 11 }}
+              />
+            )}
             {p.target && <ReferenceArea y1={p.target[0]} y2={p.target[1]} fill="var(--dial-target)" fillOpacity={0.3} ifOverflow="extendDomain" />}
             <ChartTooltip
+              isAnimationActive={false}
               cursor={line ? LINE_CURSOR : BAR_CURSOR}
               content={
                 <ChartTooltipContent

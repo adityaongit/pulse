@@ -65,6 +65,7 @@ function Chart({ s, variant }: { s: StressSeries; variant: "full" | "spark" }) {
         <YAxis domain={[0, 3]} ticks={[0, 1, 2, 3]} tickFormatter={(v: number) => v.toFixed(1)} width={28} hide={!full} {...AXIS} tickMargin={4} />
         {full && (
           <ChartTooltip
+            isAnimationActive={false}
             cursor={LINE_CURSOR}
             content={
               <ChartTooltipContent

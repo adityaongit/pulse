@@ -56,6 +56,7 @@ function Chart({ night }: { night: HypnogramNight }) {
           tick={{ fontSize: 11, fontWeight: 700 }}
         />
         <ChartTooltip
+          isAnimationActive={false}
           cursor={LINE_CURSOR}
           content={
             <ChartTooltipContent

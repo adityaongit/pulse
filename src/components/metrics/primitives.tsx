@@ -73,7 +73,7 @@ export function StatusChip({
   return (
     <span
       className={cn(
-        "inline-flex h-6 w-fit items-center gap-1 rounded-md px-2 text-xs font-bold tabular-nums",
+        "inline-flex min-h-6 w-fit items-center gap-1 rounded-md px-2 py-1 text-xs leading-4 font-bold tabular-nums",
         CHIP_TONE_CLASS[tone],
         className
       )}
