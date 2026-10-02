@@ -9,7 +9,7 @@ export type { InfoContent }
 
 /**
  * Info trigger and its centred info card (spec §4.8). `card`: 32 px visual inside a 44 px hit area
- * (card headers). `header`: WHOOP's ringed "i", 28 px inside 44 px (DetailHeader, [latest-recovery-1]).
+ * (card headers). `header`: WHOOP's ringed "i", 24 px inside 44 px (DetailHeader, [latest-recovery-1]).
  */
 export function InfoButton({ info, label, variant }: { info: InfoContent; label: string; variant: "card" | "header" }) {
   const header = variant === "header"
@@ -23,9 +23,8 @@ export function InfoButton({ info, label, variant }: { info: InfoContent; label:
         )}
       >
         {header ? (
-          <span aria-hidden className="grid size-7 place-items-center rounded-full ring-[1.5px] ring-current">
-            <Info className="size-4" strokeWidth={2} />
-          </span>
+          // lucide's Info already draws the circle: one ring, as WHOOP's header "i" [latest-recovery-1].
+          <Info aria-hidden className="size-6" strokeWidth={1.75} />
         ) : (
           <Info aria-hidden strokeWidth={1.75} className="size-4" />
         )}
