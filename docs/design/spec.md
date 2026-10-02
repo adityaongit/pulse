@@ -560,7 +560,6 @@ Sizes:
 |---|---|---|---|---|---|
 | `sm` | 56 | 5 | small (16) | below, caption | Forecast, reports, Health hub |
 | `md` | 96 (≥ 768: 120) | 6 (7) | Home | below, dial-label + `ChevronRight` 12 | Home Sleep and Strain |
-| `md-hero` | 116 (≥ 768: 144) | 7 (8) | Home Recovery | below | Home Recovery |
 | `lg` | 240 (≥ 768: 280) | 11 (13) | hero | inside | Detail heroes |
 
 The 768 px step is part of the size, set with `md:` inside ScoreDial's size map (the one place a kit component reads a breakpoint, because the dial's geometry is its type role). Diameters are fixed pixel boxes so centre text never clips.
@@ -1028,7 +1027,7 @@ Shell: `PageShell layout="home" dateSwitcher={{ mode: "day" }}`. References: [ho
 | 1 | Top bar | TopBar: Demo chip, DateSwitcher, SyncStatus | "Demo data"; "Today" | n/a |
 | 2 | Connection | ConnectionBanner | §5.13 | hidden when connected or demo |
 | 3 | Day strip | DayStrip `indicator="recovery"` | n/a | n/a |
-| 4 | Wordmark and dials | wordmark "Pulse"; ScoreDial `sleep md`, `recovery md-hero`, `strain md` (with target) as links | labels "Sleep", "Recovery", "Strain"; "So far" tag under Strain for today | Any dial in reason: track only, centre `--`; one centred ReasonPlaceholder `sm` line under the row with the most important reason (Recovery's, else Sleep's, else Strain's), e.g. "Calibrating: 4 nights left" |
+| 4 | Wordmark and dials | wordmark "Pulse"; ScoreDial `sleep md`, `recovery md`, `strain md` (with target), three equal dials as in WHOOP, as links | labels "Sleep", "Recovery", "Strain"; "So far" tag under Strain for today | Any dial in reason: track only, centre `--`; one centred ReasonPlaceholder `sm` line under the row with the most important reason (Recovery's, else Sleep's, else Strain's), e.g. "Calibrating: 4 nights left" |
 | 5 | Health Monitor alert (only when flagged) | `Alert` (bg-card, `ring-1 ring-warning/50`; illness: `ring-recovery-red/60`), icon `TriangleAlert` warning / `CircleAlert` red | Flagged: title "{n} vitals outside your normal range", body "{Names} are outside your usual range. This can be an early sign of illness or heavy strain.", link "View Health Monitor". Illness: title "Your body may be fighting something", body "Several vitals moved away from your normal range together, a pattern that often comes before feeling unwell. Consider an easier day.", same link | hidden when nothing is flagged |
 | 6 | Monitor row | two linked cards (SectionShell `card`, whole card is the link) | **Health Monitor**: in range → chip `Check` on `bg-optimal/15` + "Within range" (`text-optimal`, stat-label) over "5/5 metrics" (caption); flagged → `TriangleAlert` on `bg-warning/15` + "Out of range" (`text-warning`) over "3/5 metrics". **Stress Monitor**: value chip (`font-numeric text-lg font-bold`, `rounded-md px-1.5` on the level colour at 15%, text in level colour) + level word (stat-label, level colour) over the time of the reading (caption, `HH:mm`) | Health Monitor reason (no vitals last night): chip `--`, "No readings" / reason short copy. Stress no data: chip `--`, "No still minutes yet" |
 | 7 | My Day | SectionShell `section` "My Day" | | |
@@ -2223,7 +2222,7 @@ flowchart LR
 
 | # | Plan says | Spec does | Why |
 |---|---|---|---|
-| D1 | Home: "Recovery is the hero and is larger" | Recovery is the centre dial at 1.2× (116 / 144 px) between equal Sleep and Strain dials, in WHOOP's Sleep, Recovery, Strain order | WHOOP's 2025 Home uses three equal dials; 1.2× honours the plan without breaking WHOOP's row |
+| D1 | Home: "Recovery is the hero and is larger" | Three equal `md` dials (Sleep, Recovery, Strain), as in WHOOP's Home | User decision 2026-10-02: match WHOOP's equal-sized row exactly |
 | D2 | AppShell owns the top bar | AppShell owns the frame and status (`ShellStatus` context); PageShell renders `TopBar` and DetailShell renders `DetailHeader` in the same sticky slot | A layout cannot receive per-page title/date props; detail screens need back and info instead of the global items, as in WHOOP |
 | D3 | Fonts: "a condensed numeric display face" | Barlow at regular width (+ `tabular-nums`) | Measured WHOOP numerals are DIN 2014 regular width (advance ÷ cap 0.775); Barlow matches to 1%, the semi-condensed cut does not |
 | D4 | Kit list | Adds `InsightCard` and `TickScale`; `KeyStatRow` gains a `tile` variant and `status` segments; `ZoneBars` gains a `stacked` variant; `DriverList` gains an `impact` variant (Journal Insights) | Needed by Recovery/Strain/Stress/Healthspan coach text, Pace of Aging, Energy Bank, Health Monitor tiles, report breakdowns; variants reuse rather than add components |
