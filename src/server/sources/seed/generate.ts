@@ -15,11 +15,11 @@ import {
   exercises,
   intradayDirty,
   journalEntries,
-  journalTags,
   sleepSegments,
   sleepSessions,
   syncState,
 } from "../../db/schema";
+import { ensureDefaultTags } from "../../journalTags";
 import type { Source } from "../types";
 import {
   ALCOHOL_WEEKEND_ODDS,
@@ -38,6 +38,7 @@ import {
   SEED_DAYS,
   SKIN_TEMP_LAG_S,
   SLEEP_SYNC_DELAY_S,
+  TAG_ODDS,
   type Tag,
   type WorkoutKind,
   WORKOUTS,
@@ -133,7 +134,7 @@ function behaviour(ctx: Ctx, i: number) {
   const weekday = weekdayOf(day);
   const weekend = isWeekend(weekday);
   const r = rng(day, "behaviour");
-  const tags = Object.fromEntries(DEFAULT_JOURNAL_TAGS.map(({ tag, odds }) => [tag, r.chance(odds)])) as Record<Tag, boolean>;
+  const tags = Object.fromEntries(DEFAULT_JOURNAL_TAGS.map(({ tag }) => [tag, r.chance(TAG_ODDS[tag])])) as Record<Tag, boolean>;
   if (weekday === 5 || weekday === 6) tags.alcohol ||= r.chance(ALCOHOL_WEEKEND_ODDS);
   if (illnessSeverity(i) > 0) tags.alcohol = false;
   tags.illness = illnessSeverity(i) >= 0.3;
@@ -545,11 +546,7 @@ export function seedPull(db: Db, { now, timeZone, maxHr }: SeedOptions): { chang
     const first = db.select({ day: min(dailyMetrics.day) }).from(dailyMetrics).where(eq(dailyMetrics.source, "seed")).get()?.day;
     const ctx: Ctx = { anchor: first ?? addDays(today, 1 - SEED_DAYS), timeZone, maxHr };
 
-    let changes = db
-      .insert(journalTags)
-      .values(DEFAULT_JOURNAL_TAGS.map(({ tag, label }) => ({ tag, label, isDefault: true })))
-      .onConflictDoNothing()
-      .run().changes;
+    let changes = ensureDefaultTags(db);
     const from = synced === null ? 0 : Math.max(0, daysBetween(ctx.anchor, localDay(synced, timeZone)));
     for (let i = from; i <= daysBetween(ctx.anchor, today); i++) changes += writeDay(db, generateDay(ctx, i), now);
 
