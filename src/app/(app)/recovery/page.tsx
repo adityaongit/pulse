@@ -34,7 +34,7 @@ export default async function RecoveryPage({ searchParams }: PageProps<"/recover
     <DetailShell
       title="Recovery"
       info={RECOVERY_INFO}
-      dateSwitcher={{ mode: "day" }}
+      dateSwitcher={{ mode: "day", placement: "header" }}
       hero={<ScoreDial variant="recovery" size="lg" value={r.value} reason={r.reason} nightsLeft={r.nightsLeft} provisional={r.provisional} tags={r.tags} />}
       summary={
         <Card className="gap-0 px-4 py-1 ring-0">

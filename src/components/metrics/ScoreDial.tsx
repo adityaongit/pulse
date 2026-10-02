@@ -10,7 +10,7 @@ import { dialAriaLabel, formatValue, type FormatKey } from "@/lib/format"
 import { reasonCopy, type MetricTag, type ReasonCode } from "@/lib/reasons"
 import { useReducedMotion } from "@/hooks/use-reduced-motion"
 import { ChartContainer } from "@/components/ui/chart"
-import { Skeleton } from "@/components/ui/skeleton"
+import { SkeletonText } from "@/components/ui/skeleton"
 import { MetricTags, type TagKind } from "./primitives"
 
 export type DialSize = "sm" | "md" | "lg"
@@ -40,16 +40,21 @@ export type ScoreDialProps = {
   caption?: string
   /** Home: the dial and label become one link. */
   href?: string
+  /** Loading (spec §5.19): the real track and label, bars where the numbers go. */
+  loading?: boolean
 }
 
 const SIZE = {
   sm: { box: "size-14", d: 56, ring: 5, value: "text-base leading-none" },
   md: { box: "size-24 md:size-30", d: 96, ring: 6, value: "text-[26px] leading-none tracking-[-0.01em] md:text-[30px]" },
-  lg: { box: "size-60 md:size-70", d: 240, ring: 11, value: "text-[64px] leading-none tracking-[-0.01em] md:text-[72px]" },
+  // v2 hero ring: 14 at 240 (16 at 280), measured on [latest-recovery-1].
+  lg: { box: "size-60 md:size-70", d: 240, ring: 14, value: "text-[64px] leading-none tracking-[-0.01em] md:text-[72px]" },
 } as const
 
 const DIAL_LABEL = "text-xs leading-4 font-bold tracking-[0.08em] uppercase"
 const TRACK = "var(--dial-track)"
+// Every current ring opens with a 4° gap each side of 12 o'clock ([latest-recovery-1], [latest-home-top-1]).
+const ARC = { startAngle: 86, endAngle: -266 } as const
 const CHART_RESET = "absolute inset-0 aspect-auto size-full [&_.recharts-radial-bar-background-sector]:fill-dial-track"
 
 type Resolved = { label: string; max: number; color: string; text: string; unit?: string; word?: { text: string; className: string } }
@@ -66,7 +71,8 @@ function resolve(p: ScoreDialProps): Resolved {
         color: c.css,
         unit: "%",
         text: formatValue("int", p.value),
-        word: band ? { text: BAND_WORD[band], className: c.text } : undefined,
+        // The ring carries the colour; the word stays secondary so it reads as a label (spec §5.1 v2).
+        word: band ? { text: BAND_WORD[band], className: lg ? "text-foreground-secondary" : c.text } : undefined,
       }
     }
     case "strain":
@@ -96,7 +102,7 @@ function resolve(p: ScoreDialProps): Resolved {
 
 /** The WHOOP ring (spec §5.1): Recharts radial bar over a pie track, centre text in HTML. */
 export function ScoreDial(props: ScoreDialProps) {
-  const { variant, size, value, href } = props
+  const { variant, size, value, href, loading } = props
   const reduced = useReducedMotion()
   const r = resolve(props)
   const s = SIZE[size]
@@ -158,8 +164,7 @@ export function ScoreDial(props: ScoreDialProps) {
               <Pie
                 {...pieBase}
                 data={(target ? targetSlices(target[0], target[1]) : [1]).map((v, i) => ({ v, fill: i === 1 ? "var(--dial-target)" : TRACK }))}
-                startAngle={90}
-                endAngle={-270}
+                {...ARC}
                 innerRadius={radii.inner}
                 outerRadius={radii.outer}
               />
@@ -167,8 +172,7 @@ export function ScoreDial(props: ScoreDialProps) {
                 <Pie
                   {...pieBase}
                   data={markerSlices((target[0] + target[1]) / 2, 21, 0.2).map((v, i) => ({ v, fill: i === 1 ? "var(--foreground)" : "transparent" }))}
-                  startAngle={90}
-                  endAngle={-270}
+                  {...ARC}
                   // Stays inside the ring, like WHOOP's target tick; the stress gauge marker keeps its overhang.
                   innerRadius={radii.inner}
                   outerRadius={radii.outer}
@@ -180,12 +184,11 @@ export function ScoreDial(props: ScoreDialProps) {
       </ChartContainer>
 
       {/* Fill layer: draws above the target band, so the band is covered once strain passes it. */}
-      {!gauge && (
+      {!gauge && !loading && (
         <ChartContainer config={{}} className={CHART_RESET} initialDimension={{ width: s.d, height: s.d }}>
           <RadialBarChart
             data={[{ value: empty ? 0 : Math.min(value, r.max) }]}
-            startAngle={90}
-            endAngle={-270}
+            {...ARC}
             innerRadius={radii.inner}
             outerRadius={radii.outer}
             margin={{ top: 0, right: 0, bottom: 0, left: 0 }}
@@ -197,12 +200,14 @@ export function ScoreDial(props: ScoreDialProps) {
       )}
 
       <div className="absolute inset-0 grid place-content-center justify-items-center px-[12%] text-center">
-        {lg && !empty && !gauge && (
+        {lg && (!empty || loading) && !gauge && (
           <span aria-hidden className="mb-1 text-xs leading-4 font-medium tracking-[0.35em] text-foreground-secondary uppercase">
             Pulse
           </span>
         )}
-        {lg && empty && reason?.code !== "no_data" ? (
+        {loading ? (
+          size !== "sm" && <SkeletonText className={cn("font-numeric font-bold", s.value, lg ? "w-[2.4ch]" : "w-[2.2ch]")} />
+        ) : lg && empty && reason?.code !== "no_data" ? (
           <ReasonCentre icon={reason!.icon} text={reason!.short} />
         ) : (
           <span className={cn("font-numeric font-bold tabular-nums", s.value, empty && "text-muted-foreground")}>
@@ -216,7 +221,7 @@ export function ScoreDial(props: ScoreDialProps) {
           <>
             <span className={cn(DIAL_LABEL, "mt-2 max-w-36 text-balance")}>{r.label}</span>
             {r.word && <span className={cn(DIAL_LABEL, "mt-1", r.word.className)}>{r.word.text}</span>}
-            <span className="mt-2 empty:hidden">{tagNode}</span>
+            {!loading && <span className="mt-2 empty:hidden">{tagNode}</span>}
           </>
         )}
       </div>
@@ -235,11 +240,11 @@ export function ScoreDial(props: ScoreDialProps) {
         {r.label}
         {href && <ChevronRight aria-hidden className="size-3" strokeWidth={2.5} />}
       </span>
-      {tagNode}
+      {!loading && tagNode}
     </span>
   )
 
-  const longReason = lg && empty && reason && (
+  const longReason = lg && empty && !loading && reason && (
     <p className="max-w-[36ch] text-center text-xs leading-4 font-medium text-muted-foreground">{reason.long}</p>
   )
 
@@ -256,12 +261,13 @@ export function ScoreDial(props: ScoreDialProps) {
       <Link
         href={href}
         aria-label={`${aria}. Open ${r.label} details`}
-        className="flex min-w-24 flex-col items-center gap-2 rounded-xl p-1 transition-transform duration-150 ease-standard outline-none focus-visible:ring-3 focus-visible:ring-ring/50 active:scale-[0.96]"
+        className="flex min-w-24 flex-col items-center gap-2 rounded-xl p-1 transition-[scale,color] duration-150 ease-standard outline-none hover:text-foreground-secondary focus-visible:ring-3 focus-visible:ring-ring/50 active:scale-[0.96]"
       >
         {content}
       </Link>
     )
-  return <div className={cn("flex flex-col items-center", lg ? "gap-3" : "gap-2")}>{content}</div>
+  // A loading md dial keeps the Home link's 4 px padding, so the swap to the linked dial moves nothing.
+  return <div className={cn("flex flex-col items-center", lg ? "gap-3" : "gap-2", loading && size === "md" && "min-w-24 p-1")}>{content}</div>
 }
 
 function ReasonCentre({ icon: Icon, text }: { icon: ReturnType<typeof reasonCopy>["icon"]; text: string }) {
@@ -274,28 +280,13 @@ function ReasonCentre({ icon: Icon, text }: { icon: ReturnType<typeof reasonCopy
 }
 
 /**
- * Loading shape: the ring at its diameter plus the label bar (spec §5.1). Server components import
- * the named export: they cannot dot into a client module.
+ * Loading shape (spec §5.19): the dial itself with its real track and label, bars for the numbers,
+ * so the swap moves nothing. Server components import the named export: they cannot dot into a client module.
  */
-export function ScoreDialSkeleton({ size }: { size: DialSize }) {
-  const s = SIZE[size]
+export function ScoreDialSkeleton({ size, variant = "stat", label }: { size: DialSize; variant?: DialVariant; label?: string }) {
   return (
-    <div aria-hidden className="flex flex-col items-center gap-2">
-      <div
-        className={cn(
-          "grid shrink-0 place-content-center justify-items-center gap-2 rounded-full border-muted animate-pulse motion-reduce:animate-none",
-          size === "lg" ? "border-[11px] md:border-[13px]" : size === "sm" ? "border-[5px]" : "border-[6px]",
-          s.box
-        )}
-      >
-        {size === "lg" && (
-          <>
-            <Skeleton className="h-12 w-28 rounded-md" />
-            <Skeleton className="h-3 w-20" />
-          </>
-        )}
-      </div>
-      {size !== "lg" && <Skeleton className="h-3 w-14" />}
+    <div aria-hidden className="contents">
+      <ScoreDial variant={variant} size={size} value={null} label={label} loading />
     </div>
   )
 }

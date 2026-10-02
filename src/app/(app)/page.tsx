@@ -1,12 +1,11 @@
 import Link from "next/link"
-import { CalendarRange, Check, ChevronRight, CircleAlert, Maximize2, TriangleAlert } from "lucide-react"
+import { CalendarRange, Check, ChevronRight, CircleAlert, Maximize2, Plus, TriangleAlert } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { clock, formatValue, MISSING, rangeLabel } from "@/lib/format"
 import { reasonCopy } from "@/lib/reasons"
 import { dayHref } from "@/lib/url"
 import { EnergyBankChart } from "@/components/charts/EnergyBankChart"
 import { ActivityCard } from "@/components/metrics/ActivityCard"
-import { DayStrip } from "@/components/metrics/DayStrip"
 import { KeyStatRow } from "@/components/metrics/KeyStatRow"
 import { ReasonPlaceholder } from "@/components/metrics/ReasonPlaceholder"
 import { ScoreDial } from "@/components/metrics/ScoreDial"
@@ -14,11 +13,12 @@ import { SleepCard } from "@/components/metrics/SleepCard"
 import { TickScale } from "@/components/metrics/TickScale"
 import { MetricTags } from "@/components/metrics/primitives"
 import { EmptyState } from "@/components/shells/EmptyState"
+import { HEADER_SENTINEL } from "@/lib/header-state"
 import { MetricState } from "@/components/shells/MetricState"
 import { PageShell } from "@/components/shells/PageShell"
 import { SectionShell } from "@/components/shells/SectionShell"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { Card } from "@/components/ui/card"
+import { CARD_MATERIAL } from "@/components/ui/card"
 import { getHome } from "@/server/queries/home"
 import type { HomeVM, StressLevel } from "@/server/queries/types"
 import { pageDay, type SearchParams } from "./_lib/day"
@@ -43,18 +43,20 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
   const vm = getHome(d)
   const at = (href: string) => dayHref(href, d, today)
   const { dials } = vm
+  const checkIn = `${at("/journal")}${vm.isToday ? "?" : "&"}checkin=1`
 
   return (
     <PageShell
       title="Home"
-      dateSwitcher={{ mode: "day" }}
       layout="home"
+      rings={{
+        sleep: { value: dials.sleep.value, href: at("/sleep") },
+        recovery: { value: dials.recovery.value, href: at("/recovery") },
+        strain: { value: dials.strain.value, href: at("/strain") },
+      }}
       slots={{
         top: (
-          <div className="space-y-6">
-            <div className="-mx-4 md:mx-0">
-              <DayStrip indicator="recovery" days={vm.strip.map((s) => ({ date: s.day, recovery: s.recovery }))} />
-            </div>
+          <div className="pt-4 xl:pt-2">
             <div className="flex flex-col gap-6 xl:grid xl:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] xl:items-center xl:gap-x-6">
               <div className="space-y-4">
                 <p aria-hidden className="text-center text-[13px] leading-4 font-semibold tracking-[0.35em] text-foreground-secondary uppercase">
@@ -82,6 +84,8 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
                     href={at("/strain")}
                   />
                 </div>
+                {/* The header's ring row appears once this passes under it (spec §4.3). */}
+                <div aria-hidden {...{ [HEADER_SENTINEL]: "" }} />
                 {dials.reason && (
                   <p className="text-center">
                     <ReasonPlaceholder reason={dials.reason.reason} nightsLeft={dials.reason.nightsLeft} size="sm" />
@@ -101,7 +105,19 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
           </div>
         ),
         right: (
-          <SectionShell variant="section" title="My Day">
+          <SectionShell
+            variant="section"
+            title="My Day"
+            action={
+              <Link
+                href={checkIn}
+                aria-label="Add to today"
+                className="-my-2 grid size-12 place-items-center rounded-[14px] bg-foreground text-primary-foreground transition-[scale,background-color] duration-150 ease-standard outline-none hover:bg-foreground/90 focus-visible:ring-3 focus-visible:ring-ring/50 active:scale-[0.96]"
+              >
+                <Plus aria-hidden className="size-[26px]" strokeWidth={2} />
+              </Link>
+            }
+          >
             <div className="space-y-3 xl:space-y-4">
               <SectionShell
                 variant="card"
@@ -158,30 +174,28 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
           </SectionShell>
         ),
         left: (
-          <SectionShell variant="section" title="Key statistics" aside="vs. 30-day average">
-            <Card className="gap-0 px-4 py-1 ring-0">
-              <div className="divide-y divide-border">
-                {/* Plain wrappers carry the dividers: the rows are rounded hover targets. */}
-                {vm.keyStats.map((s) => (
-                  <div key={s.key}>
-                    <KeyStatRow variant="row" {...statProps(s, { d, today })} />
-                  </div>
-                ))}
-              </div>
-            </Card>
+          <SectionShell variant="section" title="My Dashboard" aside="vs. 30-day average">
+            {/* One card per metric (V9, [latest-home-dashboard-1]). */}
+            <ul className="space-y-2">
+              {vm.keyStats.map((s) => (
+                <li key={s.key}>
+                  <KeyStatRow variant="card" {...statProps(s, { d, today })} />
+                </li>
+              ))}
+            </ul>
           </SectionShell>
         ),
         bottom: vm.weeklyTeaser && (
           <Link
             href={`/reports/${vm.weeklyTeaser.period}`}
-            className="flex h-14 items-center gap-3 rounded-xl bg-linear-to-r from-banner-from to-banner-to px-4 transition-[filter] duration-150 ease-standard outline-none hover:brightness-110 focus-visible:ring-3 focus-visible:ring-ring/50"
+            className="flex h-14 items-center gap-3 rounded-2xl bg-linear-to-r from-banner-from to-banner-to px-4 shadow-card transition-[filter,scale] duration-150 ease-standard outline-none hover:brightness-110 focus-visible:ring-3 focus-visible:ring-ring/50 active:scale-[0.96]"
           >
-            <CalendarRange aria-hidden className="size-5 shrink-0" strokeWidth={1.75} />
+            <CalendarRange aria-hidden className="size-[22px] shrink-0" strokeWidth={1.5} />
             <span className="min-w-0 flex-1 truncate text-base leading-[22px] font-semibold">Your week in review</span>
             <span className="shrink-0 font-numeric text-xs leading-4 font-medium text-foreground-secondary tabular-nums">
               {rangeLabel(vm.weeklyTeaser.start, vm.weeklyTeaser.end)}
             </span>
-            <ChevronRight aria-hidden className="size-4 shrink-0 text-foreground-secondary" strokeWidth={1.75} />
+            <ChevronRight aria-hidden className="size-5 shrink-0 text-foreground-secondary" strokeWidth={1.75} />
           </Link>
         ),
       }}
@@ -195,7 +209,8 @@ function MonitorAlert({ alert, href }: { alert: NonNullable<HomeVM["monitorAlert
   return (
     <Alert
       className={cn(
-        "grid-cols-[auto_minmax(0,1fr)] gap-x-3 gap-y-0.5 rounded-xl border-0 bg-card px-4 py-3 *:[svg]:size-5 *:[svg]:translate-y-px",
+        CARD_MATERIAL,
+        "grid-cols-[auto_minmax(0,1fr)] gap-x-3 gap-y-0.5 border-0 px-4 py-3 *:[svg]:size-5 *:[svg]:translate-y-px",
         illness ? "ring-1 ring-recovery-red/60" : "ring-1 ring-warning/50",
       )}
     >

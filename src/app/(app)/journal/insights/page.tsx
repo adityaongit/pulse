@@ -20,7 +20,7 @@ export default async function JournalInsightsPage({ searchParams }: PageProps<"/
 
   return (
     <DetailShell
-      title="Journal insights"
+      title="Behaviour insights"
       hero={
         // Top-aligned beside the list on laptop (spec §7.12 wireframe), and no wider than the hero column.
         <div data-hero-align="start" className="w-full space-y-4 xl:w-[360px]">

@@ -16,6 +16,7 @@ export default async function SettingsPage() {
   return (
     <DetailShell
       title="Settings"
+      dismiss="close"
       primary={
         <>
           <OAuthToast />

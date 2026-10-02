@@ -8,6 +8,7 @@ import { ago, clock } from "@/lib/format"
 import { useNow } from "@/hooks/use-now"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
+import { CARD_MATERIAL } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { useShellStatus } from "@/components/shells/ShellStatus"
 
@@ -73,7 +74,8 @@ export function ConnectionBanner({ className }: { className?: string }) {
       role={view.role}
       aria-live={view.role === "status" ? "polite" : undefined}
       className={cn(
-        "grid-cols-[auto_minmax(0,1fr)] gap-x-3 gap-y-0.5 rounded-xl border-0 bg-card px-4 py-3 *:[svg]:size-5 *:[svg]:translate-y-px md:grid-cols-[auto_minmax(0,1fr)_auto]",
+        CARD_MATERIAL,
+        "grid-cols-[auto_minmax(0,1fr)] gap-x-3 gap-y-0.5 border-0 px-4 py-3 *:[svg]:size-5 *:[svg]:translate-y-px md:grid-cols-[auto_minmax(0,1fr)_auto]",
         className
       )}
     >

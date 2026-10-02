@@ -5,32 +5,34 @@ import { CalendarDays, CalendarRange, ChevronRight, FlaskConical, Plug, Settings
 import { rangeLabel } from "@/lib/format"
 import { getMore } from "@/server/queries/settings"
 import { PageShell } from "@/components/shells/PageShell"
-import { SectionShell } from "@/components/shells/SectionShell"
-import { Card } from "@/components/ui/card"
+import { CARD_LINK } from "@/components/shells/SectionShell"
+import { cn } from "@/lib/utils"
 
 export const metadata = { title: "More" }
 
 type Row = { icon: LucideIcon; label: string; caption?: string; href: string }
 
-function Rows({ rows }: { rows: Row[] }) {
+/** WHOOP's settings rows [latest-more-1], [latest-settings-1]: one 56 px card per item, caps label, chevron. */
+function Rows({ title, rows }: { title: string; rows: Row[] }) {
+  const id = `more-${title.toLowerCase()}`
   return (
-    <Card className="gap-0 px-4 py-1 ring-0">
-      <ul className="divide-y divide-border">
+    <section aria-labelledby={id} className="space-y-2">
+      <h2 id={id} className="px-1 text-xs leading-4 font-bold tracking-[0.08em] text-muted-foreground uppercase">
+        {title}
+      </h2>
+      <ul className="space-y-2">
         {rows.map(({ icon: Icon, label, caption, href }) => (
           <li key={label}>
-            <Link
-              href={href}
-              className="-mx-2 flex min-h-13 items-center gap-3 rounded-lg px-2 transition-[background-color] duration-150 ease-standard outline-none hover:bg-accent focus-visible:ring-3 focus-visible:ring-ring/50 active:bg-accent"
-            >
-              <Icon aria-hidden className="size-5 shrink-0 text-muted-foreground" strokeWidth={1.75} />
-              <span className="min-w-0 flex-1 truncate text-[15px] leading-[22px]">{label}</span>
-              {caption && <span className="shrink-0 text-xs leading-4 font-medium text-muted-foreground tabular-nums">{caption}</span>}
-              <ChevronRight aria-hidden className="size-4 shrink-0 text-muted-foreground" strokeWidth={1.75} />
+            <Link href={href} className={cn(CARD_LINK, "flex min-h-14 items-center gap-3 px-4")}>
+              <Icon aria-hidden className="size-[22px] shrink-0 text-foreground-secondary" strokeWidth={1.5} />
+              <span className="min-w-0 flex-1 truncate text-[13px] leading-4 font-bold tracking-[0.08em] uppercase">{label}</span>
+              {caption && <span className="shrink-0 font-numeric text-xs leading-4 font-medium text-muted-foreground tabular-nums">{caption}</span>}
+              <ChevronRight aria-hidden className="size-5 shrink-0 text-muted-foreground" strokeWidth={1.75} />
             </Link>
           </li>
         ))}
       </ul>
-    </Card>
+    </section>
   )
 }
 
@@ -50,20 +52,15 @@ export default async function MorePage() {
 
   return (
     <PageShell title="More">
-      <div className="flex flex-col gap-8 xl:max-w-[720px] xl:gap-10">
-        {reports.length > 0 && (
-          <SectionShell variant="section" title="Reports">
-            <Rows rows={reports} />
-          </SectionShell>
-        )}
-        <SectionShell variant="section" title="App">
-          <Rows
-            rows={[
-              { icon: Settings, label: "Settings", href: "/settings" },
-              { icon: demo ? FlaskConical : Plug, label: "Data source", caption: demo ? "Demo data" : "Google Health", href: "/settings#source" },
-            ]}
-          />
-        </SectionShell>
+      <div className="flex flex-col gap-6 xl:max-w-[720px] xl:gap-8">
+        {reports.length > 0 && <Rows title="Reports" rows={reports} />}
+        <Rows
+          title="App"
+          rows={[
+            { icon: Settings, label: "Settings", href: "/settings" },
+            { icon: demo ? FlaskConical : Plug, label: "Data source", caption: demo ? "Demo data" : "Google Health", href: "/settings#source" },
+          ]}
+        />
         <p className="text-center text-xs leading-4 font-medium text-muted-foreground tabular-nums">
           Pulse {vm.version} · scoring v{vm.scoringVersion}
         </p>

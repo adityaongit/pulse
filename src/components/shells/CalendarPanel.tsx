@@ -37,8 +37,8 @@ export type CalendarPanelProps = {
 type Months = Record<string, Map<string, CalendarDayVM>>
 
 // Phone: drops from the very top over the top bar. ≥ 768: hangs under the top bar (56 px) beside the
-// sidebar (3rem collapsed, 16rem from 1280), so the bar and nav stay readable (CAL6, inferred).
-const REGION = "fixed inset-x-0 top-0 z-50 md:top-[calc(env(safe-area-inset-top)+3.5rem)] md:left-12 xl:left-64"
+// rail (112 px) or sidebar (256 px from 1280), so the header and nav stay readable (CAL6, inferred).
+const REGION = "fixed inset-x-0 top-0 z-50 md:top-[calc(env(safe-area-inset-top)+3.5rem)] md:left-[112px] xl:left-[256px]"
 
 /**
  * WHOOP's month calendar (spec §4.3, refs calendar-recovery-current-2026-05*.jpg): a flat panel that

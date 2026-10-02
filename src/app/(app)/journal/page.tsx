@@ -31,17 +31,12 @@ export default async function JournalPage({ searchParams }: PageProps<"/journal"
       title="Journal"
       dateSwitcher={{ mode: "day" }}
       actions={
-        <div className="flex min-w-0 flex-1 items-center justify-between gap-3">
-          <p aria-hidden className="text-[22px] leading-7 font-semibold tracking-[-0.01em] xl:text-2xl">
-            Journal
-          </p>
-          <Button asChild variant="secondary" size="touch">
-            <Link href="/journal/insights">
-              <Sparkles aria-hidden strokeWidth={1.75} />
-              Insights
-            </Link>
-          </Button>
-        </div>
+        <Button asChild variant="secondary" size="touch">
+          <Link href="/journal/insights">
+            <Sparkles aria-hidden strokeWidth={1.75} />
+            Insights
+          </Link>
+        </Button>
       }
     >
       <div className="-mx-4 -mt-2 md:mx-0">
@@ -55,7 +50,7 @@ export default async function JournalPage({ searchParams }: PageProps<"/journal"
 
       <SectionShell variant="section" title="History">
         {vm.history.length ? (
-          <Card className="gap-0 px-4 py-1 ring-0 xl:px-5">
+          <Card className="gap-0 px-4 py-1 xl:px-5">
             <ul className="divide-y divide-border">
               {vm.history.map((h) => {
                 const shown = h.yes.slice(0, 3)

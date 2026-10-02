@@ -8,6 +8,8 @@
 /* Theme tokens only. Values are sampled from docs/design/reference (see docs/design/spec.md §2).
    Dark only: the `dark` class on <html> stays so shadcn's dark: variants apply. */
 @custom-variant dark (&:is(.dark *));
+/* Components that blur content could opt out with this; the glass tokens already turn opaque (spec §2.6). */
+@custom-variant reduced-transparency (@media (prefers-reduced-transparency: reduce));
 
 @theme inline {
   --color-background: var(--background);
@@ -17,14 +19,6 @@
   /* shadcn's chart tooltip sets font-mono + tabular-nums on values; route it to the numeric face */
   --font-mono: var(--font-numeric);
   --font-heading: var(--font-sans);
-  --color-sidebar-ring: var(--sidebar-ring);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar: var(--sidebar);
   --color-chart-5: var(--chart-5);
   --color-chart-4: var(--chart-4);
   --color-chart-3: var(--chart-3);
@@ -52,6 +46,12 @@
   --color-background-mid: var(--background-mid);
   --color-foreground-secondary: var(--foreground-secondary);
   --color-inset: var(--inset);
+  --color-card-top: var(--card-top);
+  --color-card-hover: var(--card-hover);
+  --color-popover-top: var(--popover-top);
+  --color-sheet: var(--sheet);
+  --color-sheet-bottom: var(--sheet-bottom);
+  --color-field: var(--field);
   --color-recovery-green: var(--recovery-green);
   --color-recovery-yellow: var(--recovery-yellow);
   --color-recovery-red: var(--recovery-red);
@@ -71,6 +71,8 @@
   --color-insight-to: var(--insight-to);
   --color-banner-from: var(--banner-from);
   --color-banner-to: var(--banner-to);
+  --color-outlook-from: var(--outlook-from);
+  --color-outlook-to: var(--outlook-to);
   --color-dial-track: var(--dial-track);
   --color-dial-target: var(--dial-target);
   --color-chart-grid: var(--chart-grid);
@@ -81,44 +83,74 @@
   --color-stage-light: var(--stage-light);
   --color-stage-deep: var(--stage-deep);
 
-  /* Radius scale: cards 12px, rows and buttons 8px, pills full (spec §2.4) */
+  /* Materials (spec §2.6): glass chrome, the action button's rim, overlay dims */
+  --color-glass-top: var(--glass-top);
+  --color-glass-bottom: var(--glass-bottom);
+  --color-glass-rim: var(--glass-rim);
+  --color-glass-lens: var(--glass-lens);
+  --color-glass-action-top: var(--glass-action-top);
+  --color-glass-action-bottom: var(--glass-action-bottom);
+  --color-action-rim-from: var(--action-rim-from);
+  --color-action-rim-to: var(--action-rim-to);
+  --color-action-face: var(--action-face);
+  --color-dim: var(--dim);
+  --color-dim-strong: var(--dim-strong);
+  --shadow-card: inset 0 1px 0 var(--card-edge);
+  --shadow-sheet: inset 0 1px 0 var(--sheet-edge);
+  --shadow-glass: inset 0 1px 0 var(--glass-edge), var(--glass-shadow);
+  --shadow-overlay: 0 8px 24px rgb(0 0 0 / 0.45);
+
+  /* Radius scale (spec §2.4): chips 8, rows 10, buttons 12, cards 16, info card 24, sheets 28 */
   --radius-sm: 0.25rem;
-  --radius-md: 0.375rem;
-  --radius-lg: 0.5rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.625rem;
   --radius-xl: 0.75rem;
   --radius-2xl: 1rem;
   --radius-3xl: 1.5rem;
-  --radius-4xl: 2rem;
+  --radius-4xl: 1.75rem;
 
-  /* Motion (spec §2.6) */
+  /* Motion (spec §2.7): fast 150, base 220, overlay 320 / 200 */
   --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-quick: cubic-bezier(0.4, 0, 1, 1);
 }
 
 :root {
   color-scheme: dark;
-  --radius: 0.5rem;
+  --radius: 0.625rem;
 
-  /* Ground: vertical gradient top -> mid -> bottom, sampled from WHOOP screens */
+  /* Ground: vertical gradient top -> mid -> bottom, fixed to the viewport (spec §2.1, C2) */
   --background-top: #262e33;
   --background-mid: #1b2024;
   --background: #0f1113;
+  --ground: linear-gradient(180deg, var(--background-top) 0, var(--background-mid) 270px, var(--background) 740px);
+  --ground-health: radial-gradient(120% 55% at 50% 0, #0f2c2a 0, transparent 70%), linear-gradient(180deg, #0a0b0c 0, #14171c 60%);
+  --ground-healthspan: linear-gradient(#050607, #050607);
+  /* The ground in use; a shell's data-ground attribute swaps it (base layer below). Headers paint the same value. */
+  --page-ground: var(--ground);
   --foreground: #ffffff;
   --foreground-secondary: #babac0;
 
   /* Surfaces */
   --card: #2b2f32;
+  --card-top: #2f3337;
+  --card-hover: #33383c;
   --card-foreground: #ffffff;
-  --popover: #34393d;
+  --popover: #252c32;
+  --popover-top: #2a373f;
   --popover-foreground: #ffffff;
   --primary: #ffffff;
   --primary-foreground: #0f1113;
-  --secondary: #34393d;
+  --secondary: #3b4244;
   --secondary-foreground: #ffffff;
   --muted: #22282c;
   --muted-foreground: #999ea3;
-  --accent: #34393d;
+  --accent: #41484b;
   --accent-foreground: #ffffff;
-  --inset: #0c0f11;
+  --inset: #111619;
+  --sheet: #14181c;
+  --sheet-bottom: #0f1316;
+  --field: #32393e;
   --destructive: #ff0026;
   --border: rgb(255 255 255 / 0.1);
   --input: rgb(255 255 255 / 0.15);
@@ -152,6 +184,8 @@
   --insight-to: #346e8c;
   --banner-from: #2e2c4f;
   --banner-to: #2b3f50;
+  --outlook-from: #6a5a45;
+  --outlook-to: #2f4a5e;
 
   /* Dials and charts */
   --dial-track: #33383c;
@@ -178,15 +212,43 @@
     transparent 1.5px 5px
   );
 
-  /* Sidebar (>= 768px) */
-  --sidebar: #14181b;
-  --sidebar-foreground: #babac0;
-  --sidebar-primary: #ffffff;
-  --sidebar-primary-foreground: #0f1113;
-  --sidebar-accent: #2b2f32;
-  --sidebar-accent-foreground: #ffffff;
-  --sidebar-border: rgb(255 255 255 / 0.08);
-  --sidebar-ring: #ffffff;
+  /* Glass (spec §2.6, sampled on latest-tabbar-1; alphas inferred, I1). A web approximation of
+     Apple's Liquid Glass, which has no web package: dark fill, soft show-through, lit top edge. */
+  --glass-top: rgb(34 39 45 / 0.8);
+  --glass-bottom: rgb(22 27 31 / 0.88);
+  --glass-edge: rgb(255 255 255 / 0.1);
+  --glass-rim: rgb(255 255 255 / 0.06);
+  --glass-lens: rgb(255 255 255 / 0.07);
+  --glass-shadow: 0 10px 30px rgb(0 0 0 / 0.5), 0 2px 6px rgb(0 0 0 / 0.35);
+  --glass-action-top: rgb(35 39 53 / 0.82);
+  --glass-action-bottom: rgb(30 35 51 / 0.9);
+  --action-rim-from: #7778dd;
+  --action-rim-to: #4c94db;
+  /* Opaque face inside the monogram ring, so the ring can be a gradient border. */
+  --action-face: #1f2436;
+  --dim: rgb(0 0 0 / 0.65);
+  --dim-strong: rgb(0 0 0 / 0.85);
+  --card-edge: rgb(255 255 255 / 0.06);
+  --sheet-edge: rgb(255 255 255 / 0.14);
+}
+
+/* No backdrop-filter, or the user asks for less transparency: the glass reads as its sampled solids. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  :root {
+    --glass-top: #22272d;
+    --glass-bottom: #181d21;
+    --glass-action-top: #232735;
+    --glass-action-bottom: #1e2333;
+  }
+}
+@media (prefers-reduced-transparency: reduce) {
+  :root {
+    --glass-top: #22272d;
+    --glass-bottom: #181d21;
+    --glass-action-top: #232735;
+    --glass-action-bottom: #1e2333;
+    --dim: rgb(0 0 0 / 0.8);
+  }
 }
 
 @layer base {
@@ -195,31 +257,49 @@
   }
   html {
     @apply font-sans;
+    background: var(--background);
     -webkit-tap-highlight-color: transparent;
     text-rendering: optimizeLegibility;
   }
+  /* The one page-level background switch (spec §2.1). */
+  :root:has([data-ground="health"]) {
+    --page-ground: var(--ground-health);
+  }
+  :root:has([data-ground="healthspan"]) {
+    --page-ground: var(--ground-healthspan);
+  }
   body {
     @apply text-foreground;
-    background:
-      linear-gradient(
-          180deg,
-          var(--background-top) 0,
-          var(--background-mid) 270px,
-          var(--background) 740px
-        )
-        no-repeat,
-      var(--background);
+  }
+  /* Fixed to the viewport (a fixed pseudo-element works on iOS, background-attachment: fixed does not). */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background: var(--page-ground);
   }
   ::selection {
     background-color: rgb(255 255 255 / 0.25);
   }
+  /* Reduced motion keeps fades and drops movement (spec §2.7): tw-animate entrances and exits lose
+     their translate, scale and blur and run 120 ms; components drop their own translates with motion-reduce:. */
   @media (prefers-reduced-motion: reduce) {
     *,
     ::before,
     ::after {
-      animation-duration: 0.01ms !important;
-      animation-iteration-count: 1 !important;
-      transition-duration: 0.01ms !important;
+      --tw-enter-translate-x: 0 !important;
+      --tw-enter-translate-y: 0 !important;
+      --tw-enter-scale: 1 !important;
+      --tw-enter-rotate: 0 !important;
+      --tw-enter-blur: 0 !important;
+      --tw-exit-translate-x: 0 !important;
+      --tw-exit-translate-y: 0 !important;
+      --tw-exit-scale: 1 !important;
+      --tw-exit-rotate: 0 !important;
+      --tw-exit-blur: 0 !important;
+      --tw-animation-duration: 120ms !important;
       scroll-behavior: auto !important;
     }
   }

@@ -98,6 +98,15 @@ export function ago(ms: number, now: number) {
   return `${d} days ago`;
 }
 
+/** Header sync age, WHOOP's battery slot (spec §4.3.2): "Now", "12m", "3h", "2d". */
+export function agoShort(ms: number, now: number) {
+  const min = Math.max(0, Math.floor((now - ms) / 60000));
+  if (min < 1) return "Now";
+  if (min < 60) return `${min}m`;
+  const h = Math.floor(min / 60);
+  return h < 48 ? `${h}h` : `${Math.floor(h / 24)}d`;
+}
+
 // --- Spoken labels (aria) ---
 
 const UNIT_WORDS: Record<string, string> = {

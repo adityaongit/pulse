@@ -1,25 +1,13 @@
 "use client"
 
+import * as React from "react"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useSearchParams } from "next/navigation"
 import { getISOWeek, getISOWeekYear, parseISO, subWeeks } from "date-fns"
 import { CalendarRange, HeartPulse, House, Menu, NotebookPen, Settings, type LucideIcon } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { tabForPath, TAB_ROOT, type Tab } from "@/lib/url"
-import { useMediaQuery } from "@/hooks/use-reduced-motion"
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarFooter,
-  SidebarGroup,
-  SidebarHeader,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  SidebarProvider,
-  SidebarSeparator,
-  useSidebar,
-} from "@/components/ui/sidebar"
+import { dayLabel } from "@/lib/format"
+import { dayHref, parseDay, tabForPath, TAB_ROOT, type Tab } from "@/lib/url"
 import { useShellStatus } from "./ShellStatus"
 import { DemoChip, SyncStatus } from "./TopBar"
 
@@ -29,6 +17,16 @@ const TABS: { tab: Tab; label: string; icon: LucideIcon }[] = [
   { tab: "journal", label: "Journal", icon: NotebookPen },
   { tab: "more", label: "More", icon: Menu },
 ]
+const ROOTS = new Set(Object.values(TAB_ROOT))
+
+/**
+ * Glass bar material (spec §2.6), for chrome that floats over scrolling content only: tab bar, rail,
+ * sidebar, round action. A labelled web approximation of iOS Liquid Glass: near-opaque gradient fill,
+ * 12 px blur, lit top edge, faint rim, soft lower shadow. Opaque under reduced transparency.
+ */
+export const GLASS = "bg-linear-to-b from-glass-top to-glass-bottom backdrop-blur-md backdrop-saturate-150 shadow-glass ring-1 ring-glass-rim"
+const PRESS = "transition-[color,scale] duration-150 ease-standard outline-none active:scale-[0.96] focus-visible:ring-3 focus-visible:ring-ring/50"
+const ITEM_TONE = (active: boolean) => (active ? "text-foreground" : "text-muted-foreground hover:text-foreground-secondary")
 
 /** Latest complete ISO week, e.g. "2026-W39". */
 function lastWeekPeriod(today: string) {
@@ -37,114 +35,167 @@ function lastWeekPeriod(today: string) {
 }
 
 /**
- * SidebarProvider whose open state follows the viewport, not the user: expanded at 1280 px and up,
- * icon rail at 768-1279 px (spec §4.2). No trigger, no cookie read.
+ * The active item's lens: one element that slides between items (150 ms), a soft pool of light that
+ * is brightest at the item's lower edge, as sampled under WHOOP's active tab [latest-tabbar-1].
  */
-export function ShellFrame({ children }: { children: React.ReactNode }) {
-  const expanded = useMediaQuery("(min-width: 1280px)")
+function Lens({ index, axis, className }: { index: number; axis: "x" | "y"; className: string }) {
   return (
-    <SidebarProvider open={expanded} onOpenChange={() => {}} className="min-h-svh">
-      {children}
-    </SidebarProvider>
+    <span
+      aria-hidden
+      style={{ "--tab": index } as React.CSSProperties}
+      className={cn(
+        "pointer-events-none absolute bg-radial-[ellipse_at_50%_115%] from-white/16 via-white/5 via-55% to-white/[0.02] transition-[translate,opacity] duration-150 ease-standard",
+        axis === "x" ? "translate-x-[calc(var(--tab)*100%)]" : "translate-y-[calc(var(--tab)*(100%+4px))]",
+        index < 0 && "opacity-0",
+        className
+      )}
+    />
   )
 }
 
-export function AppSidebar() {
-  const pathname = usePathname()
+/** Phone tab bar: a 62 px glass squircle with four destinations (spec §4.2, G1). */
+function TabBar({ current }: { current: number }) {
+  return (
+    <nav aria-label="Primary" className={cn(GLASS, "relative h-[62px] min-w-0 flex-1 rounded-[22px] p-1")}>
+      <Lens index={current} axis="x" className="inset-y-1 left-1 w-[calc((100%-8px)/4)] rounded-[18px]" />
+      <ul className="relative grid h-full grid-cols-4">
+        {TABS.map(({ tab, label, icon: Icon }, i) => (
+          <li key={tab} className="min-w-0">
+            <Link
+              href={TAB_ROOT[tab]}
+              aria-current={i === current ? "page" : undefined}
+              className={cn(PRESS, ITEM_TONE(i === current), "flex h-full flex-col items-center justify-center gap-0.5 rounded-[18px] focus-visible:ring-inset")}
+            >
+              <Icon aria-hidden strokeWidth={1.6} className="size-[26px]" />
+              <span className="text-[11px] leading-[13px] font-semibold">{label}</span>
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  )
+}
+
+/** Tablet rail, 88 px, floating (inferred, I2): the tab bar turned on its side. */
+function Rail({ current }: { current: number }) {
+  return (
+    <nav aria-label="Primary" className={cn(GLASS, "fixed inset-y-3 left-3 z-30 hidden w-[88px] flex-col items-center rounded-[28px] py-4 md:flex xl:hidden")}>
+      <Link href="/" aria-label="Pulse home" className={cn(PRESS, "mb-5 grid size-10 place-items-center rounded-full font-numeric text-xl leading-none font-bold")}>
+        P
+      </Link>
+      <ul className="relative flex flex-col gap-1">
+        <Lens index={current} axis="y" className="inset-x-0 top-0 h-16 rounded-[20px]" />
+        {TABS.map(({ tab, label, icon: Icon }, i) => (
+          <li key={tab} className="relative">
+            <Link
+              href={TAB_ROOT[tab]}
+              aria-current={i === current ? "page" : undefined}
+              className={cn(PRESS, ITEM_TONE(i === current), "flex h-16 w-[72px] flex-col items-center justify-center gap-1 rounded-[20px]")}
+            >
+              <Icon aria-hidden strokeWidth={1.6} className="size-[26px]" />
+              <span className="text-xs leading-4 font-semibold">{label}</span>
+            </Link>
+          </li>
+        ))}
+      </ul>
+      <div className="mt-auto">
+        <SyncStatus variant="icon" />
+      </div>
+    </nav>
+  )
+}
+
+/** Laptop sidebar, 232 px, floating (inferred, I2), with Reports and Settings under a hairline. */
+function Sidebar({ current, pathname }: { current: number; pathname: string }) {
   const { today } = useShellStatus()
-  const { state } = useSidebar()
-  const expanded = state === "expanded"
   const extra = [
     { href: `/reports/${lastWeekPeriod(today)}`, match: "/reports", label: "Reports", icon: CalendarRange },
     { href: "/settings", match: "/settings", label: "Settings", icon: Settings },
   ]
-  const extraActive = expanded && extra.some((e) => pathname.startsWith(e.match))
-  const current = tabForPath(pathname)
-
-  const item = (href: string, label: string, Icon: LucideIcon, active: boolean) => (
-    <SidebarMenuItem key={label}>
-      <SidebarMenuButton
-        asChild
-        size="lg"
-        isActive={active}
-        tooltip={label}
-        className="gap-3 px-3 text-sm font-semibold text-sidebar-foreground transition-[background-color,color] duration-150 ease-standard focus-visible:ring-3 focus-visible:ring-ring/50 group-data-[collapsible=icon]:size-10! group-data-[collapsible=icon]:justify-center [&_svg]:size-6"
+  const extraActive = extra.some((e) => pathname.startsWith(e.match))
+  const tab = extraActive ? -1 : current
+  const item = (href: string, label: string, Icon: LucideIcon, active: boolean, lit = false) => (
+    <li key={label} className="relative">
+      <Link
+        href={href}
+        aria-current={active ? "page" : undefined}
+        className={cn(PRESS, ITEM_TONE(active), "flex h-12 items-center gap-3 rounded-full px-4 text-[15px] leading-5 font-semibold", lit && "bg-glass-lens")}
       >
-        <Link href={href} aria-current={active ? "page" : undefined}>
-          <Icon aria-hidden strokeWidth={1.75} />
-          <span className="group-data-[collapsible=icon]:hidden">{label}</span>
-        </Link>
-      </SidebarMenuButton>
-    </SidebarMenuItem>
+        <Icon aria-hidden strokeWidth={1.6} className="size-6 shrink-0" />
+        {label}
+      </Link>
+    </li>
   )
-
   return (
-    <Sidebar collapsible="icon" className="border-sidebar-border">
-      <SidebarHeader className="h-14 justify-center px-5 group-data-[collapsible=icon]:items-center group-data-[collapsible=icon]:px-0">
-        <span aria-hidden className="hidden font-numeric text-xl leading-none font-bold group-data-[collapsible=icon]:grid group-data-[collapsible=icon]:size-8 group-data-[collapsible=icon]:place-items-center">
-          P
-        </span>
-        <span className="text-[13px] leading-4 font-semibold tracking-[0.35em] text-foreground uppercase group-data-[collapsible=icon]:sr-only">
-          Pulse
-        </span>
-      </SidebarHeader>
-      <SidebarContent>
-        <SidebarGroup className="group-data-[collapsible=icon]:px-1">
-          <nav aria-label="Primary">
-            <SidebarMenu className="gap-1">
-              {TABS.map((t) => item(TAB_ROOT[t.tab], t.label, t.icon, current === t.tab && !extraActive))}
-            </SidebarMenu>
-            {expanded && (
-              <>
-                <SidebarSeparator className="my-3" />
-                <SidebarMenu className="gap-1">
-                  {extra.map((e) => item(e.href, e.label, e.icon, pathname.startsWith(e.match)))}
-                </SidebarMenu>
-              </>
-            )}
-          </nav>
-        </SidebarGroup>
-      </SidebarContent>
-      <SidebarFooter className="gap-2 p-3 group-data-[collapsible=icon]:items-center group-data-[collapsible=icon]:px-0.5">
-        {expanded && (
-          <div className="@container px-1">
-            <DemoChip />
-          </div>
-        )}
-        <SyncStatus withLabel={expanded} />
-      </SidebarFooter>
-    </Sidebar>
+    <nav aria-label="Primary" className={cn(GLASS, "fixed inset-y-3 left-3 z-30 hidden w-[232px] flex-col rounded-[28px] p-3 xl:flex")}>
+      <Link href="/" className="flex h-14 items-center rounded-full px-3 text-[13px] leading-4 font-semibold tracking-[0.35em] uppercase outline-none focus-visible:ring-3 focus-visible:ring-ring/50">
+        Pulse
+      </Link>
+      <ul className="relative flex flex-col gap-1">
+        <Lens index={tab} axis="y" className="inset-x-0 top-0 h-12 rounded-full" />
+        {TABS.map((t, i) => item(TAB_ROOT[t.tab], t.label, t.icon, i === tab))}
+      </ul>
+      <div aria-hidden className="mx-3 my-2 h-px bg-white/8" />
+      <ul className="flex flex-col gap-1">{extra.map((e) => item(e.href, e.label, e.icon, pathname.startsWith(e.match), pathname.startsWith(e.match)))}</ul>
+      <div className="mt-auto space-y-1">
+        <div className="px-3">
+          <DemoChip />
+        </div>
+        <SyncStatus variant="line" />
+      </div>
+    </nav>
   )
 }
 
-/** WHOOP's floating tab bar, below 768 px (spec §4.2). */
-export function BottomTabs() {
-  const current = tabForPath(usePathname())
+/**
+ * The round "Check in" action (spec §4.2.1), WHOOP's coach button: indigo-rimmed glass with the "P"
+ * monogram. Opens the journal check-in for the day on screen through `?checkin=1`.
+ */
+function FloatingAction() {
+  const { today } = useShellStatus()
+  const params = useSearchParams()
+  const { d } = parseDay(params.get("d") ?? undefined, today)
   return (
-    <nav
-      aria-label="Primary"
-      className="fixed inset-x-3 bottom-[max(env(safe-area-inset-bottom),12px)] z-30 h-16 touch-manipulation rounded-[22px] bg-muted/95 ring-1 ring-border md:hidden"
+    <Link
+      href={`${dayHref("/journal", d, today)}${d === today ? "?" : "&"}checkin=1`}
+      aria-label={`Check in for ${dayLabel(d, today)}`}
+      className="group/fab relative grid size-[62px] shrink-0 place-items-center rounded-[22px] bg-linear-to-b from-glass-action-top to-glass-action-bottom shadow-glass ring-1 ring-action-rim-from/25 backdrop-blur-md backdrop-saturate-150 transition-[scale,filter] duration-150 ease-standard outline-none hover:brightness-110 focus-visible:ring-3 focus-visible:ring-ring/50 active:scale-[0.96] md:size-14 md:rounded-[20px]"
     >
-      <ul className="grid h-full grid-cols-4">
-        {TABS.map(({ tab, label, icon: Icon }) => {
-          const active = current === tab
-          return (
-            <li key={tab} className="min-w-0">
-              <Link
-                href={TAB_ROOT[tab]}
-                aria-current={active ? "page" : undefined}
-                className={cn(
-                  "flex h-full flex-col items-center justify-center gap-1 rounded-[22px] text-[11px] leading-[14px] font-semibold tracking-[0.01em] transition-[color,scale] duration-150 ease-standard outline-none focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:ring-inset active:scale-[0.96]",
-                  active ? "text-foreground" : "text-muted-foreground hover:text-foreground-secondary"
-                )}
-              >
-                <Icon aria-hidden strokeWidth={1.75} className="size-6" />
-                {label}
-              </Link>
-            </li>
-          )
-        })}
-      </ul>
-    </nav>
+      <span
+        aria-hidden
+        className="grid size-[30px] place-items-center rounded-full border-[1.5px] border-transparent font-numeric text-[15px] leading-none font-bold [background:linear-gradient(var(--action-face),var(--action-face))_padding-box,linear-gradient(135deg,var(--action-rim-from),var(--action-rim-to))_border-box]"
+      >
+        P
+      </span>
+    </Link>
+  )
+}
+
+/**
+ * Navigation in three forms switched by CSS only (spec §4.2): the glass tab bar plus the round
+ * action below 768 px (tab roots; detail screens show the action alone), the rail from 768 px,
+ * the sidebar from 1280 px, where the action floats bottom right.
+ */
+export function AppNav() {
+  const pathname = usePathname()
+  const index = TABS.findIndex((t) => t.tab === tabForPath(pathname))
+  const root = ROOTS.has(pathname)
+  return (
+    <>
+      <Rail current={index} />
+      <Sidebar current={index} pathname={pathname} />
+      <div className="pointer-events-none fixed inset-x-3 bottom-[max(calc(env(safe-area-inset-bottom)-6px),12px)] z-30 flex touch-manipulation justify-end gap-2 *:pointer-events-auto md:inset-x-auto md:right-6 md:bottom-6 xl:right-8 xl:bottom-8">
+        {root && (
+          <div className="flex min-w-0 flex-1 md:hidden">
+            <TabBar current={index} />
+          </div>
+        )}
+        {!pathname.startsWith("/settings") && (
+          <React.Suspense>
+            <FloatingAction />
+          </React.Suspense>
+        )}
+      </div>
+    </>
   )
 }

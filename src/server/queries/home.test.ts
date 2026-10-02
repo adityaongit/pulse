@@ -143,4 +143,10 @@ describe("every screen query", () => {
     expect(vm.profile).toMatchObject({ sex: "male", maxHr: 183, maxHrSource: "set", age: 36 });
     expect(getShellStatus(ctxFor(db))).toMatchObject({ mode: "demo", connection: "connected", today: dayAt(179), firstDay: dayAt(0) });
   });
+
+  it("counts the wear streak back to the band-off day; early on, today does not count yet", () => {
+    // Day 156 had no heart rate at all; day 157 got the band back late in the evening.
+    expect(getShellStatus(ctxFor(db)).streak).toEqual({ days: 179 - 157 + 1, asOf: dayAt(179) });
+    expect(getShellStatus(ctxFor(early, BEFORE_WAKE)).streak).toEqual({ days: 178 - 157 + 1, asOf: dayAt(178) });
+  });
 });
