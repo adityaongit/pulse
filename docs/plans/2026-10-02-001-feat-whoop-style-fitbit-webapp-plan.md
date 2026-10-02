@@ -1135,6 +1135,7 @@ Added 2026-10-02 at the user's request, after the Home dials shipped at unequal 
 - Fix every "fix" item. Re-capture and confirm.
 - Where spec.md caused the difference, correct the spec first, so the contract and the UI agree.
 - Screens without a reference (reports, Settings, Fitness, the desktop sidebar) are checked against the nearest WHOOP screen for consistency of components, not for a pixel match.
+- **Evidence first.** Before judging any component or interaction (opening direction of sheets and pickers, transitions, tooltips, gestures), find real WHOOP or Bevel screenshots or video frames through web search and save them in `docs/design/reference/`. Every decision in `audit.md` cites its reference. Anything without one is marked "inferred" and flagged to the user. Example of what this catches: WHOOP's calendar drops down from the top bar, while the first build used a bottom sheet.
 - Polish items from the user's review of the first build (2026-10-02). Each one is checked and fixed explicitly:
   - **Skeletons match the real components.** Every loading skeleton has the same shape, size and position as the component it stands in for, so nothing shifts when data arrives.
   - **Laptop dashboard UX.** At 1280 px and wider, the screens use the space well: deliberate column layouts, sensible content widths, and no stretched or sparse cards.
