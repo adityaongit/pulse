@@ -1,0 +1,15 @@
+node_modules
+.next
+.git
+.env*
+data
+*.db
+*.db-*
+coverage
+test-results
+playwright-report
+blob-report
+e2e/__screens__
+docs/design/reference
+*.tsbuildinfo
+.DS_Store
