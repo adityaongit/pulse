@@ -1,0 +1,13 @@
+Pulse is a private, personal, non-commercial project. It is not published.
+
+It contains code derived from the following projects:
+
+noop (https://github.com/ryanbr/noop)
+  Licensed under the PolyForm Noncommercial License 1.0.0.
+  The scoring code in src/core/scoring/ is ported from its Kotlin analytics
+  (android/app/src/main/java/com/noop/analytics/).
+
+Haelan (https://github.com/bardesss/haelan)
+  Licensed under the GNU Affero General Public License v3.0.
+  The Google Health API ingestion, raw payload archive, migrations-at-boot
+  and seed patterns in src/server/ follow its implementation.

@@ -1,0 +1,39 @@
+# dependencies
+/node_modules
+/.pnp
+.pnp.*
+
+# testing
+/coverage
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+
+# next.js
+/.next/
+/out/
+/build
+next-env.d.ts
+*.tsbuildinfo
+
+# env files (only the example is committed)
+.env*
+!.env.example
+
+# health data
+/data/
+*.db
+*.db-*
+
+# raw design captures
+docs/design/reference/raw/
+
+# misc
+.DS_Store
+*.pem
+npm-debug.log*
+.pnpm-debug.log*
+
+# agent worktrees
+/.claude/worktrees/
