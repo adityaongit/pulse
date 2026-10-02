@@ -297,7 +297,8 @@ With opaque glass tokens the blur has nothing to show and the bar reads as the s
 | Interaction | Spec | Evidence |
 |---|---|---|
 | Header collapse | §4.3: ring row fades in (`opacity 0 → 1`) and rises 6 px, 220 ms `--ease-out-expo`; mini rings fill 0 → value in 500 ms the first time they appear in a page view, instantly afterwards | Mid-collapse frame [latest-home-collapsing-1] shows rings already filled under a still-visible top row |
-| Top row hide / show | `translate-y-[-100%]` + `opacity-0`, 220 ms; shows on any upward scroll of 8 px or more | [latest-home-collapsed-2] (hidden) vs [latest-home-collapsed-3] (shown, deep in the page). Thresholds inferred |
+| Top row | Never hides (user correction 2026-10-03; WHOOP hides it deep, [latest-home-collapsed-2], not adopted) | §4.3 |
+| Detail header collapse | §4.3a: row 2 grows 220 ms `--ease-out-expo`, compact hero fades and scales 0.85 → 1, stats fade and rise 4 px | `docs/design/sticky.md` B5 |
 | Tab change | Active lens slides between items: a single absolutely positioned lens with `transition-[translate,width] duration-150 ease-standard`; icon and label colour cross-fade 150 ms | Lens [latest-tabbar-1]; movement inferred |
 | Calendar open | As built (§5.16): slides down 200 ms `ease-standard` (tw-animate `slide-in-from-top`), the dim fades; reduced motion: appears at once (CAL7) | Opens from the top (user; README) |
 | Sheet open | vaul default spring kept; the dim uses `--dim-strong` | [latest-sheet-edit-1] |
@@ -312,7 +313,7 @@ Rules:
 
 - Transitions name their properties (`transition-[opacity,translate]`, `transition-transform`). Never `transition-all`.
 - No page-load choreography, no staggered section entrances, no counting-up numbers.
-- No `window.addEventListener("scroll")` for the header: §4.3 uses two `IntersectionObserver` sentinels plus one passive `scroll` listener read through `requestAnimationFrame` for direction only, writing a `data-*` attribute, never React state per frame. (The taste skill bans raw scroll listeners that set state each frame; this one sets an attribute at most once per direction change.)
+- No scroll listener for headers: §4.3 and §4.3a use one `IntersectionObserver` (`useHeroCollapse`) that writes a `data-state` attribute, never React state per frame.
 - `prefers-reduced-motion: reduce`: every Recharts series `isAnimationActive={false}`; CSS durations collapse in the base layer; the header switches states with opacity only (no translate); the calendar and sheets appear without movement (opacity 120 ms); the orb renders its static frame (§5.17); skeleton pulse stops.
 
 ### 2.8 Icons
@@ -534,13 +535,13 @@ The round glass button [latest-tabbar-1]; on detail screens it floats alone at t
 
 ### 4.3 HomeHeader (`shells/HomeHeader.tsx`), the collapsing header
 
-Home's top of screen in three states [latest-home-top-1] → [latest-home-collapsing-1] → [latest-home-collapsed-1] / [latest-home-collapsed-2], with the top row returning on upward scroll [latest-home-collapsed-3].
+Home's top of screen has two states: `top` at rest [latest-home-top-1], and `rings` once the dials have scrolled away [latest-home-collapsing-1], [latest-home-collapsed-1], [latest-home-sticky-header-user-2025]. In `rings` the header keeps **both rows**: the top row and the ring row added under it. **The top row never hides** (user correction, 2026-10-03; WHOOP hides it deep in the page, [latest-home-collapsed-2], which Pulse does not adopt). Home is the one header outside the shared mechanism of §4.3a, but it uses the same hook.
 
 ```
- State "top" (scroll 0)                        State "rings" (dials scrolled away)          State "rings-only" (scrolling down, deep)
-┌──────────────────────────────────────────┐  ┌──────────────────────────────────────────┐  ┌──────────────────────────────────────────┐
-│ (av) [(flame) 70]   ‹ [ TODAY ] ›     55% (⌚•)│  │ (av) [(flame) 70]   ‹ [ TODAY ] ›     55% (⌚•)│  │  ◯ SLEEP     ◯ RECOVERY     ◯ STRAIN     │ 40
-└──────────────────────────────────────────┘  │  ◯ SLEEP     ◯ RECOVERY     ◯ STRAIN     │  └───────────── 24 px fade ────────────────┘
+ State "top" (scroll 0)                        State "rings" (dials scrolled away, at any depth)
+┌──────────────────────────────────────────┐  ┌──────────────────────────────────────────┐
+│ (av) [(flame) 70]   ‹ [ TODAY ] ›     55% (⌚•)│  │ (av) [(flame) 70]   ‹ [ TODAY ] ›     55% (⌚•)│
+└──────────────────────────────────────────┘  │  ◯ SLEEP     ◯ RECOVERY     ◯ STRAIN     │ 40
                P U L S E                      └───────────── 24 px fade ────────────────┘
      ◯ 96%       ◯ 53%       ◯ 12.1           (content scrolls under, fading in)
     SLEEP >    RECOVERY >   STRAIN >
@@ -561,30 +562,14 @@ Home's top of screen in three states [latest-home-top-1] → [latest-home-collap
 
 **Ring row** (`h-10 grid grid-cols-3 items-center px-4 md:px-6 xl:px-8`): three `MiniRing` links (§5.1, size `mini`): Sleep, Recovery, Strain, in WHOOP's order, each `inline-flex items-center justify-center gap-2` with the ring (22 px, 3 px stroke) and its label in the mini ring label role. Ring colour: Sleep `--sleep`, Recovery the band colour, Strain `--strain` filled to strain / 21. No numbers inside, as in every capture. Reason or no data: track only. Each links to its detail with `?d=`, `aria-label="Recovery 53 percent, yellow. Open Recovery"`. The rings are **always** today's (or the selected day's) values, the same view model the dials use.
 
-**States and thresholds.** Pure helper `src/lib/header-state.ts`, unit-tested (plan U17 test scenario):
+**State.** Pure helper `src/lib/header-state.ts`, unit-tested: `type HeaderState = "top" | "rings"`; `nextHeaderState({ dialsVisible })` returns `top` while the dial row (labels included) is below the top row and `rings` once it has scrolled under it. The trigger is the moment the bottom of the dial labels passes under the top row, and it reverses at the same point on the way up. There are no scroll-depth or direction thresholds.
 
-```ts
-type HeaderState = "top" | "rings" | "rings-only";
-export function nextHeaderState(i: {
-  dialsVisible: boolean;      // IntersectionObserver on the dial row (labels included), rootMargin = -(top row height) px
-  y: number;                  // scroll position
-  dy: number;                 // y minus the y at the last direction change
-  hideAfter: number;          // y where the top row may start hiding: dial row bottom + 160 px
-}): HeaderState
-// top        while dialsVisible
-// rings      when !dialsVisible and (y < hideAfter or dy <= -8)   (scrolled up 8 px or more since the last change)
-// rings-only when !dialsVisible and y >= hideAfter and dy >= 8   (scrolled down 8 px or more)
-// otherwise keep the previous state (hysteresis)
-```
+**Wiring.** One client island owns the header and uses the shared `useHeroCollapse` hook (§4.3a): an `IntersectionObserver` on a zero-height sentinel after the dial labels, with `rootMargin` = −(top row height) px. It writes `data-state` on the header and uses no scroll listener. CSS does the rest:
 
-Thresholds: the ring row appears when the bottom of the dial labels passes under the top row (the moment the dials' state would otherwise be lost); the top row hides only after 160 px more and only while moving down. The mid-collapse capture shows both rows together while My Day's first cards are on screen [latest-home-collapsing-1]; deep captures show both behaviours [latest-home-collapsed-2] (hidden), [latest-home-collapsed-3] (shown). The 160 px and 8 px values are **inferred**.
-
-**Wiring.** One client island owns the header. An `IntersectionObserver` watches a zero-height sentinel placed after the dial labels; a passive `scroll` listener (rAF-throttled) tracks `y` and `dy` in refs; the island writes `data-state` on the header only when `nextHeaderState` returns a new state. CSS does the rest:
-
-- Ring row: `grid-rows-[0fr] opacity-0 translate-y-1.5` → `group-data-[state=rings]:grid-rows-[1fr] group-data-[state=rings]:opacity-100 group-data-[state=rings]:translate-y-0` (same for `rings-only`), `transition-[grid-template-rows,opacity,translate] duration-220 ease-out-expo`.
-- Top row: in `rings-only`, `-translate-y-full opacity-0 h-0` with the same transition; the ring row then sits under the status bar ([latest-home-collapsed-2] shows the rings directly under the status bar).
+- Ring row: `grid-rows-[0fr] opacity-0 translate-y-1.5` → `group-data-[state=rings]:grid-rows-[1fr] group-data-[state=rings]:opacity-100 group-data-[state=rings]:translate-y-0`, `transition-[grid-template-rows,opacity,translate] duration-220 ease-out-expo`. The ring row lives in an overlay panel that grows over the content, so nothing below shifts.
+- Top row: static in both states.
 - Mini rings animate their fill only on first reveal in a page view (500 ms), then stay static; under reduced motion no translate, no fill animation, opacity 120 ms.
-- Focus: if focus is inside the top row when it would hide, it stays shown (`:focus-within` keeps `data-state` at `rings`).
+- WHOOP shrinks the dials into the ring row, linked to scroll position (recording 2026-06-29, [latest-home-collapsed-4], [latest-home-collapsed-5]). Pulse keeps the time-based cross-fade above (`docs/design/sticky.md` A2, B5).
 
 **Other tab roots** (Health, Journal, More) use `TitleHeader`: the same sticky ground frame and fade, a centred page title in the detail header title role ("HEALTH", "JOURNAL", "MORE"), SyncStatus on the right; Journal also centres its DateSwitcher under the title. [latest-health-tab-1] shows "HEALTH" centred; [latest-more-1] shows "MORE" centred with icons on both sides.
 
@@ -612,6 +597,18 @@ WHOOP shows the band's battery ("69%") and a band outline with a green connectio
 - `inline-flex h-11 items-center gap-1.5` button: text in the header sync text role, then `Watch` 22 px with an 8 px dot at its top right (`absolute -right-0.5 -top-0.5 size-2 rounded-full ring-2 ring-background-top`).
 - Text: "Demo" in demo mode; else the age of the last successful sync, short: "Now", "12m", "3h", "2d". Dot: ok `bg-optimal`, syncing `bg-coach animate-pulse motion-reduce:animate-none`, stale (> 2 h) `bg-warning`, error or auth revoked `bg-recovery-red`. `aria-label` as v1 ("Synced 12 minutes ago"...).
 - Opens the v1 sync popover, now in the flat panel material (§2.6), anchored under the button.
+
+### 4.3a Sticky and collapsing headers per screen
+
+The full research, API and evidence are in **`docs/design/sticky.md`**. This section summarises them.
+
+- **WHOOP (evidence).** Only Home and Healthspan collapse. Every other screen pins a plain 44 pt bar with an opaque ground fill and a fade of about 20-24 pt. There is no blur and no hairline, no sticky section headers, and no sticky W / M / 6M controls. The tab bar and round button never hide. Sheets and the Sleep Planner pin their primary button at the bottom.
+- **Pulse architecture (user decision, 2026-10-03).**
+  1. **Each hero component has a compact form.** It takes `compact?: boolean` and renders only its glyph and number, `aria-hidden` and `inert`. Sizes: `WhoopAgeOrb` 108 px (measured); `ScoreDial` recovery, strain and sleep 64 px ring with the value inside; `ScoreDial gauge` 64 px; the Activity glyph disc 40 px; the Monitor "4/5" and Fitness "48.2" as 28 px text. Only the orb size is measured; the rest is designed (sticky.md B2).
+  2. **One shared mechanism.** `DetailShell` renders one `CollapsingHeader`, driven by one hook, `useHeroCollapse(headerRef, heroRef)` (a single `IntersectionObserver`, no scroll listener). The hook writes `data-state="top" | "collapsed"` once the hero's bottom passes under the header. In `collapsed`, row 1 keeps back and info and the title or date fades out. A row-2 overlay (`grid h-[62px] grid-cols-[1fr_auto_1fr]`) shows the left stat, `cloneElement(hero, { compact: true })` and the right stat, and grows over the content with no layout shift. Pages declare only `hero` and `stats={{ left: { value, label, tone? }, right: … }}`.
+  3. **Transition.** Time-based, on the state change: row 2 `grid-rows` 0fr → 1fr over 220 ms `--ease-out-expo`; the compact hero fades and scales from 0.85 to 1; the stats fade in and rise 4 px, 40 ms later. Reduced motion: opacity only, 120 ms. It reverses when the hero comes back.
+  4. **Home is the exception** (§4.3): its own header with two states, `top` and `rings`, built on the same hook. The top row never hides.
+- **Per-screen stats** (sticky.md B6): Healthspan years younger or older with Pace of Aging (measured); Recovery HRV and RHR; Strain target and steps; Sleep hours and need; Activity strain and duration; Stress level and last updated; Fitness category and percentile; Health Monitor status. All except Healthspan are inferred. Journal Insights, Reports and Settings stay plain (`collapse={false}`).
 
 ### 4.4 DetailHeader (`shells/DetailHeader.tsx`)
 
@@ -1302,7 +1299,7 @@ Interface used by §7: `<WhoopAgeOrb age={29.9} deltaYears={+2.3} size="hero" | 
 
 ### 5.18 HealthspanHeader (part of DetailShell for `/health/healthspan`)
 
-[latest-healthspan-collapsed-1]. When the hero orb scrolls under the DetailHeader, the header grows a row: `grid grid-cols-[1fr_auto_1fr] items-center h-28`: left "3.4" (stat value row role, `text-optimal` when younger, `text-warning` when older) over "YEARS YOUNGER" / "YEARS OLDER" (stat-label); centre the `mini` orb; right "−0.8x" over "PACE OF AGING". Same sentinel and helper as §4.3 (only the `top` / `rings` states; no `rings-only`).
+[latest-healthspan-collapsed-1]. When the hero orb scrolls under the DetailHeader, the header grows a row: `grid grid-cols-[1fr_auto_1fr] items-center h-28`: left "3.4" (stat value row role, `text-optimal` when younger, `text-warning` when older) over "YEARS YOUNGER" / "YEARS OLDER" (stat-label); centre the `mini` orb; right "−0.8x" over "PACE OF AGING". This is now the shared `CollapsingHeader` of §4.3a with `hero={<WhoopAgeOrb …/>}` (compact 108 px); the layout and measurements are in `docs/design/sticky.md` B3 and A6.
 
 ### 5.19 Skeletons (rules for every `.Skeleton`)
 
@@ -1468,12 +1465,12 @@ Phone, 390:
 │ ╰──────────────────────────────────╯ ╰───╯ │
 └────────────────────────────────────────────┘
 
- Scrolled past the dials ("rings"), then deeper while scrolling down ("rings-only"):
-┌────────────────────────────────────────────┐   ┌────────────────────────────────────────────┐
-│ (av)[(flame)70]     ‹ [ TODAY ] ›     12m (⌚•) │   │  ◯ SLEEP     ◯ RECOVERY      ◯ STRAIN      │
-│  ◯ SLEEP     ◯ RECOVERY      ◯ STRAIN      │   │░░░░░░░░ fade: content fading in ░░░░░░░░░░░│
-│░░░░░░░░ My Day (fading under) ░░░░░░░░░░░░░│   │ [(rhr) RESTING HEART RATE        47 ▼ ]    │
-│ [(sun) Your daily outlook               >] │   │ ...                                        │
+ Scrolled past the dials ("rings", at any depth; the top row stays):
+┌────────────────────────────────────────────┐
+│ (av)[(flame)70]     ‹ [ TODAY ] ›     12m (⌚•) │
+│  ◯ SLEEP     ◯ RECOVERY      ◯ STRAIN      │
+│░░░░░░░░ My Day (fading under) ░░░░░░░░░░░░░│
+│ [(sun) Your daily outlook               >] │
 ```
 
 Tablet, 820 (rail 88 + insets; 720 px column; dials 120 px):
@@ -2739,6 +2736,19 @@ flowchart LR
 
 Rows overridden by v2: **D2** (TopBar part only, V3), **B1** (V10), **CAL6** (offset only). All other D, B, A and CAL rows stand.
 
+**U17 build rows (G).** Deviations the shell and material build made from v2, with the reason.
+
+| # | v2 says | Build does | Why |
+|---|---|---|---|
+| G1 | §4.2: tab bar a full capsule, round action a 62 px circle, lens a `rounded-full bg-(--glass-lens)` pill | Both are squircles, `rounded-[22px]` at 62 px (`md:` action `rounded-[20px]` at 56 px); the lens is a radial light pool brightest at the item's lower edge | A zoomed crop of [latest-tabbar-1] shows corners about 30 % of the height on both, and a glow under "Home", not a pill |
+| G2 | §4.2.1: the action opens the check-in sheet in place and hides while an overlay is open | It links to `/journal?checkin=1` (with `d`), which opens the existing check-in sheet; it is not hidden under overlays, the 85 % dim (z-50) covers it | Reuses `CheckIn` without a second copy of the sheet; WHOOP itself leaves its coach button above the info-card dim [latest-popover-info-1] |
+| G3 | §4.3: header `sticky` with the ring row as a grid row inside it | The in-flow header is the top row plus its fade (68 px, `md:` 76 px); rows live in an absolute panel over it, so the ring row grows over the content and nothing below reflows | A growing sticky header pushed the dials and fought the observer |
+| G4 | §4.3: avatar `bg-white/6` | Avatar fill is the opaque `--background-top` | The avatar overlaps the streak pill by 4 px; a translucent fill doubled the overlap |
+| G5 | §2.7: mini rings sweep only on first reveal, then static | First reveal sweeps 0 → value (500 ms); later value changes (day steps) sweep from the previous value | Same rule as the dials on a day change; holding them static needs a second code path |
+| G6 | §4.3 I4: today counts once it has data | Today counts toward the streak once it has 6 h of heart-rate minutes; until then the streak ends yesterday and today neither counts nor breaks it | The spec's "before today has 6 hours of data", made exact |
+| G7 | §2.7: rows press with `active:bg-accent` | Card-material rows that are links (My Dashboard, More, Behaviour insights) and whole-card links press with `active:scale-[0.96]` too; rows inside cards keep `active:bg-accent` | User review: press feedback on every tappable element; card-rows are cards |
+| G8 | §4.8: InfoDialog moves focus in on open | Focus goes to the card itself (`tabIndex=-1`), not the close button; Tab reaches the close button next | A tap no longer lights a focus ring on the X, as in [latest-popover-info-1] |
+
 
 Open items for U12/U13 (not design changes): the `button.tsx` sizes edit (§5.0), `src/hooks/use-reduced-motion.ts`, `src/lib/charts.ts` (`splitByBand`), the root `viewport` export, and "WHOOP Age" as the label (the plan's name; swap the one constant in `src/lib/format.ts` for "Pulse Age" if preferred).
 
@@ -2757,7 +2767,7 @@ Open items for U17 (not design changes): `src/lib/header-state.ts` with its unit
 | I3 | FloatingAction opens the check-in (WHOOP's opens the coach) | §4.2.1 | Pulse has no assistant |
 | I4 | Streak = consecutive worn days, using the `band_not_worn` coverage rule | §4.3 | WHOOP's "continuous data" wording [latest-streak-1]; the threshold is Pulse's |
 | I5 | Sync freshness in the battery slot ("12m", dot colours) | §4.3.2 | Pulse has no battery data |
-| I6 | Header thresholds: ring row when the dial labels pass under the top row; top row hides 160 px later on downward scroll, returns on 8 px upward scroll | §4.3 | Behaviour is in the captures; the numbers are not |
+| I6 | Header trigger: ring row (Home) or compact hero (details) when the hero's bottom passes under the header; compact dial, gauge and stat sizes and their side stats (sticky.md B2, B6) | §4.3, §4.3a | Only Home's rings and Healthspan's orb are in the captures |
 | I7 | Tab lens slides between items (150 ms) | §2.7 | The lens is captured, its motion is not |
 | I8 | Detail header keeps small chevrons beside the date | §4.4 | WHOOP shows only the date; journey 2 needs stepping |
 | I9 | Info card motion (scale 0.96 + blur 4 px → 0, 320 ms) | §2.7 | Card captured, motion not |
