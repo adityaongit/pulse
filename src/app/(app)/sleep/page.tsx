@@ -38,7 +38,7 @@ export default async function SleepPage({ searchParams }: PageProps<"/sleep">) {
     <DetailShell
       title="Sleep"
       info={SLEEP_INFO}
-      dateSwitcher={{ mode: "day" }}
+      dateSwitcher={{ mode: "day", placement: "header" }}
       hero={<ScoreDial variant="sleep" size="lg" value={p.value} reason={p.reason} nightsLeft={p.nightsLeft} provisional={p.provisional} tags={p.tags} />}
       summary={
         <Card className="gap-0 px-4 py-1 ring-0">

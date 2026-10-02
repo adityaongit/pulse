@@ -2,7 +2,7 @@
 
 import * as React from "react"
 
-/** Global shell state read by the top bar, sync dot, demo chip and ConnectionBanner (spec §4.2, D2). */
+/** Global shell state read by the headers, nav, sync status and ConnectionBanner (spec §4.2, D2). */
 export type ShellStatus = {
   mode: "demo" | "google"
   sync: { state: "ok" | "syncing" | "stale" | "error"; lastSuccessAt: number | null }
@@ -14,6 +14,8 @@ export type ShellStatus = {
   firstDay?: string
   /** IANA zone for clock times in client-rendered charts. */
   timeZone?: string
+  /** Consecutive worn days (Home header streak pill, spec §4.3); null or missing at 0. */
+  streak?: { days: number; asOf: string } | null
 }
 
 const Ctx = React.createContext<ShellStatus | null>(null)

@@ -37,7 +37,7 @@ export const GRID = { vertical: false, stroke: "var(--chart-grid)" } as const
 export const AXIS = { tickLine: false, axisLine: false, tickMargin: 8 } as const
 export const LINE_CURSOR = { stroke: "var(--chart-cursor)", strokeWidth: 1 }
 export const BAR_CURSOR = { fill: "rgb(255 255 255 / 0.05)" }
-export const TOOLTIP_CLASS = "rounded-lg border-0 bg-popover shadow-[0_12px_32px_rgb(0_0_0/0.5)] ring-1 ring-border"
+export const TOOLTIP_CLASS = "rounded-xl border-0 bg-popover shadow-overlay ring-1 ring-white/10"
 
 /** One tooltip line: a colour tick and text. */
 export function TooltipLine({ color, children }: { color?: string; children: React.ReactNode }) {

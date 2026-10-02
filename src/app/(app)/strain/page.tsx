@@ -36,7 +36,7 @@ export default async function StrainPage({ searchParams }: PageProps<"/strain">)
     <DetailShell
       title="Strain"
       info={STRAIN_INFO}
-      dateSwitcher={{ mode: "day" }}
+      dateSwitcher={{ mode: "day", placement: "header" }}
       hero={
         <ScoreDial
           variant="strain"

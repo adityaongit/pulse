@@ -10,7 +10,7 @@ import { dayLabel, formatValue, spoken, type FormatKey } from "@/lib/format"
 import type { Metric } from "@/lib/reasons"
 import { parseRange, RANGE_DAYS, withParam, type TrendRange } from "@/lib/url"
 import { ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
-import { Skeleton } from "@/components/ui/skeleton"
+import { Skeleton, SkeletonText } from "@/components/ui/skeleton"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { EmptyState } from "@/components/shells/EmptyState"
 import { MetricState } from "@/components/shells/MetricState"
@@ -249,16 +249,23 @@ export function TrendChart(p: TrendChartProps) {
 }
 
 export function TrendChartSkeleton() {
+  // The header's real label and a disabled range toggle; bars for the numbers; the plot at its fixed height (spec §5.19).
   return (
-    <div aria-hidden>
-      <div className="mb-4 flex justify-between">
-        <div className="space-y-2">
-          <Skeleton className="h-3 w-16" />
-          <Skeleton className="h-7 w-20" />
+    <div aria-hidden className="min-w-0">
+      <div className="mb-4 flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <p className="text-xs leading-4 font-bold tracking-[0.08em] text-muted-foreground uppercase">Average</p>
+          <SkeletonText className="w-[4ch] font-numeric text-[28px] leading-8 font-bold" />
         </div>
-        <Skeleton className="h-11 w-32 rounded-lg" />
+        <div className="flex shrink-0 gap-0.5 rounded-lg bg-muted p-0.5">
+          {(["w", "m", "6m"] as const).map((r) => (
+            <span key={r} className="grid h-10 min-w-11 place-items-center rounded-md px-3 font-numeric text-[13px] font-bold text-muted-foreground/60">
+              {RANGE_LABEL[r]}
+            </span>
+          ))}
+        </div>
       </div>
-      <Skeleton className="h-[200px] rounded-lg" />
+      <Skeleton className="h-[200px] rounded-lg bg-muted/60" />
     </div>
   )
 }

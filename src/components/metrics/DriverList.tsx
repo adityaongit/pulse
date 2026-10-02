@@ -109,9 +109,11 @@ function Item({ i, max, p }: { i: DriverItem; max: number; p: DriverListProps })
       </span>
     </>
   )
-  // Inside a card the rows step up to bg-secondary (no card in a card), with the concentric 8 px radius.
+  // Each row is its own card ([latest-journal-insights-1]); inside a card it steps down to a 10 px
+  // bg-secondary row (no card in a card). Rows that open a sheet press in.
   const cls = cn(
-    "block w-full rounded-xl bg-card px-4 py-3 text-left in-data-[slot=card]:rounded-lg in-data-[slot=card]:bg-secondary",
+    "block w-full rounded-2xl bg-card bg-linear-to-b from-card-top to-card px-4 py-3 text-left shadow-card transition-[scale,--tw-gradient-from,background-color] duration-150 ease-standard in-data-[slot=card]:rounded-lg in-data-[slot=card]:bg-secondary in-data-[slot=card]:bg-none in-data-[slot=card]:shadow-none",
+    p.onSelect && "outline-none hover:from-card-hover focus-visible:ring-3 focus-visible:ring-ring/50 active:scale-[0.96] in-data-[slot=card]:hover:bg-accent",
     p.selectedKey === i.key && "ring-1 ring-foreground/60"
   )
   return (
@@ -121,7 +123,7 @@ function Item({ i, max, p }: { i: DriverItem; max: number; p: DriverListProps })
           type="button"
           onClick={() => p.onSelect?.(i.key)}
           aria-pressed={p.selectedKey === i.key}
-          className={cn(cls, "transition-[background-color] duration-150 ease-standard outline-none hover:bg-accent focus-visible:ring-3 focus-visible:ring-ring/50")}
+          className={cls}
         >
           {content}
         </button>
@@ -172,7 +174,7 @@ export function DriverListSkeleton() {
       </div>
       <div className="space-y-2">
         {[0, 1, 2].map((k) => (
-          <Skeleton key={k} className="h-16 rounded-xl" />
+          <Skeleton key={k} className="h-16 rounded-2xl" />
         ))}
       </div>
     </div>

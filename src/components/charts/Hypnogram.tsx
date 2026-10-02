@@ -124,6 +124,6 @@ export function Hypnogram({ data }: HypnogramProps) {
 }
 
 export function HypnogramSkeleton() {
-  return <Skeleton aria-hidden className="h-40 rounded-lg" />
+  return <Skeleton aria-hidden className="h-40 rounded-lg bg-muted/60" />
 }
 Hypnogram.Skeleton = HypnogramSkeleton

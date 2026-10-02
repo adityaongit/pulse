@@ -1,40 +1,36 @@
 import { cn } from "@/lib/utils"
 import { ConnectionBanner } from "@/components/metrics/ConnectionBanner"
-import { DateSwitcher, type DateSwitcherProps } from "./DateSwitcher"
-import { TopBar } from "./TopBar"
+import type { DateSwitcherProps } from "./DateSwitcher"
+import { HomeHeader, type HeaderRings } from "./HomeHeader"
+import { TitleHeader } from "./TopBar"
 
-/** The content column: full width on phone, 720 px on tablet, up to 1200 px on laptop (spec §2.5). */
-export const CONTENT_COLUMN = "mx-auto w-full min-w-0 px-4 pt-4 md:max-w-[720px] md:px-6 xl:max-w-[1200px] xl:px-8 xl:pt-6"
-const TOP_BAR_TITLE = "text-[13px] leading-4 font-bold tracking-[0.1em] uppercase truncate"
+/** The content column: full width on phone, 720 px on tablet, up to 1120 px on laptop (spec §2.5, §4.5). */
+export const CONTENT_COLUMN = "mx-auto w-full min-w-0 px-4 pt-2 md:max-w-[720px] md:px-6 xl:max-w-[1120px] xl:px-8 xl:pt-4"
 
 export type HomeSlots = { top: React.ReactNode; left: React.ReactNode; right: React.ReactNode; bottom?: React.ReactNode }
 
 export type PageShellProps = {
-  /** The page's h1. Shown in the top bar, or visually hidden when the DateSwitcher takes the centre. */
+  /** The page's h1, shown centred in the header (Home's is visually hidden). */
   title: string
+  /** Under the title (Journal). Home's header always carries the date pill. */
   dateSwitcher?: DateSwitcherProps
-  /** Right-aligned on the first row of content (never in the top bar). */
+  /** Right-aligned on the first row of content (never in the header). */
   actions?: React.ReactNode
   layout?: "stack" | "home" | "grid-2"
   /** For `layout="home"`: `top` and `bottom` span both laptop columns; phone order is top, right, left, bottom. */
   slots?: HomeSlots
+  /** For `layout="home"`: the day's scores for the collapsing header's ring row (spec §4.3). */
+  rings?: HeaderRings
+  /** Page ground (spec §2.1): the Health hub has a teal glow. */
+  ground?: "default" | "health"
   children?: React.ReactNode
 }
 
-/** Tab roots: Home, Health, Journal, More (spec §4.4). */
-export function PageShell({ title, dateSwitcher, actions, layout = "stack", slots, children }: PageShellProps) {
+/** Tab roots: Home, Health, Journal, More (spec §4.5). */
+export function PageShell({ title, dateSwitcher, actions, layout = "stack", slots, rings, ground, children }: PageShellProps) {
   return (
-    <>
-      <TopBar>
-        {dateSwitcher ? (
-          <>
-            <h1 className="sr-only">{title}</h1>
-            <DateSwitcher {...dateSwitcher} />
-          </>
-        ) : (
-          <h1 className={TOP_BAR_TITLE}>{title}</h1>
-        )}
-      </TopBar>
+    <div data-ground={ground === "health" ? "health" : undefined}>
+      {layout === "home" ? <HomeHeader rings={rings} /> : <TitleHeader title={title} dateSwitcher={dateSwitcher} />}
       <div className={CONTENT_COLUMN}>
         <ConnectionBanner className="mb-4 xl:mb-6" />
         {actions && <div className="mb-4 flex justify-end gap-2">{actions}</div>}
@@ -46,15 +42,9 @@ export function PageShell({ title, dateSwitcher, actions, layout = "stack", slot
             {slots.bottom && <div className="min-w-0 xl:col-span-2">{slots.bottom}</div>}
           </div>
         ) : (
-          <div
-            className={cn(
-              layout === "grid-2" ? "grid grid-cols-1 gap-3 md:grid-cols-2 xl:gap-4" : "flex flex-col gap-8 xl:gap-10"
-            )}
-          >
-            {children}
-          </div>
+          <div className={cn(layout === "grid-2" ? "grid grid-cols-1 gap-3 md:grid-cols-2 xl:gap-4" : "flex flex-col gap-8 xl:gap-10")}>{children}</div>
         )}
       </div>
-    </>
+    </div>
   )
 }

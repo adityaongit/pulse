@@ -1,6 +1,6 @@
 import Link from "next/link"
 import { ArrowRight } from "lucide-react"
-import { Skeleton } from "@/components/ui/skeleton"
+import { SkeletonText } from "@/components/ui/skeleton"
 
 export type InsightCardProps = {
   title?: string
@@ -10,8 +10,9 @@ export type InsightCardProps = {
   action?: { label: string; href: string }
 }
 
-const FRAME = "rounded-xl bg-linear-to-r from-insight-from to-insight-to p-px"
-const INNER = "space-y-2 rounded-[11px] bg-inset p-4"
+// 16 px card, 1 px gradient hairline, so the inner radius is 15 px (spec §2.4).
+const FRAME = "rounded-2xl bg-linear-to-r from-insight-from to-insight-to p-px"
+const INNER = "space-y-2 rounded-[15px] bg-inset p-4"
 
 /** WHOOP's coach card with the 1 px gradient hairline (spec §5.15). Not rendered when empty. */
 export function InsightCard({ title, body, action }: InsightCardProps) {
@@ -38,9 +39,11 @@ export function InsightCardSkeleton() {
   return (
     <div aria-hidden className={FRAME}>
       <div className={INNER}>
-        <Skeleton className="h-3.5 w-full" />
-        <Skeleton className="h-3.5 w-11/12" />
-        <Skeleton className="h-3.5 w-2/3" />
+        <span className="block text-[15px] leading-[22px]">
+          <SkeletonText className="w-full" />
+          <SkeletonText className="w-11/12" />
+          <SkeletonText className="w-2/3" />
+        </span>
       </div>
     </div>
   )

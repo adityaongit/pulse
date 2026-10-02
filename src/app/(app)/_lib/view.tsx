@@ -19,7 +19,7 @@ export const mapMetric = <A, B>(m: Metric<A>, f: (a: A) => B): Metric<B> =>
 
 const FORMAT_BY_UNIT: Record<string, FormatKey> = { ms: "int", bpm: "int", rpm: "decimal1", "%": "int", kcal: "grouped", "°C": "signed1", min: "duration" }
 
-const STAT_ICON: Record<string, React.ReactNode> = {
+export const STAT_ICON: Record<string, React.ReactNode> = {
   hrv: <Activity />,
   rhr: <Heart />,
   resp: <Wind />,

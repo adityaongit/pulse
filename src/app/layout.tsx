@@ -42,7 +42,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`dark ${figtree.variable} ${barlow.variable} h-full scroll-pt-[calc(4rem+env(safe-area-inset-top))] scroll-pb-24 antialiased md:scroll-pb-4`}
+      className={`dark ${figtree.variable} ${barlow.variable} h-full scroll-pt-[calc(120px+env(safe-area-inset-top))] scroll-pb-[110px] antialiased md:scroll-pb-24`}
     >
       <head>
         {/* Next's own manifest link omits crossorigin outside Vercel previews; child layouts set manifest: null. */}

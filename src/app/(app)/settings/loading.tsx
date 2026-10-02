@@ -5,11 +5,12 @@ export default function Loading() {
   return (
     <DetailShell
       title="Settings"
+      dismiss="close"
       primary={
         <div aria-hidden className="grid gap-3 lg:grid-cols-2 xl:gap-4">
-          <Skeleton className="h-48 rounded-xl" />
-          <Skeleton className="h-48 rounded-xl" />
-          <Skeleton className="h-72 rounded-xl" />
+          <Skeleton className="h-48 rounded-2xl" />
+          <Skeleton className="h-48 rounded-2xl" />
+          <Skeleton className="h-72 rounded-2xl" />
         </div>
       }
     />

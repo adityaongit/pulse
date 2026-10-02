@@ -350,6 +350,8 @@ export type ShellStatusVM = {
   today: string;
   firstDay?: string;
   timeZone?: string;
+  /** Consecutive worn days ending `asOf` (today, or yesterday early in the day); null at 0. */
+  streak: { days: number; asOf: string } | null;
 };
 
 export type SettingsVM = {

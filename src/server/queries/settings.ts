@@ -1,6 +1,6 @@
 // More, Settings and the shell's status (spec §7.14, §4.2). Pages also call worker.requestSync() on load.
 import { SCORING_VERSION } from "../pipeline";
-import { daysBetween } from "../time";
+import { addDays, daysBetween } from "../time";
 import { defaultCtx, firstDay, type QueryCtx, todayOf } from "./common";
 import { latestReport } from "./home";
 import type { MoreVM, SettingsVM, ShellStatusVM } from "./types";
@@ -99,6 +99,37 @@ export function getMore(ctx: QueryCtx = defaultCtx()): MoreVM {
   return { latestWeek: latestReport(ctx, "week"), latestMonth: latestReport(ctx, "month"), mode: ctx.mode, version: APP_VERSION, scoringVersion: SCORING_VERSION };
 }
 
+/** Today counts toward the streak once it has this many minutes of heart rate; until then the streak ends yesterday. */
+const STREAK_TODAY_MIN = 6 * 60;
+
+/**
+ * Consecutive worn days (spec §4.3, I4): WHOOP's "continuous data" streak. A day is worn when it has any
+ * heart rate, the same rule that keeps `band_not_worn` off its Strain. Null when the streak is 0.
+ */
+export function getWearStreak(ctx: QueryCtx = defaultCtx()): { days: number; asOf: string } | null {
+  const today = todayOf(ctx);
+  const rows = ctx.db.$client
+    .prepare(
+      `select day, coalesce(json_extract(strain, '$.hrCount'), 0) hr,
+         coalesce(json_extract(strain, '$.hrMinutesAm'), 0) + coalesce(json_extract(strain, '$.hrMinutesPm'), 0) minutes
+       from daily_scores where day <= ? order by day desc`,
+    )
+    .iterate(today) as Iterable<{ day: string; hr: number; minutes: number }>;
+  let expected = today;
+  let asOf: string | null = null;
+  let days = 0;
+  for (const r of rows) {
+    if (r.day !== expected) break;
+    expected = addDays(r.day, -1);
+    // Today neither counts nor breaks the streak until it has enough data.
+    if (r.day === today && r.minutes < STREAK_TODAY_MIN) continue;
+    if (r.hr <= 0) break;
+    asOf ??= r.day;
+    days++;
+  }
+  return days > 0 && asOf ? { days, asOf } : null;
+}
+
 /** The AppShell's ShellStatus (top bar, sync dot, demo chip, ConnectionBanner). */
 export function getShellStatus(ctx: QueryCtx = defaultCtx()): ShellStatusVM {
   const rows = syncRows(ctx).filter((r) => (ctx.mode === "demo" ? r.type === "seed" : r.type !== "seed"));
@@ -128,5 +159,6 @@ export function getShellStatus(ctx: QueryCtx = defaultCtx()): ShellStatusVM {
     today: todayOf(ctx),
     ...(firstDay(ctx) && { firstDay: firstDay(ctx)! }),
     timeZone: ctx.timeZone,
+    streak: getWearStreak(ctx),
   };
 }

@@ -79,7 +79,7 @@ function Strip({ indicator, days }: DayStripProps) {
               value={day.date}
               ref={on ? selected : undefined}
               aria-label={label}
-              className="h-15 w-11 flex-col gap-1 rounded-lg p-0 transition-[background-color] duration-150 ease-standard hover:bg-accent/60 data-[state=on]:bg-secondary"
+              className="h-15 w-11 flex-col gap-1 rounded-xl p-0 transition-[background-color,scale] duration-150 ease-standard hover:bg-white/6 active:scale-[0.96] data-[state=on]:bg-white/10"
             >
               <span aria-hidden className="text-[11px] leading-[14px] font-semibold text-muted-foreground">
                 {format(date, "EEEEE")}
@@ -119,7 +119,7 @@ export function DayStripSkeleton() {
   return (
     <div aria-hidden className="flex gap-1 overflow-hidden px-4">
       {Array.from({ length: 7 }, (_, i) => (
-        <Skeleton key={i} className="h-15 w-11 shrink-0 rounded-lg" />
+        <Skeleton key={i} className="h-15 w-11 shrink-0 rounded-xl" />
       ))}
     </div>
   )

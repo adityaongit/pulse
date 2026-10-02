@@ -2,7 +2,7 @@ import { cn } from "@/lib/utils"
 import { DATA_COLORS, type DataColor } from "@/lib/bands"
 import { durationWords, hmm } from "@/lib/format"
 import type { Metric } from "@/lib/reasons"
-import { Skeleton } from "@/components/ui/skeleton"
+import { Skeleton, SkeletonText } from "@/components/ui/skeleton"
 import { EmptyState } from "@/components/shells/EmptyState"
 import { MetricState } from "@/components/shells/MetricState"
 
@@ -121,9 +121,17 @@ export function ZoneBars(p: ZoneBarsProps) {
 export function ZoneBarsSkeleton({ variant }: { variant: "rows" | "stacked" }) {
   if (variant === "rows")
     return (
+      // Each zone row's own box: the real "Zone n" label, bars for range and time, the hatched track.
       <div aria-hidden className="space-y-2">
-        {[0, 1, 2, 3, 4].map((k) => (
-          <Skeleton key={k} className="h-14 rounded-lg" />
+        {[5, 4, 3, 2, 1].map((k) => (
+          <div key={k} className="space-y-2 rounded-lg bg-secondary px-3 py-2.5">
+            <div className="flex items-center gap-3">
+              <span className={LABEL}>Zone {k}</span>
+              <SkeletonText className={cn(LABEL, "w-20")} />
+              <SkeletonText className="ml-auto w-[7ch] font-numeric text-lg leading-6 font-bold" />
+            </div>
+            <div className="h-2 rounded-sm bg-(image:--pattern-hatch)" />
+          </div>
         ))}
       </div>
     )

@@ -4,7 +4,7 @@ import { cn } from "cn"
 import { Slot } from "radix-ui"
 
 const buttonVariants = cva(
-  "group/button inline-flex shrink-0 items-center justify-center rounded-lg border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+  "group/button inline-flex shrink-0 items-center justify-center rounded-lg border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-[background-color,color,box-shadow,scale,filter] duration-150 ease-standard outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:scale-[0.96] disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
   {
     variants: {
       variant: {
@@ -18,6 +18,8 @@ const buttonVariants = cva(
         destructive:
           "bg-destructive/10 text-destructive hover:bg-destructive/20 focus-visible:border-destructive/40 focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:hover:bg-destructive/30 dark:focus-visible:ring-destructive/40",
         link: "text-primary underline-offset-4 hover:underline",
+        // The second action in sheets and the info card ("Delete", "Open trend view"), spec §5 v2.
+        "outline-pill": "rounded-full bg-transparent text-foreground ring-1 ring-foreground/70 hover:bg-foreground/[0.06]",
       },
       size: {
         default:
@@ -33,9 +35,10 @@ const buttonVariants = cva(
         "icon-lg": "size-9",
         // Pulse touch sizes (spec §5.0): every text button in content and sheets, and every icon button.
         touch:
-          "h-11 gap-2 rounded-lg px-4 text-[13px] font-bold tracking-[0.06em] uppercase transition-[background-color,color,scale] duration-150 ease-standard active:scale-[0.96] [&_svg:not([class*='size-'])]:size-5",
-        "icon-touch":
-          "size-11 rounded-full transition-[background-color,color,scale] duration-150 ease-standard active:scale-[0.96] [&_svg:not([class*='size-'])]:size-5",
+          "h-11 gap-2 rounded-xl px-4 text-[13px] font-bold tracking-[0.06em] uppercase [&_svg:not([class*='size-'])]:size-5",
+        "icon-touch": "size-11 rounded-full [&_svg:not([class*='size-'])]:size-5",
+        // Sheet footer pills (spec §3.4 "Sheet primary button", [latest-sheet-edit-1]).
+        sheet: "h-14 w-full gap-2 rounded-full px-6 text-[15px] font-bold tracking-[0.08em] uppercase [&_svg:not([class*='size-'])]:size-5",
       },
     },
     defaultVariants: {

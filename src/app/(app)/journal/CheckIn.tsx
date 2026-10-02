@@ -9,7 +9,7 @@ import { withParam } from "@/lib/url"
 import { addCustomTag, saveJournalEntry } from "@/server/actions/journal"
 import type { JournalTag, JournalVM } from "@/server/queries/types"
 import { StatusChip } from "@/components/metrics/primitives"
-import { ResponsiveSheet } from "@/components/shells/ResponsiveSheet"
+import { ResponsiveSheet, SHEET_SECTION } from "@/components/shells/ResponsiveSheet"
 import { SectionShell } from "@/components/shells/SectionShell"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Badge } from "@/components/ui/badge"
@@ -36,7 +36,6 @@ const GROUPS: { key: JournalTag["group"]; title: string }[] = [
   { key: "context", title: "Context" },
   { key: "custom", title: "Your behaviours" },
 ]
-const CARD_TITLE = "text-[13px] leading-4 font-bold tracking-[0.08em] uppercase"
 const ITEM =
   "h-11 min-w-14 rounded-lg px-3 text-[13px] font-bold tracking-[0.06em] uppercase transition-[background-color,color] duration-150 ease-standard"
 export const TAG_CLASS = "h-7 rounded-full px-3 text-[13px] font-semibold"
@@ -173,7 +172,7 @@ export function CheckIn({ day, dayLabel, tags, checkIn }: CheckInProps) {
                 <AlertDescription className="text-recovery-red-text">Couldn&apos;t save. Check your connection and try again.</AlertDescription>
               </Alert>
             )}
-            <Button size="touch" onClick={save} disabled={saving} aria-live="polite">
+            <Button size="sheet" onClick={save} disabled={saving} aria-live="polite">
               {saving ? "Saving…" : "Save"}
             </Button>
           </>
@@ -184,7 +183,7 @@ export function CheckIn({ day, dayLabel, tags, checkIn }: CheckInProps) {
           if (!items.length && g.key !== "custom") return null
           return (
             <section key={g.key} aria-labelledby={`checkin-${g.key}`} className="mt-6 first:mt-2">
-              <h3 id={`checkin-${g.key}`} className={CARD_TITLE}>
+              <h3 id={`checkin-${g.key}`} className={SHEET_SECTION}>
                 {g.title}
               </h3>
               <ul>

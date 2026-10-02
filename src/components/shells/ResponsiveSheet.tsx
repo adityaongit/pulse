@@ -5,8 +5,8 @@ import { X } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { Button } from "@/components/ui/button"
-import { Drawer, DrawerContent, DrawerDescription, DrawerHeader, DrawerTitle } from "@/components/ui/drawer"
-import { Sheet, SheetClose, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet"
+import { Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerTitle } from "@/components/ui/drawer"
+import { Sheet, SheetClose, SheetContent, SheetDescription, SheetTitle } from "@/components/ui/sheet"
 
 export type ResponsiveSheetProps = {
   open: boolean
@@ -14,45 +14,61 @@ export type ResponsiveSheetProps = {
   title: string
   description?: string
   children: React.ReactNode
+  /** Stacked full-width actions: `Button size="sheet"` (white primary, then `variant="outline-pill"`). */
   footer?: React.ReactNode
   size?: "default" | "tall"
 }
 
-const OVERLAY = "shadow-[0_12px_32px_rgb(0_0_0/0.5)] ring-1 ring-border"
+/** Sheet material (spec §2.6): opaque dark gradient, a lit 1 px top edge. Not glass: sheets hold content. */
+const SHEET = "bg-linear-to-b from-sheet to-sheet-bottom shadow-sheet"
+const TITLE = "text-[15px] leading-5 font-bold tracking-[0.08em] text-balance uppercase"
+const DESCRIPTION = "text-xs leading-4 font-medium text-muted-foreground"
+const CLOSE = "shrink-0 text-foreground hover:bg-white/8"
+
+/** A caps section label with a hairline running to the edge, as WHOOP's "TIME ───" [latest-sheet-edit-1]. */
+export const SHEET_SECTION =
+  "flex items-center gap-3 text-xs leading-4 font-bold tracking-[0.08em] text-muted-foreground uppercase after:h-px after:flex-1 after:bg-white/10"
 
 /**
- * Bottom drawer below 768 px, right sheet from 768 px (spec §4.7). The one JS breakpoint read
- * besides AppShell. Focus moves in on open and back to the trigger on close (Radix and vaul).
+ * Tasks (check-in, vital and contributor detail): a bottom drawer below 768 px, a floating right
+ * sheet from 768 px (spec §4.8). X at the left, centred caps title, white pill actions. The one JS
+ * breakpoint read. Focus moves in on open and back to the opener on close (Radix and vaul).
  */
 export function ResponsiveSheet({ open, onOpenChange, title, description, children, footer, size = "default" }: ResponsiveSheetProps) {
   const mobile = useIsMobile()
   // Radix returns focus to a DialogTrigger; these sheets are controlled without one, so remember the opener.
   const opener = React.useRef<HTMLElement | null>(null)
 
+  const header = (Title: React.ElementType, Description: React.ElementType, Close: React.ElementType) => (
+    <div className="grid grid-cols-[44px_minmax(0,1fr)_44px] items-center gap-2 px-2 pt-1 pb-3">
+      <Close asChild>
+        <Button variant="ghost" size="icon-touch" aria-label="Close" className={CLOSE}>
+          <X aria-hidden strokeWidth={1.75} className="size-[22px]" />
+        </Button>
+      </Close>
+      <div className="min-w-0 text-center">
+        <Title className={TITLE}>{title}</Title>
+        <Description className={cn(DESCRIPTION, "mt-0.5", !description && "sr-only")}>{description ?? title}</Description>
+      </div>
+    </div>
+  )
+  const foot = footer && (
+    <div className="flex flex-col gap-3 px-4 pt-3 pb-[max(env(safe-area-inset-bottom),16px)] *:w-full md:px-6 md:pb-6">{footer}</div>
+  )
+
   if (mobile)
     return (
       <Drawer open={open} onOpenChange={onOpenChange}>
         <DrawerContent
           className={cn(
-            "border-t-0 data-[vaul-drawer-direction=bottom]:max-h-[90svh] data-[vaul-drawer-direction=bottom]:rounded-t-2xl",
-            size === "tall" && "data-[vaul-drawer-direction=bottom]:h-[90svh]",
-            OVERLAY
+            SHEET,
+            "border-t-0 motion-reduce:animate-none! data-[vaul-drawer-direction=bottom]:max-h-[92svh] data-[vaul-drawer-direction=bottom]:rounded-t-[28px] [&>div:first-child]:mt-2.5 [&>div:first-child]:h-1.5 [&>div:first-child]:w-10 [&>div:first-child]:bg-white/25",
+            size === "tall" && "data-[vaul-drawer-direction=bottom]:h-[92svh]"
           )}
         >
-          <DrawerHeader className="px-4 pt-3 pb-3 text-left group-data-[vaul-drawer-direction=bottom]/drawer-content:text-left">
-            <DrawerTitle className="text-lg leading-6 font-semibold tracking-[-0.01em]">{title}</DrawerTitle>
-            {description ? (
-              <DrawerDescription className="text-xs leading-4 font-medium text-muted-foreground">{description}</DrawerDescription>
-            ) : (
-              <DrawerDescription className="sr-only">{title}</DrawerDescription>
-            )}
-          </DrawerHeader>
+          {header(DrawerTitle, DrawerDescription, DrawerClose)}
           <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pb-4">{children}</div>
-          {footer && (
-            <div className="sticky bottom-0 flex flex-col gap-2 border-t border-border bg-popover px-4 pt-3 pb-[max(env(safe-area-inset-bottom),16px)] *:w-full">
-              {footer}
-            </div>
-          )}
+          {foot}
         </DrawerContent>
       </Drawer>
     )
@@ -70,24 +86,14 @@ export function ResponsiveSheet({ open, onOpenChange, title, description, childr
           e.preventDefault()
           opener.current.focus()
         }}
-        className={cn("w-full gap-0 border-l-0 data-[side=right]:sm:max-w-[420px] data-[side=right]:xl:max-w-[440px]", OVERLAY)}>
-        <SheetHeader className="flex-row items-start justify-between gap-3 px-6 pt-5 pb-4">
-          <div className="min-w-0 space-y-0.5 pt-2.5">
-            <SheetTitle className="text-lg leading-6 font-semibold tracking-[-0.01em]">{title}</SheetTitle>
-            {description ? (
-              <SheetDescription className="text-xs leading-4 font-medium text-muted-foreground">{description}</SheetDescription>
-            ) : (
-              <SheetDescription className="sr-only">{title}</SheetDescription>
-            )}
-          </div>
-          <SheetClose asChild>
-            <Button variant="ghost" size="icon-touch" aria-label="Close" className="-mr-3 shrink-0">
-              <X aria-hidden strokeWidth={1.75} />
-            </Button>
-          </SheetClose>
-        </SheetHeader>
+        className={cn(
+          SHEET,
+          "gap-0 border-l-0 pt-4 data-[side=right]:inset-y-3 data-[side=right]:right-3 data-[side=right]:h-auto data-[side=right]:w-[420px] data-[side=right]:max-w-[calc(100%-24px)] data-[side=right]:rounded-[28px] data-[side=right]:sm:max-w-[420px]"
+        )}
+      >
+        {header(SheetTitle, SheetDescription, SheetClose)}
         <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-6 pb-6">{children}</div>
-        {footer && <div className="sticky bottom-0 flex justify-end gap-2 border-t border-border bg-popover px-6 py-4">{footer}</div>}
+        {foot}
       </SheetContent>
     </Sheet>
   )

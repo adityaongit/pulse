@@ -68,7 +68,7 @@ export default async function MonitorPage({ searchParams }: PageProps<"/health/m
       hero={<Count count={vm.count} />}
       summary={
         vm.illness && (
-          <Alert role="alert" className="rounded-xl border-0 bg-card px-4 py-3 ring-1 ring-recovery-red/60 *:[svg]:size-5 *:[svg]:translate-y-px">
+          <Alert role="alert" className="rounded-2xl border-0 bg-linear-to-b from-card-top to-card px-4 py-3 shadow-card ring-1 ring-recovery-red/60 *:[svg]:size-5 *:[svg]:translate-y-px">
             <CircleAlert aria-hidden className="text-recovery-red-text" strokeWidth={1.75} />
             <AlertTitle className="text-base leading-[22px] font-semibold">Possible illness signal</AlertTitle>
             <AlertDescription className="text-[15px] leading-[22px] text-pretty text-foreground-secondary">

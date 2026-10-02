@@ -3,7 +3,7 @@ import { Bike, Dumbbell, Footprints, PersonStanding, Timer, type LucideIcon } fr
 import { cn } from "@/lib/utils"
 import { clock, formatValue } from "@/lib/format"
 import type { Metric } from "@/lib/reasons"
-import { Skeleton } from "@/components/ui/skeleton"
+import { Skeleton, SkeletonText } from "@/components/ui/skeleton"
 
 export type ActivityKind = "run" | "ride" | "walk" | "strength" | "workout"
 export const ACTIVITY_ICON: Record<ActivityKind, LucideIcon> = {
@@ -27,6 +27,10 @@ export type ActivityCardProps = {
   href: string
   timeZone?: string
 }
+
+// Rows are 10 px inside a 16 px card with a 6 px inset; the chip is 8 px inside the row (concentric, spec §2.4).
+const ROW = "flex h-14 items-center gap-3 rounded-lg bg-secondary pr-3 pl-1.5"
+const CHIP = "flex h-11 min-w-18 shrink-0 items-center justify-center gap-1.5 rounded-md px-2.5 text-foreground"
 
 /** One row on the day's timeline (spec §5.12). Shared by ActivityCard and SleepCard. */
 export function TimelineRow({
@@ -52,9 +56,9 @@ export function TimelineRow({
     <Link
       href={href}
       aria-label={label}
-      className="flex h-14 items-center gap-3 rounded-lg bg-secondary pr-3 pl-1.5 transition-[background-color] duration-150 ease-standard outline-none hover:bg-[color-mix(in_oklch,var(--secondary),var(--foreground)_5%)] focus-visible:ring-3 focus-visible:ring-ring/50 active:bg-accent"
+      className={cn(ROW, "transition-[background-color,scale] duration-150 ease-standard outline-none hover:bg-accent focus-visible:ring-3 focus-visible:ring-ring/50 active:scale-[0.96] active:bg-accent")}
     >
-      <span className={cn("flex h-11 min-w-18 shrink-0 items-center justify-center gap-1.5 rounded-md px-2.5 text-foreground", chipClass)}>{chip}</span>
+      <span className={cn(CHIP, chipClass)}>{chip}</span>
       <span className="min-w-0 flex-1">
         <span className="block truncate text-[15px] leading-5 font-bold tracking-[0.06em] uppercase">{name}</span>
         {caption && <span className="block truncate text-xs leading-4 font-medium text-muted-foreground">{caption}</span>}
@@ -91,12 +95,20 @@ export function ActivityCard({ name, kind, strain, start, end, href, timeZone }:
   )
 }
 
-/** Two timeline rows. */
+/** Two timeline rows in their real box: the row, its chip, bars for the name and times. */
 export function TimelineSkeleton() {
   return (
     <div aria-hidden className="space-y-1.5">
-      <Skeleton className="h-14 rounded-lg" />
-      <Skeleton className="h-14 rounded-lg" />
+      {[0, 1].map((i) => (
+        <div key={i} className={ROW}>
+          <Skeleton className={cn(CHIP, "bg-muted")} />
+          <SkeletonText className="w-20 flex-1 text-[15px] leading-5" />
+          <span className="w-10 shrink-0">
+            <SkeletonText className="text-xs leading-4" />
+            <SkeletonText className="text-xs leading-4" />
+          </span>
+        </div>
+      ))}
     </div>
   )
 }

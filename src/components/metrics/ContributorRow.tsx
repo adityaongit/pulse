@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils"
 import { deltaTone, type GoodDirection, type Tone } from "@/lib/bands"
 import { formatValue, isSymbolUnit, MISSING, spoken, type FormatKey } from "@/lib/format"
 import type { Metric } from "@/lib/reasons"
-import { Skeleton } from "@/components/ui/skeleton"
+import { SkeletonText } from "@/components/ui/skeleton"
 import { MetricState, type MetricMeta } from "@/components/shells/MetricState"
 import { MetricTags, ValueUnit } from "./primitives"
 
@@ -194,13 +194,14 @@ export function ContributorRow(p: ContributorRowProps) {
 
 export function ContributorRowSkeleton() {
   return (
-    <div aria-hidden className="space-y-2.5 py-3">
-      <div className="flex justify-between">
-        <Skeleton className="h-3 w-36" />
-        <Skeleton className="h-5 w-20" />
+    // The recovery row's box: a 24 px header line, the 6 px track, a caption line.
+    <div aria-hidden className="space-y-2 py-3">
+      <div className="flex items-center gap-3">
+        <SkeletonText className={cn(LABEL, "w-36 flex-1")} />
+        <SkeletonText className="w-[6ch] font-numeric text-xl leading-6 font-bold" />
       </div>
-      <Skeleton className="h-1.5 w-full rounded-full" />
-      <Skeleton className="h-3 w-28" />
+      <div className="h-1.5 rounded-full bg-dial-track" />
+      <SkeletonText className={cn(CAPTION, "w-28")} />
     </div>
   )
 }

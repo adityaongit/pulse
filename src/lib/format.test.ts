@@ -1,7 +1,14 @@
 import { describe, expect, it } from "vitest";
-import { dayLabel, dialAriaLabel, durationWords, formatValue, rangeLabel } from "./format";
+import { agoShort, dayLabel, dialAriaLabel, durationWords, formatValue, rangeLabel } from "./format";
 
 describe("format", () => {
+  it("shortens sync ages for the header", () => {
+    const now = Date.parse("2026-10-02T12:00:00Z");
+    expect(agoShort(now - 30_000, now)).toBe("Now");
+    expect(agoShort(now - 12 * 60_000, now)).toBe("12m");
+    expect(agoShort(now - 3 * 3600_000, now)).toBe("3h");
+    expect(agoShort(now - 50 * 3600_000, now)).toBe("2d");
+  });
   it("uses the real minus sign and signs deltas", () => {
     expect(formatValue("signed1", -0.6)).toBe("−0.6");
     expect(formatValue("signed1", 0.4)).toBe("+0.4");

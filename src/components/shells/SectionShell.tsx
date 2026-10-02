@@ -1,7 +1,7 @@
 import Link from "next/link"
 import { ChevronRight } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { Card } from "@/components/ui/card"
+import { Card, CARD_MATERIAL } from "@/components/ui/card"
 import { InfoButton, type InfoContent } from "./InfoButton"
 
 export type SectionShellProps = {
@@ -37,7 +37,13 @@ function ActionLink({ label, href }: { label: string; href: string }) {
   )
 }
 
-/** A titled section or card (spec §4.6). Owns the card padding step at 1280 px. */
+/** A whole-card link: the card lightens toward its top on hover and presses in (spec §2.7). */
+export const CARD_LINK = cn(
+  CARD_MATERIAL,
+  "block transition-[scale,--tw-gradient-from] duration-150 ease-standard outline-none hover:from-card-hover focus-visible:ring-3 focus-visible:ring-ring/50 active:scale-[0.96]"
+)
+
+/** A titled section or card (spec §4.7). Owns the card padding step at 1280 px. */
 export function SectionShell({ variant, title, info, action, aside, href, level, id, className, children }: SectionShellProps) {
   const headingId = `${id ?? slug(title)}-title`
   const actionNode = isLinkAction(action) ? <ActionLink {...action} /> : action
@@ -78,19 +84,13 @@ export function SectionShell({ variant, title, info, action, aside, href, level,
     </div>
   )
 
-  const cardClass = cn("scroll-mt-20 gap-0 py-0 ring-0", className)
+  const cardClass = cn("scroll-mt-20 gap-0 py-0", className)
   if (href)
     return (
-      <Card id={id} className={cardClass}>
-        <Link
-          href={href}
-          aria-labelledby={headingId}
-          className="flex-1 rounded-xl p-4 transition-[background-color] duration-150 ease-standard outline-none hover:bg-[color-mix(in_oklch,var(--card),var(--foreground)_4%)] focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:ring-inset active:bg-accent xl:p-5"
-        >
-          {header}
-          {children}
-        </Link>
-      </Card>
+      <Link id={id} href={href} aria-labelledby={headingId} className={cn(CARD_LINK, "scroll-mt-20 min-w-0 p-4 xl:p-5", className)}>
+        {header}
+        {children}
+      </Link>
     )
 
   return (
