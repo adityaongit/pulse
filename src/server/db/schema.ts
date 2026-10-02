@@ -111,7 +111,7 @@ export const sleepSegments = sqliteTable(
       .references(() => sleepSessions.id, { onDelete: "cascade" }),
     startTs: integer("start_ts").notNull(),
     endTs: integer("end_ts").notNull(),
-    stage: text("stage", { enum: ["AWAKE", "LIGHT", "DEEP", "REM"] }).notNull(),
+    stage: text("stage", { enum: ["awake", "light", "deep", "rem"] }).notNull(),
   },
   (t) => [primaryKey({ columns: [t.sessionId, t.startTs] })],
 );
