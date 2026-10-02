@@ -2,13 +2,20 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
+/* The design spec quotes class names; keep it out of the class scan. */
+@source not "../../docs";
+
+/* Theme tokens only. Values are sampled from docs/design/reference (see docs/design/spec.md §2).
+   Dark only: the `dark` class on <html> stays so shadcn's dark: variants apply. */
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-numeric: var(--font-numeric);
+  /* shadcn's chart tooltip sets font-mono + tabular-nums on values; route it to the numeric face */
+  --font-mono: var(--font-numeric);
   --font-heading: var(--font-sans);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
@@ -39,92 +46,180 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
-  --radius-sm: calc(var(--radius) * 0.6);
-  --radius-md: calc(var(--radius) * 0.8);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) * 1.4);
-  --radius-2xl: calc(var(--radius) * 1.8);
-  --radius-3xl: calc(var(--radius) * 2.2);
-  --radius-4xl: calc(var(--radius) * 2.6);
+
+  /* Pulse extensions (WHOOP data language) */
+  --color-background-top: var(--background-top);
+  --color-foreground-secondary: var(--foreground-secondary);
+  --color-inset: var(--inset);
+  --color-recovery-green: var(--recovery-green);
+  --color-recovery-yellow: var(--recovery-yellow);
+  --color-recovery-red: var(--recovery-red);
+  --color-recovery-red-text: var(--recovery-red-text);
+  --color-strain: var(--strain);
+  --color-strain-text: var(--strain-text);
+  --color-strain-deep: var(--strain-deep);
+  --color-sleep: var(--sleep);
+  --color-sleep-deep: var(--sleep-deep);
+  --color-optimal: var(--optimal);
+  --color-warning: var(--warning);
+  --color-stress-low: var(--stress-low);
+  --color-stress-medium: var(--stress-medium);
+  --color-stress-high: var(--stress-high);
+  --color-coach: var(--coach);
+  --color-insight-from: var(--insight-from);
+  --color-insight-to: var(--insight-to);
+  --color-banner-from: var(--banner-from);
+  --color-banner-to: var(--banner-to);
+  --color-dial-track: var(--dial-track);
+  --color-dial-target: var(--dial-target);
+  --color-chart-grid: var(--chart-grid);
+  --color-chart-band: var(--chart-band);
+  --color-chart-cursor: var(--chart-cursor);
+  --color-stage-awake: var(--stage-awake);
+  --color-stage-rem: var(--stage-rem);
+  --color-stage-light: var(--stage-light);
+  --color-stage-deep: var(--stage-deep);
+
+  /* Radius scale: cards 12px, rows and buttons 8px, pills full (spec §2.4) */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.375rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+  --radius-2xl: 1rem;
+  --radius-3xl: 1.5rem;
+  --radius-4xl: 2rem;
+
+  /* Motion (spec §2.6) */
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
 }
 
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
-}
+  color-scheme: dark;
+  --radius: 0.5rem;
 
-.dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  /* Ground: vertical gradient top -> mid -> bottom, sampled from WHOOP screens */
+  --background-top: #262e33;
+  --background-mid: #1b2024;
+  --background: #0f1113;
+  --foreground: #ffffff;
+  --foreground-secondary: #babac0;
+
+  /* Surfaces */
+  --card: #2b2f32;
+  --card-foreground: #ffffff;
+  --popover: #34393d;
+  --popover-foreground: #ffffff;
+  --primary: #ffffff;
+  --primary-foreground: #0f1113;
+  --secondary: #34393d;
+  --secondary-foreground: #ffffff;
+  --muted: #22282c;
+  --muted-foreground: #999ea3;
+  --accent: #34393d;
+  --accent-foreground: #ffffff;
+  --inset: #0c0f11;
+  --destructive: #ff0026;
+  --border: rgb(255 255 255 / 0.1);
+  --input: rgb(255 255 255 / 0.15);
+  --ring: #ffffff;
+
+  /* Recovery bands (>= 67 green, 34-66 yellow, <= 33 red) */
+  --recovery-green: #19ec06;
+  --recovery-yellow: #ffde00;
+  --recovery-red: #ff0026;
+  --recovery-red-text: #ff5a6a;
+
+  /* Strain, sleep */
+  --strain: #0093e7;
+  --strain-text: #1fa0f0;
+  --strain-deep: #0d48be;
+  --sleep: #7ba1bb;
+  --sleep-deep: #39597b;
+
+  /* Status */
+  --optimal: #00f19f;
+  --warning: #ffa722;
+
+  /* Stress 0-3 (low < 1, medium 1-2, high >= 2) */
+  --stress-low: #67aee6;
+  --stress-medium: #00f19f;
+  --stress-high: #ffa722;
+
+  /* Coach / insight language */
+  --coach: #7095fe;
+  --insight-from: #4b418c;
+  --insight-to: #346e8c;
+  --banner-from: #2e2c4f;
+  --banner-to: #2b3f50;
+
+  /* Dials and charts */
+  --dial-track: #33383c;
+  --dial-target: #5a5e61;
+  --chart-grid: rgb(255 255 255 / 0.08);
+  --chart-band: rgb(255 255 255 / 0.05);
+  --chart-cursor: rgb(255 255 255 / 0.4);
+  --chart-1: #0093e7;
+  --chart-2: #00f19f;
+  --chart-3: #7ba1bb;
+  --chart-4: #ffa722;
+  --chart-5: #67aee6;
+
+  /* Hypnogram lanes: sleep-blue ramp, lighter = lighter sleep */
+  --stage-awake: #e6edf2;
+  --stage-rem: #a6c3d7;
+  --stage-light: #7ba1bb;
+  --stage-deep: #48708c;
+
+  /* Hatched track used by zone rows and impact rows: bg-(image:--pattern-hatch) */
+  --pattern-hatch: repeating-linear-gradient(
+    -45deg,
+    rgb(255 255 255 / 0.09) 0 1.5px,
+    transparent 1.5px 5px
+  );
+
+  /* Sidebar (>= 768px) */
+  --sidebar: #14181b;
+  --sidebar-foreground: #babac0;
+  --sidebar-primary: #ffffff;
+  --sidebar-primary-foreground: #0f1113;
+  --sidebar-accent: #2b2f32;
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: rgb(255 255 255 / 0.08);
+  --sidebar-ring: #ffffff;
 }
 
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
-  body {
-    @apply bg-background text-foreground;
-  }
   html {
     @apply font-sans;
+    -webkit-tap-highlight-color: transparent;
+    text-rendering: optimizeLegibility;
+  }
+  body {
+    @apply text-foreground;
+    background:
+      linear-gradient(
+          180deg,
+          var(--background-top) 0,
+          var(--background-mid) 270px,
+          var(--background) 740px
+        )
+        no-repeat,
+      var(--background);
+  }
+  ::selection {
+    background-color: rgb(255 255 255 / 0.25);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    ::before,
+    ::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 }
