@@ -1109,6 +1109,40 @@ pulse/
 
 **Verification:** The suite is green, and the screenshots look like the reference at each viewport.
 
+### U16. Visual fidelity audit against WHOOP and Bevel references
+
+Added 2026-10-02 at the user's request, after the Home dials shipped at unequal sizes when WHOOP's are equal.
+
+**Goal:** Every component and every screen is checked side by side against the real WHOOP and Bevel screenshots, so that no deviation like the unequal dials survives.
+
+**Requirements:** R20, R21, R22
+
+**Dependencies:** U13, U14
+
+**Files:**
+- `docs/design/audit.md` (the findings)
+- Fixes in `src/components/**` and `src/app/(app)/**`
+- Updates to `docs/design/spec.md`, where the spec itself was wrong
+
+**Approach:**
+- Capture each screen and each `/dev/kit` component at 390 px, in demo mode, and pair it with its reference image in `docs/design/reference/`.
+- For each pair, record every visible difference in `docs/design/audit.md`:
+  - sizes and proportions (dial diameter, ring thickness, gaps)
+  - colour, typography (face, weight, size, tracking, case) and spacing
+  - alignment and order of sections
+  - icons, copy and the states shown
+- Classify each difference: fix it, or keep it as a deliberate deviation. A kept deviation needs a stated reason, for example that WHOOP has no equivalent screen.
+- Fix every "fix" item. Re-capture and confirm.
+- Where spec.md caused the difference, correct the spec first, so the contract and the UI agree.
+- Screens without a reference (reports, Settings, Fitness, the desktop sidebar) are checked against the nearest WHOOP screen for consistency of components, not for a pixel match.
+- Load the frontend skills while auditing: `impeccable` (critique and audit), `better-ui`, `make-interfaces-feel-better`, `web-design-guidelines`, `frontend-design:frontend-design` and `design-taste-frontend`.
+
+**Test scenarios:**
+- U14's sweep still passes after the fixes, at every route and all 3 viewports.
+- Test expectation for the visual comparison itself: none. It is a reviewed side-by-side record in `audit.md`.
+
+**Verification:** `docs/design/audit.md` lists every screen and component with its reference pair. No difference is left open: each one is either fixed, or kept with a reason. A re-capture of every fixed item matches its reference.
+
 ### Phase D: Ship
 
 ### U15. Deploy to the server behind Cloudflare Access
