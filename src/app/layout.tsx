@@ -1,16 +1,18 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Barlow, Figtree } from "next/font/google";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import "./globals.css";
 
-// next/font self-hosts at build time (no runtime requests to Google Fonts). U11 picks the final faces.
-const geistSans = Geist({
+// next/font self-hosts at build time (no runtime requests to Google Fonts).
+// Figtree stands in for WHOOP's Proxima Nova (text); Barlow for DIN 2014 (numerals). See docs/design/spec.md §3.
+const figtree = Figtree({
   variable: "--font-sans",
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const barlow = Barlow({
+  variable: "--font-numeric",
+  weight: ["500", "600", "700"],
   subsets: ["latin"],
 });
 
@@ -21,7 +23,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`dark ${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
+    <html lang="en" className={`dark ${figtree.variable} ${barlow.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col">
         <TooltipProvider>{children}</TooltipProvider>
       </body>
