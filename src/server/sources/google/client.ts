@@ -7,6 +7,7 @@ import { createHash } from "node:crypto";
 import { gzipSync } from "node:zlib";
 import type { Db } from "../../db";
 import { rawPayloads } from "../../db/schema";
+import { addDays, localDay, localMidnight, wall } from "../../time";
 import { DATA_TYPES, type DataType, type DataTypeId, type FilterMember } from "./catalogue";
 import { errorCode, getAccessToken, GoogleError, markRevoked, parseJson } from "./oauth";
 
@@ -19,43 +20,7 @@ const MAX_PAGES = 1000; // a nextPageToken that never advances must not loop for
 
 // --- Local days ---------------------------------------------------------------------------------
 
-const formatters = new Map<string, Intl.DateTimeFormat>();
-
-function wall(s: number, tz: string) {
-  let f = formatters.get(tz);
-  if (!f) {
-    f = new Intl.DateTimeFormat("en-CA", {
-      timeZone: tz,
-      hourCycle: "h23",
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-    });
-    formatters.set(tz, f);
-  }
-  const p = Object.fromEntries(f.formatToParts(new Date(s * 1000)).map((x) => [x.type, x.value]));
-  return {
-    day: `${p.year}-${p.month}-${p.day}`,
-    time: `${p.hour}:${p.minute}:${p.second}`,
-    asUtc: Date.UTC(+p.year, +p.month - 1, +p.day, +p.hour, +p.minute, +p.second) / 1000,
-  };
-}
-
-/** The local day containing instant `s`. */
-export const localDay = (s: number, tz: string) => wall(s, tz).day;
-
-export const addDays = (day: string, n: number) =>
-  new Date(Date.parse(`${day}T00:00:00Z`) + n * 86_400_000).toISOString().slice(0, 10);
-
-/** The instant local midnight opens `day`. The offset is read twice, so a DST day uses midnight's own offset. */
-export function localMidnight(day: string, tz: string): number {
-  const utc = Date.parse(`${day}T00:00:00Z`) / 1000;
-  const offset = (s: number) => wall(s, tz).asUtc - Math.floor(s);
-  return utc - offset(utc - offset(utc));
-}
+export { addDays, localDay, localMidnight };
 
 /** The first local midnight at or after `s`. */
 function ceilMidnight(s: number, tz: string): number {
