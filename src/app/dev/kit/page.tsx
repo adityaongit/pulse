@@ -106,10 +106,10 @@ export default function KitPage() {
 
       <SectionShell variant="section" title="Score dials">
         <div className="space-y-6">
-          <Specimen name="Home row: md / md-hero / md, links, strain target and So far">
+          <Specimen name="Home row: three equal md dials, links, strain target and So far">
             <div className="flex items-start justify-center gap-2">
               <ScoreDial variant="sleep" size="md" value={74} href="/sleep" />
-              <ScoreDial variant="recovery" size="md-hero" value={85} href="/recovery" />
+              <ScoreDial variant="recovery" size="md" value={85} href="/recovery" />
               <ScoreDial variant="strain" size="md" value={9.4} target={[12, 15]} extraTags={["so_far"]} href="/strain" />
             </div>
           </Specimen>
@@ -117,7 +117,7 @@ export default function KitPage() {
             <div className="flex flex-col items-center gap-3">
               <div className="flex items-start justify-center gap-2">
                 <ScoreDial variant="sleep" size="md" value={null} reason="awaiting_sleep_sync" />
-                <ScoreDial variant="recovery" size="md-hero" value={null} reason="calibrating" nightsLeft={4} />
+                <ScoreDial variant="recovery" size="md" value={null} reason="calibrating" nightsLeft={4} />
                 <ScoreDial variant="strain" size="md" value={16.8} target={[12, 15]} />
               </div>
               <ReasonPlaceholder reason="calibrating" nightsLeft={4} size="sm" />
@@ -126,7 +126,7 @@ export default function KitPage() {
           <Specimen name="Loading">
             <div className="flex items-start justify-center gap-2">
               <ScoreDialSkeleton size="md" />
-              <ScoreDialSkeleton size="md-hero" />
+              <ScoreDialSkeleton size="md" />
               <ScoreDialSkeleton size="md" />
             </div>
           </Specimen>

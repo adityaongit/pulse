@@ -13,7 +13,7 @@ import { ChartContainer } from "@/components/ui/chart"
 import { Skeleton } from "@/components/ui/skeleton"
 import { MetricTags, type TagKind } from "./primitives"
 
-export type DialSize = "sm" | "md" | "md-hero" | "lg"
+export type DialSize = "sm" | "md" | "lg"
 export type DialVariant = "recovery" | "strain" | "sleep" | "stat" | "gauge"
 
 export type ScoreDialProps = {
@@ -45,7 +45,6 @@ export type ScoreDialProps = {
 const SIZE = {
   sm: { box: "size-14", d: 56, ring: 5, value: "text-base leading-none" },
   md: { box: "size-24 md:size-30", d: 96, ring: 6, value: "text-[26px] leading-none tracking-[-0.01em] md:text-[30px]" },
-  "md-hero": { box: "size-29 md:size-36", d: 116, ring: 7, value: "text-[30px] leading-none tracking-[-0.01em] md:text-[36px]" },
   lg: { box: "size-60 md:size-70", d: 240, ring: 11, value: "text-[64px] leading-none tracking-[-0.01em] md:text-[72px]" },
 } as const
 

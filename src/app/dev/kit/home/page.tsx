@@ -25,7 +25,7 @@ export default function KitHomePage() {
             <p aria-hidden className="text-center text-[13px] leading-4 font-semibold tracking-[0.35em] text-foreground-secondary uppercase">Pulse</p>
             <div className="flex items-start justify-center gap-2">
               <ScoreDial variant="sleep" size="md" value={74} href="/sleep" />
-              <ScoreDial variant="recovery" size="md-hero" value={85} href="/recovery" />
+              <ScoreDial variant="recovery" size="md" value={85} href="/recovery" />
               <ScoreDial variant="strain" size="md" value={14.2} target={[12, 15]} extraTags={["so_far"]} href="/strain" />
             </div>
           </div>
