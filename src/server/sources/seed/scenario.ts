@@ -1,6 +1,7 @@
 // The demo person's story. Day indices are 0-based from the first seeded day (the anchor), so the
 // first "today" is index SEED_DAYS - 1. Days past it are ordinary days on the same weekly rhythm.
 // generate.ts turns this into rows; nothing here draws randomness.
+import { DEFAULT_JOURNAL_TAGS } from "../../journalTags";
 
 export const SEED_DAYS = 180;
 
@@ -106,20 +107,22 @@ export function blockWeek(i: number) {
   return i >= start && i <= end ? Math.floor((i - start) / 7) : 0;
 }
 
-/** The Journal screen's default behaviours. `odds` is the daily chance; generate.ts adds the scripted days. */
-export const DEFAULT_JOURNAL_TAGS = [
-  { tag: "alcohol", label: "Alcohol", odds: 0.07 },
-  { tag: "late_caffeine", label: "Late caffeine", odds: 0.12 },
-  { tag: "late_meal", label: "Late meal", odds: 0.15 },
-  { tag: "screen_in_bed", label: "Screen in bed", odds: 0.3 },
-  { tag: "meditation", label: "Meditation", odds: 0.4 },
-  { tag: "stretching", label: "Stretching", odds: 0.35 },
-  { tag: "sauna", label: "Sauna", odds: 0.06 },
-  { tag: "travel", label: "Travel", odds: 0.02 },
-  { tag: "illness", label: "Illness", odds: 0 },
-] as const;
+export { DEFAULT_JOURNAL_TAGS };
 
 export type Tag = (typeof DEFAULT_JOURNAL_TAGS)[number]["tag"];
+
+/** Daily chance of each default behaviour; generate.ts adds the scripted days. */
+export const TAG_ODDS: Record<Tag, number> = {
+  alcohol: 0.07,
+  late_caffeine: 0.12,
+  late_meal: 0.15,
+  screen_in_bed: 0.3,
+  meditation: 0.4,
+  stretching: 0.35,
+  sauna: 0.06,
+  travel: 0.02,
+  illness: 0,
+};
 
 /** Friday and Saturday drinks are likelier. */
 export const ALCOHOL_WEEKEND_ODDS = 0.55;
