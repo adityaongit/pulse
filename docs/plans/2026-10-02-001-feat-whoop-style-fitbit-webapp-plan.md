@@ -1136,6 +1136,18 @@ Added 2026-10-02 at the user's request, after the Home dials shipped at unequal 
 - Fix every "fix" item. Re-capture and confirm.
 - Where spec.md caused the difference, correct the spec first, so the contract and the UI agree.
 - Screens without a reference (reports, Settings, Fitness, the desktop sidebar) are checked against the nearest WHOOP screen for consistency of components, not for a pixel match.
+- Polish items from the user's review of the first build (2026-10-02). Each one is checked and fixed explicitly:
+  - **Skeletons match the real components.** Every loading skeleton has the same shape, size and position as the component it stands in for, so nothing shifts when data arrives.
+  - **Laptop dashboard UX.** At 1280 px and wider, the screens use the space well: deliberate column layouts, sensible content widths, and no stretched or sparse cards.
+  - **Spacing and gaps.** Check the gaps between the three Home dials and the spacing around the rings, the track gap at the ring's start, and ring thickness against WHOOP.
+  - **Micro-interactions:**
+    - hover, press and focus states on every tappable element
+    - dial fill-in animation
+    - page and sheet transitions
+    - the day-strip selection
+    - toggle feedback
+    - all of it respecting reduced motion
+  - **Chart tooltips** appear at the pointer with no slide-in from the left edge, follow the cursor or snap to the nearest point, stay inside the chart, and work on touch (tap or drag to scrub). The slide-in was fixed by turning off Recharts' tooltip position animation; re-check the rest.
 - Load the frontend skills while auditing: `impeccable` (critique and audit), `better-ui`, `make-interfaces-feel-better`, `web-design-guidelines`, `frontend-design:frontend-design` and `design-taste-frontend`.
 
 **Test scenarios:**
