@@ -22,6 +22,10 @@ Every variable is listed and explained in [`.env.example`](.env.example). It is 
 - `GOOGLE_OAUTH_ENABLED=true` switches to the Google Health API and `data/pulse.db`. It needs `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` and `APP_URL`.
 - `CF_ACCESS_TEAM_DOMAIN` and `CF_ACCESS_AUD` are required unless `DEV_ACCESS_BYPASS=1`. The bypass is only accepted under `next dev`.
 
+## Deploy
+
+Production runs as one container on the homelab, behind Cloudflare Tunnel and Cloudflare Access, with no published ports. For Google Cloud setup, Cloudflare, `docker compose`, backups and troubleshooting, see [`docs/runbook.md`](docs/runbook.md).
+
 ## Commands
 
 | Command | What it does |

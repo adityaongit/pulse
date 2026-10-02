@@ -1,0 +1,19 @@
+services:
+  pulse:
+    build: .
+    image: pulse:latest
+    container_name: pulse
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      - pulse-data:/app/data
+    networks:
+      - proxy
+    # No ports: cloudflared-portlabs reaches http://pulse:3000 over the proxy network.
+
+volumes:
+  pulse-data:
+
+networks:
+  proxy:
+    external: true
