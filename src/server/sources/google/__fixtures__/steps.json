@@ -1,0 +1,12 @@
+{
+  "dataPoints": [
+    { "dataSource": { "platform": "FITBIT", "recordingMethod": "PASSIVELY_MEASURED", "device": { "displayName": "<device>" } },
+      "steps": { "count": "40", "interval": { "startTime": "2026-10-01T03:00:00Z", "startUtcOffset": "19800s", "endTime": "2026-10-01T03:01:00Z", "endUtcOffset": "19800s" } } },
+    { "dataSource": { "platform": "HEALTH_CONNECT", "recordingMethod": "PASSIVELY_MEASURED", "application": { "packageName": "<app>" } },
+      "steps": { "count": "55", "interval": { "startTime": "2026-10-01T03:00:00Z", "startUtcOffset": "19800s", "endTime": "2026-10-01T03:01:00Z", "endUtcOffset": "19800s" } } },
+    { "dataSource": { "platform": "FITBIT", "recordingMethod": "PASSIVELY_MEASURED", "device": { "displayName": "<device>" } },
+      "steps": { "count": "100", "interval": { "startTime": "2026-10-01T03:01:00Z", "startUtcOffset": "19800s", "endTime": "2026-10-01T03:04:00Z", "endUtcOffset": "19800s" } } },
+    { "dataSource": { "platform": "FITBIT", "recordingMethod": "PASSIVELY_MEASURED", "device": { "displayName": "<device>" } },
+      "steps": { "count": "12", "interval": { "startTime": "2026-10-02T05:40:00Z", "startUtcOffset": "19800s", "endTime": "2026-10-02T05:41:00Z", "endUtcOffset": "19800s" } } }
+  ]
+}

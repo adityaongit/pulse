@@ -1,0 +1,8 @@
+{
+  "dataPoints": [
+    {
+      "dataSource": { "platform": "FITBIT", "recordingMethod": "DERIVED", "device": { "displayName": "<device>" } },
+      "runVo2Max": { "sampleTime": { "physicalTime": "2026-10-01T13:10:00Z", "utcOffset": "19800s" }, "runVo2Max": 46.3 }
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "dataPoints": [
+    {
+      "name": "users/me/dataTypes/daily-heart-rate-variability/dataPoints/hrv-2",
+      "dataSource": { "platform": "FITBIT", "recordingMethod": "DERIVED", "device": { "displayName": "<device>" } },
+      "dailyHeartRateVariability": {
+        "date": { "year": 2026, "month": 10, "day": 2 },
+        "averageHeartRateVariabilityMilliseconds": 44.5,
+        "deepSleepRootMeanSquareOfSuccessiveDifferencesMilliseconds": 49.25,
+        "entropy": 2.5,
+        "nonRemHeartRateBeatsPerMinute": "55"
+      }
+    },
+    {
+      "name": "users/me/dataTypes/daily-heart-rate-variability/dataPoints/hrv-1",
+      "dataSource": { "platform": "FITBIT", "recordingMethod": "DERIVED", "device": { "displayName": "<device>" } },
+      "dailyHeartRateVariability": {
+        "date": { "year": 2026, "month": 10, "day": 1 },
+        "averageHeartRateVariabilityMilliseconds": 41.5,
+        "deepSleepRootMeanSquareOfSuccessiveDifferencesMilliseconds": 47,
+        "entropy": 2.25,
+        "nonRemHeartRateBeatsPerMinute": "56"
+      }
+    }
+  ]
+}

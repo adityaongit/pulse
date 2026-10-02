@@ -1,0 +1,82 @@
+{
+  "dataPoints": [
+    {
+      "name": "users/me/dataTypes/sleep/dataPoints/sleep-a",
+      "dataSource": { "platform": "FITBIT", "recordingMethod": "DERIVED", "device": { "displayName": "<device>" } },
+      "sleep": {
+        "type": "STAGES",
+        "interval": { "startTime": "2026-09-30T18:00:00Z", "startUtcOffset": "19800s", "endTime": "2026-10-01T01:40:00Z", "endUtcOffset": "19800s" },
+        "metadata": { "mainSleep": true, "processed": true, "stagesStatus": "SUCCEEDED" },
+        "stages": [
+          { "type": "AWAKE", "startTime": "2026-09-30T18:00:00Z", "startUtcOffset": "19800s", "endTime": "2026-09-30T18:10:00Z", "endUtcOffset": "19800s" },
+          { "type": "LIGHT", "startTime": "2026-09-30T18:10:00Z", "startUtcOffset": "19800s", "endTime": "2026-09-30T19:30:00Z", "endUtcOffset": "19800s" },
+          { "type": "DEEP", "startTime": "2026-09-30T19:30:00Z", "startUtcOffset": "19800s", "endTime": "2026-09-30T20:30:00Z", "endUtcOffset": "19800s" },
+          { "type": "REM", "startTime": "2026-09-30T20:30:00Z", "startUtcOffset": "19800s", "endTime": "2026-09-30T21:30:00Z", "endUtcOffset": "19800s" },
+          { "type": "LIGHT", "startTime": "2026-09-30T21:30:00Z", "startUtcOffset": "19800s", "endTime": "2026-10-01T01:30:00Z", "endUtcOffset": "19800s" },
+          { "type": "AWAKE", "startTime": "2026-10-01T01:30:00Z", "startUtcOffset": "19800s", "endTime": "2026-10-01T01:40:00Z", "endUtcOffset": "19800s" }
+        ],
+        "shortAwakenings": [
+          { "type": "AWAKE", "startTime": "2026-09-30T23:00:00Z", "startUtcOffset": "19800s", "endTime": "2026-09-30T23:02:00Z", "endUtcOffset": "19800s" }
+        ],
+        "summary": {
+          "minutesAsleep": "440",
+          "minutesAwake": "20",
+          "minutesInSleepPeriod": "460",
+          "minutesToFallAsleep": "10",
+          "minutesAfterWakeUp": "10",
+          "stagesSummary": [
+            { "type": "AWAKE", "minutes": "20", "count": "2" },
+            { "type": "LIGHT", "minutes": "320", "count": "2" },
+            { "type": "DEEP", "minutes": "60", "count": "1" },
+            { "type": "REM", "minutes": "60", "count": "1" }
+          ]
+        },
+        "createTime": "2026-10-01T02:00:00Z",
+        "updateTime": "2026-10-01T02:00:00Z"
+      }
+    },
+    {
+      "name": "users/me/dataTypes/sleep/dataPoints/sleep-b",
+      "dataSource": { "platform": "FITBIT", "recordingMethod": "DERIVED", "device": { "displayName": "<device>" } },
+      "sleep": {
+        "type": "STAGES",
+        "interval": { "startTime": "2026-10-01T19:30:00Z", "startUtcOffset": "19800s", "endTime": "2026-10-02T01:00:00Z", "endUtcOffset": "19800s" },
+        "metadata": { "mainSleep": true, "processed": true, "stagesStatus": "SUCCEEDED" },
+        "stages": [
+          { "type": "LIGHT", "startTime": "2026-10-01T19:30:00Z", "endTime": "2026-10-01T22:00:00Z" },
+          { "type": "DEEP", "startTime": "2026-10-01T22:00:00Z", "endTime": "2026-10-01T23:00:00Z" },
+          { "type": "REM", "startTime": "2026-10-01T23:00:00Z", "endTime": "2026-10-02T01:00:00Z" }
+        ],
+        "summary": {
+          "minutesAsleep": "330",
+          "stagesSummary": [
+            { "type": "LIGHT", "minutes": "150", "count": "1" },
+            { "type": "DEEP", "minutes": "60", "count": "1" },
+            { "type": "REM", "minutes": "120", "count": "1" }
+          ]
+        }
+      }
+    },
+    {
+      "name": "users/me/dataTypes/sleep/dataPoints/sleep-c",
+      "dataSource": { "platform": "HEALTH_CONNECT", "recordingMethod": "DERIVED", "application": { "packageName": "<app>" } },
+      "sleep": {
+        "interval": { "startTime": "2026-10-01T17:30:00Z", "startUtcOffset": "19800s", "endTime": "2026-10-02T01:30:00Z", "endUtcOffset": "19800s" },
+        "summary": { "minutesAsleep": "450", "minutesAwake": "30" }
+      }
+    },
+    {
+      "name": "users/me/dataTypes/sleep/dataPoints/sleep-d",
+      "dataSource": { "platform": "FITBIT", "recordingMethod": "DERIVED", "device": { "displayName": "<device>" } },
+      "sleep": {
+        "type": "CLASSIC",
+        "interval": { "startTime": "2026-09-29T17:45:00Z", "startUtcOffset": "19800s", "endTime": "2026-09-30T00:15:00Z", "endUtcOffset": "19800s" },
+        "metadata": { "mainSleep": true, "processed": true, "stagesStatus": "FAILED" },
+        "stages": [
+          { "type": "LIGHT", "startTime": "2026-09-29T17:45:00Z", "endTime": "2026-09-30T00:15:00Z" }
+        ],
+        "summary": { "minutesAsleep": "350", "minutesAwake": "40" }
+      }
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "dataPoints": [
+    {
+      "dataSource": { "platform": "FITBIT", "recordingMethod": "DERIVED", "device": { "displayName": "<device>" } },
+      "dailyRestingHeartRate": {
+        "date": { "year": 2026, "month": 10, "day": 2 },
+        "beatsPerMinute": "54",
+        "dailyRestingHeartRateMetadata": { "calculationMethod": "WITH_SLEEP" }
+      }
+    },
+    {
+      "dataSource": { "platform": "FITBIT", "recordingMethod": "DERIVED", "device": { "displayName": "<device>" } },
+      "dailyRestingHeartRate": {
+        "date": { "year": 2026, "month": 10, "day": 1 },
+        "beatsPerMinute": "57",
+        "dailyRestingHeartRateMetadata": { "calculationMethod": "WITH_SLEEP" }
+      }
+    }
+  ]
+}
