@@ -304,3 +304,42 @@ These are the plan's open data questions, plus the gaps in Hælan's findings. Ti
 - [ ] **Nightly vitals.** Are SpO2 and skin temperature present on the Air? Skin temperature appears after 3 nights. Is respiratory rate present on nights without HRV?
 - [ ] **Retry-After.** Does a 429 carry a `Retry-After` header?
 - [ ] **Daily volume.** What is the raw volume per day, and the gzipped size in `raw_payloads`? (Use `select type, count(*), sum(length(gz_body)) from raw_payloads group by type`.)
+
+## Fitted baseline spreads (seed values)
+
+**These are seed values, not Fitbit Air data.** They come from one run of the pipeline (U10) on a fresh 180-day demo database (`GOOGLE_OAUTH_ENABLED=false`, the seed scenario in `src/server/sources/seed/scenario.ts`), via `PULSE_E2E=1 pnpm vitest run src/server/pipeline.seed.test.ts`. Repeat this section with real values after the first real backfill.
+
+```mermaid
+flowchart LR
+  N[Nightly value, day D] --> F[Winsorized EWMA fold, nights before D]
+  F --> S[Spread, abs-dev units]
+  S --> FL{Below the metric's floor?}
+  FL -->|yes| B[Floor binds: spread = floor]
+  FL -->|no| K[Fitted spread]
+  B --> Z[z = value − mean, ÷ 1.253 × spread]
+  K --> Z
+  Z --> R[Recovery term]
+```
+
+The spread is in noop's abs-dev units, so σ = 1.253 × spread. The figures are over the 166 days whose baseline was trusted (14 or more accepted nights).
+
+| Baseline | noop floor | p10 | Median | p90 | Days at the floor |
+|---|---|---|---|---|---|
+| HRV (`hrv_ms`) | 5 ms | 5.2 | 6.1 | 6.8 | 9 of 166 |
+| Resting HR (`sessionRestingHR`) | 2 bpm | 2.0 | 2.0 | 2.1 | 108 of 166 |
+| Respiratory rate (`resp_bpm`) | 0.5 | 0.5 | 0.5 | 0.5 | 143 of 166 |
+
+- **HRV** sits just above its floor, so the floor rarely binds on the seed.
+- **Resting HR and respiratory rate** sit on their floors most days. The seed draws them with small night-to-night noise, so the floors set their z-scores. On Fitbit's smoothed nightly values the same may happen. If it does, those two terms are compressed toward zero, and the floors should be tuned per metric with a `scoring_version` bump.
+
+**Recovery bands on the seed.** Of the 170 scored days, 63 are green (37 %), 84 yellow (49 %) and 23 red (14 %). The other 10 days are the 7 calibrating days, the 2 band-off nights and the no-HRV night.
+
+**Other seed distributions from the same run** (Strain on WHOOP's 0–21 scale; complete days only):
+
+| Series | n | p10 | p25 | Median | p75 | p90 |
+|---|---|---|---|---|---|---|
+| Day Strain, rest days | 69 | 4.2 | 4.8 | 5.4 | 5.7 | 5.9 |
+| Day Strain, workout days | 107 | 5.4 | 8.1 | 11.3 | 11.8 | 12.5 |
+| Energy Bank at the end of the day | 168 | 6.0 | 14.7 | 28.3 | 38.2 | 47.3 |
+
+87 of the 168 days end the Energy Bank inside its 15–40 target. U8 tuned its constants with Recovery fixed at 60. With real Recovery, the red days of the training block and the short-sleep week start lower and end below 15, and quiet green weekends end above 40. Retune `energyBankConfig` if that spread looks wrong on real data.

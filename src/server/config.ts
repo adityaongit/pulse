@@ -24,6 +24,7 @@ const Env = z
     SEX: z.enum(["male", "female"]),
     TZ: z.string().refine(isTimeZone, "must be an IANA time zone"),
     MAX_HR: z.coerce.number().int().min(100).max(240).optional(),
+    HEIGHT_CM: z.coerce.number().positive().max(272).optional(),
     GOOGLE_CLIENT_ID: z.string().optional(),
     GOOGLE_CLIENT_SECRET: z.string().optional(),
     APP_URL: z.url().optional(),
@@ -71,6 +72,9 @@ export function parseConfig(env: Record<string, string | undefined>, now = new D
       sex: e.SEX,
       // Tanaka: 208 - 0.7 * age.
       maxHr: e.MAX_HR ?? Math.round(208 - 0.7 * ageOn(e.BIRTH_DATE, now)),
+      maxHrSet: e.MAX_HR !== undefined,
+      /** Healthspan's lean-mass term (fat-free mass index) needs it; the term drops without it. */
+      heightCm: e.HEIGHT_CM ?? null,
     },
     google: e.GOOGLE_OAUTH_ENABLED
       ? { clientId: e.GOOGLE_CLIENT_ID!, clientSecret: e.GOOGLE_CLIENT_SECRET!, appUrl: e.APP_URL!.replace(/\/$/, "") }

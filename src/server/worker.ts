@@ -1,4 +1,6 @@
 import { getConfig } from "./config";
+import { getDb } from "./db";
+import { ensureDefaultTags } from "./journalTags";
 import { recomputeIfNeeded } from "./pipeline";
 import { googleSource } from "./sources/google/sync";
 import { seedSource } from "./sources/seed/generate";
@@ -73,6 +75,7 @@ const g = globalThis as typeof globalThis & { __pulseWorker?: Worker };
 export function startWorker() {
   if (g.__pulseWorker) return;
   const google = getConfig().googleOAuthEnabled;
+  ensureDefaultTags(getDb()); // both modes: the Journal's default behaviours exist before the first sync
   g.__pulseWorker = createWorker({
     name: google ? "google" : "seed",
     source: google ? googleSource : seedSource,

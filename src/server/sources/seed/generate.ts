@@ -20,6 +20,7 @@ import {
   syncState,
 } from "../../db/schema";
 import { ensureDefaultTags } from "../../journalTags";
+import { addDays, daysBetween, localDay, localMidnight } from "../../time";
 import type { Source } from "../types";
 import {
   ALCOHOL_WEEKEND_ODDS,
@@ -76,41 +77,11 @@ function rng(day: string, stream: string) {
 }
 type Rng = ReturnType<typeof rng>;
 
-const DAY_MS = 86_400_000;
 const clamp = (x: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, x));
 const round = (x: number, dp = 0) => Math.round(x * 10 ** dp) / 10 ** dp;
-const addDays = (day: string, n: number) => new Date(Date.parse(`${day}T00:00:00Z`) + n * DAY_MS).toISOString().slice(0, 10);
-const daysBetween = (from: string, to: string) => Math.round((Date.parse(to) - Date.parse(from)) / DAY_MS);
 const weekdayOf = (day: string) => new Date(`${day}T00:00:00Z`).getUTCDay();
 
-const formats = new Map<string, Intl.DateTimeFormat>();
-function partsFormat(timeZone: string) {
-  let f = formats.get(timeZone);
-  if (!f) {
-    const n = "numeric";
-    f = new Intl.DateTimeFormat("en-US", { timeZone, hourCycle: "h23", year: n, month: n, day: n, hour: n, minute: n, second: n });
-    formats.set(timeZone, f);
-  }
-  return f;
-}
-
-/** Local wall-clock parts of a unix-seconds instant. */
-function localParts(ts: number, timeZone: string) {
-  const p = Object.fromEntries(partsFormat(timeZone).formatToParts(ts * 1000).map((x) => [x.type, Number(x.value)]));
-  return { year: p.year, month: p.month, day: p.day, offsetS: Date.UTC(p.year, p.month - 1, p.day, p.hour, p.minute, p.second) / 1000 - ts };
-}
-
-/** Local `YYYY-MM-DD` of a unix-seconds instant. */
-export function localDay(ts: number, timeZone: string) {
-  const { year, month, day } = localParts(ts, timeZone);
-  return `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
-}
-
-/** Unix seconds of the local midnight that starts `day`. */
-export function localMidnight(day: string, timeZone: string) {
-  const utc = Date.parse(`${day}T00:00:00Z`) / 1000;
-  return utc - localParts(utc - localParts(utc, timeZone).offsetS, timeZone).offsetS;
-}
+export { localDay, localMidnight };
 
 type Ctx = { anchor: string; timeZone: string; maxHr: number };
 
