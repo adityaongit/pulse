@@ -93,6 +93,7 @@ function Chart({ hr, variant }: { hr: HrSeries; variant: "day" | "activity" }) {
         <YAxis domain={domain} width={32} tickCount={4} {...AXIS} />
         {hr.now && <ReferenceLine x={hr.now} stroke="var(--chart-cursor)" strokeDasharray="4 4" ifOverflow="hidden" />}
         <ChartTooltip
+          isAnimationActive={false}
           cursor={LINE_CURSOR}
           content={
             <ChartTooltipContent

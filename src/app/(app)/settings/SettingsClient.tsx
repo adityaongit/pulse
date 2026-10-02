@@ -1,0 +1,75 @@
+"use client"
+
+import * as React from "react"
+import { usePathname, useRouter, useSearchParams } from "next/navigation"
+import { toast } from "sonner"
+import { Button } from "@/components/ui/button"
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { disconnectGoogle } from "./actions"
+
+/** Landing back from Google with `?oauth=connected` or `?oauth=<code>` shows one toast, then drops the param. */
+function OAuthToastInner() {
+  const params = useSearchParams()
+  const router = useRouter()
+  const pathname = usePathname()
+  const result = params.get("oauth")
+  React.useEffect(() => {
+    if (!result) return
+    if (result === "connected") toast.success("Google connected")
+    else if (result === "access_denied") toast.error("Google access wasn't granted. Connect again to allow it.")
+    else toast.error(`Couldn't connect Google (${result}). Try again.`)
+    router.replace(`${pathname}${window.location.hash}`, { scroll: false })
+  }, [result, router, pathname])
+  return null
+}
+
+export function OAuthToast() {
+  return (
+    <React.Suspense fallback={null}>
+      <OAuthToastInner />
+    </React.Suspense>
+  )
+}
+
+/** "Disconnect" and its confirmation dialog (spec §7.14). */
+export function DisconnectButton() {
+  const [open, setOpen] = React.useState(false)
+  const [pending, setPending] = React.useState(false)
+  const [error, setError] = React.useState(false)
+  const run = async () => {
+    setPending(true)
+    const r = await disconnectGoogle().catch(() => ({ ok: false as const, error: "network" }))
+    setPending(false)
+    if (!r.ok) return setError(true)
+    setOpen(false)
+    toast.success("Google disconnected")
+  }
+  return (
+    <>
+      <Button variant="outline" size="touch" className="text-recovery-red-text" onClick={() => setOpen(true)}>
+        Disconnect
+      </Button>
+      <Dialog open={open} onOpenChange={(o) => !pending && setOpen(o)}>
+        <DialogContent showCloseButton={false} className="ring-1 ring-border">
+          <DialogHeader>
+            <DialogTitle>Disconnect Google?</DialogTitle>
+            <DialogDescription>Sync stops. Your stored data stays on this server.</DialogDescription>
+          </DialogHeader>
+          {error && (
+            <p role="alert" className="text-xs leading-4 font-medium text-recovery-red-text">
+              Couldn&apos;t disconnect. Check your connection and try again.
+            </p>
+          )}
+          <DialogFooter>
+            <Button variant="secondary" size="touch" onClick={() => setOpen(false)} disabled={pending}>
+              Cancel
+            </Button>
+            <Button variant="outline" size="touch" className="text-recovery-red-text" onClick={run} disabled={pending}>
+              {pending ? "Disconnecting…" : "Disconnect"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
+  )
+}

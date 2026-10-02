@@ -48,7 +48,7 @@ function Header({ p, value, right }: { p: Common; value: number | null; right?: 
   return (
     <span className="flex items-center gap-3">
       {p.icon && <span className="grid size-5 shrink-0 place-items-center text-muted-foreground [&_svg]:size-5">{p.icon}</span>}
-      <span className={cn(LABEL, "min-w-0 flex-1 truncate")}>{p.label}</span>
+      <span className={cn(LABEL, "line-clamp-2 min-w-0 flex-1")}>{p.label}</span>
       <span className="flex shrink-0 items-center gap-2">
         <ValueUnit
           value={formatValue(p.format, value)}
@@ -102,7 +102,7 @@ function RecoveryRow({ p, value, meta }: { p: Extract<ContributorRowProps, { var
         <p className={cn(CAPTION, "flex flex-wrap items-center gap-2")}>
           {value === null
             ? (p.reasonCopy ?? "Not measured: left out of today's score")
-            : `Baseline ${formatValue(p.format, mean)} ± ${formatValue(p.format, sd)}${p.unit ? (isSymbolUnit(p.unit) ? p.unit : ` ${p.unit}`) : ""}`}
+            : `Baseline ${formatValue(p.format, mean)} ± ${formatValue(p.format, sd).replace(/^\+/, "")}${p.unit ? (isSymbolUnit(p.unit) ? p.unit : ` ${p.unit}`) : ""}`}
           {meta && value !== null && <MetricTags provisional={meta.provisional} tags={meta.tags} />}
         </p>
       </div>
@@ -112,7 +112,8 @@ function RecoveryRow({ p, value, meta }: { p: Extract<ContributorRowProps, { var
 
 function HealthspanRow({ p, value, meta }: { p: Extract<ContributorRowProps, { variant: "healthspan" }>; value: number | null; meta?: MetricMeta }) {
   const [lo, hi] = p.domain
-  const years = value === null ? null : p.years
+  // Under 0.05 years rounds to "0.0": no change, neither younger nor older.
+  const years = value === null || p.years === null ? null : Math.abs(p.years) < 0.05 ? 0 : p.years
   const yearsText = years === null ? MISSING : formatValue("decimal1", years)
   const sentence =
     value === null
@@ -150,9 +151,7 @@ function HealthspanRow({ p, value, meta }: { p: Extract<ContributorRowProps, { v
         </span>
         <span className="flex justify-between font-numeric text-xs leading-4 font-medium text-muted-foreground tabular-nums">
           <span>{formatValue(p.format, lo)}</span>
-          {value === null ? (
-            <span className="font-sans">{p.reasonCopy ?? "No data"}</span>
-          ) : (
+          {value !== null && (
             <span className="inline-flex items-center gap-2">
               Target {formatValue(p.format, p.target)}
               {meta && <MetricTags provisional={meta.provisional} tags={meta.tags} />}
@@ -160,6 +159,8 @@ function HealthspanRow({ p, value, meta }: { p: Extract<ContributorRowProps, { v
           )}
           <span>{formatValue(p.format, hi)}</span>
         </span>
+        {/* Reason copy can be a sentence; it gets its own line rather than squeezing between the end labels. */}
+        {value === null && <span className="block text-xs leading-4 font-medium text-pretty text-muted-foreground">{p.reasonCopy ?? "No data"}</span>}
       </span>
     </>
   )

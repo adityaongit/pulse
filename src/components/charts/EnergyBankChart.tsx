@@ -58,6 +58,7 @@ function Chart({ e }: { e: EnergySeries }) {
         <XAxis dataKey="x" type="number" scale="time" domain={[first, last]} ticks={hourTicks(first, last, 6, tz)} tickFormatter={(v: number) => clock(v, tz)} interval="preserveStartEnd" minTickGap={24} {...AXIS} />
         <YAxis domain={[0, 100]} ticks={[33, 67, 100]} width={28} {...AXIS} tickMargin={4} />
         <ChartTooltip
+          isAnimationActive={false}
           cursor={LINE_CURSOR}
           content={
             <ChartTooltipContent

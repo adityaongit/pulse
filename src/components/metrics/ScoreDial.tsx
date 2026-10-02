@@ -169,8 +169,9 @@ export function ScoreDial(props: ScoreDialProps) {
                   data={markerSlices((target[0] + target[1]) / 2, 21, 0.2).map((v, i) => ({ v, fill: i === 1 ? "var(--foreground)" : "transparent" }))}
                   startAngle={90}
                   endAngle={-270}
-                  innerRadius={radii.tickInner}
-                  outerRadius={radii.tickOuter}
+                  // Stays inside the ring, like WHOOP's target tick; the stress gauge marker keeps its overhang.
+                  innerRadius={radii.inner}
+                  outerRadius={radii.outer}
                 />
               )}
             </>

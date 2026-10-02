@@ -1,0 +1,59 @@
+import { render, screen, within } from "@testing-library/react"
+import { describe, expect, it, vi } from "vitest"
+import type { SettingsVM } from "@/server/queries/types"
+import { SettingsView } from "./SettingsView"
+
+// The Disconnect button's server action touches the database; the view only needs its shape.
+vi.mock("./actions", () => ({ disconnectGoogle: vi.fn() }))
+
+const NOW = Date.parse("2026-10-02T10:00:00Z")
+const base: SettingsVM = {
+  mode: "google",
+  source: { label: "Google Health", status: "connected" },
+  import: null,
+  sync: [
+    { key: "heart-rate", label: "Heart rate", lastSuccessAt: NOW - 12 * 60_000, status: "ok", error: null },
+    { key: "sleep", label: "Sleep", lastSuccessAt: NOW - 3 * 3600_000, status: "stale", error: null },
+    { key: "steps", label: "Steps", lastSuccessAt: null, status: "error", error: "HTTP 429" },
+  ],
+  profile: { birthDate: "1990-01-01", age: 36, sex: "male", maxHr: 186, maxHrSource: "estimated", timeZone: "Asia/Kolkata", heightCm: null },
+  version: "0.1.0",
+  scoringVersion: 2,
+}
+const source = () => screen.getByRole("region", { name: "Data source" })
+
+describe("Settings view", () => {
+  it("journey 9: not connected offers Connect Google to /oauth/start", () => {
+    render(<SettingsView vm={{ ...base, source: { label: "Google Health", status: "not_connected" } }} now={NOW} />)
+    expect(within(source()).getByText("Not connected")).toBeInTheDocument()
+    expect(within(source()).getByRole("link", { name: "Connect Google" })).toHaveAttribute("href", "/oauth/start")
+  })
+
+  it("journey 9: importing shows backfill progress", () => {
+    render(<SettingsView vm={{ ...base, import: { done: 42, total: 180 } }} now={NOW} />)
+    expect(screen.getByText("Importing history: 42 of 180 days")).toBeInTheDocument()
+    expect(screen.getByRole("progressbar", { name: "Import progress" })).toBeInTheDocument()
+  })
+
+  it("journey 10: revoked asks to reconnect", () => {
+    render(<SettingsView vm={{ ...base, source: { label: "Google Health", status: "revoked" } }} now={NOW} />)
+    expect(within(source()).getByText("Reconnect needed")).toBeInTheDocument()
+    expect(within(source()).getByRole("link", { name: "Reconnect Google" })).toHaveAttribute("href", "/oauth/start")
+  })
+
+  it("connected offers Reconnect and Disconnect; sync rows show age and errors", () => {
+    render(<SettingsView vm={base} now={NOW} />)
+    expect(within(source()).getByRole("link", { name: "Reconnect" })).toHaveAttribute("href", "/oauth/start")
+    expect(within(source()).getByRole("button", { name: "Disconnect" })).toBeInTheDocument()
+    expect(screen.getByText("12 minutes ago")).toBeInTheDocument()
+    expect(screen.getByText("HTTP 429")).toBeInTheDocument()
+  })
+
+  it("demo mode has no actions and names the switch; About carries the attributions", () => {
+    render(<SettingsView vm={{ ...base, mode: "demo", source: { label: "Demo data", status: "demo" } }} now={NOW} />)
+    expect(within(source()).queryByRole("link")).not.toBeInTheDocument()
+    expect(screen.getByText(/GOOGLE_OAUTH_ENABLED=true/)).toBeInTheDocument()
+    expect(screen.getByText(/noop \(PolyForm Noncommercial 1\.0\.0\)/)).toBeInTheDocument()
+    expect(screen.getByText(/Hælan \(AGPL-3\.0\)/)).toBeInTheDocument()
+  })
+})

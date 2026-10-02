@@ -1,5 +1,6 @@
 "use client"
 
+import * as React from "react"
 import { X } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useIsMobile } from "@/hooks/use-mobile"
@@ -25,6 +26,8 @@ const OVERLAY = "shadow-[0_12px_32px_rgb(0_0_0/0.5)] ring-1 ring-border"
  */
 export function ResponsiveSheet({ open, onOpenChange, title, description, children, footer, size = "default" }: ResponsiveSheetProps) {
   const mobile = useIsMobile()
+  // Radix returns focus to a DialogTrigger; these sheets are controlled without one, so remember the opener.
+  const opener = React.useRef<HTMLElement | null>(null)
 
   if (mobile)
     return (
@@ -56,7 +59,18 @@ export function ResponsiveSheet({ open, onOpenChange, title, description, childr
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="right" showCloseButton={false} className={cn("w-full gap-0 border-l-0 data-[side=right]:sm:max-w-[420px] data-[side=right]:xl:max-w-[440px]", OVERLAY)}>
+      <SheetContent
+        side="right"
+        showCloseButton={false}
+        onOpenAutoFocus={() => {
+          opener.current = document.activeElement as HTMLElement | null
+        }}
+        onCloseAutoFocus={(e) => {
+          if (!opener.current?.isConnected) return
+          e.preventDefault()
+          opener.current.focus()
+        }}
+        className={cn("w-full gap-0 border-l-0 data-[side=right]:sm:max-w-[420px] data-[side=right]:xl:max-w-[440px]", OVERLAY)}>
         <SheetHeader className="flex-row items-start justify-between gap-3 px-6 pt-5 pb-4">
           <div className="min-w-0 space-y-0.5 pt-2.5">
             <SheetTitle className="text-lg leading-6 font-semibold tracking-[-0.01em]">{title}</SheetTitle>
