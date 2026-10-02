@@ -1109,6 +1109,42 @@ pulse/
 
 **Verification:** The suite is green, and the screenshots look like the reference at each viewport.
 
+### U17. Design refresh to WHOOP's latest glass UI
+
+Added 2026-10-02 at the user's request. The first build copied an older, basic WHOOP look. The user wants the current app (2025–2026, after the October 2025 redesign, in iOS 26 "liquid glass" style), made as good-looking as possible.
+
+**Goal:** Rebuild the visual layer (tokens, shells, kit and screens) to match the latest WHOOP app, based on current real screenshots. Data, queries and screen structure stay as they are.
+
+**Requirements:** R20, R21, R22
+
+**Dependencies:** U13
+
+**Files:**
+- `docs/design/reference/latest-*` (current references, each dated)
+- `docs/design/spec.md`: revised. The old values are kept in a §0 changelog.
+- `src/app/globals.css`
+- `src/components/**`
+- `src/app/(app)/**`, wherever composition changes
+
+**Approach:**
+- **Research.** Collect current screenshots for every screen in the Screen Inventory, plus every interaction pattern, and check each one's date. Reddit is the main source, because members post their progress: r/whoop threads such as https://www.reddit.com/r/whoop/comments/1msi3b1/strain_20_club_user_flair/. Also use App Store screenshots for the current version, reviews from October 2025 onward, and 2025–26 YouTube walkthroughs. Reddit blocks anonymous fetches, so use the browser session.
+- **The known current pattern** (`latest-home-sticky-header-user-2025.png`):
+  - The sticky top bar holds the avatar, a streak flame with a count, a "‹ TODAY ›" pill, and band battery % with a device icon and connection dot.
+  - On scroll, the large dials collapse into a row of mini Sleep/Recovery/Strain rings, each with its label.
+  - The surfaces are translucent and blurred.
+- **Glass system.** Translucent blurred surfaces (`backdrop-blur`, layered alpha fills, hairline highlights), a floating glass tab bar, glass sheets, popovers and the calendar, and the depth and motion of the current app. All of it goes through Tailwind utilities and theme tokens, with no bespoke CSS files. Add a solid fallback where `backdrop-filter` isn't supported, and respect reduced motion and reduced transparency.
+- **Collapsing header.** It shows the Sleep/Recovery/Strain mini rings plus the date pill, and replaces the current static top bar.
+- **Calendar.** Use the researched current design, which opens from the top. The first build's bottom sheet is wrong.
+- **Skills.** Load the frontend skills: `impeccable`, `better-ui`, `make-interfaces-feel-better`, `web-design-guidelines`, `frontend-design:frontend-design` and `design-taste-frontend`.
+- **Evidence.** Every visual decision cites a dated reference. Anything inferred is marked as such.
+
+**Test scenarios:**
+- The existing component and lib tests still pass.
+- The collapsing header switches between its expanded and collapsed states at the scroll threshold, using a pure helper with its own test.
+- Test expectation for the glass look itself: none. It is reviewed in U16's side-by-side.
+
+**Verification:** Every screen at 390, 820 and 1440 px matches the current WHOOP references in structure, materials and motion, and U14's sweep passes.
+
 ### U16. Visual fidelity audit against WHOOP and Bevel references
 
 Added 2026-10-02 at the user's request, after the Home dials shipped at unequal sizes when WHOOP's are equal.
@@ -1117,7 +1153,7 @@ Added 2026-10-02 at the user's request, after the Home dials shipped at unequal 
 
 **Requirements:** R20, R21, R22
 
-**Dependencies:** U13, U14
+**Dependencies:** U13, U17, U14
 
 **Files:**
 - `docs/design/audit.md` (the findings)
