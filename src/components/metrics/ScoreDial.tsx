@@ -42,6 +42,11 @@ export type ScoreDialProps = {
   href?: string
   /** Loading (spec §5.19): the real track and label, bars where the numbers go. */
   loading?: boolean
+  /**
+   * The sticky header's form (docs/design/sticky.md B2): a 64 px ring with the value inside, no label or
+   * tags, `aria-hidden` and `inert` (the full dial stays in the page). `size` is ignored.
+   */
+  compact?: boolean
 }
 
 const SIZE = {
@@ -50,6 +55,7 @@ const SIZE = {
   // v2 hero ring: 14 at 240 (16 at 280), measured on [latest-recovery-1].
   lg: { box: "size-60 md:size-70", d: 240, ring: 14, value: "text-[64px] leading-none tracking-[-0.01em] md:text-[72px]" },
 } as const
+const COMPACT = { box: "size-16", d: 64, ring: 5, value: "text-[20px] leading-none" } as const
 
 const DIAL_LABEL = "text-xs leading-4 font-bold tracking-[0.08em] uppercase"
 const TRACK = "var(--dial-track)"
@@ -102,12 +108,14 @@ function resolve(p: ScoreDialProps): Resolved {
 
 /** The WHOOP ring (spec §5.1): Recharts radial bar over a pie track, centre text in HTML. */
 export function ScoreDial(props: ScoreDialProps) {
-  const { variant, size, value, href, loading } = props
+  const { variant, size, value, href, loading, compact } = props
   const reduced = useReducedMotion()
   const r = resolve(props)
-  const s = SIZE[size]
-  const lg = size === "lg"
+  const s = compact ? COMPACT : SIZE[size]
+  const lg = !compact && size === "lg"
   const radii = ringRadii(s.d, s.ring)
+  // The track sits 0.25 px inside each edge of the arc, so no dark fringe shows along the fill.
+  const track = ringRadii(s.d, s.ring - 0.5, 2.25)
   const empty = value === null
   const reason = empty ? reasonCopy(props.reason, props.nightsLeft) : null
   const gauge = variant === "gauge"
@@ -133,7 +141,7 @@ export function ScoreDial(props: ScoreDialProps) {
   const pieBase = { dataKey: "v", stroke: "none", isAnimationActive: false, cx: "50%", cy: "50%" } as const
 
   const ring = (
-    <div className={cn("relative shrink-0", s.box)} role="img" aria-label={aria} aria-hidden={href ? true : undefined}>
+    <div data-dial-part="ring" className={cn("relative shrink-0", s.box)} role="img" aria-label={aria} aria-hidden={href ? true : undefined}>
       {/* Track layer: plain track, Strain Target band and tick, or the stress gauge arc. */}
       <ChartContainer config={{}} className={CHART_RESET} initialDimension={{ width: s.d, height: s.d }}>
         <PieChart margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
@@ -165,19 +173,9 @@ export function ScoreDial(props: ScoreDialProps) {
                 {...pieBase}
                 data={(target ? targetSlices(target[0], target[1]) : [1]).map((v, i) => ({ v, fill: i === 1 ? "var(--dial-target)" : TRACK }))}
                 {...ARC}
-                innerRadius={radii.inner}
-                outerRadius={radii.outer}
+                innerRadius={track.inner}
+                outerRadius={track.outer}
               />
-              {target && (
-                <Pie
-                  {...pieBase}
-                  data={markerSlices((target[0] + target[1]) / 2, 21, 0.2).map((v, i) => ({ v, fill: i === 1 ? "var(--foreground)" : "transparent" }))}
-                  {...ARC}
-                  // Stays inside the ring, like WHOOP's target tick; the stress gauge marker keeps its overhang.
-                  innerRadius={radii.inner}
-                  outerRadius={radii.outer}
-                />
-              )}
             </>
           )}
         </PieChart>
@@ -191,11 +189,28 @@ export function ScoreDial(props: ScoreDialProps) {
             {...ARC}
             innerRadius={radii.inner}
             outerRadius={radii.outer}
+            // Recharts' default 10% category gap insets the arc ~1.3 px from each ring edge, which left a dark track fringe.
+            barCategoryGap={0}
             margin={{ top: 0, right: 0, bottom: 0, left: 0 }}
           >
             <PolarAngleAxis type="number" domain={[0, r.max]} tick={false} axisLine={false} />
             <RadialBar dataKey="value" fill={r.color} cornerRadius={0} background={false} {...anim} />
           </RadialBarChart>
+        </ChartContainer>
+      )}
+
+      {/* Strain Target tick: one white tick across the ring, above the fill (WHOOP, [latest-strain-1]). */}
+      {target && (
+        <ChartContainer config={{}} className={CHART_RESET} initialDimension={{ width: s.d, height: s.d }}>
+          <PieChart margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
+            <Pie
+              {...pieBase}
+              data={markerSlices((target[0] + target[1]) / 2, 21, 0.2).map((v, i) => ({ v, fill: i === 1 ? "var(--foreground)" : "transparent" }))}
+              {...ARC}
+              innerRadius={radii.inner}
+              outerRadius={radii.outer}
+            />
+          </PieChart>
         </ChartContainer>
       )}
 
@@ -210,13 +225,16 @@ export function ScoreDial(props: ScoreDialProps) {
         ) : lg && empty && reason?.code !== "no_data" ? (
           <ReasonCentre icon={reason!.icon} text={reason!.short} />
         ) : (
-          <span className={cn("font-numeric font-bold tabular-nums", s.value, empty && "text-muted-foreground")}>
+          <span
+            data-dial-part="value"
+            className={cn("font-numeric font-bold tabular-nums", s.value, empty && "text-muted-foreground", compact && gauge && r.word?.className)}
+          >
             {r.text}
             {r.unit && !empty && <span className="text-[0.55em]">{r.unit}</span>}
           </span>
         )}
-        {gauge && r.word && <span className={cn(DIAL_LABEL, "mt-1", r.word.className)}>{r.word.text}</span>}
-        {gauge && props.caption && <span className="mt-1 text-xs leading-4 font-medium text-foreground-secondary">{props.caption}</span>}
+        {gauge && !compact && r.word && <span className={cn(DIAL_LABEL, "mt-1", r.word.className)}>{r.word.text}</span>}
+        {gauge && !compact && props.caption && <span className="mt-1 text-xs leading-4 font-medium text-foreground-secondary">{props.caption}</span>}
         {lg && !gauge && (
           <>
             <span className={cn(DIAL_LABEL, "mt-2 max-w-36 text-balance")}>{r.label}</span>
@@ -234,13 +252,25 @@ export function ScoreDial(props: ScoreDialProps) {
     </div>
   )
 
+  if (compact)
+    return (
+      <div aria-hidden inert className="flex">
+        {ring}
+      </div>
+    )
+
+  // data-dial-part marks what Home's header morph moves (HomeHeader): the label row, its text, and the extras that fade.
   const below = !lg && (
-    <span className="flex flex-col items-center gap-1.5">
-      <span className={cn(size === "sm" ? "text-xs leading-4 font-medium text-foreground-secondary" : DIAL_LABEL, "inline-flex items-center gap-0.5")}>
-        {r.label}
-        {href && <ChevronRight aria-hidden className="size-3" strokeWidth={2.5} />}
+    <span data-dial-part="below" className="flex flex-col items-center gap-1.5">
+      <span className={cn(size === "sm" ? "text-xs leading-4 font-medium text-foreground-secondary" : DIAL_LABEL, "inline-flex items-center gap-0.5 text-center")}>
+        <span data-dial-part="label">{r.label}</span>
+        {href && <ChevronRight data-dial-part="extra" aria-hidden className="size-3" strokeWidth={2.5} />}
       </span>
-      {!loading && tagNode}
+      {!loading && (
+        <span data-dial-part="extra" className="empty:hidden">
+          {tagNode}
+        </span>
+      )}
     </span>
   )
 
@@ -260,6 +290,7 @@ export function ScoreDial(props: ScoreDialProps) {
     return (
       <Link
         href={href}
+        data-dial={variant}
         aria-label={`${aria}. Open ${r.label} details`}
         className="flex min-w-24 flex-col items-center gap-2 rounded-xl p-1 transition-[scale,color] duration-150 ease-standard outline-none hover:text-foreground-secondary focus-visible:ring-3 focus-visible:ring-ring/50 active:scale-[0.96]"
       >
@@ -267,7 +298,7 @@ export function ScoreDial(props: ScoreDialProps) {
       </Link>
     )
   // A loading md dial keeps the Home link's 4 px padding, so the swap to the linked dial moves nothing.
-  return <div className={cn("flex flex-col items-center", lg ? "gap-3" : "gap-2", loading && size === "md" && "min-w-24 p-1")}>{content}</div>
+  return <div data-dial={variant} className={cn("flex flex-col items-center", lg ? "gap-3" : "gap-2", loading && size === "md" && "min-w-24 p-1")}>{content}</div>
 }
 
 function ReasonCentre({ icon: Icon, text }: { icon: ReturnType<typeof reasonCopy>["icon"]; text: string }) {
