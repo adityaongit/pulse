@@ -7,7 +7,7 @@ import { CircleUserRound, Flame } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { BAND_WORD, recoveryBand } from "@/lib/bands"
 import { formatValue } from "@/lib/format"
-import { HEADER_SENTINEL, HIDE_AFTER_PX, nextHeaderState, type HeaderState } from "@/lib/header-state"
+import { HEADER_SENTINEL, nextHeaderState, type HeaderState } from "@/lib/header-state"
 import { MiniRing, type MiniRingVariant } from "@/components/metrics/MiniRing"
 import { DateSwitcher } from "./DateSwitcher"
 import { useShellStatus } from "./ShellStatus"
@@ -54,9 +54,9 @@ function Streak() {
 }
 
 /**
- * Home's collapsing header (spec §4.3): `top` at rest; `rings` once the dials pass under it (mini
- * Sleep / Recovery / Strain rings fade and rise in); `rings-only` deep in the page while scrolling
- * down. One observer and one passive rAF-throttled scroll listener write `data-state`; CSS animates.
+ * Home's collapsing header (spec §4.3): `top` at rest; `rings` once the dials pass under it, when the
+ * mini Sleep / Recovery / Strain rings fade and rise in under the top row, which always stays. One
+ * IntersectionObserver writes `data-state`; CSS animates.
  */
 export function HomeHeader({ rings }: { rings?: HeaderRings }) {
   const panel = React.useRef<HTMLDivElement>(null)
@@ -70,47 +70,19 @@ export function HomeHeader({ rings }: { rings?: HeaderRings }) {
     const sentinel = document.querySelector(`[${HEADER_SENTINEL}]`)
     if (!el || !top || !sentinel) return
     let state: HeaderState = "top"
-    let dialsVisible = true
-    let lastY = window.scrollY
-    let anchor = lastY
-    let dir = 0
-    let frame = 0
 
-    const update = () => {
-      frame = 0
-      const y = window.scrollY
-      const d = Math.sign(y - lastY)
-      if (d && d !== dir) {
-        dir = d
-        anchor = lastY
-      }
-      lastY = y
-      const hideAfter = sentinel.getBoundingClientRect().top + y + HIDE_AFTER_PX
-      let next = nextHeaderState({ prev: state, dialsVisible, y, dy: y - anchor, hideAfter })
-      // Never hide a focused control.
-      if (next === "rings-only" && top.contains(document.activeElement)) next = "rings"
-      if (next === state) return
-      state = next
-      el.dataset.state = next
-      if (next !== "top") setRevealed(true)
-    }
-    const schedule = () => {
-      if (!frame) frame = requestAnimationFrame(update)
-    }
     const io = new IntersectionObserver(
       ([e]) => {
-        dialsVisible = e.boundingClientRect.top > (e.rootBounds?.top ?? 0)
-        schedule()
+        const next = nextHeaderState({ dialsVisible: e.boundingClientRect.top > (e.rootBounds?.top ?? 0) })
+        if (next === state) return
+        state = next
+        el.dataset.state = next
+        if (next !== "top") setRevealed(true)
       },
       { rootMargin: `-${Math.round(top.getBoundingClientRect().bottom)}px 0px 0px 0px` }
     )
     io.observe(sentinel)
-    window.addEventListener("scroll", schedule, { passive: true })
-    return () => {
-      io.disconnect()
-      window.removeEventListener("scroll", schedule)
-      cancelAnimationFrame(frame)
-    }
+    return () => io.disconnect()
   }, [])
 
   return (
@@ -125,10 +97,10 @@ export function HomeHeader({ rings }: { rings?: HeaderRings }) {
         <div
           className={cn(
             ROW_MOTION,
-            "grid-rows-[1fr] group-data-[state=rings-only]/hdr:-translate-y-full group-data-[state=rings-only]/hdr:grid-rows-[0fr] group-data-[state=rings-only]/hdr:opacity-0"
+            "grid-rows-[1fr]"
           )}
         >
-          <div ref={topRow} className="min-h-0 overflow-hidden transition-[visibility] duration-220 group-data-[state=rings-only]/hdr:invisible">
+          <div ref={topRow} className="min-h-0 overflow-hidden">
             <div className="grid h-11 grid-cols-[1fr_auto_1fr] items-center gap-2 px-4 md:h-13 md:px-6 xl:px-8">
               <div className="flex min-w-0 items-center">
                 <Link
