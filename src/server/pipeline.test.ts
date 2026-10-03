@@ -1,6 +1,6 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { type Db, openDb } from "./db";
-import { lastRun, needsRecompute, recompute, type RecoveryRow, SCORING_VERSION, type SleepRow, type StrainTargetRow } from "./pipeline";
+import { type JournalImpactRow, lastRun, needsRecompute, recompute, type RecoveryRow, SCORING_VERSION, type SleepRow, type StrainTargetRow } from "./pipeline";
 import { seedPull } from "./sources/seed/generate";
 import { localMidnight } from "./time";
 import { cleanup, copyDb, DAY_S, dayAt, dump, NOW, OPTS, seeded, TZ, PROFILE, tempFile } from "./testing";
@@ -92,6 +92,24 @@ describe("needsRecompute", () => {
 
   it("is false on an empty database", () => {
     expect(needsRecompute(openDb(tempFile()))).toBe(false);
+  });
+
+  it("a check-in's dirty mark refreshes journal impact, causally and deterministically", () => {
+    const logged = copyDb(db);
+    // What saveJournalEntry writes: the entry, and the day marked dirty.
+    logged.$client.prepare("insert into journal_entries (day, tag, value) values (?, 'cold_plunge', 1)").run(dayAt(170));
+    logged.$client.prepare("insert into intraday_dirty (day) values (?)").run(dayAt(170));
+    expect(needsRecompute(logged)).toBe(true);
+    recompute(logged, OPTS);
+    expect(lastRun.stage1Days).toEqual([dayAt(170)]);
+    expect(needsRecompute(logged)).toBe(false);
+    const tags = (day: string) => json<JournalImpactRow>(logged, "journal_impact", day).impacts.map((i) => i.tag);
+    expect(tags(dayAt(179))).toContain("cold_plunge");
+    expect(tags(dayAt(170))).not.toContain("cold_plunge"); // a day's impact reads only earlier check-ins
+    expect(rowsBefore(logged, dayAt(171))).toBe(rowsBefore(db, dayAt(171)));
+    const after = dump(logged, "daily_scores");
+    recompute(logged, OPTS);
+    expect(dump(logged, "daily_scores")).toBe(after);
   });
 });
 
