@@ -74,7 +74,7 @@ Built from the data tokens in `src/app/globals.css`. Every colour was checked fo
 | 4d | Green beat | white, recovery green |
 | 4e | Optimal | white, optimal teal |
 | 4f | Recovery band | one vertical gradient through both beats: red at the base, yellow, green at the top |
-| **4g** | **Cool pair** | **optimal teal, strain blue. Applied.** |
+| **4g** | **Cool pair** | **optimal teal, strain blue. Final, chosen by the user.** |
 
 ### Why W6
 
@@ -82,6 +82,10 @@ Built from the data tokens in `src/app/globals.css`. Every colour was checked fo
 - **It keeps letter integrity.** In W6, every letter keeps the strokes that identify it: the L keeps its corner and the S keeps both bowls. The beat lives in space that is already open (the gap between L and S). That is why it survives at 14 px where W1 to W3 failed.
 - **It is ownable.** The dip below the baseline is the one tension point in an otherwise calm, wide word. It is what makes the line read as an ECG and not just a peak. It is ours and not WHOOP's (WHOOP's device is stencil breaks).
 - **It suits the dark UI.** Monoline white strokes on #0f1113, with no fills, gradients or accent colour. Like WHOOP, the wordmark stays monochrome and the metrics carry the colour.
+
+### Final mark: 4g
+
+The user's final choice is 4g, Cool pair. It is live in every icon file and is the `color="brand"` default of `Mark.tsx`. `/dev/brand/marks` stays as the record of the options.
 
 ### Why mark 4g
 

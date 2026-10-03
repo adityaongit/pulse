@@ -134,7 +134,7 @@ const VARIANTS: Concept[] = [
   },
   {
     id: "4g",
-    name: "Cool pair",
+    name: "Cool pair (final)",
     why: "Optimal teal, then strain blue: still the two scores, in two neighbouring cool hues that sit together calmly.",
     art: beats(C.optimal, C.strainText),
   },
@@ -212,6 +212,7 @@ function Gallery({ items }: { items: Concept[] }) {
             </div>
             <h3 className="mt-4 text-[15px] leading-5 font-semibold">
               <span className="font-numeric tabular-nums">{c.id}.</span> {c.name}
+              {c.id === "4g" && <span className="ml-2 rounded-full bg-secondary px-2 py-0.5 text-xs leading-4 font-semibold">Chosen</span>}
             </h3>
             <p className="mt-0.5 max-w-[65ch] text-sm leading-5 text-foreground-secondary">{c.why}</p>
             <details className="mt-3">
@@ -234,8 +235,8 @@ export default function MarksPage() {
     <main className="mx-auto w-full max-w-6xl px-4 py-10 text-foreground md:px-8">
       <h1 className="text-2xl leading-8 font-bold">Mark concepts</h1>
       <p className="mt-1 max-w-[65ch] text-sm leading-5 text-foreground-secondary">
-        Option 4 is chosen. 4g is applied to the favicon, the touch icon, the maskable PNGs and Mark.tsx; name another
-        variant to switch. The dashed circle on the masked version is the 80% safe zone.
+        Final: 4g, Cool pair. It is live in the favicon, the touch icon, the maskable PNGs and Mark.tsx. The rest stay here
+        for reference. The dashed circle on the masked version is the 80% safe zone.
       </p>
 
       <section className="mt-10">
