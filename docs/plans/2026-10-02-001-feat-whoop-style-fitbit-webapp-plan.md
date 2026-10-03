@@ -1,7 +1,7 @@
 ---
 title: "feat: Pulse, a WHOOP-style personal health app for Fitbit Air"
 type: feat
-status: completed
+status: active
 date: 2026-10-02
 ---
 
@@ -1145,6 +1145,21 @@ Added 2026-10-02 at the user's request. The first build copied an older, basic W
 - Test expectation for the glass look itself: none. It is reviewed in U16's side-by-side.
 
 **Verification:** Every screen at 390, 820 and 1440 px matches the current WHOOP references in structure, materials and motion, and U14's sweep passes.
+
+### U19. Profile in the database, with onboarding and Settings
+
+Added 2026-10-03. The user rejected the profile coming from `.env` (KTD11). It made editing awkward, and it doesn't work for an open-source app.
+
+**Goal:** Birth date, sex, height, weight and an optional max HR live in a `profile` table. On first run, an onboarding screen asks for birth date and sex. Settings › Profile edits them. Height and weight fill from the Google Health API when it has them. `.env` is only an optional default.
+
+**Approach:**
+- Add a migration for `profile`. Config falls back to it, and `.env` becomes the seed or default only.
+- Onboarding route gate: if the profile is incomplete, the app routes to `/onboarding`. Demo mode pre-fills it.
+- Saving the profile marks every day for recompute, because zones, strain, Pulse Age and fitness level depend on age and sex.
+- Map the latest `height` and `weight` from Google into the profile when present.
+- Tests: profile CRUD and validation, the onboarding gate, recompute on save, and an e2e onboarding journey.
+
+**Supersedes:** KTD11 (profile from env).
 
 ### U18. Large-screen UX audit and fixes (tablet and laptop)
 
