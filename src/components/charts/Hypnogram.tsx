@@ -9,7 +9,7 @@ import { ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import { Skeleton } from "@/components/ui/skeleton"
 import { EmptyState } from "@/components/shells/EmptyState"
 import { MetricState } from "@/components/shells/MetricState"
-import { useOptionalShellStatus } from "@/components/shells/ShellStatus"
+import { useOptionalShellCalendar } from "@/components/shells/ShellStatus"
 import { ReasonPlaceholder } from "@/components/metrics/ReasonPlaceholder"
 import { AXIS, ChartFigure, LINE_CURSOR, TOOLTIP_CLASS, TooltipLine, useSeriesAnimation } from "./ChartFrame"
 
@@ -23,7 +23,7 @@ const STAGE_NAME: Record<Stage, string> = { awake: "Awake", rem: "REM", light: "
 const LANE_NAME = ["Deep", "Light", "REM", "Awake"]
 
 function Chart({ night }: { night: HypnogramNight }) {
-  const tz = useOptionalShellStatus()?.timeZone
+  const tz = useOptionalShellCalendar()?.timeZone
   const anim = useSeriesAnimation()
   const { connector, stages } = hypnogramSeries(night.segments)
   const total = night.segments.reduce((a, s) => a + (s.end - s.start), 0)

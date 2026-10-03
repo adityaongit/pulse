@@ -23,10 +23,29 @@ export type ShellStatus = {
 
 const Ctx = React.createContext<ShellStatus | null>(null)
 
+/** The calendar facts most components need: they change once a day, not on every sync. */
+export type ShellCalendar = Pick<ShellStatus, "today" | "firstDay" | "timeZone">
+const CalendarCtx = React.createContext<ShellCalendar | null>(null)
+
+/**
+ * Two contexts, so a sync or a `router.refresh()` re-renders only what shows sync state (headers, banner, nav
+ * status), not every chart and date control. The server sends a new status object on each refresh, so both values
+ * are rebuilt only when their fields actually change: a refresh with nothing new re-renders no consumer.
+ */
 export function ShellStatusProvider({ value, children }: { value: ShellStatus; children: React.ReactNode }) {
-  return <Ctx.Provider value={value}>{children}</Ctx.Provider>
+  const { today, firstDay, timeZone } = value
+  const calendar = React.useMemo(() => ({ today, firstDay, timeZone }), [today, firstDay, timeZone])
+  const key = JSON.stringify(value)
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- keyed on content: a new object with the same fields is the same status
+  const status = React.useMemo(() => value, [key])
+  return (
+    <CalendarCtx.Provider value={calendar}>
+      <Ctx.Provider value={status}>{children}</Ctx.Provider>
+    </CalendarCtx.Provider>
+  )
 }
 
+/** The full status: sync state, connection, import progress, streak, avatar. For the chrome that shows them. */
 export function useShellStatus() {
   const v = React.useContext(Ctx)
   if (!v) throw new Error("useShellStatus must be used inside AppShell")
@@ -35,3 +54,13 @@ export function useShellStatus() {
 
 /** Like useShellStatus, for kit components that also render outside a shell (tests, gallery). */
 export const useOptionalShellStatus = () => React.useContext(Ctx)
+
+/** Today, the first stored day and the time zone. Prefer this over useShellStatus when that is all you read. */
+export function useShellCalendar() {
+  const v = React.useContext(CalendarCtx)
+  if (!v) throw new Error("useShellCalendar must be used inside AppShell")
+  return v
+}
+
+/** Like useShellCalendar, for kit components that also render outside a shell (tests, gallery). */
+export const useOptionalShellCalendar = () => React.useContext(CalendarCtx)

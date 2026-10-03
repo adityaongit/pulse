@@ -9,7 +9,7 @@ import { dayLabel, rangeLabel } from "@/lib/format"
 import { dayHref, parseDay, stepDay, weekOf } from "@/lib/url"
 import { Dialog, DialogTrigger } from "@/components/ui/dialog"
 import { CalendarPanel } from "./CalendarPanel"
-import { useShellStatus } from "./ShellStatus"
+import { useShellCalendar } from "./ShellStatus"
 
 export type DateSwitcherProps = {
   mode: "day" | "week"
@@ -52,7 +52,7 @@ const NARROW_STEP = "max-[400px]:size-6"
 const NARROW_LABEL = "max-[400px]:min-w-0 max-[400px]:px-2.5"
 
 function Switcher({ mode, calendar, placement = "body", narrow = false }: DateSwitcherProps) {
-  const { today, firstDay } = useShellStatus()
+  const { today, firstDay } = useShellCalendar()
   const router = useRouter()
   const pathname = usePathname()
   const params = useSearchParams()
