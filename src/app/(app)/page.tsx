@@ -45,7 +45,6 @@ const CARD_BUTTON =
 /** The 56 px gradient banner rows: day outlook / review and week in review (spec §7.1 7a, 10). */
 const BANNER =
   "flex h-14 w-full items-center gap-3 rounded-2xl px-4 text-left shadow-card transition-[filter,scale] duration-150 ease-standard outline-none hover:brightness-110 focus-visible:ring-3 focus-visible:ring-ring/50 active:scale-[0.96]"
-const INSIGHT_ACTION = { strain: "View Strain", recovery: "View Recovery", sleep: "View Sleep" } as const
 const ADD_ACTIVITY_INFO = {
   title: "Add an activity",
   body: (
@@ -104,7 +103,6 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
                     value={dials.strain.value}
                     reason={dials.strain.reason}
                     target={dials.strainTarget}
-                    extraTags={dials.soFar && dials.strain.value !== null ? ["so_far"] : undefined}
                     href={at("/strain")}
                   />
                 </div>
@@ -119,7 +117,7 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
               </div>
               {vm.insights.length > 0 && (
                 <div className="xl:col-span-2 xl:row-start-2">
-                  <HomeInsight items={vm.insights.map((i) => ({ ...i, href: at(i.href), action: INSIGHT_ACTION[i.key] }))} />
+                  <HomeInsight items={vm.insights} />
                 </div>
               )}
               {vm.monitorAlert && (

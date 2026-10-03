@@ -1,15 +1,15 @@
 "use client"
 
 import * as React from "react"
-import Link from "next/link"
-import { ArrowRight, Check } from "lucide-react"
+import { Check } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { CARD_MATERIAL } from "@/components/ui/card"
 
-export type HomeInsightItem = { key: string; title: string; body: string; href: string; action: string }
+export type HomeInsightItem = { key: string; title: string; body: string }
 
 /**
- * Home's coach card [latest-home-top-1], [latest-home-top-3]: an opaque card with a title, body and link,
+ * Home's coach card [latest-home-top-1], [latest-home-top-3]: an opaque card with a title and body (no link: WHOOP,
+ * Bevel and Baro keep the coach card text-only; U16 decision 2026-10-03),
  * and WHOOP's check-over-count pill at the right. With several cards a second card peeks out underneath
  * and the pill cycles through them (WHOOP swipes; tap to cycle is inferred, spec §12 I13). Every card sits
  * in the same grid cell, so the box keeps the tallest card's height and nothing below moves on a cycle.
@@ -39,13 +39,6 @@ export function HomeInsight({ items }: { items: HomeInsightItem[] }) {
             >
               <p className="text-base leading-[22px] font-medium text-balance">{it.title}</p>
               <p className="max-w-[65ch] text-[15px] leading-5 text-pretty text-foreground/85">{it.body}</p>
-              <Link
-                href={it.href}
-                className="relative mt-3! inline-flex items-center gap-1.5 rounded-md text-xs leading-4 font-bold tracking-[0.08em] text-coach uppercase underline-offset-4 outline-none after:absolute after:-inset-x-1 after:-inset-y-3.5 hover:underline focus-visible:ring-3 focus-visible:ring-ring/50"
-              >
-                {it.action}
-                <ArrowRight aria-hidden className="size-3.5" strokeWidth={2} />
-              </Link>
             </div>
           ))}
         </div>
