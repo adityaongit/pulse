@@ -197,7 +197,7 @@ export function getHealthspan(day: string, ctx: QueryCtx = defaultCtx()): Health
           ? "From runs"
           : "Estimated: counts half"
         : key === "leanMass" && !c
-          ? "No lean body mass: add weight and body fat in Fitbit. Left out of WHOOP Age."
+          ? "No lean body mass: add weight and body fat in Fitbit. Left out of Pulse Age."
           : undefined;
     const domain: [number, number] = key === "leanMass" && c ? [target * 0.75, target * 1.25] : meta.domain;
     return {
