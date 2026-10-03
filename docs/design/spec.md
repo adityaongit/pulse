@@ -2496,6 +2496,8 @@ Laptop, 1440:
 
 ### 7.14 More `/more` and Settings `/settings`
 
+**U21 (2026-10-03) supersedes the More and Settings tables below; see §11 H1-H12.** More is the hub for everything that isn't configuration. Phone, top to bottom: an account row (below 768 px only: avatar, email or "Demo", "Account, data source, profile", → `/settings`), then row groups "Reports" (Weekly report, Monthly report, All reports → `/reports`), "Trends" (→ `/trends`), "Journal" (Behaviours, caption "{shown} of {total} shown" → `/more/behaviours`), "Help" (How Pulse works → `/more/how-it-works`), "Your data" (Export and backup → `/more/data`), then the About card (moved from Settings: the user's copy "Scoring is ported from noop. Pulse is for personal use and is not a medical device.", Version, Scoring version, buttons "Source code" and "Report a bug" to the GitHub repo and its issues). From 1280 px the groups pair up in two columns (`LIST_GRID`). Settings keeps Account, Data source and Profile only.
+
 **More.** Shell: `PageShell title="More" layout="stack"`. Derived (WHOOP's More tab is a plain list).
 
 **v2 deltas** [latest-more-1], [latest-settings-1]: More uses `TitleHeader` "MORE"; its rows become WHOOP's settings rows: one card-material row per item, 56 px, icon 22 left, label in the card-title role (caps), `ChevronRight`; groups under caps section labels ("REPORTS", "APP"). Settings opens with an `X` at the left of its header instead of a back chevron (WHOOP presents Settings as a modal screen [latest-settings-1]); it is still the `/settings` route. Shop, referral and gift sections are not adopted.
@@ -2593,6 +2595,26 @@ Laptop, 1440 (Settings: two columns; More: the same lists at max 720 px, left-al
 - **Baseline stale tag:** "Your baseline has 14 nights or more missing. Scores firm up as new nights arrive."
 - **Updated tag:** "Updated after a late sync added data."
 - **Demo chip (tooltip):** "You're looking at generated demo data."
+
+### 7.16 Reports archive `/reports` (U21)
+
+Shell: `DetailShell title="Reports"` (parent More). Two `LinkList` groups, "Weeks" and "Months", newest first: label "SEP 21 - SEP 27" / "SEPTEMBER 2026", caption "Partial week" / "Partial month" under it when the period is partial, the period's average Recovery as the 22 px `MiniRing` plus its value at the right, chevron. Side by side from 1280 px. Empty: "No reports yet. Your first weekly report appears once a week has data."
+
+### 7.17 Trends `/trends?metric=&r=` (U21)
+
+Shell: `DetailShell title="Trends"`. A metric picker of pill links (one row that scrolls edge to edge on phone, wrapping from 768 px; the current one white): Recovery, Strain, Sleep performance, Hours of sleep, Sleep consistency, Heart rate variability, Resting heart rate, Respiratory rate, Stress, Steps. Then a card titled with the metric (action "Details" → its screen) holding `TrendChart` with ranges W, M, 6M, 1Y (`?r=1y`, a line like 6M; with four ranges the toggle spans the card above the average), and an "Averages" card: KeyStatRow rows "Last 7 days", "Last 30 days", "Last 6 months", "Last 12 months", each with caption "vs. the 7 days before" etc., the prior average under the value and a toned arrow. From 1280 px the chart takes 2fr and Averages 1fr. Strain, Steps and Stress leave today as a gap (they accrue through the day). States: no values in the year → `no_data`; Recovery still calibrating → `calibrating` with nights left (MetricState).
+
+### 7.18 Behaviours `/more/behaviours` (U21)
+
+Shell: `DetailShell title="Behaviours"`, one 640 px column. Intro: "Choose what the check-in asks. A hidden behaviour leaves the check-in, but its past answers stay and still count in your insights." One card per check-in group (Evening, Recovery, Context, Your behaviours). Row: icon, name with "{n} days logged" / "Not logged yet" / "Hidden" under it, move up and move down (44 px ghost icon buttons, disabled at the group's ends, absent in a one-item group), and a Switch "Show {name} in the check-in". Your behaviours ends with the "Add a behaviour" field (32 characters). Changes apply in place and roll back with the toast "Couldn't save. Try again." on failure.
+
+### 7.19 Your data `/more/data` (U21)
+
+Shell: `DetailShell title="Your data"`, one 640 px column. Cards: "Daily scores" (aside "{n} days"; what the file holds; buttons CSV and JSON → `/export/daily?format=`), "Journal" (aside "{n} answers"; buttons → `/export/journal?format=`), "Backup" (what is stripped; "Download backup" → `/export/backup` for the owner; for a demo session the button is disabled with "Backups are for the owner's Google account. Demo data is generated, so there is nothing to keep."). Footer caption: "No export includes your Google access tokens."
+
+### 7.20 How Pulse works `/more/how-it-works` and `/more/how-it-works/[score]` (U21)
+
+Index: `DetailShell title="How Pulse works"`, an intro line and one `LinkList` row per score (name and its one-line summary), two-up from 1280 px. A score: `DetailShell` titled with the score, subtitle "How it works"; the summary at 17 px with "Open {score}" beside it (under it on phone); the four section cards "What goes in", "How it is weighted", "What the bands mean", "Limits" in DetailShell's secondary grid (two columns from 1280 px); short details sit beside their term ("HRV 55%"), sentences go under it. Footer: "Not a medical device. Pulse's scores are estimates from a wrist sensor, for personal use, not a diagnosis." and Previous / Next links. Copy lives in `content.ts`, written from the code; when a constant changes, the copy changes with it.
 
 ---
 
@@ -2825,6 +2847,23 @@ Rows overridden by v2: **D2** (TopBar part only, V3), **B1** (V10), **CAL6** (of
 | SYM10 | §7.12 laptop (U18 JI-01): the sticky hero column holds the intro and toggle; Keep logging to unlock sits alone in a half row under the list | From 1280 px Keep logging to unlock sits in the sticky hero column under the toggle; on phone and tablet it stays after the list (two renders, one hidden per width, so the phone order is unchanged). The title follows the outcome ("HRV impact analysis") | A 500 px empty column under the hero and an orphaned half row. The remaining 178 px is closed by the sticky column, which pins until its bottom meets the list's |
 | SYM11 | §6 copy; guidelines review | Health Monitor reads "N/5 within range" with "Out of range" as the status on Home and on /health/monitor (the illness alert names the signal); Home's monitor caption wraps rather than truncating. From the guidelines review: no `transition-all` left, the behaviour input is 16 px (no iOS zoom), Home's monitor cards are `h2` | Coordinator request (copy mismatch on the illness day, a 1 px truncation at 320 px); docs/design/guidelines-review.md |
 
+
+**More hub rows (H).** Decisions from U21 (2026-10-03). They override §7.14 and the rows they name.
+
+| # | Spec says | Build does | Why |
+|---|---|---|---|
+| H1 | §7.14: More lists Reports and App (Settings, Data source); Settings has Account, Data source, Profile, About | More holds Reports, Trends, Journal behaviours, How Pulse works, Your data and About; Settings is configuration only (Account, Data source, Profile) | More was a near-copy of Settings; one destination per job |
+| H2 | §4.2: the laptop sidebar has Reports and Settings under the hairline | Settings only; Reports and Trends live in More, and `/reports`, `/trends` count as the More tab (`tabForPath`) | No destination listed twice in the same view |
+| H3 | §4.3: Home's avatar opens More | It opens Settings (`aria-label` "Settings") | The avatar is the account; More is a tab |
+| H4 | n/a | Phones (below 768 px) get an account row at the top of More to Settings; from 768 px the rail and sidebar carry Settings | No sidebar on phones |
+| H5 | n/a | Row groups are a shell, `LinkList` (WHOOP's 56 px card rows, caps group label), shared by More, the archive and How Pulse works; `LIST_GRID` pairs groups from 1280 px | One row style; laptops use the width |
+| H6 | §5.5: TrendChart ranges W, M, 6M | `ranges` prop; Trends adds 1Y (365 days, line + dots like 6M). With four ranges the toggle takes its own full-width row above the average | At 361 px a 4-item toggle beside the average wrapped the change chip onto two lines |
+| H7 | §5.5: range deltas computed from the chart's points | Trends computes each range's average and the one before it on the server over two years (`getTrends`); ranges with no prior data show no arrow | The 6M and 1Y comparisons need more history than the chart draws |
+| H8 | n/a | Trends' metric picker is a row of pill links (`?metric=` kept in the URL, `?r=` carried) rather than a row per metric in More | One entry in More; switching metrics keeps the range |
+| H9 | n/a | Behaviours: hide and reorder inside a group (up and down buttons, no drag); groups stay fixed | Cheap, accessible, and the check-in's grouping is part of its design |
+| H10 | n/a | Exports are extension-less route handlers (`/export/daily`, `/export/journal`, `/export/backup`) that check the session themselves; the backup is owner-only and strips `oauth_tokens` and `instance` | The proxy gates only paths without an extension; secrets never leave the server |
+| H11 | §7.14 About copy credits noop and Hælan with licences | About uses the user's own copy ("Scoring is ported from noop. Pulse is for personal use and is not a medical device."), version, scoring version, Source code and Report a bug; the licence and full credits stay in LICENSE, NOTICE and the README | User decision 2026-10-03 |
+| H12 | n/a | Every new route has a `loading.tsx` built from the same shells and row boxes (checked side by side at 361 and 1440 px) | Spec §5.19, no layout jump |
 
 **Fidelity audit rows (F).** Corrections from the U16 side-by-side audit at 390 px (2026-10-03, `docs/design/audit.md`), each measured on the dated captures it cites. They override the text they name.
 

@@ -1196,6 +1196,49 @@ Added 2026-10-03. Product decision: Pulse is self-hosted with one user per insta
 - MongoDB adds a server and makes range and aggregate queries harder, with no gain.
 - Postgres only becomes necessary for a hosted, multi-user deployment, which is out of scope.
 
+### U21. More hub
+
+**Status 2026-10-03: built.** Spec: §7.14 (More, Settings) and §7.16-§7.20 (the new screens); decisions in §11 rows H1-H12.
+
+Added 2026-10-03. More was a near-copy of Settings. It becomes the hub for everything that isn't configuration, and Settings keeps only Account, Data source and Profile.
+
+**Goal:** One place for reports, long-range trends, the check-in list, data export, how each score works, and About.
+
+**Built:**
+- Reports archive `/reports`: every week and month with data, newest first, each with its average Recovery. Query `getReportArchive` (`src/server/queries/reports.ts`).
+- Trends `/trends?metric=&r=`: ten daily metrics (Recovery, Strain, Sleep performance, hours, consistency, HRV, resting HR, respiratory rate, stress, steps) over W, M, 6M or 1Y, with each range's average against the range before. Query `getTrends` (`src/server/queries/trends.ts`); `TrendChart` gains a `ranges` prop and a 1Y line.
+- Behaviours `/more/behaviours`: show or hide each behaviour on the check-in sheet, reorder inside its group, add a custom one. Migration 0003 adds `journal_tags.hidden` and `position`. Hidden answers stay and still count in insights (the pipeline reads `journal_entries` directly).
+- Your data `/more/data`: daily scores and journal answers as CSV or JSON (`/export/daily`, `/export/journal`), and an owner-only SQLite backup (`/export/backup`).
+- How Pulse works `/more/how-it-works` and `/more/how-it-works/[score]`: sixteen explainers written from `src/core`, `src/server/pipeline.ts` and `docs/algorithms/` (`content.ts`).
+- About moved from Settings to More, with the repo and issues links. Phones get an account row at the top of More (to Settings); the sidebar drops Reports; Home's avatar opens Settings.
+
+**Export security:**
+
+```mermaid
+flowchart LR
+  R[GET /export/x] --> P{proxy: session cookie?}
+  P -->|no| L[302 /login]
+  P -->|yes| H{handler: requestSession}
+  H -->|no| U[401]
+  H -->|daily or journal| F[CSV or JSON attachment]
+  H -->|backup, demo| D[403]
+  H -->|backup, owner| B[online backup to a temp file]
+  B --> S[delete oauth_tokens and instance, secure_delete, vacuum]
+  S --> A[attachment, temp dir removed]
+```
+
+- Extension-less paths, so `src/proxy.ts` gates them, and every handler checks the session again.
+- No export reads `oauth_tokens` or `instance`. The backup copy deletes both and vacuums, so no free page still holds the session secret or the Google grant. A restored backup asks for sign-in and Google again.
+- CSV cells that start with `=`, `+`, `-` or `@` get a leading apostrophe (a custom behaviour's label is user input).
+
+**Follow-ups found while writing the explainers** (the explainers follow the code; these are not fixed here):
+- The Sleep info sheet (`SLEEP_INFO`) says the need includes yesterday's strain, debt and naps; Sleep Performance uses only the baseline need. Strain, debt and naps feed the Sleep Planner.
+- `docs/algorithms/sleep-regularity.md` describes midnight days and "any HR" coverage; the pipeline uses noon-to-noon periods and needs 720 minutes with HR.
+- At ACWR exactly 1.30 and 1.50, Fitness (`acwrTone`) and Reports (`acwrSignal`) use different words.
+- Fitness says "Training load needs 28 days of strain"; ACWR shows after 14.
+
+**Tests:** `src/server/queries/more.test.ts` (Trends, archive, Behaviours, More, Your data on a seeded temp DB), `src/server/actions/journal.test.ts` (hide, reorder, signed-out refusal), `src/app/export/export.test.ts` (formats, 401 and 403, no tokens or secret in any file or the backup bytes), `Behaviours.test.tsx`. E2E: the new routes are in the sweep; journey 9 opens More, switches a Trends metric and range, adds a custom behaviour and finds it in the check-in sheet, and downloads the CSV.
+
 ### U18. Large-screen UX audit and fixes (tablet and laptop)
 
 Added 2026-10-03 at the user's request: the web UI on bigger screens has broken UX, gaps and unlinked elements.
