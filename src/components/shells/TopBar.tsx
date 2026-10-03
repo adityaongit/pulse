@@ -54,7 +54,7 @@ function Band({ dot, syncing }: { dot: string; syncing: boolean }) {
           <circle cx="18" cy="18" r="16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeDasharray="25 25.3" />
         </svg>
       ) : (
-        <span className={cn("absolute -top-0.5 -right-0.5 size-2 rounded-full ring-2 ring-background-top", dot)} />
+        <span className={cn("absolute -top-1 -right-1.5 size-2 rounded-full ring-2 ring-background-top", dot)} />
       )}
     </span>
   )
