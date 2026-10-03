@@ -2,7 +2,7 @@ import { ChevronDown, ChevronRight, ChevronUp } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { formatValue } from "@/lib/format"
 import type { Metric } from "@/lib/reasons"
-import { Skeleton } from "@/components/ui/skeleton"
+import { SkeletonText } from "@/components/ui/skeleton"
 import { EmptyState } from "@/components/shells/EmptyState"
 import { MetricState } from "@/components/shells/MetricState"
 import { MetricTags } from "./primitives"
@@ -74,6 +74,9 @@ function Header({ variant, unit, provisional }: { variant: DriverListProps["vari
   )
 }
 
+const ROW =
+  "block w-full rounded-2xl bg-card bg-linear-to-b from-card-top to-card px-4 py-3 text-left shadow-card transition-[scale,--tw-gradient-from,background-color] duration-150 ease-standard in-data-[slot=card]:rounded-lg in-data-[slot=card]:bg-secondary in-data-[slot=card]:bg-none in-data-[slot=card]:shadow-none"
+
 function Item({ i, max, p }: { i: DriverItem; max: number; p: DriverListProps }) {
   const e = effectOf(i)
   const width = `${(Math.abs(i.delta) / (max || 1)) * 50}%`
@@ -128,7 +131,7 @@ function Item({ i, max, p }: { i: DriverItem; max: number; p: DriverListProps })
   // Each row is its own card ([latest-journal-insights-1]); inside a card it steps down to a 10 px
   // bg-secondary row (no card in a card). Rows that open a sheet press in.
   const cls = cn(
-    "block w-full rounded-2xl bg-card bg-linear-to-b from-card-top to-card px-4 py-3 text-left shadow-card transition-[scale,--tw-gradient-from,background-color] duration-150 ease-standard in-data-[slot=card]:rounded-lg in-data-[slot=card]:bg-secondary in-data-[slot=card]:bg-none in-data-[slot=card]:shadow-none",
+    ROW,
     p.onSelect && "outline-none hover:from-card-hover focus-visible:ring-3 focus-visible:ring-ring/50 active:scale-[0.96] in-data-[slot=card]:hover:bg-accent",
     p.selectedKey === i.key && "ring-1 ring-foreground/60"
   )
@@ -162,7 +165,7 @@ export function DriverList(p: DriverListProps) {
       />
     )
   return (
-    <MetricState metric={p.data} skeleton={<DriverListSkeleton />} empty={empty} renderReason={() => null}>
+    <MetricState metric={p.data} skeleton={<DriverListSkeleton variant={p.variant} unit={p.unit} />} empty={empty} renderReason={() => null}>
       {(items, meta) => {
         const max = Math.max(...items.map((i) => Math.abs(i.delta)))
         return (
@@ -180,19 +183,28 @@ export function DriverList(p: DriverListProps) {
   )
 }
 
-export function DriverListSkeleton() {
+/** Loading shape (spec §5.19): the real header and each row's own box, with bars for the label, value and caption. */
+export function DriverListSkeleton({ variant = "impact", unit = "%", rows = 3 }: { variant?: DriverListProps["variant"]; unit?: DriverListProps["unit"]; rows?: number }) {
+  const impact = variant === "impact"
+  const value = <SkeletonText className="w-[4ch] shrink-0 font-numeric text-base font-bold" />
   return (
     <div aria-hidden>
-      <div className="mb-2 flex justify-between">
-        <Skeleton className="h-3 w-20" />
-        <Skeleton className="h-3 w-16" />
-        <Skeleton className="h-3 w-20" />
-      </div>
-      <div className="space-y-2">
-        {[0, 1, 2].map((k) => (
-          <Skeleton key={k} className="h-16 rounded-2xl" />
+      <Header variant={variant} unit={unit} provisional={false} />
+      <ul className="space-y-2">
+        {Array.from({ length: rows }, (_, k) => (
+          <li key={k} className={cn(ROW, "space-y-2")}>
+            <span className="flex items-center justify-between gap-3">
+              <SkeletonText className={cn("w-28", impact ? "text-[15px] leading-5" : "text-xs leading-4")} />
+              {!impact && value}
+            </span>
+            <span className={cn("block", impact && "flex items-center gap-3")}>
+              <span className={cn("block h-2 rounded-sm bg-(image:--pattern-hatch)", impact && "flex-1")} />
+              {impact && value}
+            </span>
+            {impact && <SkeletonText className="w-56 text-xs leading-4" />}
+          </li>
         ))}
-      </div>
+      </ul>
     </div>
   )
 }

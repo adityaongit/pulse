@@ -215,10 +215,10 @@ Both components render `role="img"` with `aria-label="Pulse"`. Pass `title` to c
 
 ```mermaid
 flowchart TD
-  W["Wordmark (bold)"] --> H["Home, above the dials<br/>src/app/(app)/page.tsx"]
+  W["Wordmark (bold)"] --> H["Home, above the dials<br/>src/app/(app)/(home)/page.tsx"]
   W --> S["Laptop sidebar header<br/>src/components/shells/AppNav.tsx"]
   W --> D["Score detail ring, over the value (h-[15px])<br/>src/components/metrics/ScoreDial.tsx"]
-  WB["Wordmark (black)"] --> L["Splash / first load<br/>src/app/(app)/loading.tsx"]
+  WB["Wordmark (black)"] --> L["Splash / first load<br/>src/app/(app)/(home)/loading.tsx"]
   M["Mark"] --> R["Tablet rail home button<br/>AppNav.tsx Rail"]
   M --> S
   M --> A["More: About footer<br/>src/app/(app)/more/page.tsx"]
@@ -233,10 +233,10 @@ Placement in the screens is a separate change. These are the targets:
 
 | Where | Today | Replace with |
 | --- | --- | --- |
-| Home, above the dials (`src/app/(app)/page.tsx`, the `<p aria-hidden>Pulse</p>` in `slots.top`) | Tracked Figtree caps, 13 px, `text-foreground-secondary` | `<span aria-hidden className="flex justify-center text-foreground-secondary"><Wordmark className="h-[17px]" /></span>`, keeping it hidden from assistive tech as now (the page has its own title). |
+| Home, above the dials (`src/app/(app)/(home)/page.tsx`, the `<p aria-hidden>Pulse</p>` in `slots.top`) | Tracked Figtree caps, 13 px, `text-foreground-secondary` | `<span aria-hidden className="flex justify-center text-foreground-secondary"><Wordmark className="h-[17px]" /></span>`, keeping it hidden from assistive tech as now (the page has its own title). |
 | Laptop sidebar header (`AppNav.tsx`, the xl `<nav>`'s first `<Link href="/">`) | Tracked text "Pulse" | The lockup: `<Mark className="size-7" />` + `<Wordmark className="h-[17px]" />`, gap-2.5, inside the existing h-14 link. Wrap both in `<span aria-hidden>` and add `aria-label="Pulse home"` to the link. |
 | Tablet rail (`AppNav.tsx` `Rail`, the "P" letter in the size-10 home button) | A Barlow "P" | `<Mark className="size-6" />` |
-| Loading / splash (`src/app/(app)/loading.tsx` returns `HomeSkeleton`; for a cold start, the PWA splash uses the manifest icon and `background_color`) | Skeleton only | Keep the skeleton for in-app navigation. For a first-load splash, centre `<Wordmark weight="black" className="h-[39px]" />` on `--background`. |
+| Loading / splash (`src/app/(app)/(home)/loading.tsx` returns `HomeSkeleton`; for a cold start, the PWA splash uses the manifest icon and `background_color`) | Skeleton only | Keep the skeleton for in-app navigation. For a first-load splash, centre `<Wordmark weight="black" className="h-[39px]" />` on `--background`. |
 | More: About footer (`src/app/(app)/more/page.tsx`, the "Pulse {version} · scoring v…" line) | Text only | Put `<Mark color="mono" className="size-8 text-muted-foreground" />` above the version line, centred, with 8 px of space. |
 
 ## Regenerating the icons

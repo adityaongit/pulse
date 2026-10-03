@@ -14,7 +14,7 @@ import { Skeleton, SkeletonText } from "@/components/ui/skeleton"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { EmptyState } from "@/components/shells/EmptyState"
 import { MetricState } from "@/components/shells/MetricState"
-import { useOptionalShellStatus } from "@/components/shells/ShellStatus"
+import { useOptionalShellCalendar } from "@/components/shells/ShellStatus"
 import { StatusChip, ValueUnit } from "@/components/metrics/primitives"
 import { AXIS, BAR_CURSOR, ChartFigure, GRID, LINE_CURSOR, TOOLTIP_CLASS, TooltipLine, useSeriesAnimation } from "./ChartFrame"
 
@@ -61,7 +61,7 @@ function Trend({ points, p }: { points: TrendPoint[]; p: TrendChartProps }) {
   const router = useRouter()
   const pathname = usePathname()
   const params = useSearchParams()
-  const today = useOptionalShellStatus()?.today ?? points.at(-1)?.date ?? ""
+  const today = useOptionalShellCalendar()?.today ?? points.at(-1)?.date ?? ""
   const anim = useSeriesAnimation()
   const fallback = p.defaultRange ?? "m"
   const urlRange = params.get("r") ? parseRange(params.get("r") ?? undefined) : fallback
@@ -257,7 +257,11 @@ export function TrendChart(p: TrendChartProps) {
   )
 }
 
-export function TrendChartSkeleton() {
+/**
+ * `chip`: room for the change-vs-prior chip under the average, which charts with a prior period show.
+ * `caption`: the baseline / target line under the plot.
+ */
+export function TrendChartSkeleton({ chip = false, caption = false }: { chip?: boolean; caption?: boolean }) {
   // The header's real label and a disabled range toggle; bars for the numbers; the plot at its fixed height (spec §5.19).
   return (
     <div aria-hidden className="min-w-0">
@@ -265,6 +269,7 @@ export function TrendChartSkeleton() {
         <div className="min-w-0">
           <p className="text-xs leading-4 font-bold tracking-[0.08em] text-muted-foreground uppercase">Average</p>
           <SkeletonText className="w-[4ch] font-numeric text-[28px] leading-8 font-bold" />
+          {chip && <Skeleton className="mt-1 h-6 w-28 rounded-md" />}
         </div>
         <div className="flex shrink-0 gap-0.5 rounded-lg bg-muted p-0.5">
           {(["w", "m", "6m"] as const).map((r) => (
@@ -275,6 +280,7 @@ export function TrendChartSkeleton() {
         </div>
       </div>
       <Skeleton className="h-[200px] rounded-lg bg-muted/60" />
+      {caption && <SkeletonText className="mt-2 w-48 text-xs leading-4" />}
     </div>
   )
 }
