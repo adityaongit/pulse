@@ -1,7 +1,7 @@
 ---
 title: "feat: Pulse, a WHOOP-style personal health app for Fitbit Air"
 type: feat
-status: active
+status: completed
 date: 2026-10-02
 ---
 
