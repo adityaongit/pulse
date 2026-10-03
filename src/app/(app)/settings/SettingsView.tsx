@@ -23,7 +23,7 @@ const ROW_VALUE = "truncate text-right text-[15px] leading-[22px] text-foregroun
 /** The logo tile beside a row's name (account photo, data source mark). */
 const TILE = "grid size-11 shrink-0 place-items-center overflow-hidden rounded-xl bg-white/[0.06]"
 
-export type SettingsAccount = { email: string | null; avatar: string | null; seed: string; customPhoto: boolean }
+export type SettingsAccount = { email: string | null; avatar: string | null; customPhoto: boolean }
 
 /** Who is signed in: photo, account, change photo, sign out (U20). Sign out is a plain form post, so it works before hydration. */
 export function Account({ account }: { account: SettingsAccount }) {
@@ -32,7 +32,7 @@ export function Account({ account }: { account: SettingsAccount }) {
     <SectionShell variant="card" level={2} id="account" title="Account">
       <div className="flex min-h-11 items-center gap-3">
         <span className="size-14 shrink-0">
-          <UserAvatar src={account.avatar} seed={account.seed} />
+          <UserAvatar src={account.avatar} />
         </span>
         <div className="min-w-0 flex-1">
           <p className="truncate text-[15px] leading-[22px] font-semibold">{owner ? account.email : "Demo"}</p>

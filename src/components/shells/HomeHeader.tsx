@@ -97,10 +97,10 @@ function Streak() {
 }
 
 /**
- * The avatar: the uploaded or Google photo, else a blobatar (src/server/avatar.ts). Both sit on a disc ringed in the page colour, over the streak pill (M6).
+ * The avatar: the uploaded or Google photo, else the outline person icon (src/server/avatar.ts). Both sit on a disc ringed in the page colour, over the streak pill (M6).
  */
 function Avatar() {
-  const { avatar, avatarSeed } = useShellStatus()
+  const { avatar } = useShellStatus()
   return (
     // The 3 px ring is the page ground itself (the header's own fill), so it cuts the pill exactly where WHOOP's does.
     <Link
@@ -111,7 +111,7 @@ function Avatar() {
         "relative z-10 -ml-[calc(var(--u)*3px)] grid size-[calc(var(--u)*46px)] shrink-0 place-items-center rounded-full p-[calc(var(--u)*3px)] after:absolute after:-inset-[max(0px,calc((44px-var(--u)*46px)/2))] transition-[scale,color] duration-150 ease-standard outline-none hover:text-foreground-secondary focus-visible:ring-3 focus-visible:ring-ring/50 active:scale-[0.96]"
       )}
     >
-      <UserAvatar src={avatar} seed={avatarSeed ?? "pulse"} />
+      <UserAvatar src={avatar} />
     </Link>
   )
 }
@@ -319,8 +319,8 @@ export function HomeHeader({ rings }: { rings?: HeaderRings }) {
               ROW_EDGES
             )}
           >
-            {/* --u scales the avatar and streak pill as one (spec §11 M6). The avatar is a filled disc (photo or blobatar),
-                which reads heavier than WHOOP's outline icon, so it tops out near the date pill's height (about 34 px)
+            {/* --u scales the avatar and streak pill as one (spec §11 M6). The avatar (photo or outline icon) tops out near the
+                date pill's height (about 34 px)
                 and steps down on narrower phones so the pair fits its half of the row and the pill stays centred (M4). */}
             <div className="flex items-center [--u:0.64] min-[356px]:[--u:0.7] min-[400px]:[--u:0.76] md:[--u:0.72]">
               <Avatar />

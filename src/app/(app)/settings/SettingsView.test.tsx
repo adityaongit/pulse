@@ -24,7 +24,7 @@ const base: SettingsVM = {
   version: "0.1.0",
   scoringVersion: 2,
 }
-const account = { email: "me@example.com", avatar: null, seed: "me@example.com", customPhoto: false }
+const account = { email: "me@example.com", avatar: null, customPhoto: false }
 const source = () => screen.getByRole("region", { name: "Data source" })
 
 describe("Settings view", () => {

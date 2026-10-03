@@ -1,6 +1,5 @@
 import { connection } from "next/server"
 import { AppShell } from "@/components/shells/AppShell"
-import { currentSession } from "@/server/auth"
 import { avatarSrc } from "@/server/avatar"
 import { getDb } from "@/server/db"
 import { getShellStatus, requestSync } from "@/server/queries/settings"
@@ -15,7 +14,5 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
   await connection()
   // Fire and forget: the worker throttles itself; the page renders from what is already stored.
   requestSync()
-  const session = await currentSession()
-  const seed = session?.kind === "owner" ? session.email : "pulse-demo"
-  return <AppShell status={{ ...getShellStatus(), avatar: avatarSrc(getDb()), avatarSeed: seed }}>{children}</AppShell>
+  return <AppShell status={{ ...getShellStatus(), avatar: avatarSrc(getDb()) }}>{children}</AppShell>
 }
