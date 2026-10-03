@@ -37,3 +37,6 @@ npm-debug.log*
 
 # agent worktrees
 /.claude/worktrees/
+
+# e2e screenshots (review locally)
+/e2e/__screens__/
