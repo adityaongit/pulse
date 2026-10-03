@@ -113,9 +113,11 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
               <Link
                 href={checkIn}
                 aria-label="Add to today"
-                className="-my-3 grid size-12 place-items-center rounded-[14px] bg-foreground text-primary-foreground transition-[scale,background-color] duration-150 ease-standard outline-none hover:bg-foreground/90 focus-visible:ring-3 focus-visible:ring-ring/50 active:scale-[0.96]"
+                // WHOOP's "+" is a ~34 pt white tile with a soft top-light, centred on the title, about 15 pt above
+                // the first card [latest-home-collapsed-1]; the hit area grows to 44 px without moving it.
+                className="relative grid size-[34px] place-items-center rounded-[10px] bg-linear-to-b from-white to-zinc-200 text-primary-foreground shadow-sm transition-[scale,filter] duration-150 ease-standard outline-none after:absolute after:-inset-[5px] hover:brightness-95 focus-visible:ring-3 focus-visible:ring-ring/50 active:scale-[0.96]"
               >
-                <Plus aria-hidden className="size-[26px]" strokeWidth={2} />
+                <Plus aria-hidden className="size-5" strokeWidth={2.25} />
               </Link>
             }
           >
