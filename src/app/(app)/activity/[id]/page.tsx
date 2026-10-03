@@ -78,7 +78,7 @@ export default async function ActivityPage({ params }: PageProps<"/activity/[id]
 
 const STAT_LABEL = "text-xs leading-4 font-bold tracking-[0.08em] text-foreground-secondary uppercase"
 
-/** WHOOP's activity hero [latest-activity-1]: a left-aligned stat pair, activity strain in blue and the duration. */
+/** WHOOP's activity hero [latest-activity-1]: a left-aligned stat pair at 34 px (spec §11 F14), activity strain in blue and the duration. */
 function Hero({ vm }: { vm: ActivityVM }) {
   const s = vm.strain.value
   const duration = vm.stats.find((k) => k.key === "duration")?.metric.value ?? (vm.end - vm.start) / 60_000
@@ -86,13 +86,13 @@ function Hero({ vm }: { vm: ActivityVM }) {
     <div className="w-full space-y-2">
       <div className="flex flex-wrap items-end gap-x-10 gap-y-3">
         <div>
-          <p className="font-numeric text-[44px] leading-none font-bold tabular-nums">
+          <p className="font-numeric text-[34px] leading-none font-bold tabular-nums">
             <span className={s === null ? "text-muted-foreground" : "text-strain-text"}>{formatValue("decimal1", s)}</span>
           </p>
           <p className={cn(STAT_LABEL, "mt-2")}>Activity strain</p>
         </div>
         <div>
-          <p className="font-numeric text-[44px] leading-none font-bold tabular-nums">{hmm(duration)}</p>
+          <p className="font-numeric text-[34px] leading-none font-bold tabular-nums">{hmm(duration)}</p>
           <p className={cn(STAT_LABEL, "mt-2")}>Duration</p>
         </div>
       </div>

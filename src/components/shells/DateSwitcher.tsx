@@ -35,7 +35,8 @@ const BARE_STEP = cn(
   "relative grid size-9 place-items-center rounded-full text-foreground/70 after:absolute after:-inset-x-0.5 after:-inset-y-1 hover:text-foreground disabled:pointer-events-none disabled:text-foreground/25",
   PRESS
 )
-const LABEL = "text-[13px] leading-4 font-bold tracking-[0.1em] whitespace-nowrap uppercase tabular-nums"
+// 11 px caps: WHOOP's "TODAY" is 39 pt wide with a 7.3 pt cap height [latest-home-top-2], [latest-home-sticky-header-user-2025] (spec §11 F4).
+const LABEL = "text-[11px] leading-4 font-bold tracking-[0.1em] whitespace-nowrap uppercase tabular-nums"
 
 /** Keys that belong to the focused control, not to day stepping. */
 function ownsArrows(target: EventTarget | null) {
@@ -111,7 +112,7 @@ function Switcher({ mode, calendar, placement = "body", narrow = false }: DateSw
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <div className={cn("inline-flex items-center", bare ? "gap-1" : "h-8 rounded-full bg-white/[0.04] p-0.5")}>
+      <div className={cn("inline-flex items-center", bare ? "gap-1" : "h-[30px] rounded-full bg-white/[0.04] p-px")}>
         <button type="button" className={bare ? BARE_STEP : cn(STEP, narrow && NARROW_STEP)} aria-label={`Previous ${unit}`} disabled={atStart} onClick={() => go(addDays(d, -step))}>
           <ChevronLeft aria-hidden className={bare ? "size-4" : "size-[18px]"} strokeWidth={2.25} />
         </button>
@@ -123,7 +124,7 @@ function Switcher({ mode, calendar, placement = "body", narrow = false }: DateSw
             className={cn(
               PRESS,
               bare
-                ? "relative h-9 min-w-28 rounded-full px-2 text-center after:absolute after:inset-x-0 after:-inset-y-1 text-[15px] leading-5 font-bold tracking-[0.1em] whitespace-nowrap uppercase tabular-nums hover:text-foreground-secondary"
+                ? "relative h-9 min-w-28 rounded-full px-2 text-center after:absolute after:inset-x-0 after:-inset-y-1 text-xs leading-4 font-bold tracking-[0.1em] whitespace-nowrap uppercase tabular-nums hover:text-foreground-secondary"
                 : cn(LABEL, "relative h-7 min-w-24 rounded-full bg-white/[0.08] px-4 text-center after:absolute after:inset-x-0 after:-inset-y-2 hover:bg-white/[0.12]", narrow && NARROW_LABEL)
             )}
           >
@@ -149,7 +150,7 @@ function Switcher({ mode, calendar, placement = "body", narrow = false }: DateSw
 /** WHOOP's date pill (spec §4.3). Reads `?d=`; changes it with router.replace. */
 export function DateSwitcher(props: DateSwitcherProps) {
   return (
-    <React.Suspense fallback={<div aria-hidden className={cn(props.placement === "header" ? "h-9 w-44" : "h-8 w-40 rounded-full bg-white/[0.04]", props.narrow && "max-[400px]:w-32")} />}>
+    <React.Suspense fallback={<div aria-hidden className={cn(props.placement === "header" ? "h-9 w-44" : "h-[30px] w-40 rounded-full bg-white/[0.04]", props.narrow && "max-[400px]:w-32")} />}>
       <Switcher {...props} />
     </React.Suspense>
   )

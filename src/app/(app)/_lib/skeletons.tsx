@@ -9,6 +9,7 @@ import { TimelineSkeleton } from "@/components/metrics/ActivityCard"
 import { ContributorRowSkeleton } from "@/components/metrics/ContributorRow"
 import { InsightCardSkeleton } from "@/components/metrics/InsightCard"
 import { KeyStatRowSkeleton } from "@/components/metrics/KeyStatRow"
+import { Wordmark } from "@/components/brand/Wordmark"
 import { ScoreDialSkeleton } from "@/components/metrics/ScoreDial"
 import { SleepStagesSkeleton } from "@/components/metrics/SleepStages"
 import { DetailShell } from "@/components/shells/DetailShell"
@@ -69,12 +70,12 @@ export function HomeSkeleton() {
       layout="home"
       slots={{
         top: (
-          <div aria-busy className="pt-4 xl:pt-2">
+          <div aria-busy className="max-md:-mt-2 md:pt-4 xl:pt-2">
             <div className="flex flex-col gap-6 xl:grid xl:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] xl:items-center xl:gap-x-6">
-              <div className="space-y-4">
-                <p aria-hidden className="text-center text-[13px] leading-4 font-semibold tracking-[0.35em] text-foreground-secondary uppercase">
-                  Pulse
-                </p>
+              <div className="space-y-3 md:space-y-4">
+                <span aria-hidden className="flex justify-center text-foreground-secondary">
+                  <Wordmark className="h-[17px]" />
+                </span>
                 <div className="grid grid-cols-3 items-start justify-items-center">
                   <ScoreDialSkeleton size="md" variant="sleep" />
                   <ScoreDialSkeleton size="md" variant="recovery" />
@@ -203,7 +204,7 @@ export function ActivitySkeleton() {
         <div aria-hidden className="flex w-full flex-wrap items-end gap-x-10 gap-y-3">
           {["Activity strain", "Duration"].map((l) => (
             <div key={l}>
-              <SkeletonText className="w-[3ch] font-numeric text-[44px] leading-none font-bold" />
+              <SkeletonText className="w-[3ch] font-numeric text-[34px] leading-none font-bold" />
               <p className={`${LABEL} mt-2 text-foreground-secondary`}>{l}</p>
             </div>
           ))}

@@ -18,7 +18,7 @@ function Rows({ title, rows }: { title: string; rows: Row[] }) {
   const id = `more-${title.toLowerCase()}`
   return (
     <section aria-labelledby={id} className="space-y-2">
-      <h2 id={id} className="px-1 text-xs leading-4 font-bold tracking-[0.08em] text-muted-foreground uppercase">
+      <h2 id={id} className="px-1 text-[13px] leading-4 font-bold tracking-[0.1em] text-foreground/85 uppercase">
         {title}
       </h2>
       <ul className="space-y-2">
@@ -26,7 +26,7 @@ function Rows({ title, rows }: { title: string; rows: Row[] }) {
           <li key={label}>
             <Link href={href} className={cn(CARD_LINK, "flex min-h-14 items-center gap-3 px-4")}>
               <Icon aria-hidden className="size-[22px] shrink-0 text-foreground-secondary" strokeWidth={1.5} />
-              <span className="min-w-0 flex-1 truncate text-[13px] leading-4 font-bold tracking-[0.08em] uppercase">{label}</span>
+              <span className="min-w-0 flex-1 truncate text-xs leading-4 font-bold tracking-[0.08em] uppercase">{label}</span>
               {caption && <span className="shrink-0 font-numeric text-xs leading-4 font-medium text-muted-foreground tabular-nums">{caption}</span>}
               <ChevronRight aria-hidden className="size-5 shrink-0 text-muted-foreground" strokeWidth={1.75} />
             </Link>

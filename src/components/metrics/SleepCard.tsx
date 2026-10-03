@@ -22,7 +22,9 @@ export function SleepCard({ kind, minutes, start, end, href, timeZone }: SleepCa
   return (
     <TimelineRow
       href={href}
-      chipClass="bg-sleep-deep"
+      // WHOOP's light sleep chip [latest-home-pastday-1]; 85 % over the row keeps white text at 3.3 : 1 (large, bold).
+      chipClass="bg-sleep/85"
+      barClass="bg-foreground/80"
       chip={
         <>
           <Moon aria-hidden className="size-4" strokeWidth={1.75} />

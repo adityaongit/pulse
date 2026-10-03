@@ -20,7 +20,8 @@ export const HEADER_FILL = "bg-(image:--page-ground) bg-no-repeat [background-si
 /** The lower 24 px fade content scrolls into. No blur: WHOOP fades, it does not frost. */
 export const HEADER_FADE = "pb-6 mask-b-from-[calc(100%-24px)]"
 /** Detail header title, date pill label and tab-root title roles (spec §3.4). */
-export const HEADER_TITLE = "text-[15px] leading-5 font-bold tracking-[0.1em] uppercase"
+// 12 px: WHOOP's bar titles measure an 8-9 pt cap height across eight captures (spec §11 F13).
+export const HEADER_TITLE = "text-xs leading-5 font-bold tracking-[0.1em] uppercase"
 
 type SyncView = { dot: string; label: string; line: string }
 

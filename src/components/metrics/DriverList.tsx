@@ -1,4 +1,4 @@
-import { ChevronDown, ChevronUp } from "lucide-react"
+import { ChevronDown, ChevronRight, ChevronUp } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { formatValue } from "@/lib/format"
 import type { Metric } from "@/lib/reasons"
@@ -77,17 +77,31 @@ function Header({ variant, unit, provisional }: { variant: DriverListProps["vari
 function Item({ i, max, p }: { i: DriverItem; max: number; p: DriverListProps }) {
   const e = effectOf(i)
   const width = `${(Math.abs(i.delta) / (max || 1)) * 50}%`
+  const impact = p.variant === "impact"
+  const value = (
+    <span className={cn("shrink-0 font-numeric text-base font-bold tabular-nums", e === "positive" ? "text-optimal" : e === "negative" ? "text-warning" : "text-foreground-secondary")}>
+      {fmt(i.delta, p.unit)}
+    </span>
+  )
   const content = (
     <>
       <span className="sr-only">{sentence(i, p.variant, p.unit, p.outcome)}</span>
       <span aria-hidden className="block space-y-2">
-        <span className="flex items-baseline justify-between gap-3">
-          <span className="min-w-0 text-xs leading-4 font-bold tracking-[0.08em] text-pretty uppercase">{i.label}</span>
-          <span className={cn("font-numeric text-base font-bold tabular-nums", e === "positive" ? "text-optimal" : e === "negative" ? "text-warning" : "text-foreground-secondary")}>
-            {fmt(i.delta, p.unit)}
+        {impact ? (
+          // WHOOP's behaviour rows: the name in sentence case with a chevron, the % at the track's end
+          // [latest-journal-insights-1] (spec §11 F17).
+          <span className="flex items-center justify-between gap-3">
+            <span className="min-w-0 text-[15px] leading-5 font-medium text-pretty">{i.label}</span>
+            {p.onSelect && <ChevronRight className="-mr-1 size-5 shrink-0 text-foreground-secondary" strokeWidth={1.75} />}
           </span>
-        </span>
-        <span className="relative block h-2 rounded-sm bg-(image:--pattern-hatch)">
+        ) : (
+          <span className="flex items-baseline justify-between gap-3">
+            <span className="min-w-0 text-xs leading-4 font-bold tracking-[0.08em] text-pretty uppercase">{i.label}</span>
+            {value}
+          </span>
+        )}
+        <span className={cn(impact && "flex items-center gap-3")}>
+        <span className={cn("relative block h-2 rounded-sm bg-(image:--pattern-hatch)", impact && "flex-1")}>
           {i.delta !== 0 && (
             <span
               className={cn(
@@ -99,6 +113,8 @@ function Item({ i, max, p }: { i: DriverItem; max: number; p: DriverListProps })
             />
           )}
           <span className="absolute top-1/2 left-1/2 size-1.5 -translate-1/2 rounded-full bg-foreground ring-2 ring-card in-data-[slot=card]:ring-secondary" />
+        </span>
+        {impact && value}
         </span>
         {p.variant === "impact" && i.yes !== undefined && i.no !== undefined && (
           <span className="block text-xs leading-4 font-medium text-muted-foreground tabular-nums">

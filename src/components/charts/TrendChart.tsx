@@ -176,6 +176,15 @@ function Trend({ points, p }: { points: TrendPoint[]; p: TrendChartProps }) {
                 label={{ value: p.reference.label, position: "insideTopLeft", fill: "var(--muted-foreground)", fontSize: 11 }}
               />
             )}
+            {/* WHOOP's month bars carry a dashed average line [latest-trends-1] (spec §11 F21). */}
+            {!line && range !== "w" && avg !== null && (
+              <ReferenceLine
+                y={avg}
+                stroke="var(--chart-cursor)"
+                strokeDasharray="3 3"
+                label={{ value: "Avg", position: "insideBottomLeft", fill: "var(--foreground-secondary)", fontSize: 11, fontWeight: 600 }}
+              />
+            )}
             {p.target && <ReferenceArea y1={p.target[0]} y2={p.target[1]} fill="var(--dial-target)" fillOpacity={0.3} ifOverflow="extendDomain" />}
             <ChartTooltip
               isAnimationActive={false}

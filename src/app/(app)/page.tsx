@@ -77,9 +77,11 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
       }}
       slots={{
         top: (
-          <div className="pt-4 xl:pt-2">
+          // Phone: the wordmark sits right under the header's fade, 52 px below the date pill as in WHOOP
+          // [latest-home-top-2], [latest-home-top-3] (spec §11 F1); -mt-2 cancels the column's own 8 px.
+          <div className="max-md:-mt-2 md:pt-4 xl:pt-2">
             <div className="flex flex-col gap-6 xl:grid xl:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] xl:items-center xl:gap-x-6">
-              <div className="space-y-4 xl:col-start-1 xl:row-start-1">
+              <div className="space-y-3 md:space-y-4 xl:col-start-1 xl:row-start-1">
                 <span aria-hidden className="flex justify-center text-foreground-secondary">
                   <Wordmark className="h-[17px]" />
                 </span>
@@ -107,7 +109,8 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
                   />
                 </div>
                 {/* The end of the collapse distance: the dial labels' bottom (spec §4.3). */}
-                <div aria-hidden {...{ [HEADER_SENTINEL]: "" }} />
+                {/* -mt-4 cancels the stack's gap, so the card below sits 24 px under the labels as in WHOOP (spec §11 F1). */}
+                <div aria-hidden className="-mt-3 md:-mt-4" {...{ [HEADER_SENTINEL]: "" }} />
                 {dials.reason && (
                   <p className="text-center">
                     <ReasonPlaceholder reason={dials.reason.reason} nightsLeft={dials.reason.nightsLeft} size="sm" />

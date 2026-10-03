@@ -58,7 +58,7 @@ function Unlock({ id, needsMore, word, className }: { id: string; needsMore: Jou
   return (
     <section aria-labelledby={`${id}-title`} className={cn("space-y-3", className)}>
       <div className="space-y-1">
-        <h2 id={`${id}-title`} className="text-[13px] leading-4 font-bold tracking-[0.08em] uppercase">
+        <h2 id={`${id}-title`} className="text-xs leading-4 font-bold tracking-[0.08em] uppercase">
           Keep logging to unlock
         </h2>
         <p className="max-w-[65ch] text-[15px] leading-[22px] text-pretty text-muted-foreground">

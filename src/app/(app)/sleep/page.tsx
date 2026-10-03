@@ -57,7 +57,7 @@ export default async function SleepPage({ searchParams }: PageProps<"/sleep">) {
           <div className="divide-y divide-border">
             {vm.summary.map((k) => (
               // WHOOP's sleep rows show the status segments instead of a 30-day comparison.
-              <KeyStatRow key={k.key} variant="row" {...statProps(k, undefined, false)} average={null} direction="none" />
+              <KeyStatRow key={k.key} variant="row" {...statProps(k)} average={null} direction="none" />
             ))}
           </div>
           <p className={cn(LEGEND, "flex flex-wrap items-center gap-x-4 gap-y-1")}>

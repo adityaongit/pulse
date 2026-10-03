@@ -77,15 +77,15 @@ export function SectionShell({ variant, title, info, action, aside, href, level,
   const H = level === 2 ? "h2" : "h3"
   const header = (
     <div className="mb-3 flex min-h-6 items-center justify-between gap-2">
-      <div className="flex min-w-0 items-center gap-1">
-        <H id={headingId} className="min-w-0 text-[13px] leading-4 font-bold tracking-[0.08em] text-balance uppercase">
-          {title}
-        </H>
-        {info && !href && <InfoButton info={info} label={title} variant="card" />}
-      </div>
+      {/* 12 px caps, WHOOP's card title ("HEALTH MONITOR" 116 pt on one line) [latest-home-top-2], [latest-home-collapsed-3] (spec §11 F7). */}
+      <H id={headingId} className="min-w-0 text-xs leading-4 font-bold tracking-[0.08em] text-balance uppercase">
+        {title}
+      </H>
       <div className="flex shrink-0 items-center gap-2">
         {aside}
-        {href ? <ChevronRight aria-hidden className="size-[18px] text-foreground-secondary" strokeWidth={1.75} /> : actionNode}
+        {href ? <ChevronRight aria-hidden className="-mr-1.5 size-[18px] text-foreground-secondary" strokeWidth={1.75} /> : actionNode}
+        {/* WHOOP puts a card's info button at its top right corner [latest-home-collapsed-3] (spec §11 F8). */}
+        {info && !href && <InfoButton info={info} label={title} variant="card" />}
       </div>
     </div>
   )

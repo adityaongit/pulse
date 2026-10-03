@@ -37,6 +37,7 @@ export function TimelineRow({
   href,
   chip,
   chipClass,
+  barClass,
   name,
   caption,
   start,
@@ -46,6 +47,8 @@ export function TimelineRow({
   href: string
   chip: React.ReactNode
   chipClass: string
+  /** The thin bar after the times: white for sleep, strain blue for activities [latest-home-pastday-1] (spec §11 F18). */
+  barClass: string
   name: string
   caption?: string
   start: string
@@ -67,6 +70,7 @@ export function TimelineRow({
         <span className="block">{start}</span>
         <span className="block">{end}</span>
       </span>
+      <span aria-hidden className={cn("-ml-1 h-7 w-0.5 shrink-0 rounded-full", barClass)} />
     </Link>
   )
 }
@@ -79,7 +83,8 @@ export function ActivityCard({ name, kind, strain, start, end, href, timeZone }:
   return (
     <TimelineRow
       href={href}
-      chipClass="bg-strain-deep"
+      chipClass="bg-strain"
+      barClass="bg-strain"
       chip={
         <>
           <Icon aria-hidden className="size-4" strokeWidth={1.75} />
@@ -107,6 +112,7 @@ export function TimelineSkeleton() {
             <SkeletonText className="text-xs leading-4" />
             <SkeletonText className="text-xs leading-4" />
           </span>
+          <span className="-ml-1 h-7 w-0.5 shrink-0 rounded-full bg-muted" />
         </div>
       ))}
     </div>

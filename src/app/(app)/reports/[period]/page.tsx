@@ -69,7 +69,7 @@ function PeriodSwitcher({ vm }: { vm: ReportVM }) {
   return (
     <div className="inline-flex h-9 items-center rounded-full bg-secondary">
       {step(vm.prev, "prev")}
-      <span className="min-w-24 px-3 text-center text-[13px] leading-4 font-bold tracking-[0.1em] whitespace-nowrap uppercase tabular-nums">
+      <span className="min-w-24 px-3 text-center text-[11px] leading-4 font-bold tracking-[0.1em] whitespace-nowrap uppercase tabular-nums">
         {periodLabel(vm.kind, vm.start, vm.end)}
       </span>
       {step(vm.next, "next")}

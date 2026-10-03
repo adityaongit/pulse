@@ -12,6 +12,7 @@ import { reasonCopy, type MetricTag, type ReasonCode } from "@/lib/reasons"
 import { useReducedMotion } from "@/hooks/use-reduced-motion"
 import { ChartContainer } from "@/components/ui/chart"
 import { SkeletonText } from "@/components/ui/skeleton"
+import { Wordmark } from "@/components/brand/Wordmark"
 import { MetricTags, type TagKind } from "./primitives"
 
 export type DialSize = "sm" | "md" | "lg"
@@ -30,7 +31,7 @@ export type ScoreDialProps = {
   extraTags?: TagKind[]
   /** Strain Target range on the 0-21 track. */
   target?: readonly [number, number] | null
-  /** Overrides the default label ("Recovery", "Day strain"…). Required for `stat`. */
+  /** Overrides the default label ("Recovery", "Strain"…). Required for `stat`. */
   label?: string
   /** `stat` only: colour token, domain max, value format and unit. */
   color?: DataColor
@@ -54,9 +55,10 @@ export type ScoreDialProps = {
 
 const SIZE = {
   sm: { box: "size-14", d: 56, ring: 5, value: "text-base leading-none" },
-  md: { box: "size-24 md:size-30", d: 96, ring: 6, value: "text-[26px] leading-none tracking-[-0.01em] md:text-[30px]" },
-  // v2 hero ring: 14 at 240 (16 at 280), measured on [latest-recovery-1].
-  lg: { box: "size-60 md:size-70", d: 240, ring: 14, value: "text-[64px] leading-none tracking-[-0.01em] md:text-[72px]" },
+  // Home row: an 88 px ring 6 px thick inside the 92 px box, WHOOP's size at 390 [latest-home-top-2], [latest-home-top-3] (spec §11 F2).
+  md: { box: "size-23 md:size-30", d: 92, ring: 6, value: "text-[26px] leading-none tracking-[-0.01em] md:text-[30px]" },
+  // v2 hero ring: a 252 px ring 17 px thick at 390, measured on [latest-recovery-1], [latest-strain-1] (spec §11 F11).
+  lg: { box: "size-64 md:size-70", d: 256, ring: 17, value: "text-[68px] leading-none tracking-[-0.01em] md:text-[76px]" },
 } as const
 const COMPACT = { box: "size-16", d: 64, ring: 5, value: "text-[20px] leading-none" } as const
 
@@ -86,7 +88,7 @@ function resolve(p: ScoreDialProps): Resolved {
       }
     }
     case "strain":
-      return { label: p.label ?? (lg ? "Day strain" : "Strain"), max: 21, color: DATA_COLORS[dialColor("strain", p.value ?? 0)].css, text: formatValue("decimal1", p.value) }
+      return { label: p.label ?? "Strain", max: 21, color: DATA_COLORS[dialColor("strain", p.value ?? 0)].css, text: formatValue("decimal1", p.value) }
     case "sleep":
       return { label: p.label ?? (lg ? "Sleep performance" : "Sleep"), max: 100, color: DATA_COLORS[dialColor("sleep", p.value ?? 0)].css, unit: "%", text: formatValue("int", p.value) }
     case "gauge": {
@@ -249,8 +251,9 @@ export function ScoreDial(props: ScoreDialProps) {
 
       <div className="absolute inset-0 grid place-content-center justify-items-center px-[12%] text-center">
         {lg && (!empty || loading) && !gauge && (
-          <span aria-hidden className="mb-1 text-xs leading-4 font-medium tracking-[0.35em] text-foreground-secondary uppercase">
-            Pulse
+          // The wordmark over the value, as WHOOP's ring carries its own (spec §11 F11; brand.md: never "PULSE" in a font).
+          <span aria-hidden className="mb-2 text-foreground-secondary">
+            <Wordmark className="h-[15px]" />
           </span>
         )}
         {loading ? (
@@ -260,7 +263,8 @@ export function ScoreDial(props: ScoreDialProps) {
         ) : (
           <span
             data-dial-part="value"
-            className={cn("font-numeric font-bold tabular-nums", s.value, empty && "text-muted-foreground", compact && gauge && r.word?.className)}
+            // WHOOP's strain hero runs larger than its percentages (cap 64 vs 48 pt) [latest-strain-1].
+            className={cn("font-numeric font-bold tabular-nums", s.value, lg && variant === "strain" && "text-[88px] md:text-[96px]", empty && "text-muted-foreground", compact && gauge && r.word?.className)}
           >
             {r.text}
             {r.unit && !empty && <span className="text-[0.55em]">{r.unit}</span>}
@@ -332,13 +336,13 @@ export function ScoreDial(props: ScoreDialProps) {
         href={href}
         data-dial={variant}
         aria-label={`${aria}. Open ${r.label} details`}
-        className="flex min-w-24 flex-col items-center gap-2 rounded-xl p-1 transition-[scale,color] duration-150 ease-standard outline-none hover:text-foreground-secondary focus-visible:ring-3 focus-visible:ring-ring/50 active:scale-[0.96]"
+        className="flex min-w-24 flex-col items-center gap-1 rounded-xl p-1 transition-[scale,color] duration-150 ease-standard outline-none hover:text-foreground-secondary focus-visible:ring-3 focus-visible:ring-ring/50 active:scale-[0.96]"
       >
         {content}
       </Link>
     )
   // A loading md dial keeps the Home link's 4 px padding, so the swap to the linked dial moves nothing.
-  return <div data-dial={variant} className={cn("flex flex-col items-center", lg ? "gap-3" : "gap-2", loading && size === "md" && "min-w-24 p-1")}>{content}</div>
+  return <div data-dial={variant} className={cn("flex flex-col items-center", lg ? "gap-3" : size === "md" ? "gap-1" : "gap-2", loading && size === "md" && "min-w-24 p-1")}>{content}</div>
 }
 
 function ReasonCentre({ icon: Icon, text }: { icon: ReturnType<typeof reasonCopy>["icon"]; text: string }) {
