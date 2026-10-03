@@ -1,7 +1,7 @@
 import { Archive, BookOpen, CalendarDays, CalendarRange, ChartLine, Database, ListChecks } from "lucide-react"
 import { SCORING_VERSION } from "@/server/pipeline"
 import { APP_VERSION } from "@/server/queries/settings"
-import { LinkListSkeleton, LIST_GRID } from "@/components/shells/LinkList"
+import { LinkListSkeleton, MORE_COLUMN } from "@/components/shells/LinkList"
 import { PageShell } from "@/components/shells/PageShell"
 import { CARD_MATERIAL } from "@/components/ui/card"
 import { Skeleton, SkeletonText } from "@/components/ui/skeleton"
@@ -18,7 +18,7 @@ export default function Loading() {
           <span className="block text-[13px] leading-[18px] text-muted-foreground">Account, data source, profile</span>
         </span>
       </div>
-      <div className={LIST_GRID}>
+      <div className={MORE_COLUMN}>
         <LinkListSkeleton
           title="Reports"
           rows={[
@@ -27,14 +27,10 @@ export default function Loading() {
             { icon: Archive, label: "All reports" },
           ]}
         />
-        <div className="flex min-w-0 flex-col gap-6">
-          <LinkListSkeleton title="Trends" rows={[{ icon: ChartLine, label: "Trends" }]} />
-          <LinkListSkeleton title="Journal" rows={[{ icon: ListChecks, label: "Behaviours" }]} />
-        </div>
-        <div className="flex min-w-0 flex-col gap-6">
-          <LinkListSkeleton title="Help" rows={[{ icon: BookOpen, label: "How Pulse works" }]} />
-          <LinkListSkeleton title="Your data" rows={[{ icon: Database, label: "Export and backup" }]} />
-        </div>
+        <LinkListSkeleton title="Trends" rows={[{ icon: ChartLine, label: "Trends" }]} />
+        <LinkListSkeleton title="Journal" rows={[{ icon: ListChecks, label: "Behaviours" }]} />
+        <LinkListSkeleton title="Help" rows={[{ icon: BookOpen, label: "How Pulse works" }]} />
+        <LinkListSkeleton title="Your data" rows={[{ icon: Database, label: "Export and backup" }]} />
         <div aria-hidden className="contents">
           <About version={APP_VERSION} scoringVersion={SCORING_VERSION} />
         </div>

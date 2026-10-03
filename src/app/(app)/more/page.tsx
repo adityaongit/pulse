@@ -7,7 +7,7 @@ import { currentSession } from "@/server/auth"
 import { avatarSrc } from "@/server/avatar"
 import { getDb } from "@/server/db"
 import { getMore } from "@/server/queries/settings"
-import { LinkList, LIST_GRID, type LinkListRow } from "@/components/shells/LinkList"
+import { LinkList, MORE_COLUMN, type LinkListRow } from "@/components/shells/LinkList"
 import { PageShell } from "@/components/shells/PageShell"
 import { CARD_LINK } from "@/components/shells/SectionShell"
 import { UserAvatar } from "@/components/shells/UserAvatar"
@@ -56,19 +56,17 @@ export default async function MorePage() {
   return (
     <PageShell title="More">
       <AccountRow />
-      <div className={LIST_GRID}>
+      {/* One 640 px column, as Settings: a list reads top to bottom, and side-by-side columns sharing grid rows
+          left holes whenever one section was shorter (no reports yet). */}
+      <div className={MORE_COLUMN}>
         <LinkList title="Reports" rows={reports} />
-        <div className="flex min-w-0 flex-col gap-6">
-          <LinkList title="Trends" rows={[{ icon: ChartLine, label: "Trends", aside: "Up to 1 year", href: "/trends" }]} />
-          <LinkList
-            title="Journal"
-            rows={[{ icon: ListChecks, label: "Behaviours", aside: `${vm.behaviours.shown} of ${vm.behaviours.total} shown`, href: "/more/behaviours" }]}
-          />
-        </div>
-        <div className="flex min-w-0 flex-col gap-6">
-          <LinkList title="Help" rows={[{ icon: BookOpen, label: "How Pulse works", aside: `${SCORE_DOCS.length} scores`, href: "/more/how-it-works" }]} />
-          <LinkList title="Your data" rows={[{ icon: Database, label: "Export and backup", aside: "CSV, JSON, SQLite", href: "/more/data" }]} />
-        </div>
+        <LinkList title="Trends" rows={[{ icon: ChartLine, label: "Trends", aside: "Up to 1 year", href: "/trends" }]} />
+        <LinkList
+          title="Journal"
+          rows={[{ icon: ListChecks, label: "Behaviours", aside: `${vm.behaviours.shown} of ${vm.behaviours.total} shown`, href: "/more/behaviours" }]}
+        />
+        <LinkList title="Help" rows={[{ icon: BookOpen, label: "How Pulse works", aside: `${SCORE_DOCS.length} scores`, href: "/more/how-it-works" }]} />
+        <LinkList title="Your data" rows={[{ icon: Database, label: "Export and backup", aside: "CSV, JSON, SQLite", href: "/more/data" }]} />
         <About version={vm.version} scoringVersion={vm.scoringVersion} />
       </div>
     </PageShell>

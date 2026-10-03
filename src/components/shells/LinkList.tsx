@@ -18,6 +18,9 @@ export type LinkListRow = {
 }
 
 /** Groups of rows: one column in reading order, two from 1280 px (More, Reports, their loading shapes). */
+/** List-like pages (More, Settings): one centred 640 px column at every width. */
+export const MORE_COLUMN = "mx-auto flex w-full max-w-[640px] flex-col gap-6"
+
 export const LIST_GRID = "flex flex-col gap-6 xl:grid xl:grid-cols-2 xl:items-start xl:gap-x-6 xl:gap-y-8"
 
 /** WHOOP's section label over a group of rows [latest-settings-1] (spec §11 F22): 13 px caps, tracking 0.1em. */
