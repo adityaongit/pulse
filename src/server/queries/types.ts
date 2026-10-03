@@ -126,6 +126,14 @@ export type HomeVM = {
   tonight: Metric<SleepPlanVM>;
   keyStats: KeyStat[];
   weeklyTeaser: { period: string; start: string; end: string } | null;
+  /** Morning outlook before 17:00 today, day in review after it and on past days (inferred I15); null with no data. */
+  outlook: { kind: "outlook" | "review"; title: string; body: string } | null;
+  /** Today's coach cards (Strain Coach, Recovery, Sleep), in order; empty on past days. */
+  insights: { key: "strain" | "recovery" | "sleep"; title: string; body: string; href: string }[];
+  /** The 7 days ending on `day`: was a check-in logged. */
+  journalWeek: { day: string; done: boolean }[];
+  /** The 7 days ending on `day`, oldest first: Strain 0-21 and Recovery %. */
+  strainRecovery: { day: string; strain: number | null; recovery: number | null }[];
 };
 
 // ── Recovery ─────────────────────────────────────────────────────────────────
@@ -235,7 +243,8 @@ export type Vital = {
 
 export type HealthHubVM = {
   day: string;
-  healthspan: Metric<{ whoopAge: number; deltaYears: number; pace: number }>;
+  /** `paceDelta`: this week's Pace of Aging minus last week's; null without both. */
+  healthspan: Metric<{ whoopAge: number; deltaYears: number; pace: number; paceDelta: number | null }>;
   monitor: Metric<{ vitals: { key: VitalKey; short: string; status: Vital["status"] }[]; inRange: number; total: number }>;
   stress: Metric<{ highMin: number; typicalHighMin: number | null; weekday: string; spark: TimePoint[] }>;
   fitness: Metric<{ vo2max: number; category: string; percentile: number; acwr: number | null; acwrTone: ChipTone | null }>;
@@ -260,6 +269,8 @@ export type HealthspanVM = {
   day: string;
   weekStart: string;
   weekEnd: string;
+  /** The stored day the result comes from (the shown week's Sunday, or the latest day). */
+  asOf: string;
   nextUpdateInDays: number;
   age: number;
   result: Metric<{ whoopAge: number; deltaYears: number; pace: number; paceProvisional: boolean; vo2maxSource: "run" | "daily" | null }>;
@@ -283,7 +294,15 @@ export type StressVM = {
   gauge: Metric<{ value: number; level: StressLevel; at: number | null; dayAverage: boolean }>;
   insight: string | null;
   chart: Metric<{ points: TimePoint[]; spans: Span[]; now: number | null }>;
-  levels: Metric<{ lowMin: number; mediumMin: number; highMin: number; typicalDeltaMin: number | null; weekday: string }>;
+  levels: Metric<{
+    lowMin: number;
+    mediumMin: number;
+    highMin: number;
+    typicalDeltaMin: number | null;
+    weekday: string;
+    /** Mean minutes per level over the same weekday in the last 4 weeks; null without one. */
+    typical: { lowMin: number; mediumMin: number; highMin: number } | null;
+  }>;
   trend: Trend;
 };
 

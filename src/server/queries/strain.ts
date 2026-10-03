@@ -73,7 +73,7 @@ export function getStrain(day: string, ctx: QueryCtx = defaultCtx()): StrainVM {
     soFar: isToday,
     target,
     summary,
-    coach: coach(strain, target, row),
+    coach: coach(strain, target.value, row),
     hr: hrChart(ctx, row, day, isToday),
     zones: zoneRows(row),
     maxHr: row?.s1?.maxHr ?? ctx.profile.maxHr,
@@ -85,9 +85,9 @@ export function getStrain(day: string, ctx: QueryCtx = defaultCtx()): StrainVM {
 const fmt1 = (x: number) => x.toFixed(1);
 
 /** Strain Coach copy (spec §7.3), by position against today's target. */
-function coach(strain: Metric<number>, target: StrainVM["target"], row: DayRow | undefined): string | null {
-  if (strain.value == null || !target.value) return null;
-  const { low, high } = target.value;
+export function coach(strain: Metric<number>, target: { low: number; high: number } | null, row: DayRow | undefined): string | null {
+  if (strain.value == null || !target) return null;
+  const { low, high } = target;
   const range = `${fmt1(low)} - ${fmt1(high)}`;
   if (row?.recovery?.value != null && row.recovery.value < 34) return `Your body needs rest today. Keep strain between ${range.replace(" - ", " and ")}.`;
   if (strain.value < low) {

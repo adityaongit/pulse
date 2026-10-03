@@ -155,21 +155,23 @@ function Tile({ p, c }: { p: KeyStatRowProps; c: Computed }) {
       )}
     >
       <span aria-hidden className="contents">
-        <span className="flex items-start gap-2">
-          {p.icon && <span className="grid size-5 shrink-0 place-items-center text-muted-foreground [&_svg]:size-5 [&_svg]:stroke-[1.75]">{p.icon}</span>}
-          {p.label ? <span className={cn(LABEL, "line-clamp-3 min-w-0 pt-0.5")}>{p.label}</span> : <SkeletonText className={cn(LABEL, "w-24 pt-0.5")} />}
+        {/* WHOOP's v2 tile [latest-health-monitor-1]: icon and caps label on one line, then a 34 px value and its chip. */}
+        <span className="flex items-center gap-2.5">
+          {p.icon && <span className="grid size-5 shrink-0 place-items-center text-muted-foreground [&_svg]:size-5 [&_svg]:stroke-[1.5]">{p.icon}</span>}
+          {p.label ? <span className={cn(LABEL, "line-clamp-3 min-w-0 text-foreground-secondary")}>{p.label}</span> : <SkeletonText className={cn(LABEL, "w-24")} />}
         </span>
         <span className="mt-auto flex flex-col items-start gap-2">
           {c.loading ? (
             <>
-              <SkeletonText className="w-[3ch] font-numeric text-4xl leading-10 font-bold" />
+              <SkeletonText className="w-[3ch] font-numeric text-[34px] leading-10 font-bold" />
               <SkeletonText className="w-28 text-xs leading-6" />
             </>
           ) : (
           <ValueUnit
             value={c.valueText}
             unit={p.unit}
-            className={cn("font-numeric text-4xl leading-10 font-bold tracking-[-0.01em]", c.reason && "text-muted-foreground")}
+            className={cn("font-numeric text-[34px] leading-10 font-bold tracking-[-0.01em]", c.reason && "text-muted-foreground")}
+            unitClassName="text-[15px] leading-5 font-medium text-foreground"
           />
           )}
           {c.loading ? null : c.reason ? (

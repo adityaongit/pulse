@@ -128,7 +128,7 @@ const bedMin = (start: number, tz: string) => {
   return m > 720 ? m - 1440 : m;
 };
 
-function insightOf(rows: Map<string, DayRow>, day: string, tz: string): string | null {
+export function insightOf(rows: Map<string, DayRow>, day: string, tz: string): string | null {
   const row = rows.get(day);
   const perf = row?.sleep?.performance;
   const main = row?.sleep?.main;

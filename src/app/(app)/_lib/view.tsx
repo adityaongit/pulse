@@ -22,6 +22,8 @@ const FORMAT_BY_UNIT: Record<string, FormatKey> = { ms: "int", bpm: "int", rpm: 
 export const STAT_ICON: Record<string, React.ReactNode> = {
   hrv: <Activity />,
   rhr: <Heart />,
+  avgHr: <Heart />,
+  maxHr: <HeartPulse />,
   resp: <Wind />,
   sleep: <Moon />,
   calories: <Zap />,

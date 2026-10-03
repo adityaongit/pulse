@@ -1,11 +1,12 @@
+import { cn } from "@/lib/utils"
+import { CARD_MATERIAL } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { getJournalInsights } from "@/server/queries/journal"
 import type { ImpactMetricKey } from "@/server/queries/types"
 import { DetailShell } from "@/components/shells/DetailShell"
-import { SectionShell } from "@/components/shells/SectionShell"
 import { ImpactList, MetricToggle } from "./Impacts"
 
-export const metadata = { title: "Journal insights" }
+export const metadata = { title: "Behaviour insights" }
 
 const WORD: Record<ImpactMetricKey, string> = { recovery: "Recovery", hrv: "HRV", sleep: "sleep performance" }
 const parseMetric = (raw: string | string[] | undefined): ImpactMetricKey => {
@@ -38,25 +39,34 @@ export default async function JournalInsightsPage({ searchParams }: PageProps<"/
       secondary={
         vm.needsMore.length
           ? [
-              <SectionShell key="more" variant="card" title="Needs more data">
-                <ul className="divide-y divide-border">
-                  {vm.needsMore.map((n) => (
-                    <li key={n.key} className="flex items-center gap-3 py-3">
-                      <div className="min-w-0 flex-1 space-y-1">
-                        <p className="truncate text-xs leading-4 font-bold tracking-[0.08em] uppercase">{n.label}</p>
+              // WHOOP's "Keep logging to unlock" group [latest-journal-insights-1]: one card row per behaviour.
+              <section key="more" aria-labelledby="unlock-title" className="space-y-3">
+                <div className="space-y-1">
+                  <h2 id="unlock-title" className="text-[13px] leading-4 font-bold tracking-[0.08em] uppercase">
+                    Keep logging to unlock
+                  </h2>
+                  <p className="max-w-[65ch] text-[15px] leading-[22px] text-pretty text-muted-foreground">
+                    Log a behaviour as Yes on at least 5 days and No on at least 5 to see how it changes your next-day {WORD[metric]}.
+                  </p>
+                </div>
+                <ul className="space-y-2">
+                  {vm.needsMore.map((n) => {
+                    const have = Math.min(5, n.yes) + Math.min(5, n.no)
+                    return (
+                      <li key={n.key} className={cn(CARD_MATERIAL, "space-y-2.5 p-4")}>
+                        <div className="flex items-baseline justify-between gap-3">
+                          <p className="min-w-0 truncate text-xs leading-4 font-bold tracking-[0.08em] uppercase">{n.label}</p>
+                          <p className="shrink-0 font-numeric text-[13px] leading-4 font-semibold text-foreground-secondary tabular-nums">{have}/10</p>
+                        </div>
+                        <Progress value={(have / 10) * 100} aria-label={`${n.label}: ${have} of 10 days logged`} className="h-1.5 bg-muted" />
                         <p className="text-xs leading-4 font-medium text-muted-foreground tabular-nums">
-                          {n.yes} of 5 days with, {n.no} of 5 without
+                          {Math.min(5, n.yes)} of 5 days with, {Math.min(5, n.no)} of 5 without
                         </p>
-                      </div>
-                      <Progress
-                        value={(Math.min(5, n.yes, n.no) / 5) * 100}
-                        aria-label={`${n.label}: ${Math.min(5, n.yes, n.no)} of 5 days needed`}
-                        className="h-1.5 w-24 shrink-0 bg-muted"
-                      />
-                    </li>
-                  ))}
+                      </li>
+                    )
+                  })}
                 </ul>
-              </SectionShell>,
+              </section>,
             ]
           : undefined
       }

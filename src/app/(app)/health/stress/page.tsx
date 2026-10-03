@@ -1,13 +1,12 @@
 import { redirect } from "next/navigation"
 import { cn } from "@/lib/utils"
-import { clock, dayLabel, durationWords } from "@/lib/format"
+import { clock, dayLabel, durationWords, hmm } from "@/lib/format"
 import { parseDay, todayIn } from "@/lib/url"
 import { getConfig } from "@/server/config"
 import { getStress } from "@/server/queries/health"
 import type { StressVM } from "@/server/queries/types"
 import { StressChart } from "@/components/charts/StressChart"
 import { TrendChart } from "@/components/charts/TrendChart"
-import { ZoneBars } from "@/components/charts/ZoneBars"
 import { InsightCard } from "@/components/metrics/InsightCard"
 import { ScoreDial } from "@/components/metrics/ScoreDial"
 import { DetailShell } from "@/components/shells/DetailShell"
@@ -41,6 +40,59 @@ const INFO = {
       <p>Pulse only scores still minutes. Movement, workouts and sleep are left out, so a walk never counts as stress.</p>
     </>
   ),
+}
+
+const LEVEL_KEYS = [
+  { key: "lowMin", word: "Low", bar: "bg-stress-low", text: "text-stress-low" },
+  { key: "mediumMin", word: "Medium", bar: "bg-stress-medium", text: "text-stress-medium" },
+  { key: "highMin", word: "High", bar: "bg-stress-high", text: "text-stress-high" },
+] as const
+
+/** One three-segment bar, each level as wide as its share of the day's scored minutes. */
+function LevelBar({ m, className }: { m: { lowMin: number; mediumMin: number; highMin: number }; className: string }) {
+  return (
+    <div aria-hidden className={cn("flex gap-0.5 overflow-hidden rounded-sm", className)}>
+      {LEVEL_KEYS.map((k) => m[k.key] > 0 && <span key={k.key} className={k.bar} style={{ flexGrow: m[k.key] }} />)}
+    </div>
+  )
+}
+
+/**
+ * WHOOP's "Total day" [latest-stress-monitor-1]: the day's minutes per level over the typical same weekday
+ * (dimmed), then the three durations in their level colours.
+ */
+function TotalDay({ l, day }: { l: NonNullable<StressVM["levels"]["value"]>; day: string }) {
+  const total = l.lowMin + l.mediumMin + l.highMin
+  if (!total) return <EmptyState body={EMPTY} />
+  return (
+    <div className="space-y-4">
+      <p className="text-xs leading-4 font-bold tracking-[0.08em] uppercase">
+        {day} stress{l.typical && <span className="text-muted-foreground"> vs. typical {l.weekday}</span>}
+      </p>
+      <div className="space-y-1.5">
+        <LevelBar m={l} className="h-3" />
+        {l.typical && <LevelBar m={l.typical} className="h-2 opacity-50" />}
+      </div>
+      <ul className="grid grid-cols-3 gap-3">
+        {LEVEL_KEYS.map((k) => (
+          <li key={k.key} aria-label={`${k.word}: ${durationWords(Math.round(l[k.key]))}${l.typical ? `, typical ${durationWords(Math.round(l.typical[k.key]))}` : ""}`}>
+            <p aria-hidden className={cn("font-numeric text-xl leading-6 font-bold tabular-nums", k.text)}>
+              {hmm(l[k.key])}
+            </p>
+            <p aria-hidden className="mt-1 text-xs leading-4 font-bold tracking-[0.08em] uppercase">
+              {k.word}
+            </p>
+            {l.typical && (
+              <p aria-hidden className="mt-0.5 font-numeric text-xs leading-4 font-medium text-muted-foreground tabular-nums">
+                {hmm(l.typical[k.key])} typical
+              </p>
+            )}
+          </li>
+        ))}
+      </ul>
+      {typicalLine(l) && <p className="text-xs leading-4 font-medium text-muted-foreground">{typicalLine(l)}</p>}
+    </div>
+  )
 }
 
 function typicalLine(l: NonNullable<StressVM["levels"]["value"]>) {
@@ -98,27 +150,9 @@ export default async function StressPage({ searchParams }: PageProps<"/health/st
         </SectionShell>
       }
       secondary={[
-        <SectionShell key="levels" variant="card" title="Time in each level">
+        <SectionShell key="levels" variant="card" title="Total day">
           <MetricState metric={vm.levels} skeleton={<Skeleton className="h-24 w-full" />} renderReason={() => <EmptyState body={EMPTY} />}>
-            {(l) => (
-              <>
-                <ZoneBars
-                  variant="stacked"
-                  unit="minutes"
-                  emptyCopy={EMPTY}
-                  data={{
-                    value: [
-                      { key: "low", label: "Low (0.0-0.9)", count: l.lowMin, color: "stress-low" },
-                      { key: "medium", label: "Medium (1.0-1.9)", count: l.mediumMin, color: "stress-medium" },
-                      { key: "high", label: "High (2.0-3.0)", count: l.highMin, color: "stress-high" },
-                    ],
-                    reason: null,
-                    provisional: vm.levels.provisional,
-                  }}
-                />
-                {typicalLine(l) && <p className="mt-3 text-xs leading-4 font-medium text-muted-foreground">{typicalLine(l)}</p>}
-              </>
-            )}
+            {(l) => <TotalDay l={l} day={vm.isToday ? "Today" : dayLabel(d, today)} />}
           </MetricState>
         </SectionShell>,
         <SectionShell key="trend" variant="card" title="30-day trend">

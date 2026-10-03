@@ -52,12 +52,13 @@ export function SectionShell({ variant, title, info, action, aside, href, level,
     const H = level === 3 ? "h3" : "h2"
     return (
       <section id={id} aria-labelledby={headingId} className={cn("scroll-mt-20 min-w-0", className)}>
-        <div className="mb-3 flex items-end justify-between gap-3 xl:mb-4">
+        {/* One header height for every section (the 34 px "+" on My Day), so side-by-side sections start their cards level. */}
+        <div className="mb-3 flex min-h-[34px] items-center justify-between gap-3 xl:mb-4">
           <H id={headingId} className="text-[22px] leading-7 font-semibold tracking-[-0.01em] text-balance xl:text-2xl">
             {title}
           </H>
           {(aside || actionNode) && (
-            <div className="flex shrink-0 items-center gap-3 pb-0.5 text-xs leading-4 font-medium text-muted-foreground">
+            <div className="flex shrink-0 items-center gap-3 text-xs leading-4 font-medium text-muted-foreground">
               {aside}
               {actionNode}
             </div>

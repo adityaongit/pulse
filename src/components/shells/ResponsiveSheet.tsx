@@ -62,8 +62,10 @@ export function ResponsiveSheet({ open, onOpenChange, title, description, childr
         <DrawerContent
           className={cn(
             SHEET,
-            "border-t-0 motion-reduce:animate-none! data-[vaul-drawer-direction=bottom]:max-h-[92svh] data-[vaul-drawer-direction=bottom]:rounded-t-[28px] [&>div:first-child]:mt-2.5 [&>div:first-child]:h-1.5 [&>div:first-child]:w-10 [&>div:first-child]:bg-white/25",
-            size === "tall" && "data-[vaul-drawer-direction=bottom]:h-[92svh]"
+            "border-t-0 data-[vaul-drawer-direction=bottom]:max-h-[92svh] data-[vaul-drawer-direction=bottom]:rounded-t-[28px] [&>div:first-child]:mt-2.5 [&>div:first-child]:h-1.5 [&>div:first-child]:w-10 [&>div:first-child]:bg-white/25",
+            size === "tall" && "data-[vaul-drawer-direction=bottom]:h-[92svh]",
+            // Reduced motion: vaul's slide becomes a 120 ms fade (its own fadeIn / fadeOut keyframes), as every overlay does (spec §2.7).
+            "motion-reduce:[animation-duration:120ms]! motion-reduce:data-[state=open]:[animation-name:fadeIn]! motion-reduce:data-[state=closed]:[animation-name:fadeOut]!"
           )}
         >
           {header(DrawerTitle, DrawerDescription, DrawerClose)}

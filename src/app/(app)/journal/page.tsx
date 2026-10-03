@@ -39,7 +39,8 @@ export default async function JournalPage({ searchParams }: PageProps<"/journal"
         </Button>
       }
     >
-      <div className="-mx-4 -mt-2 md:mx-0">
+      {/* Full-bleed on phone: the strip scrolls edge to edge, its first item keeps the 16 px gutter inside. */}
+      <div className="-mx-4 md:mx-0">
         <DayStrip indicator="journal" days={vm.strip.map((s) => ({ date: s.day, done: s.done }))} />
       </div>
 

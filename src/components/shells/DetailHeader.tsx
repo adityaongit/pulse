@@ -20,6 +20,9 @@ export type DetailHeaderProps = {
   dateTitle?: DateSwitcherProps
   /** `close`: an X instead of the back chevron, for modal-style screens (Settings, [latest-settings-1]). */
   dismiss?: "back" | "close"
+  /** `start`: back, an optional 24 px icon, then the title over the subtitle, all left-aligned (Activity, [latest-activity-1]). */
+  align?: "center" | "start"
+  titleIcon?: React.ReactNode
 }
 
 /**
@@ -36,6 +39,8 @@ export function DetailHeaderRow({
   backHref,
   dateTitle,
   dismiss = "back",
+  align = "center",
+  titleIcon,
   centerClassName,
   className,
 }: DetailHeaderProps & { centerClassName?: string; className?: string }) {
@@ -53,15 +58,29 @@ export function DetailHeaderRow({
     router.push(tabForPath(pathname) === "home" && d ? dayHref(parent, d, today) : parent)
   }
   const Icon = dismiss === "close" ? X : ChevronLeft
+  const backButton = (
+    <Button variant="ghost" size="icon-touch" aria-label={dismiss === "close" ? "Close" : "Back"} onClick={back} className="hover:bg-white/8">
+      <Icon aria-hidden strokeWidth={1.75} className={dismiss === "close" ? "size-6" : "size-[26px]"} />
+    </Button>
+  )
+
+  if (align === "start")
+    return (
+      <div className={cn("flex items-center gap-2 px-2 md:px-4", DETAIL_ROW, "h-auto min-h-11 md:min-h-13", className)}>
+        {backButton}
+        {titleIcon && <span className="grid size-7 shrink-0 place-items-center [&_svg]:size-6 [&_svg]:stroke-[1.75]">{titleIcon}</span>}
+        <div data-collapse-keep className="min-w-0 flex-1 py-1">
+          <h1 className={cn(HEADER_TITLE, "truncate")}>{title}</h1>
+          {subtitle && <p className="truncate text-[15px] leading-5 text-foreground-secondary tabular-nums">{subtitle}</p>}
+        </div>
+        {info && <InfoButton info={info} label={title} variant="header" />}
+      </div>
+    )
 
   return (
     <HeaderRow
       className={cn(DETAIL_ROW, className)}
-      left={
-        <Button variant="ghost" size="icon-touch" aria-label={dismiss === "close" ? "Close" : "Back"} onClick={back} className="hover:bg-white/8">
-          <Icon aria-hidden strokeWidth={1.75} className={dismiss === "close" ? "size-6" : "size-[26px]"} />
-        </Button>
-      }
+      left={backButton}
       center={
         <div data-collapse-keep className={cn("flex max-w-full min-w-0 flex-col items-center", centerClassName)}>
           {dateTitle ? (

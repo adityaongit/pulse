@@ -17,6 +17,9 @@ export type DetailShellProps = {
   /** `placement: "header"` makes the date the header title (Recovery, Strain, Sleep); else the pill sits under the header. */
   dateSwitcher?: DateSwitcherProps
   dismiss?: DetailHeaderProps["dismiss"]
+  /** Left-aligned header with an icon before the title (Activity, spec §7.4). */
+  align?: DetailHeaderProps["align"]
+  titleIcon?: React.ReactNode
   /** Page ground (spec §2.1): Healthspan is WHOOP's darker `#101518`; the collapsed band paints the same ground. */
   ground?: "default" | "healthspan"
   /** The hero component. With `collapse`, it must accept `compact` (or forward it to the component inside). */
@@ -29,6 +32,11 @@ export type DetailShellProps = {
    */
   collapse?: boolean
   summary?: React.ReactNode
+  /**
+   * WHOOP's speech-bubble pointer on the summary card, aimed at the dial above it (beside it on laptop)
+   * [latest-recovery-1], [latest-strain-1], [latest-sleep-1]. Recovery, Strain and Sleep.
+   */
+  notch?: boolean
   insight?: React.ReactNode
   primary?: React.ReactNode
   /** One column; two from 1024 px. An item can span both with `className="lg:col-span-2"`. */
@@ -37,11 +45,11 @@ export type DetailShellProps = {
 }
 
 /** Detail screens (spec §4.6): one dial, one number, then everything that explains it. */
-export function DetailShell({ title, subtitle, info, backHref, dateSwitcher, dismiss, ground, hero, stats, collapse, summary, insight, primary, secondary, footer }: DetailShellProps) {
+export function DetailShell({ title, subtitle, info, backHref, dateSwitcher, dismiss, align, titleIcon, ground, hero, stats, collapse, summary, notch, insight, primary, secondary, footer }: DetailShellProps) {
   // With no summary, the insight takes the hero's right column on laptop (spec §7.9).
   const side = summary ?? (hero ? insight : null)
   const inHeader = dateSwitcher?.placement === "header"
-  const headerProps = { title, subtitle, info, backHref, dismiss, dateTitle: inHeader ? dateSwitcher : undefined }
+  const headerProps = { title, subtitle, info, backHref, dismiss, align, titleIcon, dateTitle: inHeader ? dateSwitcher : undefined }
   // Built here, on the server, so a page's own wrapper hero (a server component) renders its compact form too.
   const compact = collapse && isValidElement<{ compact?: boolean }>(hero) ? cloneElement(hero, { compact: true }) : null
   return (
@@ -64,7 +72,18 @@ export function DetailShell({ title, subtitle, info, backHref, dateSwitcher, dis
                   {hero}
                 </div>
               )}
-              {side && <div className="min-w-0">{side}</div>}
+              {side && (
+                <div className={cn("min-w-0", notch && summary && "relative")}>
+                  {notch && summary && (
+                    // A 16 px square turned 45°: its upper half shows above the card. The inset light continues the card's top hairline.
+                    <span
+                      aria-hidden
+                      className="absolute -top-2 left-1/2 size-4 -translate-x-1/2 rotate-45 rounded-tl-[3px] bg-card-top shadow-[inset_1px_1px_0_var(--card-edge)] xl:top-1/2 xl:-left-2 xl:translate-x-0 xl:-translate-y-1/2 xl:bg-card xl:shadow-none"
+                    />
+                  )}
+                  {side}
+                </div>
+              )}
             </div>
           )}
           {(summary || !hero) && insight}

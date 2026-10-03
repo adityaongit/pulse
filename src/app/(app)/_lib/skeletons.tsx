@@ -1,8 +1,8 @@
 // Route loading states (spec §5.19): the real shells and each section's own box with its static
 // titles and labels; only values are bars, so nothing moves when data arrives. Headers never skeleton.
 import { Fragment } from "react"
-import { HypnogramSkeleton } from "@/components/charts/Hypnogram"
 import { IntradayHrChartSkeleton } from "@/components/charts/IntradayHrChart"
+import { StrainRecoveryChartSkeleton } from "@/components/charts/StrainRecoveryChart"
 import { TrendChartSkeleton } from "@/components/charts/TrendChart"
 import { ZoneBarsSkeleton } from "@/components/charts/ZoneBars"
 import { TimelineSkeleton } from "@/components/metrics/ActivityCard"
@@ -10,6 +10,7 @@ import { ContributorRowSkeleton } from "@/components/metrics/ContributorRow"
 import { InsightCardSkeleton } from "@/components/metrics/InsightCard"
 import { KeyStatRowSkeleton } from "@/components/metrics/KeyStatRow"
 import { ScoreDialSkeleton } from "@/components/metrics/ScoreDial"
+import { SleepStagesSkeleton } from "@/components/metrics/SleepStages"
 import { DetailShell } from "@/components/shells/DetailShell"
 import { PageShell } from "@/components/shells/PageShell"
 import { SectionShell } from "@/components/shells/SectionShell"
@@ -92,10 +93,21 @@ export function HomeSkeleton() {
           </div>
         ),
         right: (
-          <SectionShell variant="section" title="My Day" action={<span aria-hidden className="-my-2 block size-12 rounded-[14px] bg-foreground/90" />}>
+          <SectionShell variant="section" title="My Day" action={<span aria-hidden className="block size-[34px] rounded-[10px] bg-foreground/90" />}>
             <div className="space-y-3 xl:space-y-4">
               <CardSkeleton title="Today's activities">
                 <TimelineSkeleton />
+              </CardSkeleton>
+              <CardSkeleton title="My journal">
+                <div className="grid grid-cols-7 pt-1">
+                  {rows(7, () => (
+                    <div className="flex min-h-16 flex-col items-center justify-center gap-2">
+                      <SkeletonText className={`${LABEL} w-[3ch]`} />
+                      <span className="size-7 rounded-full ring-1 ring-white/25 ring-inset" />
+                    </div>
+                  ))}
+                </div>
+                <Skeleton className="mt-3 h-12 rounded-xl" />
               </CardSkeleton>
               <div className="grid grid-cols-1 gap-3 xl:grid-cols-2 xl:gap-4">
                 <CardSkeleton title="Energy Bank">
@@ -117,6 +129,9 @@ export function HomeSkeleton() {
                 </li>
               ))}
             </ul>
+            <CardSkeleton title="Strain & recovery" className="mt-3 xl:mt-4">
+              <StrainRecoveryChartSkeleton />
+            </CardSkeleton>
           </SectionShell>
         ),
       }}
@@ -144,6 +159,7 @@ export function DetailSkeleton({
       title={title}
       ground={ground}
       dateSwitcher={dateSwitcher ? { mode: "day", placement: DIAL[title] ? "header" : "body" } : undefined}
+      notch={!!DIAL[title]}
       hero={<ScoreDialSkeleton size="lg" variant={DIAL[title] ?? "stat"} />}
       summary={
         <Card aria-hidden className="gap-0 px-4 py-1">
@@ -158,7 +174,7 @@ export function DetailSkeleton({
       insight={<InsightCardSkeleton />}
       primary={
         <CardSkeleton title={PRIMARY[chart] ?? `${title} trend`}>
-          {chart === "hr" ? <IntradayHrChartSkeleton /> : chart === "stages" ? <HypnogramSkeleton /> : <TrendChartSkeleton />}
+          {chart === "hr" ? <IntradayHrChartSkeleton /> : chart === "stages" ? <SleepStagesSkeleton /> : <TrendChartSkeleton />}
         </CardSkeleton>
       }
       secondary={(SECONDARY[title] ?? ["", ""]).map((t, i) => (
@@ -182,29 +198,35 @@ export function ActivitySkeleton() {
   return (
     <DetailShell
       title="Activity"
+      align="start"
       hero={
-        <div aria-hidden className="flex flex-col items-center gap-2 py-2">
-          <Skeleton className="size-12 rounded-full" />
-          <SkeletonText className="w-[4ch] font-numeric text-[56px] leading-none font-bold" />
-          <p className={LABEL}>Activity strain</p>
-        </div>
-      }
-      summary={
-        <div className="grid grid-cols-2 gap-3 md:grid-cols-4 xl:gap-4">
-          {["Duration", "Average heart rate", "Max heart rate", "Calories"].map((l) => (
-            <KeyStatRowSkeleton key={l} variant="tile" label={l} />
+        <div aria-hidden className="flex w-full flex-wrap items-end gap-x-10 gap-y-3">
+          {["Activity strain", "Duration"].map((l) => (
+            <div key={l}>
+              <SkeletonText className="w-[3ch] font-numeric text-[44px] leading-none font-bold" />
+              <p className={`${LABEL} mt-2 text-foreground-secondary`}>{l}</p>
+            </div>
           ))}
         </div>
       }
       primary={
-        <CardSkeleton title="Heart rate">
+        <div aria-hidden className="space-y-6">
           <IntradayHrChartSkeleton variant="activity" />
-        </CardSkeleton>
+          <ZoneBarsSkeleton variant="rows" />
+        </div>
       }
       secondary={[
-        <CardSkeleton key="zones" title="Time in zones">
-          <ZoneBarsSkeleton variant="rows" />
-        </CardSkeleton>,
+        <SectionShell key="stats" variant="section" title="Key statistics" aside="vs. 30-day average" level={2} className="lg:col-span-2">
+          <div aria-hidden className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:gap-4">
+            {[
+              ["avgHr", "Average heart rate"],
+              ["maxHr", "Max heart rate"],
+              ["calories", "Calories"],
+            ].map(([k, l]) => (
+              <KeyStatRowSkeleton key={k} variant="tile" label={l} icon={STAT_ICON[k]} />
+            ))}
+          </div>
+        </SectionShell>,
         <CardSkeleton key="hrr" title="Heart rate recovery">
           <Skeleton className="h-24 rounded-lg bg-muted/60" />
         </CardSkeleton>,

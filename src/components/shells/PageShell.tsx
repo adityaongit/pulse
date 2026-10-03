@@ -5,7 +5,8 @@ import { HomeHeader, type HeaderRings } from "./HomeHeader"
 import { TitleHeader } from "./TopBar"
 
 /** The content column: full width on phone, 720 px on tablet, up to 1120 px on laptop (spec §2.5, §4.5). */
-export const CONTENT_COLUMN = "mx-auto w-full min-w-0 px-4 pt-2 md:max-w-[720px] md:px-6 xl:max-w-[1120px] xl:px-8 xl:pt-4"
+export const CONTENT_COLUMN =
+  "mx-auto w-full min-w-0 px-4 pt-2 transition-opacity duration-150 ease-standard md:max-w-[720px] md:px-6 xl:max-w-[1120px] xl:px-8 xl:pt-4 in-data-day-loading:opacity-60"
 
 export type HomeSlots = { top: React.ReactNode; left: React.ReactNode; right: React.ReactNode; bottom?: React.ReactNode }
 

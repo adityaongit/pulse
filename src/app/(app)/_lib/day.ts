@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation"
-import { parseDay, todayIn } from "@/lib/url"
+import { parseDay, parseRange, todayIn } from "@/lib/url"
 import { getConfig } from "@/server/config"
 
 export type SearchParams = Promise<Record<string, string | string[] | undefined>>
@@ -18,5 +18,6 @@ export async function pageDay(searchParams: SearchParams, path: string) {
     for (const [k, v] of Object.entries(sp)) if (k !== "d" && typeof v === "string") q.set(k, v)
     redirect(q.size ? `${path}?${q}` : path)
   }
-  return { d, today, timeZone }
+  // The trend card is WHOOP's "Weekly trends" while the range is W [latest-recovery-weekly-1].
+  return { d, today, timeZone, weekly: parseRange(sp.r) === "w" }
 }

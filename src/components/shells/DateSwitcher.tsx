@@ -59,6 +59,16 @@ function Switcher({ mode, calendar, placement = "body", narrow = false }: DateSw
   // The pill shows the app's one spinner while the next day loads (spec §2.7 "Loading a past day").
   const [loading, startLoading] = React.useTransition()
   const { d } = parseDay(params.get("d") ?? undefined, today)
+  // While the next day loads, the page keeps the previous day dimmed to 60 % (spec §2.7): a flag on <main>
+  // that the content column reads (`in-data-day-loading:`), so no page re-renders for it.
+  React.useEffect(() => {
+    const main = document.getElementById("main")
+    if (!main || !loading) return
+    main.dataset.dayLoading = ""
+    return () => {
+      delete main.dataset.dayLoading
+    }
+  }, [loading])
 
   const week = mode === "week"
   const [weekStart, weekEnd] = weekOf(d)

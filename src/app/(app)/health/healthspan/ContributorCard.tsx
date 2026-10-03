@@ -69,12 +69,14 @@ export function ContributorCard({ title, items }: { title: string; items: Health
                 years={c.years}
                 higherIsBetter={c.higherIsBetter}
                 reasonCopy={c.metric.value === null ? c.caption : undefined}
+                // A caption under the row tucks up to it (4 px) instead of a negative margin pulling it in.
+                className={c.caption && c.metric.value !== null ? "pb-1" : undefined}
                 onSelect={() => {
                   setOpen(c.key)
                   setLast(c)
                 }}
               />
-              {c.caption && c.metric.value !== null && <p className="-mt-2 pb-3 text-xs leading-4 font-medium text-muted-foreground">{c.caption}</p>}
+              {c.caption && c.metric.value !== null && <p className="pb-3 text-xs leading-4 font-medium text-muted-foreground">{c.caption}</p>}
             </div>
           )
         })}

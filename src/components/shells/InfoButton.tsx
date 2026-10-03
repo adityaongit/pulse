@@ -33,3 +33,15 @@ export function InfoButton({ info, label, variant }: { info: InfoContent; label:
     </DialogPrimitive.Root>
   )
 }
+
+/** Any element as the trigger of an info card (Home's day banner, "Add activity"); focus returns to it on close. */
+export function InfoCardTrigger({ info, className, children, ...rest }: { info: InfoContent; className?: string; children: React.ReactNode } & React.AriaAttributes) {
+  return (
+    <DialogPrimitive.Root>
+      <DialogPrimitive.Trigger className={className} {...rest}>
+        {children}
+      </DialogPrimitive.Trigger>
+      <InfoDialogContent {...info} />
+    </DialogPrimitive.Root>
+  )
+}
