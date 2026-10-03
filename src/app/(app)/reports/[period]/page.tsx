@@ -101,7 +101,7 @@ function KindToggle({ kind, week, month }: { kind: "week" | "month"; week: strin
 function Dials({ vm }: { vm: ReportVM }) {
   const word = vm.kind === "week" ? "last week" : "last month"
   return (
-    <div className="flex w-full items-start justify-center xl:gap-4">
+    <div className="flex w-full items-start justify-center gap-5 sm:gap-8">
       {vm.dials.map((dl) => {
         const f = DIAL_FORMAT[dl.key]
         const tone = dl.delta === null || dl.key === "strain" || Math.round(dl.delta * 10) === 0 ? "text-muted-foreground" : dl.delta > 0 ? "text-optimal" : "text-warning"

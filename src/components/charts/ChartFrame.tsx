@@ -20,12 +20,13 @@ export function ChartFigure({
   return (
     <figure className="min-w-0">
       <figcaption className="sr-only">{summary}</figcaption>
-      {/* Recharts' keyboard layer makes the plot a tab stop (arrows scrub the tooltip); ChartContainer hides its outline,
-          so the focused plot gets the app's ring back (U18 G-06). */}
+      {/* Recharts' keyboard layer makes the plot a tab stop (arrows scrub the tooltip). No outline box on the plot:
+          Chrome treated a click as focus-visible and drew a box round the chart; keyboard focus already shows as the
+          tooltip and cursor appearing (user report, 2026-10-03). */}
       <ChartContainer
         config={config}
         className={cn(
-          "aspect-auto w-full font-numeric text-xs font-medium [&_.recharts-surface]:rounded-md [&_.recharts-surface:focus-visible]:outline-2 [&_.recharts-surface:focus-visible]:outline-offset-2 [&_.recharts-surface:focus-visible]:outline-ring/50",
+          "aspect-auto w-full font-numeric text-xs font-medium [&_.recharts-surface]:rounded-md [&_.recharts-surface]:outline-none [&_.recharts-wrapper]:outline-none",
           className
         )}
       >
