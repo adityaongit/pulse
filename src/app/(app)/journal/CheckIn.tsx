@@ -42,6 +42,16 @@ export const TAG_CLASS = "h-7 rounded-full px-3 text-[13px] font-semibold"
 
 type Values = Record<string, number | undefined>
 
+/**
+ * The answers Save writes: each tag whose value differs from the saved one, as yes/no, or null where a
+ * saved answer was cleared (the server deletes it, so it reads as "not answered", not "no").
+ */
+export function changedEntries(values: Values, saved: Record<string, number>): [string, boolean | null][] {
+  return Object.entries(values)
+    .filter(([t, v]) => v !== saved[t])
+    .map(([t, v]) => [t, v === undefined ? null : v > 0])
+}
+
 export type CheckInProps = {
   day: string
   /** "Mon, Sep 28". */
@@ -96,10 +106,9 @@ export function CheckIn({ day, dayLabel, tags, checkIn }: CheckInProps) {
   const save = async () => {
     setSaving(true)
     setSaveError(false)
-    const changed = Object.entries(values).filter(([t, v]) => v !== undefined && v !== checkIn.entries[t])
     try {
-      for (const [tag, value] of changed) {
-        const r = await saveJournalEntry({ day, tag, value: value! > 0 })
+      for (const [tag, value] of changedEntries(values, checkIn.entries)) {
+        const r = await saveJournalEntry({ day, tag, value })
         if (!r.ok) throw new Error(r.error)
       }
       setOpen(false)

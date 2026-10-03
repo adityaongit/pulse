@@ -78,6 +78,15 @@ describe("saveJournalEntry", () => {
     await saveJournalEntry({ ...e, value: false });
     expect(entries()).toEqual([{ day: "2026-10-01", tag: "meditation", value: 0 }]);
   });
+
+  it("null clears a saved answer back to unanswered, and is idempotent", async () => {
+    await saveJournalEntry({ day: "2026-10-01", tag: "alcohol", value: true });
+    await saveJournalEntry({ day: "2026-10-01", tag: "sauna", value: false });
+    expect(await saveJournalEntry({ day: "2026-10-01", tag: "alcohol", value: null })).toEqual({ ok: true, data: undefined });
+    expect(await saveJournalEntry({ day: "2026-10-01", tag: "alcohol", value: null })).toMatchObject({ ok: true });
+    expect(entries()).toEqual([{ day: "2026-10-01", tag: "sauna", value: 0 }]);
+    expect(await saveJournalEntry({ day: "2026-10-04", tag: "alcohol", value: null })).toMatchObject({ ok: false });
+  });
 });
 
 describe("addCustomTag", () => {
