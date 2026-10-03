@@ -57,8 +57,12 @@ export default defineConfig({
     desktop("1920", 1920, 1080),
   ],
   webServer: {
-    // Fresh DB each start: the worker seeds 180 days ending today on boot.
-    command: `rm -f "${E2E_DB}"* && mkdir -p "${path.dirname(E2E_DB)}" && pnpm exec next dev -p ${PORT}`,
+    // Fresh DB each start: the worker seeds 180 days ending today on boot. E2E_PROD=1 (CI) tests a production
+    // build: every page compiled once up front instead of on first hit, which is several times faster on a
+    // 2-core runner, and it is what gets deployed.
+    command: `rm -f "${E2E_DB}"* && mkdir -p "${path.dirname(E2E_DB)}" && ${
+      process.env.E2E_PROD ? `pnpm exec next build && pnpm exec next start -p ${PORT}` : `pnpm exec next dev -p ${PORT}`
+    }`,
     url: `http://localhost:${PORT}/healthz`,
     env,
     // Reuse only the e2e server itself (same port) while iterating locally; CI always starts fresh.
