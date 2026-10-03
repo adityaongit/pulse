@@ -18,7 +18,7 @@ const barlow = Barlow({
 });
 
 const DESCRIPTION =
-  "Recovery, strain and sleep from your Fitbit Air, scored the WHOOP way: Healthspan, Energy Bank, stress and a journal, all on your own server.";
+  "Recovery, strain and sleep from your Fitbit Air: Healthspan, Energy Bank, stress and a journal, all on your own server.";
 
 export const metadata: Metadata = {
   title: { default: "Pulse", template: "%s · Pulse" },

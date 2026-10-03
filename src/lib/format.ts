@@ -5,7 +5,7 @@ import type { DeltaDir, Tone } from "./bands";
 // server component can hand them to a client component (functions do not cross that boundary).
 
 /** The product name for the Healthspan age. Swap to "Pulse Age" here if preferred (spec §11). */
-export const AGE_LABEL = "WHOOP Age";
+export const AGE_LABEL = "Pulse Age";
 export const MISSING = "--";
 const MINUS = "−";
 

@@ -108,7 +108,7 @@ export default async function HealthspanPage({ searchParams }: PageProps<"/healt
           <p className={cn(CAPTION, "mt-3")}>
             {r?.paceProvisional
               ? "Pace of Aging uses a 6-month window. It firms up as history builds."
-              : "Compares your last 30 days with your 6-month WHOOP Age."}
+              : "Compares your last 30 days with your 6-month Pulse Age."}
           </p>
         </SectionShell>
       }

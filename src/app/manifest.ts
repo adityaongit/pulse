@@ -6,7 +6,7 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: "Pulse: recovery, strain and sleep",
     short_name: "Pulse",
-    description: "Recovery, strain and sleep from your Fitbit Air, scored the WHOOP way.",
+    description: "Recovery, strain and sleep from your Fitbit Air.",
     start_url: "/",
     display: "standalone",
     background_color: "#0f1113",
