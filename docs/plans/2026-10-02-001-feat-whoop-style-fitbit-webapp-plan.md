@@ -1367,6 +1367,8 @@ Agreed on 2026-10-03 to do later, not to drop:
 - The 41 low web-guideline findings in `docs/design/guidelines-review.md`.
 - The Sleep card's hours hero and overnight HR chart (the view model has no data for them yet).
 - A customizable My Dashboard (suggested on Reddit).
+- Height from Google: the API has a `height` data type, but its value field isn't in the reference docs. Confirm it with the first real probe, then sync it into the profile (Settings keeps the manual field). Google's profile itself only has `age`: no birth date, no sex.
+- Warn when the signed-in account has a Google Health profile but no Fitbit device or data (`users.pairedDevices.list` empty), instead of an empty import that reports success.
 - An e2e onboarding journey: it needs a second e2e server without a profile, since deleting the shared demo profile would send parallel tests to onboarding. Unit tests cover the gate (`src/proxy.test.ts`).
 
 U16 decisions (2026-10-03): Home's Strain dial drops the "So far" tag, and the coach card drops its "View Strain" link (WHOOP, Bevel and Baro show neither). "HEALTH MONITOR" and "STRESS MONITOR" don't wrap on the user's phone, though they still wrap in a 361 px Playwright render; left as is. The vitest `hookTimeout` stays at 60 s.
