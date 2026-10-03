@@ -2763,7 +2763,7 @@ Rows overridden by v2: **D2** (TopBar part only, V3), **B1** (V10), **CAL6** (of
 | S8 | §5.1: track under the fill at the ring radii | The fill arc spans the full ring (`barCategoryGap={0}`); the track sits 0.25 px inside each edge, and the Strain Target tick draws above the fill | Recharts' 10 % default gap inset the arc 1.3 px, leaving a dark fringe; the tick under the arc showed as two specks (visual QA; [latest-strain-1]) |
 
 
-**Mobile QA rows (M).** Fixes from real-device testing (OnePlus 13R, Brave Android, CSS viewport about 361 px, 2026-10-03), with the reason. They override the text they name.
+**Mobile QA rows (M).** Fixes from real-device testing (an Android phone, Brave, CSS viewport about 361 px, 2026-10-03), with the reason. They override the text they name.
 
 | # | Spec says | Build does | Why |
 |---|---|---|---|

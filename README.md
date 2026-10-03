@@ -28,7 +28,7 @@ Every variable is listed and explained in [`.env.example`](.env.example). It is 
 
 ## Deploy
 
-Production runs as one container on the homelab, behind Cloudflare Tunnel, with no published ports. For Google Cloud setup, Cloudflare, `docker compose`, backups and troubleshooting, see [`docs/runbook.md`](docs/runbook.md).
+Pulse runs as one Docker container with its database in a volume, behind a tunnel or HTTPS reverse proxy. The [setup guide](docs/setup.md) covers Google Cloud, Docker, HTTPS, backups and troubleshooting.
 
 ## Commands
 

@@ -2,7 +2,7 @@
 
 Pulse runs on your own machine or server: one Next.js app with its sync worker, on SQLite. One instance
 serves one person. This guide takes you from a demo on your laptop to your own Fitbit Air data on a server
-you can open from your phone. The maintainer's own homelab deployment is in [runbook.md](runbook.md).
+you can open from your phone.
 
 ```mermaid
 flowchart TB
@@ -72,21 +72,8 @@ and Settings shows its progress. Real data lives in `data/pulse.db`, apart from 
 
 ## 4. Run it with Docker
 
-The image builds the app and keeps the database in a volume. A minimal compose file for your own server:
-
-```yaml
-services:
-  pulse:
-    build: .
-    restart: unless-stopped
-    env_file: .env
-    volumes:
-      - pulse-data:/app/data
-    ports:
-      - "127.0.0.1:3000:3000"   # only the reverse proxy or tunnel on this machine can reach it
-volumes:
-  pulse-data:
-```
+The image builds the app and keeps the database in the `pulse-data` volume. [`compose.yaml`](../compose.yaml)
+publishes it on `127.0.0.1:3000` only, so just a tunnel or reverse proxy on the same machine can reach it:
 
 ```sh
 docker compose up -d --build
@@ -132,10 +119,31 @@ with a list of what's wrong.
 ## Keeping it running
 
 - **Update:** `git pull && docker compose up -d --build`. Migrations run at boot.
-- **Back up** the database with SQLite's online backup, never by copying the file while it runs; the
-  [runbook](runbook.md#7-backups) has a script. Encrypt backups before they leave the machine.
+- **Back up** the database with SQLite's online backup, never by copying the file while it runs (see below).
 - **Sign everyone out:** delete the row in the `instance` table; a new session secret is created on the next request.
 - **Disconnect Google:** Settings › Data source › Disconnect removes Pulse's access in your Google account too.
+
+## Backups
+
+Take online backups with SQLite's backup API, which is safe while Pulse writes in WAL mode. Run this daily
+from cron; it keeps 14 days:
+
+```sh
+#!/bin/sh
+set -eu
+umask 077
+dir=/var/backups/pulse
+mkdir -p "$dir" && chmod 700 "$dir"
+f="$dir/pulse-$(date +%F).db"
+# better-sqlite3 isn't hoisted in the standalone node_modules, hence the glob.
+docker exec pulse node -e "const D=require(require('fs').globSync('/app/node_modules/.pnpm/better-sqlite3@*/node_modules/better-sqlite3')[0]);new D('/app/data/pulse.db',{readonly:true}).backup('/tmp/backup.db').then(()=>process.exit(0),e=>{console.error(e);process.exit(1)})"
+docker cp pulse:/tmp/backup.db "$f" && docker exec pulse rm -f /tmp/backup.db
+chmod 600 "$f"
+ls -1t "$dir"/pulse-*.db | tail -n +15 | xargs -r rm -f
+```
+
+- Encrypt anything that leaves the machine, for example `age -r <your-age-pubkey> -o "$f.age" "$f"`. Never copy the plain `.db` offsite.
+- To restore: `docker compose stop pulse`, copy the backup over `pulse.db` in the volume, delete `pulse.db-wal` and `pulse.db-shm` beside it, then `docker compose start pulse`.
 
 ## Troubleshooting
 

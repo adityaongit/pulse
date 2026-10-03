@@ -11,7 +11,7 @@ vi.mock("@/server/db", async (orig) => ({ ...(await orig<object>()), getDb: () =
 
 const env = { TZ: "Asia/Kolkata" };
 const google = { GOOGLE_OAUTH_ENABLED: "true", GOOGLE_CLIENT_ID: "cid", GOOGLE_CLIENT_SECRET: "csecret" };
-const start = (url = "http://192.168.1.71:3000/oauth/start") => GET(new Request(url));
+const start = (url = "http://192.168.1.10:3000/oauth/start") => GET(new Request(url));
 const location = (res: Response) => new URL(res.headers.get("location")!);
 
 beforeEach(() => {
@@ -35,7 +35,7 @@ describe("GET /oauth/start", () => {
     expect(url.searchParams.get("client_id")).toBe("cid");
     expect(url.searchParams.get("scope")).toMatch(/^openid email profile /);
     // No APP_URL: the redirect follows the host the request came in on.
-    expect(url.searchParams.get("redirect_uri")).toBe("http://192.168.1.71:3000/oauth/callback");
+    expect(url.searchParams.get("redirect_uri")).toBe("http://192.168.1.10:3000/oauth/callback");
     const state = url.searchParams.get("state");
     expect(consumeState(state)).toBe(true);
     expect(consumeState(state)).toBe(false);

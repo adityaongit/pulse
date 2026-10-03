@@ -47,7 +47,7 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
           <p className={FOOTNOTE}>
             {google
               ? "Pulse reads your Google Health data and keeps it on this server. It never writes to your account."
-              : "This server runs on generated data. To use your own, set up a Google OAuth client (see docs/runbook.md)."}
+              : "This server runs on generated data. To use your own, set up a Google OAuth client (see docs/setup.md)."}
           </p>
         </>
       }
