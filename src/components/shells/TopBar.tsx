@@ -111,7 +111,7 @@ export function SyncStatus({ variant = "header" }: { variant?: "header" | "icon"
       >
         <div className="flex items-center gap-3 p-4">
           <span aria-hidden className="grid size-10 shrink-0 place-items-center rounded-xl bg-white/[0.06]">
-            <BandIcon className="size-5" strokeWidth={1.75} />
+            <BandIcon className="size-5" strokeWidth={1.4} />
           </span>
           <div className="min-w-0">
             <p className="text-[15px] leading-5 font-semibold">{s.mode === "demo" ? "Demo data" : "Google Health"}</p>
