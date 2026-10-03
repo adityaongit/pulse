@@ -5,7 +5,8 @@ import { oauthTokens } from "@/server/db/schema";
 import { createState } from "@/server/sources/google/oauth";
 import { GET } from "./route";
 
-const h = vi.hoisted(() => ({ cfg: undefined as unknown, db: undefined as unknown }));
+const h = vi.hoisted(() => ({ cfg: undefined as unknown, db: undefined as unknown, requestSync: vi.fn() }));
+vi.mock("@/server/worker", () => ({ requestSync: h.requestSync }));
 vi.mock("@/server/config", async (orig) => ({ ...(await orig<object>()), getConfig: () => h.cfg as Config }));
 vi.mock("@/server/db", async (orig) => ({ ...(await orig<object>()), getDb: () => h.db as Db }));
 
@@ -81,6 +82,8 @@ describe("GET /oauth/callback", () => {
     expect(body.get("code")).toBe("c0de");
     expect(body.get("redirect_uri")).toBe("https://pulse.example.com/oauth/callback");
     expect(tokens()).toMatchObject([{ id: 1, accessToken: "at-NEW", refreshToken: "rt-NEW", revokedAt: null }]);
+    // The first import starts now, past the worker's 5-minute gate.
+    expect(h.requestSync).toHaveBeenCalledExactlyOnceWith({ force: true });
   });
 
   it("a reused state is rejected", async () => {
@@ -109,6 +112,7 @@ describe("GET /oauth/callback", () => {
     expect(res.headers.get("location")).toBe("https://pulse.example.com/settings?oauth=invalid_grant");
     expect(errors.mock.calls.flat().join(" ")).not.toContain("SECRET-DETAIL");
     expect(tokens()).toEqual([]);
+    expect(h.requestSync).not.toHaveBeenCalled();
   });
 
   it("a denied consent returns to settings without a token request", async () => {

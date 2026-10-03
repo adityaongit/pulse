@@ -1,6 +1,7 @@
 import { getConfig } from "@/server/config";
 import { getDb } from "@/server/db";
 import { consumeState, exchangeCode, GoogleError, redirectUri } from "@/server/sources/google/oauth";
+import { requestSync } from "@/server/worker";
 
 /**
  * Google's redirect back. A missing, unknown, reused or expired `state` is a 400 and touches nothing.
@@ -19,6 +20,9 @@ export async function GET(request: Request) {
   if (!code) return back("access_denied");
   try {
     await exchangeCode(getDb(), { google, redirectUri: redirectUri(google.appUrl), code });
+    // Start the import now, not at the next timer tick: runs before the grant finished at once and armed the
+    // 5-minute gate. Fire-and-forget, so the redirect doesn't wait on the sync.
+    requestSync({ force: true });
     return back("connected");
   } catch (err) {
     // GoogleError messages hold a status and code only; anything else is logged by name alone.

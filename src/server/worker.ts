@@ -21,6 +21,7 @@ type WorkerDeps = {
 export function createWorker({ name, source, recompute, intervalMs = INTERVAL_MS, log = console }: WorkerDeps) {
   let started = false;
   let running = false;
+  let again = false; // a forced request arrived mid-run: run once more as soon as this one ends
   let timer: ReturnType<typeof setTimeout> | undefined;
   const state = {
     lastRunAt: null as number | null,
@@ -42,7 +43,8 @@ export function createWorker({ name, source, recompute, intervalMs = INTERVAL_MS
     } finally {
       state.lastRunAt = Date.now();
       running = false;
-      timer = setTimeout(run, intervalMs);
+      timer = setTimeout(run, again ? 0 : intervalMs);
+      again = false;
     }
   }
 
@@ -57,10 +59,15 @@ export function createWorker({ name, source, recompute, intervalMs = INTERVAL_MS
     /**
      * Runs now unless a run is in progress or the last one finished under 5 minutes ago.
      * Gated on the last finished run, not the last success, so a failing source isn't retried on every page load.
+     * `force` (a new Google grant, a journal write) skips that gate, and mid-run queues one more run right after.
      */
-    requestSync() {
-      if (!started || running) return;
-      if (state.lastRunAt !== null && Date.now() - state.lastRunAt < FRESH_MS) return;
+    requestSync({ force = false } = {}) {
+      if (!started) return;
+      if (running) {
+        again ||= force;
+        return;
+      }
+      if (!force && state.lastRunAt !== null && Date.now() - state.lastRunAt < FRESH_MS) return;
       void run();
     },
   };
@@ -84,7 +91,10 @@ export function startWorker() {
   g.__pulseWorker.start();
 }
 
-/** Fire-and-forget from page loads, so a morning visit doesn't wait for the next scheduled run. */
-export function requestSync() {
-  g.__pulseWorker?.requestSync();
+/**
+ * Fire-and-forget from page loads, so a morning visit doesn't wait for the next scheduled run.
+ * `force` skips the 5-minute gate: for writes the next scores depend on (a new grant, a journal check-in).
+ */
+export function requestSync(opts?: { force?: boolean }) {
+  g.__pulseWorker?.requestSync(opts);
 }
