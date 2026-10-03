@@ -37,6 +37,7 @@ Run `pnpm typecheck && pnpm lint && pnpm test` before every commit. Run `pnpm e2
 - **Causality.** A day's scores depend only on that day and earlier days. Baselines fold from earlier nights only. Never let a later night change history.
 - **Honest states.** Every nullable metric is `{ value, reason, provisional }`, using the reason codes in `src/lib/reasons.ts`. Never show a fabricated number.
 - **UI.** Build only from shells and kit components, using Tailwind utilities and the tokens in `globals.css`. No new CSS files, and no breakpoint logic inside feature components. Every metric renders its five states through `MetricState`. Spec decisions and deviations live in `docs/design/spec.md` §11.
+- **Auth.** `src/proxy.ts` gates every page on the session cookie (`src/server/session.ts`) and sends signed-in visitors without a profile to `/onboarding`. Every Server Action checks `currentSession()` itself (`src/server/auth.ts`); never rely on the proxy matcher alone. The profile lives in the database (`src/server/profile.ts`), never in `.env`.
 - **Copy.** User-facing text says Pulse and Pulse Age.
 - **Tests.** Algorithms get golden-value or property tests beside the file. Queries get tests on a temp DB built with `src/server/testing.ts`.
 - **Design references.** `docs/design/reference/` is gitignored and holds third-party screenshots. Never commit or publish it.

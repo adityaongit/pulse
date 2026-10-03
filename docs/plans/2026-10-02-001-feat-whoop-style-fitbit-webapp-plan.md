@@ -1148,6 +1148,8 @@ Added 2026-10-02 at the user's request. The first build copied an older, basic W
 
 ### U19. Profile in the database, with onboarding and Settings
 
+**Status 2026-10-03: built.** Birth date, sex, height and max HR live in the `profile` table; `.env` no longer holds them (no env fallback). Weight already comes from Google into `daily_metrics`. Height from Google is not mapped: the Health API catalogue has no height type, so it is a manual field. Onboarding is one form (`/onboarding`), Settings › Profile edits it in a sheet (`src/components/profile/ProfileForm.tsx`).
+
 Added 2026-10-03. The user rejected the profile coming from `.env` (KTD11). It made editing awkward, and it doesn't work for an open-source app.
 
 **Goal:** Birth date, sex, height, weight and an optional max HR live in a `profile` table. On first run, an onboarding screen asks for birth date and sex. Settings › Profile edits them. Height and weight fill from the Google Health API when it has them. `.env` is only an optional default.
@@ -1162,6 +1164,13 @@ Added 2026-10-03. The user rejected the profile coming from `.env` (KTD11). It m
 **Supersedes:** KTD11 (profile from env).
 
 ### U20. Built-in login for self-hosters (one user per instance)
+
+**Status 2026-10-03: built.** Changes from the approach below, decided by the user:
+- No `cloudflare` or `none` auth mode. Cloudflare Access is gone from the app (`src/server/access.ts` deleted); the tunnel stays.
+- A Google instance offers "Sign in with Google" only. A demo instance (no OAuth client) offers "Continue with demo data" only, which sets a demo session.
+- No fixed `APP_URL` needed: the redirect URI follows the request's host, so localhost and the tunnel share one OAuth client. Google rejects raw IP redirect URIs, so a phone needs an https hostname.
+- Returning owners with a working grant get `prompt=select_account` instead of the consent screen.
+- Code: `src/server/session.ts`, `src/server/auth.ts`, `src/proxy.ts`, `src/app/login/`, `src/app/logout/`, `src/app/oauth/`. Runbook: `docs/runbook.md`.
 
 Added 2026-10-03. Product decision: Pulse is self-hosted with one user per instance. SQLite stays: the data is structured time-series, and JSON columns already cover the flexible parts. The user also asked about Postgres and MongoDB, and both were rejected; see the reasoning below.
 
@@ -1351,6 +1360,18 @@ Added 2026-10-02 at the user's request, after the Home dials shipped at unequal 
 | A WHOOP lookalike and copyleft or non-commercial code | Private repo, personal use, never published |
 
 ---
+
+## Deferred work (tracked)
+
+Agreed on 2026-10-03 to do later, not to drop:
+
+- The residual review findings in `docs/residual-review-findings.md` (pipeline refactor, raw-archive retention, deleted Fitbit records).
+- The 41 low web-guideline findings in `docs/design/guidelines-review.md`.
+- The Sleep card's hours hero and overnight HR chart (the view model has no data for them yet).
+- A customizable My Dashboard (suggested on Reddit).
+- An e2e onboarding journey: it needs a second e2e server without a profile, since deleting the shared demo profile would send parallel tests to onboarding. Unit tests cover the gate (`src/proxy.test.ts`).
+
+U16 decisions (2026-10-03): Home's Strain dial drops the "So far" tag, and the coach card drops its "View Strain" link (WHOOP, Bevel and Baro show neither). "HEALTH MONITOR" and "STRESS MONITOR" don't wrap on the user's phone, though they still wrap in a 361 px Playwright render; left as is. The vitest `hookTimeout` stays at 60 s.
 
 ## Open Questions
 
