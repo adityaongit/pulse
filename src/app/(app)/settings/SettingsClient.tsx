@@ -51,7 +51,7 @@ export function DisconnectButton() {
   }
   return (
     <>
-      <Button variant="outline" size="touch" className="text-recovery-red-text" onClick={() => setOpen(true)}>
+      <Button variant="outline" size="touch" className="w-full text-recovery-red-text" onClick={() => setOpen(true)}>
         Disconnect
       </Button>
       <Dialog open={open} onOpenChange={(o) => !pending && setOpen(o)}>

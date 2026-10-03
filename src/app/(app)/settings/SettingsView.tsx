@@ -5,33 +5,35 @@ import { cn } from "@/lib/utils"
 import { ago } from "@/lib/format"
 import type { SettingsVM } from "@/server/queries/types"
 import { SectionShell } from "@/components/shells/SectionShell"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { HEALTH_SIGNUP_URL } from "@/lib/google"
+import { GoogleG } from "@/components/brand/GoogleG"
+import { Mark } from "@/components/brand/Mark"
 import { DisconnectButton, EditProfileButton } from "./SettingsClient"
 import { CAPTION, LABEL } from "@/components/metrics/primitives"
 
 const BODY = "max-w-[65ch] text-[15px] leading-[22px] text-pretty text-foreground-secondary"
-const TAG = "h-5 rounded-full border-border px-2 text-[11px] font-bold tracking-[0.06em] text-foreground-secondary uppercase"
 
-const SOURCE: Record<SettingsVM["source"]["status"], { tag: string; body?: string }> = {
+/** The status line under the source name, and what to do about it. Connected says nothing more: its line has the account and sync. */
+const SOURCE: Record<SettingsVM["source"]["status"], { line?: string; tone?: string; body?: string }> = {
   demo: {
-    tag: "Demo",
-    body: "Demo mode generates 180 days of realistic data so every screen can be explored. Set GOOGLE_OAUTH_ENABLED=true on the server to use your Fitbit data.",
+    line: "180 days of generated data",
+    body: "Every screen runs on realistic generated data. Set GOOGLE_OAUTH_ENABLED=true on the server to use your Fitbit data.",
   },
-  not_connected: { tag: "Not connected", body: "Connect the Google account your Fitbit Air syncs to. Pulse only reads data." },
+  not_connected: { line: "Not connected", body: "Connect the Google account your Fitbit Air syncs to. Pulse only reads data." },
   not_linked: {
-    tag: "Not linked",
+    line: "No Google Health profile",
+    tone: "text-warning",
     body: "This Google account has no Google Health profile, so there is no Fitbit data to read. Set up Google Health with this account (or move your Fitbit account to it), or disconnect and sign in with the account your Fitbit Air uses.",
   },
-  connected: { tag: "Connected" },
-  revoked: { tag: "Reconnect needed", body: "Google access was revoked or expired. Sync is paused." },
+  connected: {},
+  revoked: { line: "Access revoked", tone: "text-recovery-red-text", body: "Google access was revoked or expired. Sync is paused until you reconnect." },
 }
 
 function OAuthLink({ label, variant }: { label: string; variant: "default" | "secondary" }) {
   return (
-    <Button asChild size="touch" variant={variant}>
+    <Button asChild size="touch" variant={variant} className="w-full">
       <Link href="/oauth/start" prefetch={false}>
         {label}
       </Link>
@@ -39,40 +41,60 @@ function OAuthLink({ label, variant }: { label: string; variant: "default" | "se
   )
 }
 
-export function DataSource({ source }: { source: SettingsVM["source"] }) {
+/**
+ * Data source (spec §7.14): the source as one row (logo, name, last sync) with no status pill;
+ * the status only shows when something needs doing, and the actions sit in an even two-column row.
+ */
+export function DataSource({
+  source,
+  lastSyncAt = null,
+  now,
+}: {
+  source: SettingsVM["source"]
+  lastSyncAt?: number | null
+  now: number
+}) {
   const s = SOURCE[source.status]
+  // The account itself is named once, beside Sign out.
+  const line = s.line ?? (lastSyncAt ? `Synced ${ago(lastSyncAt, now)}` : "Not synced yet")
+  const actions =
+    source.status === "connected" ? (
+      <>
+        <OAuthLink label="Reconnect" variant="secondary" />
+        <DisconnectButton />
+      </>
+    ) : source.status === "not_linked" ? (
+      <>
+        <Button asChild size="touch" variant="default" className="w-full">
+          <a href={HEALTH_SIGNUP_URL} target="_blank" rel="noreferrer">
+            Set up
+          </a>
+        </Button>
+        <DisconnectButton />
+      </>
+    ) : source.status === "revoked" ? (
+      <>
+        <OAuthLink label="Reconnect Google" variant="default" />
+        <DisconnectButton />
+      </>
+    ) : source.status === "not_connected" ? (
+      <div className="col-span-2">
+        <OAuthLink label="Connect Google" variant="default" />
+      </div>
+    ) : null
   return (
     <SectionShell variant="card" level={2} id="source" title="Data source">
-      <div className="space-y-4">
-        <div className="flex min-h-11 items-center justify-between gap-3">
-          <span className="text-[15px] leading-[22px]">Source</span>
-          <span className="flex items-center gap-2">
-            <span className="text-[15px] leading-[22px] font-semibold">{source.label}</span>
-            <Badge variant="outline" className={TAG}>
-              {s.tag}
-            </Badge>
-          </span>
+      <div className="flex min-h-11 items-center gap-3">
+        <span aria-hidden className="grid size-11 shrink-0 place-items-center rounded-xl bg-white/[0.06]">
+          {source.status === "demo" ? <Mark className="size-5" /> : <GoogleG className="size-5" />}
+        </span>
+        <div className="min-w-0 flex-1">
+          <p className="text-[15px] leading-[22px] font-semibold">{source.label}</p>
+          <p className={cn("truncate text-[13px] leading-[18px] text-muted-foreground tabular-nums", s.tone)}>{line}</p>
         </div>
-        {s.body && <p className={BODY}>{s.body}</p>}
-        {source.status === "not_connected" && <OAuthLink label="Connect Google" variant="default" />}
-        {source.status === "revoked" && <OAuthLink label="Reconnect Google" variant="default" />}
-        {source.status === "not_linked" && (
-          <div className="flex flex-wrap gap-2">
-            <Button asChild size="touch" variant="default">
-              <a href={HEALTH_SIGNUP_URL} target="_blank" rel="noreferrer">
-                Set up Google Health
-              </a>
-            </Button>
-            <DisconnectButton />
-          </div>
-        )}
-        {source.status === "connected" && (
-          <div className="flex flex-wrap gap-2">
-            <OAuthLink label="Reconnect" variant="secondary" />
-            <DisconnectButton />
-          </div>
-        )}
       </div>
+      {s.body && <p className={cn(BODY, "mt-3")}>{s.body}</p>}
+      {actions && <div className="mt-4 grid grid-cols-2 gap-2">{actions}</div>}
     </SectionShell>
   )
 }
@@ -190,11 +212,13 @@ export function Account({ email }: { email: string | null }) {
   )
 }
 
+const lastSync = (rows: SettingsVM["sync"]) => rows.reduce<number | null>((m, r) => (r.lastSuccessAt && (!m || r.lastSuccessAt > m) ? r.lastSuccessAt : m), null)
+
 export function SettingsView({ vm, now, email = null }: { vm: SettingsVM; now: number; email?: string | null }) {
   return (
     <div className="grid grid-cols-1 gap-3 xl:grid-cols-2 xl:gap-4">
       <div className="flex min-w-0 flex-col *:flex-1 xl:col-start-1 xl:row-start-1">
-        <DataSource source={vm.source} />
+        <DataSource source={vm.source} lastSyncAt={lastSync(vm.sync)} now={now} />
       </div>
       <div className="flex min-w-0 flex-col *:flex-1 xl:col-start-2 xl:row-start-1">
         <SyncStatus vm={vm} now={now} />

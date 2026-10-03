@@ -43,11 +43,15 @@ function Field({ id, label, hint, error, optional, children }: { id: string; lab
 export function ProfileForm({
   defaults,
   onboarding = false,
+  startYear,
   onSaved,
   footer,
 }: {
   defaults: ProfileDefaults
+  /** First run: only what nothing else can supply (birth date, sex). Height and max HR wait for Settings. */
   onboarding?: boolean
+  /** The year the empty date picker opens on (from Google's age). */
+  startYear?: number
   onSaved?: () => void
   footer: (pending: boolean) => React.ReactNode
 }) {
@@ -62,7 +66,7 @@ export function ProfileForm({
     <form action={action} className="flex flex-col gap-6" noValidate>
       {onboarding && <input type="hidden" name="onboarding" value="1" />}
       <Field id="birthDate" label="Birth date" hint="Sets your age for heart rate zones, sleep need and Pulse Age." error={f?.birthDate}>
-        <BirthDatePicker id="birthDate" name="birthDate" defaultValue={defaults.birthDate} invalid={!!f?.birthDate} describedBy={described("birthDate")["aria-describedby"]} />
+        <BirthDatePicker id="birthDate" name="birthDate" defaultValue={defaults.birthDate} startYear={startYear} invalid={!!f?.birthDate} describedBy={described("birthDate")["aria-describedby"]} />
       </Field>
 
       <fieldset className="flex flex-col gap-2" aria-describedby={f?.sex ? "sex-error" : "sex-hint"}>
@@ -93,14 +97,16 @@ export function ProfileForm({
         )}
       </fieldset>
 
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-4">
-        <Field id="heightCm" label="Height" hint="In cm. Adds lean body mass to Pulse Age." error={f?.heightCm} optional>
-          <input id="heightCm" name="heightCm" type="number" inputMode="decimal" min={100} max={250} step="0.1" placeholder="cm" defaultValue={defaults.heightCm ?? ""} className={FIELD} {...described("heightCm")} />
-        </Field>
-        <Field id="maxHr" label="Max heart rate" hint="Leave blank to estimate it from your age." error={f?.maxHr} optional>
-          <input id="maxHr" name="maxHr" type="number" inputMode="numeric" min={100} max={240} step="1" placeholder="bpm" defaultValue={defaults.maxHr ?? ""} className={FIELD} {...described("maxHr")} />
-        </Field>
-      </div>
+      {!onboarding && (
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-4">
+          <Field id="heightCm" label="Height" hint="In cm. Adds lean body mass to Pulse Age." error={f?.heightCm} optional>
+            <input id="heightCm" name="heightCm" type="number" inputMode="decimal" min={100} max={250} step="0.1" placeholder="cm" defaultValue={defaults.heightCm ?? ""} className={FIELD} {...described("heightCm")} />
+          </Field>
+          <Field id="maxHr" label="Max heart rate" hint="Leave blank to estimate it from your age." error={f?.maxHr} optional>
+            <input id="maxHr" name="maxHr" type="number" inputMode="numeric" min={100} max={240} step="1" placeholder="bpm" defaultValue={defaults.maxHr ?? ""} className={FIELD} {...described("maxHr")} />
+          </Field>
+        </div>
+      )}
 
       {state?.ok === false && state.error && (
         <p role="alert" className={ERROR}>
