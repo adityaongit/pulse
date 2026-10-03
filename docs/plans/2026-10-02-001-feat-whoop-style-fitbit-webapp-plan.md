@@ -1161,6 +1161,34 @@ Added 2026-10-03. The user rejected the profile coming from `.env` (KTD11). It m
 
 **Supersedes:** KTD11 (profile from env).
 
+### U20. Built-in login for self-hosters (one user per instance)
+
+Added 2026-10-03. Product decision: Pulse is self-hosted with one user per instance. SQLite stays: the data is structured time-series, and JSON columns already cover the flexible parts. The user also asked about Postgres and MongoDB, and both were rejected; see the reasoning below.
+
+**Goal:** Anyone self-hosting Pulse can sign in without Cloudflare. Sign-in is "Sign in with Google" through the same Google OAuth client that already pulls Health data. Only the instance owner can sign in. Cloudflare Access remains an optional extra layer.
+
+**Approach:**
+- Auth modes:
+  - `google` is the default when OAuth is enabled.
+  - `cloudflare` keeps today's JWT check.
+  - `none` is allowed only in demo mode or development.
+- Owner rules:
+  - The owner is `OWNER_EMAIL` when it is set. Otherwise the first Google account to complete sign-in claims the instance, and the claim is stored in the database.
+  - Any other account gets a clear "this Pulse belongs to someone else" page.
+- Sessions:
+  - An httpOnly, Secure, SameSite=Lax signed session cookie, with the secret generated on first boot and stored in the database. Use the Web Crypto API, with no new auth library unless one is clearly needed.
+  - `proxy.ts` enforces the session on every route except `/login`, `/oauth/*` and `/healthz`.
+  - Sign-out lives in Settings.
+- Scopes and first run:
+  - Add the `openid` and `email` scopes to the Health consent, so one consent covers both login and data.
+  - First run: Sign in with Google, then consent, then onboarding (U19: birth date and sex), then the importing banner.
+- Tests: the session sign and verify, owner claim and lockout, the proxy gate per mode, and an e2e login flow with a stubbed Google response.
+
+**Why not Postgres or MongoDB:**
+- The data is relational time series (samples, sessions, segments, daily rows) plus JSON score blobs, and both SQLite and Postgres handle that well.
+- MongoDB adds a server and makes range and aggregate queries harder, with no gain.
+- Postgres only becomes necessary for a hosted, multi-user deployment, which is out of scope.
+
 ### U18. Large-screen UX audit and fixes (tablet and laptop)
 
 Added 2026-10-03 at the user's request: the web UI on bigger screens has broken UX, gaps and unlinked elements.
