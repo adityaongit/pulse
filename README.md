@@ -11,8 +11,6 @@ See `docs/plans/` for the plan.
   <img src="docs/screenshots/phone-journal.png" alt="Pulse on a phone: the Journal with the Log" width="32%">
 </p>
 
-![Pulse on a laptop: the home screen](docs/screenshots/laptop-home.png)
-
 Every screen, on a phone and a laptop: [docs/screenshots.md](docs/screenshots.md) (demo mode, seeded data).
 
 ## Run in demo mode
