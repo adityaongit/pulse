@@ -12,6 +12,8 @@ export const metadata: Metadata = { title: "Sign in" }
 const ERRORS: Record<string, string> = {
   access_denied: "Google sign-in was cancelled. Try again, and allow every permission on the consent screen.",
   auth_revoked: "Google didn't grant offline access. Remove Pulse under Google Account › Security › Third-party access, then sign in again.",
+  account_not_linked:
+    "That Google account has no Google Health profile, so Pulse has nothing to read. Sign in with the account your Fitbit Air uses, or set up Google Health first.",
   email_unverified: "That Google account's email isn't verified yet. Verify it with Google, then sign in again.",
 }
 const FALLBACK = "Sign-in didn't finish. Try again."

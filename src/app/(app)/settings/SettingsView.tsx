@@ -8,6 +8,7 @@ import { SectionShell } from "@/components/shells/SectionShell"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
+import { HEALTH_SIGNUP_URL } from "@/lib/google"
 import { DisconnectButton, EditProfileButton } from "./SettingsClient"
 import { CAPTION, LABEL } from "@/components/metrics/primitives"
 
@@ -20,6 +21,10 @@ const SOURCE: Record<SettingsVM["source"]["status"], { tag: string; body?: strin
     body: "Demo mode generates 180 days of realistic data so every screen can be explored. Set GOOGLE_OAUTH_ENABLED=true on the server to use your Fitbit data.",
   },
   not_connected: { tag: "Not connected", body: "Connect the Google account your Fitbit Air syncs to. Pulse only reads data." },
+  not_linked: {
+    tag: "Not linked",
+    body: "This Google account has no Google Health profile, so there is no Fitbit data to read. Set up Google Health with this account (or move your Fitbit account to it), or disconnect and sign in with the account your Fitbit Air uses.",
+  },
   connected: { tag: "Connected" },
   revoked: { tag: "Reconnect needed", body: "Google access was revoked or expired. Sync is paused." },
 }
@@ -51,6 +56,16 @@ export function DataSource({ source }: { source: SettingsVM["source"] }) {
         {s.body && <p className={BODY}>{s.body}</p>}
         {source.status === "not_connected" && <OAuthLink label="Connect Google" variant="default" />}
         {source.status === "revoked" && <OAuthLink label="Reconnect Google" variant="default" />}
+        {source.status === "not_linked" && (
+          <div className="flex flex-wrap gap-2">
+            <Button asChild size="touch" variant="default">
+              <a href={HEALTH_SIGNUP_URL} target="_blank" rel="noreferrer">
+                Set up Google Health
+              </a>
+            </Button>
+            <DisconnectButton />
+          </div>
+        )}
         {source.status === "connected" && (
           <div className="flex flex-wrap gap-2">
             <OAuthLink label="Reconnect" variant="secondary" />
@@ -88,11 +103,11 @@ export function SyncStatus({ vm, now }: { vm: Pick<SettingsVM, "mode" | "sync" |
           const text = vm.mode === "demo" && r.lastSuccessAt ? `Updated ${when}` : when
           return (
             <li key={r.key} className="flex min-h-13 items-center gap-3 py-2">
-              <span className="min-w-0 flex-1 truncate text-[15px] leading-[22px]">{r.label}</span>
-              <span className="flex shrink-0 flex-col items-end">
-                <span className={cn(CAPTION, "font-numeric tabular-nums")}>{text}</span>
+              <span className="flex min-w-0 flex-1 flex-col">
+                <span className="truncate text-[15px] leading-[22px]">{r.label}</span>
                 {r.status === "error" && r.error && <span className={cn(CAPTION, "text-recovery-red-text")}>{r.error}</span>}
               </span>
+              <span className={cn(CAPTION, "shrink-0 font-numeric tabular-nums")}>{text}</span>
               <SyncIcon status={r.status} />
               <span className="sr-only">, {STATUS_WORD[r.status]}</span>
             </li>

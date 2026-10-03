@@ -17,13 +17,17 @@ const ownerSession = { kind: "owner", email: "me@example.com" };
 let db: Db;
 const tokens = () => db.select().from(oauthTokens).all();
 
+const fetchMock = vi.fn<typeof fetch>(async () => new Response("", { status: 200 }));
+
 beforeEach(() => {
+  vi.stubGlobal("fetch", fetchMock);
   db = h.db = openDb(":memory:");
   db.insert(oauthTokens)
     .values({ id: 1, accessToken: "at", refreshToken: "rt", expiresAt: 1, scope: "s", updatedAt: 1 })
     .run();
 });
 afterEach(() => {
+  vi.unstubAllGlobals();
   db.$client.close();
   vi.clearAllMocks();
 });
@@ -42,11 +46,20 @@ describe("disconnectGoogle", () => {
     expect(h.revalidate).not.toHaveBeenCalled();
   });
 
-  it("forgets the grant and revalidates the app", async () => {
+  it("revokes every permission at Google, forgets the grant and revalidates the app", async () => {
     h.cfg = live;
     h.session = ownerSession;
     expect(await disconnectGoogle()).toEqual({ ok: true, data: undefined });
+    expect(String(fetchMock.mock.calls[0][0])).toBe("https://oauth2.googleapis.com/revoke");
     expect(tokens()).toEqual([]);
     expect(h.revalidate).toHaveBeenCalledWith("/", "layout");
+  });
+
+  it("keeps the grant when Google can't be reached, so Disconnect can be retried", async () => {
+    h.cfg = live;
+    h.session = ownerSession;
+    fetchMock.mockRejectedValueOnce(new TypeError("fetch failed"));
+    expect(await disconnectGoogle()).toEqual({ ok: false, error: "Couldn't reach Google to remove access. Try again." });
+    expect(tokens()).toHaveLength(1);
   });
 });
