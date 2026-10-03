@@ -45,3 +45,21 @@ export function localMidnight(day: string, tz: string): number {
 
 /** Minutes after local midnight of instant `s`. */
 export const localMinutes = (s: number, tz: string) => Math.round((s - localMidnight(localDay(s, tz), tz)) / 60);
+
+// Age from a `YYYY-MM-DD` birth date on a `YYYY-MM-DD` day. Both agree on every day: fractionalYears floors
+// to wholeYears and equals it on a birthday. A Feb 29 birthday falls on Mar 1 in common years.
+
+/** Completed years on `day`; the birthday itself counts. Sleep need and the max-HR estimate use this. */
+export function wholeYears(birthDate: string, day: string) {
+  const [by, bm, bd] = birthDate.split("-").map(Number);
+  const [y, m, d] = day.split("-").map(Number);
+  return y - by - (m < bm || (m === bm && d < bd) ? 1 : 0);
+}
+
+/** Completed years plus the elapsed share of the current birthday year. Healthspan and fitness use this. */
+export function fractionalYears(birthDate: string, day: string) {
+  const whole = wholeYears(birthDate, day);
+  const [by, bm, bd] = birthDate.split("-").map(Number);
+  const birthday = (n: number) => Date.UTC(by + n, bm - 1, bd); // Feb 29 in a common year rolls to Mar 1
+  return whole + (Date.parse(day) - birthday(whole)) / (birthday(whole + 1) - birthday(whole));
+}

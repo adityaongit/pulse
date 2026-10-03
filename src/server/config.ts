@@ -1,5 +1,6 @@
 import path from "node:path";
 import { z } from "zod";
+import { wholeYears } from "./time";
 
 export class ConfigError extends Error {
   override name = "ConfigError";
@@ -49,12 +50,6 @@ const Env = z
     }
   });
 
-function ageOn(birthDate: string, now: Date) {
-  const [y, m, d] = birthDate.split("-").map(Number);
-  const beforeBirthday = now.getUTCMonth() + 1 < m || (now.getUTCMonth() + 1 === m && now.getUTCDate() < d);
-  return now.getUTCFullYear() - y - (beforeBirthday ? 1 : 0);
-}
-
 export function parseConfig(env: Record<string, string | undefined>, now = new Date()) {
   // Treat empty values (e.g. `GOOGLE_CLIENT_ID=` copied from .env.example) as unset.
   const set = Object.fromEntries(Object.entries(env).filter(([, v]) => v !== undefined && v !== ""));
@@ -74,7 +69,7 @@ export function parseConfig(env: Record<string, string | undefined>, now = new D
       birthDate: e.BIRTH_DATE,
       sex: e.SEX,
       // Tanaka: 208 - 0.7 * age.
-      maxHr: e.MAX_HR ?? Math.round(208 - 0.7 * ageOn(e.BIRTH_DATE, now)),
+      maxHr: e.MAX_HR ?? Math.round(208 - 0.7 * wholeYears(e.BIRTH_DATE, now.toISOString().slice(0, 10))),
       maxHrSet: e.MAX_HR !== undefined,
       /** Healthspan's lean-mass term (fat-free mass index) needs it; the term drops without it. */
       heightCm: e.HEIGHT_CM ?? null,
