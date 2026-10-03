@@ -17,9 +17,11 @@ function OAuthToastInner() {
   const result = params.get("oauth")
   React.useEffect(() => {
     if (!result) return
-    if (result === "connected") toast.success("Google connected")
-    else if (result === "access_denied") toast.error("Google access wasn't granted. Connect again to allow it.")
-    else toast.error(`Couldn't connect Google (${result}). Try again.`)
+    // A fixed id: Strict Mode (dev) runs this effect twice before the param is gone, and sonner keeps one toast per id.
+    const id = "oauth-result"
+    if (result === "connected") toast.success("Google connected", { id })
+    else if (result === "access_denied") toast.error("Google access wasn't granted. Connect again to allow it.", { id })
+    else toast.error(`Couldn't connect Google (${result}). Try again.`, { id })
     router.replace(`${pathname}${window.location.hash}`, { scroll: false })
   }, [result, router, pathname])
   return null
