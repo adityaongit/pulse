@@ -353,8 +353,8 @@ export function HomeHeader({ rings }: { rings?: HeaderRings }) {
                       <span data-ring={key} className="block">
                         <MiniRing variant={key} value={value} />
                       </span>
-                      {/* Below 380 px the labels tighten so "Recovery" clears the Strain ring down to 320 px. */}
-                      <span data-ring-label={key} className="text-[13px] leading-4 font-bold tracking-[0.1em] uppercase max-[380px]:text-[11px] max-[380px]:tracking-[0.06em]">
+                      {/* 11 px, WHOOP's ring-row label ("RECOVERY" 62 pt wide) [latest-home-sticky-header-user-2025] (spec §11 F5); below 380 px the tracking tightens so "Recovery" clears the Strain ring down to 320 px. */}
+                      <span data-ring-label={key} className="text-[11px] leading-4 font-bold tracking-[0.1em] uppercase max-[380px]:tracking-[0.06em]">
                         {label}
                       </span>
                     </Link>

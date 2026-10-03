@@ -2826,6 +2826,33 @@ Rows overridden by v2: **D2** (TopBar part only, V3), **B1** (V10), **CAL6** (of
 | SYM11 | §6 copy; guidelines review | Health Monitor reads "N/5 within range" with "Out of range" as the status on Home and on /health/monitor (the illness alert names the signal); Home's monitor caption wraps rather than truncating. From the guidelines review: no `transition-all` left, the behaviour input is 16 px (no iOS zoom), Home's monitor cards are `h2` | Coordinator request (copy mismatch on the illness day, a 1 px truncation at 320 px); docs/design/guidelines-review.md |
 
 
+**Fidelity audit rows (F).** Corrections from the U16 side-by-side audit at 390 px (2026-10-03, `docs/design/audit.md`), each measured on the dated captures it cites. They override the text they name.
+
+| # | Spec says | Build does | Why |
+|---|---|---|---|
+| F1 | §7.1: Home's top slot `pt-4`; the header sentinel one `space-y-4` step under the dial labels | Below 768 px the slot starts right under the header's fade (`-mt-2` cancels the column's 8 px), wordmark and dials are `space-y-3` apart, and the sentinel sits on the labels' bottom (`-mt-3`), so the card below starts 24 px under the labels | WHOOP: wordmark centre 52 pt under the pill, dial centre 74 pt under the wordmark, labels to the first card about 34 pt [latest-home-top-2], [latest-home-top-3]. Pulse sat 26 pt, 4 pt and 16 pt lower |
+| F2 | §5.1 `md`: 96 px box, 92 px ring | 92 px box (`size-23`), an 88 px ring 6 px thick; tablet keeps `md:size-30` | WHOOP's three dials measure 86-88 pt across with a 6 pt ring at 390-393 pt [latest-home-top-2], [latest-home-top-3] |
+| F3 | §5.1: `md` dial to label gap 8 px | 4 px (`gap-1`) | Ring bottom to label centre 14-15 pt in WHOOP, 17 in Pulse |
+| F4 | §4.3.1: pill label 13 px, pill `h-8 p-0.5` | 11 px label, `h-[30px] p-px` pill (Reports' period pill follows) | "TODAY" is 39 pt wide with a 7.3 pt cap height, the pill about 29 pt tall [latest-home-top-2], [latest-home-sticky-header-user-2025] |
+| F5 | §4.3: ring-row label in the 13 px label role | 11 px, tracking 0.1em (0.06em below 380 px) | "RECOVERY" is 62 pt wide in the ring row [latest-home-sticky-header-user-2025], 57 pt in [latest-home-collapsed-2]; Pulse's was 79 |
+| F6 | R1: insight card `p-4`, semibold title, body `text-foreground-secondary` 22 px lines, counter pill `w-8` in the grid | `p-5` (text 20 px in), medium title, body `text-foreground/85` on 20 px lines, the pill 24 x 48 px absolute 8 px from the top right corner | Three captures agree: text inset 20 pt, pill 23 x 46 pt inset 8 pt, body near `#d5d9dc` on 20.5 pt lines [latest-home-top-1..3] |
+| F7 | §4.7: card title 13 px | 12 px (Journal Insights' card title and More's row labels follow); a whole-card link's chevron sits 6 px into the padding | "HEALTH MONITOR" fits one line at 116 pt [latest-home-top-2]; at 13 px Pulse wrapped it at 390 px. At 361 px it still wraps (WHOOP has no capture that narrow) |
+| F8 | §4.7: card info button after the title | At the header's right end, its icon on the padding edge | [latest-home-collapsed-3] Strain & Recovery |
+| F9 | R5: today's column covers the plot only | It also runs down behind the two-line day tick | [latest-home-collapsed-3] |
+| F10 | V9: My Dashboard rows end in a chevron | No chevron on `card` rows (they still press in); `row` links keep theirs | [latest-home-dashboard-1] |
+| F11 | §5.1 `lg`: 240 px box, 14 px ring, 64 px value, "PULSE" set in caps text over the value | 256 px box, a 252 px ring 17 px thick, 68 px value (strain 88 px), the `Wordmark` (`h-[15px]`, the brand minimum) over the value | WHOOP's hero ring is 252-254 pt with a 17 pt stroke; its strain digits stand 64 pt tall against 48 pt for percentages [latest-recovery-1], [latest-recovery-2], [latest-strain-1]. brand.md forbids "PULSE" set in a font |
+| F12 | §5.1 strain `lg` label "Day strain" | "Strain" | [latest-strain-1] |
+| F13 | §4.4: bar title 15 px | 12 px, for detail, tab-root and in-header date titles alike | Cap height 8-9 pt across eight captures ("TODAY" 46 pt wide) [latest-recovery-1], [latest-recovery-2], [latest-sleep-stages-1], [latest-health-monitor-1], [latest-stress-monitor-1], [latest-journal-insights-1], [latest-health-tab-1], [latest-whoop-age-cyan-1] |
+| F14 | R11: activity hero 44 px; subtitle 15 px | 34 px; subtitle 13 px | Strain value cap 23.7 pt, subtitle 13 pt [latest-activity-1] |
+| F15 | §4.6: the date switcher under a detail header is the pill; the centred subtitle is sentence case | Bare chevrons and a 12 px caps label (the in-header style); the subtitle is 11 px caps | [latest-stress-monitor-1] "‹ MON, SEP 14 ›", [latest-whoop-age-cyan-1] "NEXT UPDATE IN 7 DAYS" and "‹ JUL 26 - AUG 1 ›" |
+| F16 | R13: vital tile 12 px label, 34 px value, `p-4`, 24 px chip | 10 px label, 30 px value, `p-3`, 20 px chip at 11 px; `min-h-31` | Label cap 6.7 pt on one line, value cap 21.7 pt, chip 16.5 pt, tile 124 pt [latest-health-monitor-1] |
+| F17 | §7.12: behaviour rows in caps with the % top right | Sentence-case 15 px name with a chevron, the % at the track's end | [latest-journal-insights-1] |
+| F18 | §5.12: chips `bg-sleep-deep` / `bg-strain-deep` | `bg-sleep/85` and `bg-strain`, plus a 2 px bar after the times (white for sleep, strain blue for activities) | Sampled `#7594b1` and `#0091e2` [latest-home-pastday-1]; white text stays at 3.3 : 1 (20 px bold) |
+| F19 | §5.16: month title 14 px | 12 px | "MAY" cap 9 pt [calendar-recovery-current-2026-05] |
+| F20 | §7.5: Sleep summary rows without icons | Each row has an icon (`Hourglass`, `CalendarCheck`, `ChartNoAxesColumn`, `BatteryCharging`) | [latest-sleep-1] |
+| F21 | §5.5: no average line | M and 6M bar charts draw a dashed average line labelled "Avg" | [latest-trends-1] |
+| F22 | §4.8: InfoDialog body `text-foreground-secondary`; More's section labels muted 12 px | Both `text-foreground/85`; More's labels 13 px, tracking 0.1em | Info copy samples near `#dcdfe6` [latest-popover-info-1]; settings section labels `#d4d8db` [latest-settings-1] |
+
 Open items for U12/U13 (not design changes): the `button.tsx` sizes edit (§5.0), `src/hooks/use-reduced-motion.ts`, `src/lib/charts.ts` (`splitByBand`), the root `viewport` export, and "WHOOP Age" as the label (the plan's name; swap the one constant in `src/lib/format.ts` for "Pulse Age" if preferred).
 
 Open items for U17 (not design changes): `src/lib/header-state.ts` with its unit test, `getWearStreak()`, the `--glass-*` and orb tokens, retiring shadcn `Sidebar` from `AppShell`, and `InfoDialog`.

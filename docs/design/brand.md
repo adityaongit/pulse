@@ -217,6 +217,7 @@ Both components render `role="img"` with `aria-label="Pulse"`. Pass `title` to c
 flowchart TD
   W["Wordmark (bold)"] --> H["Home, above the dials<br/>src/app/(app)/page.tsx"]
   W --> S["Laptop sidebar header<br/>src/components/shells/AppNav.tsx"]
+  W --> D["Score detail ring, over the value (h-[15px])<br/>src/components/metrics/ScoreDial.tsx"]
   WB["Wordmark (black)"] --> L["Splash / first load<br/>src/app/(app)/loading.tsx"]
   M["Mark"] --> R["Tablet rail home button<br/>AppNav.tsx Rail"]
   M --> S

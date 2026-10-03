@@ -84,7 +84,8 @@ export function DetailHeaderRow({
         )}
         <div data-collapse-keep className="min-w-0 flex-1 pt-3 md:pt-4">
           <h1 className={cn(HEADER_TITLE, "truncate")}>{title}</h1>
-          {subtitle && <p className="truncate text-[15px] leading-5 text-foreground-secondary tabular-nums">{subtitle}</p>}
+          {/* 13 px under the 12 px title, WHOOP's activity time range [latest-activity-1] (spec §11 F14). */}
+          {subtitle && <p className="truncate text-[13px] leading-[18px] text-foreground-secondary tabular-nums">{subtitle}</p>}
         </div>
         {info && (
           <span className={sideLine}>
@@ -110,7 +111,8 @@ export function DetailHeaderRow({
           ) : (
             <>
               <h1 className={cn(HEADER_TITLE, "max-w-full truncate")}>{title}</h1>
-              {subtitle && <p className="max-w-full truncate text-xs leading-4 font-medium text-muted-foreground">{subtitle}</p>}
+              {/* Caps and tracked, WHOOP's "NEXT UPDATE IN 7 DAYS" [latest-whoop-age-cyan-1] (spec §11 F15). */}
+              {subtitle && <p className="max-w-full truncate text-[11px] leading-4 font-semibold tracking-[0.06em] text-muted-foreground uppercase">{subtitle}</p>}
             </>
           )}
         </div>

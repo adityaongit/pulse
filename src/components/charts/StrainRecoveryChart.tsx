@@ -100,7 +100,17 @@ export function StrainRecoveryChart({ points, today, grow }: { points: StrainRec
         <YAxis yAxisId="s" domain={[0, 21]} ticks={LEFT_TICKS} width={24} tick={{ fill: "var(--strain-text)", fontSize: 12, fontWeight: 600 }} {...AXIS} />
         <YAxis yAxisId="r" orientation="right" domain={[0, 100]} ticks={RIGHT_TICKS} width={40} tick={<RightTick />} {...AXIS} />
         {/* Today's column: a light band behind both series, as WHOOP lights the current day. */}
-        <Bar yAxisId="r" dataKey="hl" fill="rgb(255 255 255 / 0.06)" radius={6} isAnimationActive={false} tooltipType="none" />
+        {/* It runs down behind the day ticks too, so "Sat 3" sits inside the lit column as in WHOOP [latest-home-collapsed-3] (spec §11 F9). */}
+        <Bar
+          yAxisId="r"
+          dataKey="hl"
+          fill="rgb(255 255 255 / 0.06)"
+          isAnimationActive={false}
+          tooltipType="none"
+          shape={(b: { x?: number; y?: number; width?: number; height?: number }) =>
+            b.height ? <rect x={b.x} y={b.y} width={b.width} height={b.height + 44} rx={6} fill="rgb(255 255 255 / 0.06)" /> : <g />
+          }
+        />
         <ChartTooltip
           isAnimationActive={false}
           cursor={{ fill: "rgb(255 255 255 / 0.04)" }}

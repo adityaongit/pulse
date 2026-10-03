@@ -61,8 +61,10 @@ export function DetailShell({ title, subtitle, info, backHref, dateSwitcher, dis
       <div className={CONTENT_COLUMN}>
         <ConnectionBanner className="mb-4 xl:mb-6" />
         {dateSwitcher && !inHeader && (
+          // Bare chevrons and caps label, no pill: WHOOP's "‹ MON, SEP 14 ›" and "‹ JUL 26 - AUG 1 ›" rows
+          // [latest-stress-monitor-1], [latest-whoop-age-cyan-1] (spec §11 F15).
           <div className="mb-6 flex justify-center">
-            <DateSwitcher {...dateSwitcher} />
+            <DateSwitcher {...dateSwitcher} placement="header" />
           </div>
         )}
         <div className="flex flex-col gap-8">

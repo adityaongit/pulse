@@ -12,7 +12,7 @@ export default function Loading() {
             <SkeletonText className="w-16 px-1 text-xs leading-4" />
             {Array.from({ length: n }, (_, i) => (
               <div key={i} className={`${CARD_MATERIAL} flex min-h-14 items-center gap-3 px-4`}>
-                <SkeletonText className="w-36 text-[13px] leading-4" />
+                <SkeletonText className="w-36 text-xs leading-4" />
               </div>
             ))}
           </div>

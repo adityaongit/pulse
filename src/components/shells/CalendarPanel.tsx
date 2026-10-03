@@ -133,7 +133,8 @@ function MonthPanel({
     <div className="mx-auto w-full px-0.5 pt-3 pb-4 md:max-w-[560px] md:pt-2">
       <div className="grid h-14 grid-cols-[44px_1fr_44px] items-center">
         <ChevronButton dir="prev" disabled={!nav.prev} onClick={() => showMonth(-1)} />
-        <DialogPrimitive.Title className="text-center text-sm leading-4 font-bold tracking-[0.1em] uppercase">
+        {/* 12 px like every bar title; WHOOP's "MAY" has a 9 pt cap height [calendar-recovery-current-2026-05] (spec §11 F19). */}
+        <DialogPrimitive.Title className="text-center text-xs leading-4 font-bold tracking-[0.1em] uppercase">
           {monthLabel(month, today)}
         </DialogPrimitive.Title>
         <ChevronButton dir="next" disabled={!nav.next} onClick={() => showMonth(1)} />

@@ -47,7 +47,8 @@ export function InfoDialogContent({ title, body, icon, chip, action }: InfoConte
           {chip && <StatusChip tone={chip.tone}>{chip.text}</StatusChip>}
           <DialogPrimitive.Title className="text-[15px] leading-5 font-bold tracking-[0.08em] text-balance uppercase">{title}</DialogPrimitive.Title>
         </div>
-        <div className="space-y-4 text-[15px] leading-[22px] text-pretty text-foreground-secondary">{body}</div>
+        {/* WHOOP's info copy is a light grey near #dcdfe6, brighter than the secondary tier [latest-popover-info-1] (spec §11 F22). */}
+        <div className="space-y-4 text-[15px] leading-[22px] text-pretty text-foreground/85">{body}</div>
         {action && (
           <Button asChild variant="outline-pill" className="mt-6 h-12 w-full text-[13px] font-bold tracking-[0.08em] uppercase">
             <Link href={action.href}>{action.label}</Link>

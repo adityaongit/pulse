@@ -19,7 +19,7 @@ export function InfoButton({ info, label, variant }: { info: InfoContent; label:
         aria-label={`About ${label}`}
         className={cn(
           "relative grid shrink-0 place-items-center rounded-full transition-[color,background-color,scale] duration-150 ease-standard outline-none focus-visible:ring-3 focus-visible:ring-ring/50 active:scale-[0.96]",
-          header ? "size-11 text-foreground/80 hover:text-foreground" : "-my-1 size-8 text-muted-foreground after:absolute after:-inset-1.5 hover:text-foreground"
+          header ? "size-11 text-foreground/80 hover:text-foreground" : "-my-1 -mr-2 size-8 text-muted-foreground after:absolute after:-inset-1.5 hover:text-foreground"
         )}
       >
         {header ? (

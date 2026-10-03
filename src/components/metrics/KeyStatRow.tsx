@@ -41,6 +41,8 @@ export type KeyStatRowProps = {
 
 const LABEL = "text-xs leading-4 font-bold tracking-[0.08em] uppercase"
 const CAPTION = "text-xs leading-4 font-medium text-muted-foreground"
+const TILE_LABEL = "text-[10px] leading-3 font-bold tracking-[0.1em] uppercase"
+const TILE_CHIP = "min-h-5 px-1.5 py-0.5 text-[11px] leading-4"
 const STATUS_ACTIVE: Record<SleepStatus, string> = {
   poor: "bg-warning",
   sufficient: "bg-foreground-secondary",
@@ -125,7 +127,8 @@ function Row({ p, c }: { p: KeyStatRowProps; c: Computed }) {
             <span className="font-numeric text-[13px] leading-4 font-medium text-muted-foreground tabular-nums">{c.avgText}</span>
           )}
         </span>
-        {p.href && <ChevronRight className="size-4 shrink-0 text-muted-foreground" strokeWidth={1.75} />}
+        {/* My Dashboard's cards carry no chevron in WHOOP [latest-home-dashboard-1] (spec §11 F10); the card still presses in. */}
+        {p.href && p.variant !== "card" && <ChevronRight className="size-4 shrink-0 text-muted-foreground" strokeWidth={1.75} />}
       </span>
     </Frame>
   )
@@ -149,30 +152,31 @@ function Tile({ p, c }: { p: KeyStatRowProps; c: Computed }) {
       sentence={sentence}
       className={cn(
         CARD_MATERIAL,
-        "flex min-h-34 min-w-0 flex-col gap-3 p-4",
+        "flex min-h-31 min-w-0 flex-col gap-3 p-3",
         flagged && "ring-1 ring-warning/50",
         (p.href || p.onSelect) && "hover:from-card-hover active:scale-[0.96]",
         p.className
       )}
     >
       <span aria-hidden className="contents">
-        {/* WHOOP's v2 tile [latest-health-monitor-1]: icon and caps label on one line, then a 34 px value and its chip. */}
+        {/* WHOOP's v2 tile [latest-health-monitor-1]: icon and a 10 px caps label on one line, then a 30 px value and a
+            compact chip (spec §11 F16). */}
         <span className="flex items-center gap-2.5">
           {p.icon && <span className="grid size-5 shrink-0 place-items-center text-muted-foreground [&_svg]:size-5 [&_svg]:stroke-[1.5]">{p.icon}</span>}
-          {p.label ? <span className={cn(LABEL, "line-clamp-3 min-w-0 text-foreground-secondary")}>{p.label}</span> : <SkeletonText className={cn(LABEL, "w-24")} />}
+          {p.label ? <span className={cn(TILE_LABEL, "line-clamp-3 min-w-0 text-foreground-secondary")}>{p.label}</span> : <SkeletonText className={cn(TILE_LABEL, "w-24")} />}
         </span>
         <span className="mt-auto flex flex-col items-start gap-2">
           {c.loading ? (
             <>
-              <SkeletonText className="w-[3ch] font-numeric text-[34px] leading-10 font-bold" />
-              <SkeletonText className="w-28 text-xs leading-6" />
+              <SkeletonText className="w-[3ch] font-numeric text-[30px] leading-9 font-bold" />
+              <SkeletonText className="w-28 text-[11px] leading-5" />
             </>
           ) : (
           <ValueUnit
             value={c.valueText}
             unit={p.unit}
-            className={cn("font-numeric text-[34px] leading-10 font-bold tracking-[-0.01em]", c.reason && "text-muted-foreground")}
-            unitClassName="text-[15px] leading-5 font-medium text-foreground"
+            className={cn("font-numeric text-[30px] leading-9 font-bold tracking-[-0.01em]", c.reason && "text-muted-foreground")}
+            unitClassName="text-sm leading-5 font-medium text-foreground"
           />
           )}
           {c.loading ? null : c.reason ? (
@@ -181,10 +185,12 @@ function Tile({ p, c }: { p: KeyStatRowProps; c: Computed }) {
             <>
               {c.meta && <MetricTags provisional={c.meta.provisional} tags={c.meta.tags} className="justify-start" />}
               {p.chip ? (
-                <StatusChip tone={p.chip.tone}>{p.chip.text}</StatusChip>
+                <StatusChip tone={p.chip.tone} className={TILE_CHIP}>
+                  {p.chip.text}
+                </StatusChip>
               ) : (
                 c.avgText && (
-                  <StatusChip tone="neutral" delta={c.dir}>
+                  <StatusChip tone="neutral" delta={c.dir} className={TILE_CHIP}>
                     {c.avgText}
                     {p.unit && <span className="font-semibold">{p.unit === "%" ? "%" : ` ${p.unit}`}</span>}
                   </StatusChip>

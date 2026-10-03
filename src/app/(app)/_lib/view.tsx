@@ -1,5 +1,5 @@
 // View-model → kit-prop mappers shared by the half-A screens (Home, Recovery, Strain, Activity, Sleep).
-import { Activity, Droplet, Dumbbell, Footprints, Heart, HeartPulse, Moon, Thermometer, Wind, Zap } from "lucide-react"
+import { Activity, BatteryCharging, CalendarCheck, ChartNoAxesColumn, Droplet, Dumbbell, Footprints, Heart, HeartPulse, Hourglass, Moon, Thermometer, Wind, Zap } from "lucide-react"
 import type { EnergySeries } from "@/components/charts/EnergyBankChart"
 import type { HrSeries } from "@/components/charts/IntradayHrChart"
 import type { TrendPoint } from "@/components/charts/TrendChart"
@@ -33,6 +33,11 @@ export const STAT_ICON: Record<string, React.ReactNode> = {
   zones13: <HeartPulse />,
   zones45: <HeartPulse />,
   strength: <Dumbbell />,
+  // Sleep summary rows carry an icon each, as WHOOP's do [latest-sleep-1] (spec §11 F20).
+  hours: <Hourglass />,
+  consistency: <CalendarCheck />,
+  efficiency: <ChartNoAxesColumn />,
+  restorative: <BatteryCharging />,
 }
 
 /**
