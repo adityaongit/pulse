@@ -127,3 +127,36 @@ function insightOf(r: Report, word: string, inTarget: number, withTarget: number
   }
   return parts.join(" ");
 }
+
+/** One period in the archive: its dates and the three headline averages (null where none). */
+export type ReportListItem = {
+  period: string;
+  start: string;
+  end: string;
+  partial: boolean;
+  recovery: number | null;
+  strain: number | null;
+  sleepPerf: number | null;
+};
+export type ReportArchiveVM = { weeks: ReportListItem[]; months: ReportListItem[] };
+
+/** Reports archive `/reports` (More): every week and month that has data, newest first. */
+export function getReportArchive(ctx: QueryCtx = defaultCtx()): ReportArchiveVM {
+  const rows = ctx.db.$client.prepare("select period, data from reports order by period desc").all() as { period: string; data: string }[];
+  const out: ReportArchiveVM = { weeks: [], months: [] };
+  for (const row of rows) {
+    const r = JSON.parse(row.data) as Report;
+    if (!r.days) continue;
+    const a = r.averages;
+    (r.kind === "week" ? out.weeks : out.months).push({
+      period: row.period,
+      start: r.start,
+      end: r.end,
+      partial: r.partial,
+      recovery: finite(a.recovery) ? a.recovery : null,
+      strain: finite(a.strain) ? a.strain : null,
+      sleepPerf: finite(a.sleepPerf) ? a.sleepPerf : null,
+    });
+  }
+  return out;
+}
