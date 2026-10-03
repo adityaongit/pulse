@@ -6,7 +6,7 @@ import { ChevronLeft, ChevronRight, LoaderCircle } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { calendarContext, type CalendarContext } from "@/lib/calendar"
 import { dayLabel, rangeLabel } from "@/lib/format"
-import { addDays, dayHref, parseDay, weekOf } from "@/lib/url"
+import { dayHref, parseDay, stepDay, weekOf } from "@/lib/url"
 import { Dialog, DialogTrigger } from "@/components/ui/dialog"
 import { CalendarPanel } from "./CalendarPanel"
 import { useShellStatus } from "./ShellStatus"
@@ -77,27 +77,36 @@ function Switcher({ mode, calendar, placement = "body", narrow = false }: DateSw
   const atStart = !!firstDay && (week ? weekStart <= firstDay : d <= firstDay)
   const unit = week ? "week" : "day"
 
+  // The day the last step asked for. `d` only moves when a navigation commits, so a second tap while the
+  // first day loads steps from here, not from `d`; once nothing is loading, the URL is the truth again.
+  const target = React.useRef(d)
+  React.useEffect(() => {
+    if (!loading) target.current = d
+  }, [d, loading])
+
   const go = React.useCallback(
     (day: string) => {
-      const next = day > today ? today : firstDay && day < firstDay ? firstDay : day
+      const next = stepDay(day, 0, today, firstDay)
+      target.current = next
       // replace, not push: the back gesture leaves the screen instead of stepping through days (spec §8).
       startLoading(() => router.replace(dayHref(`${pathname}?${params}`, next, today), { scroll: false }))
     },
     [router, pathname, params, today, firstDay]
   )
   const step = week ? 7 : 1
+  const by = React.useCallback((n: number) => go(stepDay(target.current, n, today, firstDay)), [go, today, firstDay])
 
   React.useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey || ownsArrows(e.target)) return
-      if (e.key === "ArrowLeft" && !atStart) go(addDays(d, -step))
-      else if (e.key === "ArrowRight" && !atEnd) go(addDays(d, step))
+      if (e.key === "ArrowLeft" && !atStart) by(-step)
+      else if (e.key === "ArrowRight" && !atEnd) by(step)
       else return
       e.preventDefault()
     }
     window.addEventListener("keydown", onKey)
     return () => window.removeEventListener("keydown", onKey)
-  }, [d, step, atStart, atEnd, go])
+  }, [step, atStart, atEnd, by])
 
   const label = week ? rangeLabel(weekStart, weekEnd) : dayLabel(d, today)
   const bare = placement === "header"
@@ -113,7 +122,7 @@ function Switcher({ mode, calendar, placement = "body", narrow = false }: DateSw
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <div className={cn("inline-flex items-center", bare ? "gap-1" : "h-[30px] rounded-full bg-white/[0.04] p-px")}>
-        <button type="button" className={bare ? BARE_STEP : cn(STEP, narrow && NARROW_STEP)} aria-label={`Previous ${unit}`} disabled={atStart} onClick={() => go(addDays(d, -step))}>
+        <button type="button" className={bare ? BARE_STEP : cn(STEP, narrow && NARROW_STEP)} aria-label={`Previous ${unit}`} disabled={atStart} onClick={() => by(-step)}>
           <ChevronLeft aria-hidden className={bare ? "size-4" : "size-[18px]"} strokeWidth={2.25} />
         </button>
         <DialogTrigger asChild>
@@ -131,7 +140,7 @@ function Switcher({ mode, calendar, placement = "body", narrow = false }: DateSw
             {text}
           </button>
         </DialogTrigger>
-        <button type="button" className={bare ? BARE_STEP : cn(STEP, narrow && NARROW_STEP)} aria-label={`Next ${unit}`} disabled={atEnd} onClick={() => go(addDays(d, step))}>
+        <button type="button" className={bare ? BARE_STEP : cn(STEP, narrow && NARROW_STEP)} aria-label={`Next ${unit}`} disabled={atEnd} onClick={() => by(step)}>
           <ChevronRight aria-hidden className={bare ? "size-4" : "size-[18px]"} strokeWidth={2.25} />
         </button>
       </div>

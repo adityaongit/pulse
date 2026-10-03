@@ -13,6 +13,12 @@ export function todayIn(timeZone?: string, now = new Date()) {
 
 export const addDays = (day: string, n: number) => iso(addDaysFns(parseISO(day), n));
 
+/** `from` moved by `by` days, kept within [firstDay, today]. */
+export function stepDay(from: string, by: number, today: string, firstDay?: string | null) {
+  const day = addDays(from, by);
+  return day > today ? today : firstDay && day < firstDay ? firstDay : day;
+}
+
 /** Monday and Sunday of the ISO week containing `day`. */
 export function weekOf(day: string): [string, string] {
   const mon = startOfISOWeek(parseISO(day));

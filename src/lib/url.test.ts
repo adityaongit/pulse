@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { dayHref, parentHref, parseDay, parseRange, tabForPath, todayIn, weekOf, withParam } from "./url";
+import { dayHref, parentHref, parseDay, parseRange, stepDay, tabForPath, todayIn, weekOf, withParam } from "./url";
 
 const today = "2026-10-02";
 
@@ -18,6 +18,26 @@ describe("parseDay", () => {
   });
   it("takes the first of repeated params", () => {
     expect(parseDay(["2026-09-01", "2026-09-02"], today).d).toBe("2026-09-01");
+  });
+});
+
+describe("stepDay", () => {
+  const today = "2026-10-03";
+  const first = "2026-09-25";
+  // DateSwitcher folds each tap over the last target, so taps made while a day loads add up.
+  const taps = (from: string, ...steps: number[]) => steps.reduce((d, n) => stepDay(d, n, today, first), from);
+
+  it("consecutive steps accumulate from the latest target", () => {
+    expect(taps(today, -1, -1)).toBe("2026-10-01");
+    expect(taps(today, -1, -1, -1, 1)).toBe("2026-10-01");
+    expect(taps("2026-10-01", -7)).toBe("2026-09-25");
+  });
+
+  it("clamps to [firstDay, today], so a run of taps stops at the edge and turns back from it", () => {
+    expect(taps(today, 1)).toBe(today);
+    expect(taps("2026-09-27", -1, -1, -1, -1)).toBe(first);
+    expect(taps("2026-09-27", -7, 1)).toBe("2026-09-26");
+    expect(stepDay("2026-09-20", 0, today, null)).toBe("2026-09-20");
   });
 });
 
