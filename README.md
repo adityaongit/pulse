@@ -5,17 +5,7 @@ See `docs/plans/` for the plan.
 
 ## Screenshots
 
-Demo mode, seeded data.
-
-<p>
-  <img src="docs/screenshots/mobile-home.png" width="220" alt="Home: sleep, recovery and strain rings">
-  <img src="docs/screenshots/mobile-sleep.png" width="220" alt="Sleep performance">
-  <img src="docs/screenshots/mobile-healthspan.png" width="220" alt="Healthspan: Pulse Age orb">
-</p>
-
-<img src="docs/screenshots/desktop-home.png" alt="Desktop home">
-<img src="docs/screenshots/desktop-strain.png" alt="Desktop strain">
-<img src="docs/screenshots/desktop-health.png" alt="Desktop health">
+See [docs/screenshots.md](docs/screenshots.md) (demo mode, seeded data).
 
 ## Run in demo mode
 
