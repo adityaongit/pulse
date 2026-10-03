@@ -2,7 +2,7 @@
 import type { HealthspanContribution } from "@/core/algorithms/healthspan";
 import { acwrTone } from "@/lib/bands";
 import { weekOf } from "@/lib/url";
-import { addDays, daysBetween, wall } from "../time";
+import { addDays, daysBetween, fractionalYears, wall } from "../time";
 import { illnessRaised, VITAL_LABEL } from "./home";
 import {
   type DayRow,
@@ -229,15 +229,13 @@ export function getHealthspan(day: string, ctx: QueryCtx = defaultCtx()): Health
     weekEnd,
     asOf: shown,
     nextUpdateInDays: weekEnd > last ? Math.max(0, daysBetween(today, weekEnd)) : 0,
-    age: hs && hs.reason === null ? hs.age : ageAt(ctx.profile.birthDate, shown),
+    age: hs && hs.reason === null ? hs.age : fractionalYears(ctx.profile.birthDate, shown),
     result,
     insight: hs && hs.reason === null ? healthspanInsight(hs.paceOfAging, contributions) : null,
     history,
     contributors,
   };
 }
-
-const ageAt = (birth: string, day: string) => daysBetween(birth, day) / 365.2425;
 
 function healthspanInsight(pace: number, cs: HealthspanContribution[]) {
   const title = pace < 0.9 ? "Aging slower" : pace > 1.1 ? "Aging faster" : "Steady and healthy";

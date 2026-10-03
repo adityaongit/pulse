@@ -10,13 +10,12 @@ import type { ReasonCode } from "@/lib/reasons";
 import { createHash } from "node:crypto";
 import { getConfig } from "./config";
 import { type Db, getDb } from "./db";
-import { daysBetween, addDays, localDay, localMidnight, localMinutes } from "./time";
+import { daysBetween, addDays, fractionalYears, localDay, localMidnight, localMinutes, wholeYears } from "./time";
 import {
   deviation,
   hrvCfg,
   isTrusted,
   isUsable,
-  isoEpochDay,
   respCfg,
   restingHRCfg,
   sigma,
@@ -47,9 +46,10 @@ import { minuteMeanHr, stress, type Interval } from "@/core/algorithms/stress";
 
 /**
  * Bump on any scoring change; a mismatch at startup reruns both stages for every day.
- * 1: U5 scorers. 2: SRI consistency in sleep performance (U7), U10 pipeline.
+ * 1: U5 scorers. 2: SRI consistency in sleep performance (U7), U10 pipeline. 3: one age helper
+ * (healthspan and fitness age agree with whole years on birthdays).
  */
-export const SCORING_VERSION = 2;
+export const SCORING_VERSION = 3;
 
 export type PipelineOptions = {
   timeZone: string;
@@ -548,13 +548,6 @@ function nightOf(main: Session, segments: Segment[] | undefined): NonNullable<Sl
   };
 }
 
-function ageOn(birthDate: string, day: string) {
-  const days = isoEpochDay(day)! - isoEpochDay(birthDate)!;
-  const [by, bm, bd] = birthDate.split("-").map(Number);
-  const [y, m, d] = day.split("-").map(Number);
-  return { years: days / 365.2425, whole: y - by - (m < bm || (m === bm && d < bd) ? 1 : 0) };
-}
-
 function stage2(db: Db, data: Data, opts: PipelineOptions) {
   const c = db.$client;
   const tz = opts.timeZone;
@@ -630,7 +623,8 @@ function stage2(db: Db, data: Data, opts: PipelineOptions) {
     const worn = s1.hrCount > 0;
     const mainSession = data.mainOf.get(day);
     const napSessions = (data.sessionsByDay.get(day) ?? []).filter((s) => s !== mainSession && !s.isMain);
-    const age = ageOn(opts.profile.birthDate, day);
+    // noop truncates to whole years for sleep need; healthspan and fitness take the fraction.
+    const age = { whole: wholeYears(opts.profile.birthDate, day), years: fractionalYears(opts.profile.birthDate, day) };
 
     // ── Sleep ────────────────────────────────────────────────────────────────
     const main = mainSession ? nightOf(mainSession, segments.get(mainSession.id)) : null;

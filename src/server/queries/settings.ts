@@ -1,6 +1,6 @@
 // More, Settings and the shell's status (spec §7.14, §4.2). Pages also call worker.requestSync() on load.
 import { SCORING_VERSION } from "../pipeline";
-import { addDays, daysBetween } from "../time";
+import { addDays, wholeYears } from "../time";
 import { defaultCtx, firstDay, type QueryCtx, todayOf } from "./common";
 import { latestReport } from "./home";
 import type { MoreVM, SettingsVM, ShellStatusVM } from "./types";
@@ -82,7 +82,7 @@ export function getSettings(ctx: QueryCtx = defaultCtx()): SettingsVM {
     sync,
     profile: {
       birthDate: p.birthDate,
-      age: Math.floor(daysBetween(p.birthDate, today) / 365.2425),
+      age: wholeYears(p.birthDate, today),
       sex: p.sex,
       maxHr: p.maxHr,
       maxHrSource: p.maxHrSet ? "set" : "estimated",
