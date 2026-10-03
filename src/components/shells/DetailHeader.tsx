@@ -8,7 +8,7 @@ import { dayHref, parentHref, tabForPath } from "@/lib/url"
 import { Button } from "@/components/ui/button"
 import { DateSwitcher, type DateSwitcherProps } from "./DateSwitcher"
 import { InfoButton, type InfoContent } from "./InfoButton"
-import { useShellStatus } from "./ShellStatus"
+import { useShellCalendar } from "./ShellStatus"
 import { HEADER_TITLE, HeaderFrame, HeaderRow } from "./TopBar"
 
 export type DetailHeaderProps = {
@@ -47,7 +47,7 @@ export function DetailHeaderRow({
 }: DetailHeaderProps & { centerClassName?: string; className?: string }) {
   const router = useRouter()
   const pathname = usePathname()
-  const { today } = useShellStatus()
+  const { today } = useShellCalendar()
 
   const back = () => {
     // The Navigation API lists only this origin's entries, so canGoBack means "an in-app page is behind this one".

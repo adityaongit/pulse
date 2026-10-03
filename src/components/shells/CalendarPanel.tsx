@@ -24,7 +24,7 @@ import {
 import { DATA_COLORS } from "@/lib/bands"
 import { loadCalendarMonth } from "@/server/actions/calendar"
 import type { CalendarDayVM } from "@/server/queries/types"
-import { useShellStatus } from "./ShellStatus"
+import { useShellCalendar } from "./ShellStatus"
 
 export type CalendarPanelProps = {
   /** The selected day (`?d=`, default today); it carries the circle (CAL5). */
@@ -96,7 +96,7 @@ function MonthPanel({
   months,
   load,
 }: CalendarPanelProps & { months: Months; load: (month: string) => void }) {
-  const { today, firstDay } = useShellStatus()
+  const { today, firstDay } = useShellCalendar()
   const grid = React.useRef<HTMLDivElement>(null)
   // Null until the user moves: the panel opens on the selected day's month. This unmounts with
   // Content on close, so each open starts fresh.

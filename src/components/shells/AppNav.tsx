@@ -10,7 +10,7 @@ import { Mark } from "@/components/brand/Mark"
 import { Wordmark } from "@/components/brand/Wordmark"
 import { dayLabel } from "@/lib/format"
 import { dayHref, parseDay, tabForPath, TAB_ROOT, type Tab } from "@/lib/url"
-import { useShellStatus } from "./ShellStatus"
+import { useShellCalendar } from "./ShellStatus"
 import { DemoChip, SyncStatus } from "./TopBar"
 
 const TABS: { tab: Tab; label: string; icon: LucideIcon }[] = [
@@ -114,7 +114,7 @@ function Rail({ current }: { current: number }) {
 
 /** Laptop sidebar, 232 px, floating (inferred, I2), with Reports and Settings under a hairline. */
 function Sidebar({ current, pathname }: { current: number; pathname: string }) {
-  const { today } = useShellStatus()
+  const { today } = useShellCalendar()
   const extra = [
     { href: `/reports/${lastWeekPeriod(today)}`, match: "/reports", label: "Reports", icon: CalendarRange },
     { href: "/settings", match: "/settings", label: "Settings", icon: Settings },
@@ -187,7 +187,7 @@ function Monogram() {
  * column hid its right-hand controls (U18 G-02, D-L5).
  */
 function CheckInAction({ variant }: { variant: "float" | "rail" | "sidebar" }) {
-  const { today } = useShellStatus()
+  const { today } = useShellCalendar()
   const params = useSearchParams()
   const { d } = parseDay(params.get("d") ?? undefined, today)
   const href = `${dayHref("/journal", d, today)}${d === today ? "?" : "&"}checkin=1`

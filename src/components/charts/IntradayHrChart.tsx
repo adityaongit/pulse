@@ -9,7 +9,7 @@ import { ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import { Skeleton } from "@/components/ui/skeleton"
 import { EmptyState } from "@/components/shells/EmptyState"
 import { MetricState } from "@/components/shells/MetricState"
-import { useOptionalShellStatus } from "@/components/shells/ShellStatus"
+import { useOptionalShellCalendar } from "@/components/shells/ShellStatus"
 import { ReasonPlaceholder } from "@/components/metrics/ReasonPlaceholder"
 import { AXIS, ChartFigure, GRID, LINE_CURSOR, TOOLTIP_CLASS, TooltipLine, useSeriesAnimation } from "./ChartFrame"
 
@@ -47,7 +47,7 @@ export function spanAreas(spans: ChartSpan[] | undefined) {
 }
 
 function Chart({ hr, variant }: { hr: HrSeries; variant: "day" | "activity" }) {
-  const tz = useOptionalShellStatus()?.timeZone
+  const tz = useOptionalShellCalendar()?.timeZone
   const anim = useSeriesAnimation()
   const id = React.useId().replace(/:/g, "")
   const first = hr.points[0]?.t ?? 0

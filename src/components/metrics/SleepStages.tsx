@@ -7,7 +7,7 @@ import type { Metric } from "@/lib/reasons"
 import { Skeleton, SkeletonText } from "@/components/ui/skeleton"
 import { EmptyState } from "@/components/shells/EmptyState"
 import { MetricState } from "@/components/shells/MetricState"
-import { useOptionalShellStatus } from "@/components/shells/ShellStatus"
+import { useOptionalShellCalendar } from "@/components/shells/ShellStatus"
 import { ReasonPlaceholder } from "./ReasonPlaceholder"
 import { CAPTION, LABEL } from "./primitives"
 
@@ -24,7 +24,7 @@ const ORDER: Stage[] = ["awake", "light", "deep", "rem"]
 const EMPTY = "No stage data for this night. Fitbit only stages sleeps longer than about 3 hours."
 
 function Rows({ night }: { night: SleepStagesNight }) {
-  const tz = useOptionalShellStatus()?.timeZone
+  const tz = useOptionalShellCalendar()?.timeZone
   const name = React.useId()
   const [selected, setSelected] = React.useState<Stage>("awake")
   const span = Math.max(1, night.wake - night.bed)
