@@ -44,7 +44,8 @@ Run `pnpm typecheck && pnpm lint && pnpm test` before every commit. Run `pnpm e2
 - **Git.**
   - Use the `git` CLI only, never `gh`.
   - Commit as the `adityaongit` identity.
-  - Use conventional commit messages.
+  - Use conventional commit messages, signed off (`git commit -s`).
+  - `main` is protected (`.github/rulesets/main.json`): work on a branch and land it through a pull request with green CI. See CONTRIBUTING.md and docs/maintainers.md.
 - **Secrets.** Never log tokens or API response bodies. `.env`, `data/` and `*.db` are gitignored.
 
 <!-- BEGIN:nextjs-agent-rules -->

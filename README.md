@@ -42,6 +42,13 @@ Production runs as one container on the homelab, behind Cloudflare Tunnel, with 
 | `pnpm e2e` | Playwright |
 | `pnpm db:generate` | Generates a migration in `drizzle/` from `src/server/db/schema.ts` |
 
+## Contributing and security
+
+- [Setup guide](docs/setup.md): from the demo to your own data on a server.
+- [Contributing](CONTRIBUTING.md): how changes land (`main` is protected; every change is a pull request).
+- [Security policy](SECURITY.md): report vulnerabilities privately.
+- [Code of Conduct](CODE_OF_CONDUCT.md).
+
 ## License
 
 [PolyForm Noncommercial 1.0.0](LICENSE). Use it, change it and share it for any noncommercial purpose. Selling it, or putting it inside a commercial product, is not allowed.
