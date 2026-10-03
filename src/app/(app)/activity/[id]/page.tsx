@@ -11,6 +11,7 @@ import { ReasonPlaceholder } from "@/components/metrics/ReasonPlaceholder"
 import { StatusChip, ValueUnit } from "@/components/metrics/primitives"
 import { DetailShell } from "@/components/shells/DetailShell"
 import { SectionShell } from "@/components/shells/SectionShell"
+import { Card } from "@/components/ui/card"
 import { getConfig } from "@/server/config"
 import { getActivity } from "@/server/queries/activity"
 import type { ActivityVM } from "@/server/queries/types"
@@ -55,15 +56,19 @@ export default async function ActivityPage({ params }: PageProps<"/activity/[id]
         </div>
       }
       secondary={[
-        <SectionShell key="stats" variant="section" title="Key statistics" aside="vs. 30-day average" level={2}>
-          <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:gap-4">
+        <SectionShell key="stats" variant="section" title="Key statistics" aside="vs. 30-day average" level={2} className="flex flex-col">
+          <div className="grid flex-1 grid-cols-2 gap-3 md:grid-cols-3 xl:gap-4">
             {tiles.map((k) => (
               <KeyStatRow key={k.key} variant="tile" {...statProps(k)} />
             ))}
           </div>
         </SectionShell>,
-        <SectionShell key="hrr" variant="card" title="Heart rate recovery" level={2} className="xl:self-end">
-          <HeartRateRecovery hrr={vm.hrr} />
+        // A titled section like Key statistics beside it, so both columns carry a heading and their cards start and end
+        // on one line on laptop (SYM8).
+        <SectionShell key="hrr" variant="section" title="Heart rate recovery" level={2} className="flex flex-col">
+          <Card className="flex-1 justify-center gap-0 p-4 xl:p-5">
+            <HeartRateRecovery hrr={vm.hrr} />
+          </Card>
         </SectionShell>,
       ]}
       footer={vm.insight && <InsightCard body={vm.insight} />}

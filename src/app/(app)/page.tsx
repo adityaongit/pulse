@@ -132,9 +132,12 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
           </div>
         ),
         main: (
+          // Laptop: My Day and My Dashboard end on one line. Both columns fill the row; whichever is shorter grows its
+          // last card (the Energy Bank / Tonight's sleep pair, or the Strain & recovery chart), never a blank (SYM4).
           <SectionShell
             variant="section"
             title="My Day"
+            className="xl:flex xl:h-full xl:flex-col"
             action={
               <Link
                 href={checkIn}
@@ -147,7 +150,7 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
               </Link>
             }
           >
-            <div className="space-y-3 xl:space-y-4">
+            <div className="flex flex-col gap-3 xl:flex-1 xl:gap-4">
               {vm.outlook && <DayBanner outlook={vm.outlook} />}
               <SectionShell
                 variant="card"
@@ -180,12 +183,14 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
                 )}
               </SectionShell>
               <JournalWeek vm={vm} at={at} />
-              <div className="grid grid-cols-1 gap-3 xl:grid-cols-2 xl:gap-4">
+              {/* Equal heights: each card's footer (Charged / Drained, the goal toggle) sits on the row's bottom line. */}
+              <div className="grid grid-cols-1 gap-3 xl:flex-1 xl:grid-cols-2 xl:gap-4">
                 <EnergyCard vm={vm} timeZone={timeZone} />
                 <SectionShell
                   variant="card"
                   title="Tonight's sleep"
                   info={TONIGHT_INFO}
+                  fill
                   action={
                     <Link href={at("/sleep#planner")} aria-label="Open Sleep Planner" className={ICON_LINK}>
                       <ChevronRight aria-hidden className="size-[18px]" strokeWidth={1.75} />
@@ -196,12 +201,14 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
                     metric={vm.tonight}
                     skeleton={null}
                     renderReason={(r, meta) => (
-                      <ReasonPlaceholder
-                        reason={r}
-                        nightsLeft={meta.nightsLeft}
-                        size="md"
-                        copy={r === "calibrating" ? "Sleep Planner needs 7 nights to learn your wake time." : undefined}
-                      />
+                      <div className="my-auto">
+                        <ReasonPlaceholder
+                          reason={r}
+                          nightsLeft={meta.nightsLeft}
+                          size="md"
+                          copy={r === "calibrating" ? "Sleep Planner needs 7 nights to learn your wake time." : undefined}
+                        />
+                      </div>
                     )}
                   >
                     {(plan) => <TonightPlan plan={plan} timeZone={timeZone} />}
@@ -212,7 +219,7 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
           </SectionShell>
         ),
         aside: (
-          <SectionShell variant="section" title="My Dashboard" aside="vs. 30-day average">
+          <SectionShell variant="section" title="My Dashboard" aside="vs. 30-day average" className="xl:flex xl:h-full xl:flex-col">
             {/* One card per metric (V9, [latest-home-dashboard-1]). */}
             <ul className="space-y-2">
               {vm.keyStats.map((s) => (
@@ -223,8 +230,8 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
             </ul>
             {/* Hidden with fewer than two scored days: one point is not a trend (spec §7.1 row 9). */}
             {vm.strainRecovery.filter((p) => p.strain !== null || p.recovery !== null).length >= 2 && (
-              <SectionShell variant="card" title="Strain & recovery" info={STRAIN_RECOVERY_INFO} className="mt-3 xl:mt-4">
-                <StrainRecoveryChart points={vm.strainRecovery} today={d} />
+              <SectionShell variant="card" title="Strain & recovery" info={STRAIN_RECOVERY_INFO} fill className="mt-3 xl:mt-4 xl:flex-1">
+                <StrainRecoveryChart points={vm.strainRecovery} today={d} grow />
               </SectionShell>
             )}
           </SectionShell>
@@ -232,7 +239,7 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
         bottom: vm.weeklyTeaser && (
           <Link href={`/reports/${vm.weeklyTeaser.period}`} className={cn(BANNER, "bg-linear-to-r from-banner-from to-banner-to")}>
             <CalendarRange aria-hidden className="size-[22px] shrink-0" strokeWidth={1.5} />
-            <span className="min-w-0 flex-1 truncate text-base leading-[22px] font-semibold">Your week in review</span>
+            <span className="min-w-0 flex-1 text-base leading-[22px] font-semibold text-balance">Your week in review</span>
             <span className="shrink-0 font-numeric text-xs leading-4 font-medium text-foreground-secondary tabular-nums">
               {rangeLabel(vm.weeklyTeaser.start, vm.weeklyTeaser.end)}
             </span>
@@ -346,7 +353,8 @@ function MonitorLine({ chip, chipClass, top, topClass, bottom }: { chip: React.R
       <span className={cn(CHIP_BOX, chipClass)}>{chip}</span>
       <span className="min-w-0">
         <span className={cn(LABEL, "block tracking-[0.06em] text-balance", topClass)}>{top}</span>
-        <span className={cn(CAPTION, "block truncate text-foreground-secondary tabular-nums")}>{bottom}</span>
+        {/* Wraps rather than truncates: "Day average" lost a pixel at 320 px. */}
+        <span className={cn(CAPTION, "block text-pretty text-foreground-secondary tabular-nums")}>{bottom}</span>
       </span>
     </div>
   )
@@ -355,7 +363,7 @@ function MonitorLine({ chip, chipClass, top, topClass, bottom }: { chip: React.R
 function MonitorCard({ vm, href }: { vm: HomeVM; href: string }) {
   const m = vm.monitor
   return (
-    <SectionShell variant="card" title="Health Monitor" href={href}>
+    <SectionShell variant="card" title="Health Monitor" href={href} level={2}>
       {m.value === null || m.value.inRange + m.value.flagged === 0 ? (
         // No vital judged yet (no readings, or every baseline still calibrating): never "Within range".
         <MonitorLine
@@ -371,7 +379,7 @@ function MonitorCard({ vm, href }: { vm: HomeVM; href: string }) {
           chipClass="bg-optimal/15 text-optimal"
           top="Within range"
           topClass="text-optimal"
-          bottom={`${m.value.inRange}/${m.value.total} metrics`}
+          bottom={`${m.value.inRange}/${m.value.total} within range`}
         />
       ) : (
         <MonitorLine
@@ -379,7 +387,7 @@ function MonitorCard({ vm, href }: { vm: HomeVM; href: string }) {
           chipClass="bg-warning/15 text-warning"
           top="Out of range"
           topClass="text-warning"
-          bottom={`${m.value.inRange}/${m.value.total} metrics`}
+          bottom={`${m.value.inRange}/${m.value.total} within range`}
         />
       )}
     </SectionShell>
@@ -390,7 +398,7 @@ function StressCard({ vm, href, timeZone }: { vm: HomeVM; href: string; timeZone
   const s = vm.stress
   if (s.value === null)
     return (
-      <SectionShell variant="card" title="Stress Monitor" href={href}>
+      <SectionShell variant="card" title="Stress Monitor" href={href} level={2}>
         <MonitorLine
           chip={MISSING}
           chipClass="bg-secondary font-numeric text-base font-bold text-muted-foreground"
@@ -402,7 +410,7 @@ function StressCard({ vm, href, timeZone }: { vm: HomeVM; href: string; timeZone
     )
   const tone = STRESS_TONE[s.value.level]
   return (
-    <SectionShell variant="card" title="Stress Monitor" href={href}>
+    <SectionShell variant="card" title="Stress Monitor" href={href} level={2}>
       <MonitorLine
         chip={formatValue("decimal1", s.value.value)}
         chipClass={cn("font-numeric text-lg font-bold tabular-nums", tone.chip)}
@@ -417,10 +425,19 @@ function StressCard({ vm, href, timeZone }: { vm: HomeVM; href: string; timeZone
 function EnergyCard({ vm, timeZone }: { vm: HomeVM; timeZone: string }) {
   const e = vm.energyBank
   return (
-    <SectionShell variant="card" title="Energy Bank" info={ENERGY_INFO} aside={e.value && e.provisional ? <MetricTags provisional /> : undefined}>
-      <MetricState metric={e} skeleton={null} renderReason={(r, meta) => <ReasonPlaceholder reason={r} nightsLeft={meta.nightsLeft} size="md" />}>
+    <SectionShell variant="card" title="Energy Bank" info={ENERGY_INFO} aside={e.value && e.provisional ? <MetricTags provisional /> : undefined} fill>
+      <MetricState
+        metric={e}
+        skeleton={null}
+        renderReason={(r, meta) => (
+          // Centred when the card is stretched beside Tonight's sleep, never pinned to the top of an empty card (SYM4).
+          <div className="my-auto">
+            <ReasonPlaceholder reason={r} nightsLeft={meta.nightsLeft} size="md" />
+          </div>
+        )}
+      >
         {(eb) => (
-          <div className="space-y-4">
+          <div className="flex flex-1 flex-col gap-4">
             <div className="space-y-1.5">
               <TickScale variant="meter" label="Energy" metric={{ value: eb.current, reason: null, provisional: false }} min={0} max={100} format="int" unit="%" />
               <p className={CAPTION}>
@@ -429,7 +446,7 @@ function EnergyCard({ vm, timeZone }: { vm: HomeVM; timeZone: string }) {
               </p>
             </div>
             <EnergyBankChart data={{ value: energySeries(eb), reason: null, provisional: false }} />
-            <div className="grid grid-cols-2 gap-3">
+            <div className="mt-auto grid grid-cols-2 gap-3">
               <MiniStat label="Charged" value={formatValue("signedInt", eb.charged)} className="text-optimal" />
               <MiniStat label="Drained" value={formatValue("signedInt", eb.drained)} className="text-warning" />
             </div>

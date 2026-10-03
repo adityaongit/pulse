@@ -158,6 +158,19 @@ describe("getHome", () => {
     expect(off).toEqual({ day: dayAt(156), strain: null, recovery: null });
   });
 
+  it("leaves today's Strain a gap in the 7-day series until it has a score, never a 0.0 dive", () => {
+    const morning = getHome(dayAt(179), ctxFor(early, BEFORE_WAKE));
+    expect(morning.dials.strain.value).toBe(0);
+    const today = morning.strainRecovery.at(-1)!;
+    expect(today.day).toBe(dayAt(179));
+    expect(today.strain).toBeNull();
+    // Past days keep their scores.
+    expect(morning.strainRecovery.slice(0, -1).some((p) => p.strain !== null && p.strain > 0)).toBe(true);
+    // Once effort accrues, today plots.
+    const later = getHome(dayAt(170), ctxFor(db)).strainRecovery.at(-1)!;
+    expect(later.strain).not.toBeNull();
+  });
+
   it("raises the Health Monitor alert in the seeded illness week", () => {
     const flagged = [118, 119, 120, 121, 122].map((i) => getHome(dayAt(i), ctxFor(db)).monitorAlert);
     expect(flagged.some((a) => a?.kind === "illness")).toBe(true);

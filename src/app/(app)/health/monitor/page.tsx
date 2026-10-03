@@ -27,8 +27,10 @@ const INFO = {
 
 const CHIP = {
   within: { tone: "optimal", text: () => "Within range" },
-  out: { tone: "warning", text: (n: number) => `${n} out of range` },
-  illness: { tone: "alert", text: () => "Possible illness signal" },
+  // One phrasing with Home's monitor card: "N/5 within range" for the count, "Out of range" for the status (SYM).
+  // The illness alert below the count names the illness signal.
+  out: { tone: "warning", text: () => "Out of range" },
+  illness: { tone: "alert", text: () => "Out of range" },
 } as const
 
 function Count({ count }: { count: MonitorVM["count"] }) {
@@ -47,7 +49,7 @@ function Count({ count }: { count: MonitorVM["count"] }) {
       <p aria-hidden className="text-xs leading-4 font-bold tracking-[0.08em] uppercase">
         Metrics within range
       </p>
-      {chip && <StatusChip tone={chip.tone}>{chip.text(v!.outOfRange)}</StatusChip>}
+      {chip && <StatusChip tone={chip.tone}>{chip.text()}</StatusChip>}
       {reason && <p className="max-w-[36ch] text-xs leading-4 font-medium text-muted-foreground">{reason.long}</p>}
     </div>
   )

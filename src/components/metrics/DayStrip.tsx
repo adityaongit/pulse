@@ -64,7 +64,7 @@ function Strip({ indicator, days }: DayStripProps) {
         }}
         aria-label="Choose a day"
         spacing={1}
-        className="w-max gap-1 px-4 py-1"
+        className="w-max gap-1 px-4 py-1 md:px-1"
       >
         {days.map((day) => {
           const date = parseISO(day.date)
@@ -80,7 +80,9 @@ function Strip({ indicator, days }: DayStripProps) {
               value={day.date}
               ref={on ? selected : undefined}
               aria-label={label}
-              className="h-15 w-11 flex-col gap-1 rounded-xl p-0 transition-[background-color,scale] duration-150 ease-standard hover:bg-white/6 active:scale-[0.96] data-[state=on]:bg-white/10"
+              // Sized by its contents with 8 px above and below, so the badge sits fully inside the lit tile (SYM1):
+              // 60 px with the recovery bar, 72 px with the journal badge.
+              className="h-auto w-11 flex-col justify-center gap-1 rounded-xl px-0 py-2 transition-[background-color,scale] duration-150 ease-standard hover:bg-white/6 active:scale-[0.96] data-[state=on]:bg-white/10"
             >
               <span aria-hidden className="text-[11px] leading-3 font-semibold text-muted-foreground">
                 {format(date, "EEEEE")}
@@ -116,11 +118,11 @@ export function DayStrip(props: DayStripProps) {
   )
 }
 
-export function DayStripSkeleton() {
+export function DayStripSkeleton({ indicator = "recovery" }: { indicator?: DayStripProps["indicator"] }) {
   return (
-    <div aria-hidden className="flex gap-1 overflow-hidden px-4">
+    <div aria-hidden className="flex gap-1 overflow-hidden px-4 md:px-1">
       {Array.from({ length: 7 }, (_, i) => (
-        <Skeleton key={i} className="h-15 w-11 shrink-0 rounded-xl" />
+        <Skeleton key={i} className={cn("w-11 shrink-0 rounded-xl", indicator === "journal" ? "h-18" : "h-15")} />
       ))}
     </div>
   )

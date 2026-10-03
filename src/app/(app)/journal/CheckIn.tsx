@@ -130,31 +130,36 @@ export function CheckIn({ day, dayLabel, tags, checkIn }: CheckInProps) {
 
   return (
     <>
-      <SectionShell variant="card" title="Check-in" aside={<span className="text-xs leading-4 font-medium text-muted-foreground tabular-nums">{dayLabel}</span>}>
+      {/* The section above is headed "Check-in", so the card is titled by its day, as History's rows are (SYM2). */}
+      <SectionShell variant="card" title={dayLabel} fill>
         {checkIn.done ? (
-          <div className="flex flex-col gap-4">
-            <StatusChip tone="optimal">Checked in</StatusChip>
-            {checkIn.yes.length > 0 && (
-              <ul className="flex flex-wrap gap-2" aria-label="Behaviours logged">
-                {checkIn.yes.map((y) => (
-                  <li key={y.tag}>
-                    <Badge variant="secondary" className={TAG_CLASS}>
-                      {y.label}
-                    </Badge>
-                  </li>
-                ))}
-              </ul>
-            )}
-            <Button ref={trigger} variant="secondary" size="touch" className="self-start" onClick={start}>
-              Edit
+          <div className="flex flex-1 flex-col gap-4">
+            {/* Status and the day's behaviours on one wrapping line. */}
+            <div className="flex flex-wrap items-center gap-2">
+              <StatusChip tone="optimal">Checked in</StatusChip>
+              {checkIn.yes.length > 0 && (
+                <ul className="flex flex-wrap gap-2" aria-label="Behaviours logged">
+                  {checkIn.yes.map((y) => (
+                    <li key={y.tag}>
+                      <Badge variant="secondary" className={TAG_CLASS}>
+                        {y.label}
+                      </Badge>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+            {/* Full width at the card's foot, as Check in and Home's card buttons are (SYM3). */}
+            <Button ref={trigger} variant="secondary" size="touch" className="mt-auto w-full" onClick={start}>
+              Edit check-in
             </Button>
           </div>
         ) : (
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-1 flex-col gap-4">
             <p className="max-w-[65ch] text-[15px] leading-[22px] text-pretty text-foreground-secondary">
               Log what you did today. Pulse compares it with tomorrow&apos;s Recovery.
             </p>
-            <Button ref={trigger} size="touch" className="w-full" onClick={start}>
+            <Button ref={trigger} size="touch" className="mt-auto w-full" onClick={start}>
               Check in
             </Button>
           </div>
@@ -237,7 +242,7 @@ export function CheckIn({ day, dayLabel, tags, checkIn }: CheckInProps) {
                       maxLength={32}
                       aria-invalid={!!addError}
                       aria-describedby={addError ? "new-behaviour-error" : undefined}
-                      className="h-11 min-w-0 flex-1 text-[15px]"
+                      className="h-11 min-w-0 flex-1 text-base"
                     />
                     <Button type="submit" variant="secondary" size="touch" disabled={adding || !label.trim()}>
                       Add

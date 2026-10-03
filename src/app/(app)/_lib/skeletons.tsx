@@ -216,8 +216,8 @@ export function ActivitySkeleton() {
         </div>
       }
       secondary={[
-        <SectionShell key="stats" variant="section" title="Key statistics" aside="vs. 30-day average" level={2}>
-          <div aria-hidden className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:gap-4">
+        <SectionShell key="stats" variant="section" title="Key statistics" aside="vs. 30-day average" level={2} className="flex flex-col">
+          <div aria-hidden className="grid flex-1 grid-cols-2 gap-3 md:grid-cols-3 xl:gap-4">
             {[
               ["avgHr", "Average heart rate"],
               ["maxHr", "Max heart rate"],
@@ -227,9 +227,11 @@ export function ActivitySkeleton() {
             ))}
           </div>
         </SectionShell>,
-        <CardSkeleton key="hrr" title="Heart rate recovery">
-          <Skeleton className="h-24 rounded-lg bg-muted/60" />
-        </CardSkeleton>,
+        <SectionShell key="hrr" variant="section" title="Heart rate recovery" level={2} className="flex flex-col">
+          <Card aria-hidden className="flex-1 justify-center gap-0 p-4 xl:p-5">
+            <Skeleton className="h-24 rounded-lg bg-muted/60" />
+          </Card>
+        </SectionShell>,
       ]}
     />
   )
