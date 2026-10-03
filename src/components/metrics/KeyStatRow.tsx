@@ -101,7 +101,8 @@ function Row({ p, c }: { p: KeyStatRowProps; c: Computed }) {
       <span aria-hidden className="contents">
         {p.icon && <span className="grid size-5 shrink-0 place-items-center text-muted-foreground [&_svg]:size-5 [&_svg]:stroke-[1.75]">{p.icon}</span>}
         <span className="min-w-0 flex-1">
-          {p.label ? <span className={cn(LABEL, "block truncate")}>{p.label}</span> : <SkeletonText className={cn(LABEL, "w-32")} />}
+          {/* Wraps rather than truncates: "Heart rate variability" overflows a 361 px phone by 2 px. */}
+          {p.label ? <span className={cn(LABEL, "block text-balance")}>{p.label}</span> : <SkeletonText className={cn(LABEL, "w-32")} />}
           {(c.reason || p.caption) && <span className={cn(CAPTION, "mt-0.5 block truncate")}>{c.reason ?? p.caption}</span>}
           {/* Tags sit under the label, not after the unit, so a phone never truncates the label (spec §11 note). */}
           {c.meta && <MetricTags provisional={c.meta.provisional} tags={c.meta.tags} className="mt-1 justify-start" />}

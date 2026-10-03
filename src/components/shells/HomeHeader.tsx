@@ -348,12 +348,13 @@ export function HomeHeader({ rings }: { rings?: HeaderRings }) {
                     <Link
                       href={ring?.href ?? `/${key}`}
                       aria-label={ringLabel(key, label, value)}
-                      className="inline-flex h-10 items-center justify-center gap-2 rounded-full px-2 transition-[scale,color] duration-150 ease-standard outline-none hover:text-foreground-secondary focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:ring-inset active:scale-[0.96]"
+                      className="inline-flex h-10 items-center justify-center gap-2 rounded-full px-2 max-[380px]:gap-1.5 transition-[scale,color] duration-150 ease-standard outline-none hover:text-foreground-secondary focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:ring-inset active:scale-[0.96]"
                     >
                       <span data-ring={key} className="block">
                         <MiniRing variant={key} value={value} />
                       </span>
-                      <span data-ring-label={key} className="text-[13px] leading-4 font-bold tracking-[0.1em] uppercase">
+                      {/* Below 380 px the labels tighten so "Recovery" clears the Strain ring down to 320 px. */}
+                      <span data-ring-label={key} className="text-[13px] leading-4 font-bold tracking-[0.1em] uppercase max-[380px]:text-[11px] max-[380px]:tracking-[0.06em]">
                         {label}
                       </span>
                     </Link>
