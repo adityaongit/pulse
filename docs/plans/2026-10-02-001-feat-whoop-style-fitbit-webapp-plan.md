@@ -1146,6 +1146,34 @@ Added 2026-10-02 at the user's request. The first build copied an older, basic W
 
 **Verification:** Every screen at 390, 820 and 1440 px matches the current WHOOP references in structure, materials and motion, and U14's sweep passes.
 
+### U18. Large-screen UX audit and fixes (tablet and laptop)
+
+Added 2026-10-03 at the user's request: the web UI on bigger screens has broken UX, gaps and unlinked elements.
+
+**Goal:** At 820, 1024, 1280, 1440 and 1920 px, every screen is a deliberate, complete layout. There is no dead space, no stretched or orphaned cards, no broken alignment, and no element that looks clickable but isn't (or the reverse). Navigation is complete. Every journey works with mouse and keyboard.
+
+**Dependencies:** U17 and the screen-level restyles
+
+**Approach:**
+- Audit first, with written findings in `docs/design/ux-audit-desktop.md`: one row per issue, giving screen, width, issue, severity and fix.
+- What to check:
+  - layout and grid use, content width, and reading order
+  - alignment to the content column
+  - gaps and empty areas
+  - card density
+  - missing or broken links: rows, cards and stats that should navigate, chevrons without targets, dead buttons
+  - hover, focus and active states
+  - keyboard paths
+  - the sidebar and rail behaviour
+  - sheets and dialogs on wide screens
+  - charts at width: axes, tooltips, scrubbing
+  - empty and loading states
+  - whether every page can be reached from the navigation
+- Then fix everything rated high or medium. List deferred items with their reasons.
+- Skills: `impeccable` (audit and critique), `web-design-guidelines`, `better-layout`, `better-ui`, `better-interface`, `better-accessibility` and `make-interfaces-feel-better`.
+
+**Verification:** The audit doc lists every issue as fixed or deferred with a reason. A re-sweep at all five widths shows no overflow, no console errors and no dead interactive elements. U14's sweep still passes.
+
 ### U16. Visual fidelity audit against WHOOP and Bevel references
 
 Added 2026-10-02 at the user's request, after the Home dials shipped at unequal sizes when WHOOP's are equal.
