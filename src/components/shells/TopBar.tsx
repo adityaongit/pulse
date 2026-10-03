@@ -1,7 +1,6 @@
 "use client"
 
 import * as React from "react"
-import Link from "next/link"
 import { FlaskConical, Watch } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { COLUMN_WIDTH } from "./column"
@@ -11,6 +10,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { useNow } from "@/hooks/use-now"
 import { DateSwitcher, type DateSwitcherProps } from "./DateSwitcher"
+import { SyncNowButton } from "./SyncNowButton"
 import { useShellStatus, type ShellStatus } from "./ShellStatus"
 
 // The pieces every header shares (spec §4.3, §4.4): the ground fill, the 24 px fade, sync status.
@@ -86,16 +86,32 @@ export function SyncStatus({ variant = "header" }: { variant?: "header" | "icon"
           </>
         )}
       </PopoverTrigger>
-      <PopoverContent align="end" className="w-64 gap-1.5 p-4">
-        <p className="text-base leading-[22px] font-semibold">{s.mode === "demo" ? "Demo data" : "Sync"}</p>
-        <p className="text-[15px] leading-[22px] text-foreground-secondary tabular-nums">{v.line}</p>
-        {s.mode === "demo" && <p className="text-xs leading-4 font-medium text-muted-foreground">Demo data refreshes every 15 minutes</p>}
-        <Link
-          href="/settings#sync"
-          className="mt-1 w-fit rounded-md py-1 text-xs leading-4 font-bold tracking-[0.08em] text-foreground-secondary uppercase outline-none hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50"
-        >
-          Sync settings
-        </Link>
+      <PopoverContent
+        side={variant === "line" ? "top" : variant === "icon" ? "right" : "bottom"}
+        align={variant === "header" ? "end" : "start"}
+        sideOffset={8}
+        collisionPadding={12}
+        // Focus stays on the trigger: moving it in would ring the first button on a mouse open.
+        onOpenAutoFocus={(e) => e.preventDefault()}
+        className="w-72 gap-0 p-0"
+      >
+        <div className="flex items-center gap-3 p-4">
+          <span aria-hidden className="grid size-10 shrink-0 place-items-center rounded-xl bg-white/[0.06]">
+            <Watch className="size-5" strokeWidth={1.75} />
+          </span>
+          <div className="min-w-0">
+            <p className="text-[15px] leading-5 font-semibold">{s.mode === "demo" ? "Demo data" : "Google Health"}</p>
+            <p className="flex items-center gap-1.5 text-[13px] leading-[18px] text-muted-foreground tabular-nums">
+              <span aria-hidden className={cn("size-1.5 shrink-0 rounded-full", v.dot)} />
+              {v.line}
+            </p>
+          </div>
+        </div>
+        {s.mode === "demo" && <p className="-mt-2 px-4 pb-3 text-[13px] leading-[18px] text-muted-foreground">Generated data, refreshed every 15 minutes.</p>}
+        {/* Settings is one tap away in the sidebar and in More; the popover only does the one thing. */}
+        <div className="border-t border-white/[0.06] p-3">
+          <SyncNowButton size="sm" className="w-full" />
+        </div>
       </PopoverContent>
     </Popover>
   )

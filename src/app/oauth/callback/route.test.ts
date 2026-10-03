@@ -17,7 +17,7 @@ const googleEnv = { GOOGLE_OAUTH_ENABLED: "true", GOOGLE_CLIENT_ID: "cid", GOOGL
 const live = parseConfig({ ...env, ...googleEnv, APP_URL: "https://pulse.example.com" });
 
 const idToken = (email: string) =>
-  ["{}", JSON.stringify({ aud: "cid", email, email_verified: true })].map((p) => Buffer.from(p).toString("base64url")).join(".") + ".sig";
+  ["{}", JSON.stringify({ aud: "cid", email, email_verified: true, picture: "https://lh3.googleusercontent.com/a/me" })].map((p) => Buffer.from(p).toString("base64url")).join(".") + ".sig";
 
 let db: Db;
 let tokenResponse: () => Response;
@@ -79,6 +79,7 @@ describe("GET /oauth/callback", () => {
     expect(h.requestSync).toHaveBeenCalledExactlyOnceWith({ force: true });
     expect(await sessionOf(res)).toEqual({ kind: "owner", email: "me@example.com" });
     expect(res.headers.get("set-cookie")).toMatch(/HttpOnly/i);
+    expect(db.select().from(instance).get()?.ownerPicture).toBe("https://lh3.googleusercontent.com/a/me");
   });
 
   it("without APP_URL, redirects go back to the host the request came in on", async () => {

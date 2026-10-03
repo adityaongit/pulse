@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { createWorker } from "./worker";
+import { createWorker, syncAndWait } from "./worker";
 
 const MIN = 60_000;
 const log = { info: vi.fn(), error: vi.fn() };
@@ -125,5 +125,26 @@ describe("createWorker", () => {
     expect(pull).toHaveBeenCalledTimes(2);
     await tick(MIN);
     expect(pull).toHaveBeenCalledTimes(3);
+  });
+});
+
+describe("syncAndWait", () => {
+  it("resolves after the forced run, with its error", async () => {
+    vi.useRealTimers(); // it polls on real time
+    const g = globalThis as typeof globalThis & { __pulseWorker?: unknown };
+    let fail = false;
+    const w = createWorker({
+      name: "t",
+      source: { pull: async () => (fail ? Promise.reject(new Error("[google] sleep: http_503 (HTTP 503)")) : { changed: false }) },
+      recompute: async () => {},
+      log: { info: () => {}, error: () => {} },
+    });
+    g.__pulseWorker = w;
+    w.start();
+    await vi.waitFor(() => expect(w.state.lastRunAt).not.toBeNull());
+    expect(await syncAndWait(5_000)).toEqual({ ok: true, error: null });
+    fail = true;
+    expect(await syncAndWait(5_000)).toEqual({ ok: false, error: "[google] sleep: http_503 (HTTP 503)" });
+    delete g.__pulseWorker;
   });
 });

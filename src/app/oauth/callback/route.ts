@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { getConfig } from "@/server/config";
 import { getDb } from "@/server/db";
+import { setOwnerPicture } from "@/server/avatar";
 import { claimOrCheckOwner, cookieOptions, isHttps, SESSION_COOKIE, signSession, verifySession } from "@/server/session";
 import { appOrigin, consumeState, exchangeCode, GoogleError, redirectUri } from "@/server/sources/google/oauth";
 import { requestSync } from "@/server/worker";
@@ -26,7 +27,7 @@ export async function GET(request: NextRequest) {
   const code = params.get("code");
   if (!code) return back("access_denied");
   try {
-    const email = await exchangeCode(db, {
+    const { email, picture } = await exchangeCode(db, {
       google,
       redirectUri: redirectUri(origin),
       code,
@@ -35,6 +36,7 @@ export async function GET(request: NextRequest) {
     // Start the import now, not at the next timer tick: runs before the grant finished at once and armed the
     // 5-minute gate. Fire-and-forget, so the redirect doesn't wait on the sync.
     requestSync({ force: true });
+    setOwnerPicture(db, picture);
     const res = NextResponse.redirect(signedIn ? `${origin}/settings?oauth=connected` : `${origin}/`, 302);
     res.cookies.set(SESSION_COOKIE, await signSession(db, { kind: "owner", email }), cookieOptions(isHttps(request)));
     return res;

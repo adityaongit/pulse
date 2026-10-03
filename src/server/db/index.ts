@@ -15,16 +15,26 @@ export function openDb(file: string) {
   sqlite.pragma("synchronous = NORMAL");
   sqlite.pragma("foreign_keys = ON");
   const db = drizzle(sqlite, { schema });
-  migrate(db, { migrationsFolder: path.join(process.cwd(), "drizzle") });
+  migrateDb(db);
   return db;
 }
+
+const migrateDb = (db: ReturnType<typeof drizzle<typeof schema>>) => migrate(db, { migrationsFolder: path.join(process.cwd(), "drizzle") });
 
 export type Db = ReturnType<typeof openDb>;
 
 // globalThis, not module scope: Next loads instrumentation and routes as separate bundles, and dev reloads modules.
 const g = globalThis as typeof globalThis & { __pulseDb?: Db };
 
+// Module scope, unlike the handle: a dev reload re-evaluates this module, so a migration added while the
+// server runs is applied on the next request instead of failing until a restart. Applied migrations are a no-op.
+let migrated = false;
+
 /** The app database at config.databasePath, opened and migrated on first use. */
 export function getDb(): Db {
-  return (g.__pulseDb ??= openDb(getConfig().databasePath));
+  const fresh = !g.__pulseDb;
+  const db = (g.__pulseDb ??= openDb(getConfig().databasePath));
+  if (!migrated && !fresh) migrateDb(db);
+  migrated = true;
+  return db;
 }

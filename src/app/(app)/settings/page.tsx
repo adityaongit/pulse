@@ -1,5 +1,7 @@
 import { connection } from "next/server"
 import { currentSession } from "@/server/auth"
+import { avatarSrc } from "@/server/avatar"
+import { getDb } from "@/server/db"
 import { getSettings } from "@/server/queries/settings"
 import { DetailShell } from "@/components/shells/DetailShell"
 import { OAuthToast } from "./SettingsClient"
@@ -15,6 +17,7 @@ export default async function SettingsPage() {
   await connection()
   const vm = getSettings()
   const session = await currentSession()
+  const avatar = avatarSrc(getDb())
   return (
     <DetailShell
       title="Settings"
@@ -22,7 +25,16 @@ export default async function SettingsPage() {
       primary={
         <>
           <OAuthToast />
-          <SettingsView vm={vm} now={requestTime()} email={session?.kind === "owner" ? session.email : null} />
+          <SettingsView
+            vm={vm}
+            now={requestTime()}
+            account={{
+              email: session?.kind === "owner" ? session.email : null,
+              avatar,
+              seed: session?.kind === "owner" ? session.email : "pulse-demo",
+              customPhoto: avatar?.startsWith("/avatar?") ?? false,
+            }}
+          />
         </>
       }
     />

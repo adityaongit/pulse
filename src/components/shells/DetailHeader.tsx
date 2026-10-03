@@ -64,7 +64,14 @@ export function DetailHeaderRow({
   }
   const Icon = dismiss === "close" ? X : ChevronLeft
   const backButton = (
-    <Button variant="ghost" size="icon-touch" aria-label={dismiss === "close" ? "Close" : "Back"} onClick={back} className="hover:bg-white/8">
+    <Button
+      variant="ghost"
+      size="icon-touch"
+      aria-label={dismiss === "close" ? "Close" : "Back"}
+      onClick={back}
+      // Close dismisses a screen opened over the tabs (Settings); from 768 px the sidebar is the way out, so it hides but keeps its slot.
+      className={cn("hover:bg-white/8", dismiss === "close" && "md:invisible")}
+    >
       <Icon aria-hidden strokeWidth={1.75} className={dismiss === "close" ? "size-6" : "size-[26px]"} />
     </Button>
   )

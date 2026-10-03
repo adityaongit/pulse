@@ -201,6 +201,12 @@ export const instance = sqliteTable(
     sessionSecret: text("session_secret").notNull(),
     /** Lowercased Google email of the first account to sign in; null until claimed. OWNER_EMAIL overrides it. */
     ownerEmail: text("owner_email"),
+    /** The owner's Google profile photo URL, from the ID token at each sign-in. */
+    ownerPicture: text("owner_picture"),
+    /** A photo uploaded in Settings; it wins over the Google one. */
+    avatar: blob("avatar", { mode: "buffer" }),
+    avatarType: text("avatar_type"),
+    avatarAt: integer("avatar_at"),
   },
   (t) => [check("instance_single_row", sql`${t.id} = 1`)],
 );
