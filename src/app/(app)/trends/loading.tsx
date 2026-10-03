@@ -16,7 +16,7 @@ export default function Loading() {
           <MetricPicker />
           <div className={TRENDS_GRID}>
             <SectionShell variant="card" level={2} title={"\u00a0"} aside={<SkeletonText className="w-20 text-xs leading-4" />}>
-              <TrendChartSkeleton ranges={RANGES} />
+              <TrendChartSkeleton chip ranges={RANGES} />
             </SectionShell>
             <SectionShell variant="card" level={2} title="Averages">
               <div className="divide-y divide-border">

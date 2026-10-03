@@ -51,6 +51,9 @@ const RANGE_PRIOR: Record<TrendRange, string> = { w: "vs. prior week", m: "vs. p
 const RANGE_WORD: Record<TrendRange, string> = { w: "week", m: "month", "6m": "6 months", "1y": "year" }
 const RANGE_LABEL: Record<TrendRange, string> = { w: "W", m: "M", "6m": "6M", "1y": "1Y" }
 const DEFAULT_RANGES: readonly TrendRange[] = ["w", "m", "6m"]
+/** Three ranges sit beside the average; four (Trends) take their own full-width row above it, so the chip never wraps. */
+const headerClass = (ranges: readonly TrendRange[]) =>
+  cn("mb-4 flex gap-3", ranges.length > 3 ? "flex-col-reverse" : "items-start justify-between")
 
 function colorFor(colorBy: TrendChartProps["colorBy"], v: number) {
   if (colorBy === "band") return DATA_COLORS[recoveryColor(v)].css
@@ -116,7 +119,7 @@ function Trend({ points, p }: { points: TrendPoint[]; p: TrendChartProps }) {
 
   return (
     <div className="min-w-0">
-      <div className="mb-4 flex items-start justify-between gap-3">
+      <div className={headerClass(ranges)}>
         <div className="min-w-0" aria-live="polite">
           <p className="text-xs leading-4 font-bold tracking-[0.08em] text-muted-foreground uppercase tabular-nums">
             {scrubbed ? dayLabel(scrubbed.date, today) : "Average"}
@@ -138,13 +141,13 @@ function Trend({ points, p }: { points: TrendPoint[]; p: TrendChartProps }) {
           )}
         </div>
         {!p.fixedRange && (
-          <ToggleGroup type="single" value={range} onValueChange={changeRange} spacing={0} className="shrink-0 gap-0.5 rounded-lg bg-muted p-0.5" aria-label="Range">
+          <ToggleGroup type="single" value={range} onValueChange={changeRange} spacing={0} className={cn("shrink-0 gap-0.5 rounded-lg bg-muted p-0.5", ranges.length > 3 && "w-full")} aria-label="Range">
             {ranges.map((r) => (
               <ToggleGroupItem
                 key={r}
                 value={r}
                 aria-label={RANGE_ARIA[r]}
-                className="h-10 min-w-11 rounded-md! px-3 font-numeric text-[13px] font-bold text-muted-foreground transition-[background-color,color] duration-150 ease-standard hover:bg-transparent hover:text-foreground data-[state=on]:bg-secondary data-[state=on]:text-foreground"
+                className={cn("h-10 min-w-11 rounded-md! px-3 font-numeric text-[13px] font-bold text-muted-foreground transition-[background-color,color] duration-150 ease-standard hover:bg-transparent hover:text-foreground data-[state=on]:bg-secondary data-[state=on]:text-foreground", ranges.length > 3 && "flex-1")}
               >
                 {RANGE_LABEL[r]}
               </ToggleGroupItem>
@@ -274,15 +277,15 @@ export function TrendChartSkeleton({
   // The header's real label and a disabled range toggle; bars for the numbers; the plot at its fixed height (spec §5.19).
   return (
     <div aria-hidden className="min-w-0">
-      <div className="mb-4 flex items-start justify-between gap-3">
+      <div className={headerClass(ranges)}>
         <div className="min-w-0">
           <p className="text-xs leading-4 font-bold tracking-[0.08em] text-muted-foreground uppercase">Average</p>
           <SkeletonText className="w-[4ch] font-numeric text-[28px] leading-8 font-bold" />
           {chip && <Skeleton className="mt-1 h-6 w-28 rounded-md" />}
         </div>
-        <div className="flex shrink-0 gap-0.5 rounded-lg bg-muted p-0.5">
+        <div className={cn("flex shrink-0 gap-0.5 rounded-lg bg-muted p-0.5", ranges.length > 3 && "w-full")}>
           {ranges.map((r) => (
-            <span key={r} className="grid h-10 min-w-11 place-items-center rounded-md px-3 font-numeric text-[13px] font-bold text-muted-foreground/60">
+            <span key={r} className={cn("grid h-10 min-w-11 place-items-center rounded-md px-3 font-numeric text-[13px] font-bold text-muted-foreground/60", ranges.length > 3 && "flex-1")}>
               {RANGE_LABEL[r]}
             </span>
           ))}
