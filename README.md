@@ -55,6 +55,7 @@ Pulse runs as one Docker container with its database in a volume, behind a tunne
 
 ## Credits
 
+- Design inspiration: the interface follows the look and flow of the [WHOOP](https://www.whoop.com) app. Pulse is an independent project, not affiliated with or endorsed by WHOOP, Inc. WHOOP is a trademark of WHOOP, Inc.; Fitbit and Google Health are trademarks of Google LLC.
 - [noop](https://github.com/ryanbr/noop): the recovery, strain, sleep and readiness scoring is ported from its analytics engine.
 - [Hælan](https://github.com/bardesss/haelan): its notes on how the Google Health API behaves saved a lot of trial and error.
 
