@@ -192,3 +192,30 @@ export const reports = sqliteTable("reports", {
   period: text("period").primaryKey(),
   data: json("data").notNull(),
 });
+
+/** Single row (id = 1): the session-signing secret, generated on first use, and the claimed owner. */
+export const instance = sqliteTable(
+  "instance",
+  {
+    id: integer("id").primaryKey(),
+    sessionSecret: text("session_secret").notNull(),
+    /** Lowercased Google email of the first account to sign in; null until claimed. OWNER_EMAIL overrides it. */
+    ownerEmail: text("owner_email"),
+  },
+  (t) => [check("instance_single_row", sql`${t.id} = 1`)],
+);
+
+/** Single row (id = 1): what scoring needs about the person. Absent until onboarding (demo seeds it). */
+export const profile = sqliteTable(
+  "profile",
+  {
+    id: integer("id").primaryKey(),
+    birthDate: text("birth_date").notNull(),
+    sex: text("sex", { enum: ["male", "female"] }).notNull(),
+    /** Measured max HR; null means estimate it from age. */
+    maxHr: integer("max_hr"),
+    heightCm: real("height_cm"),
+    updatedAt: integer("updated_at").notNull(),
+  },
+  (t) => [check("profile_single_row", sql`${t.id} = 1`)],
+);

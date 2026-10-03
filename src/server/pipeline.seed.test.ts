@@ -17,17 +17,14 @@ describe.skipIf(!process.env.PULSE_E2E)("demo end to end", () => {
     Object.assign(process.env, {
       GOOGLE_OAUTH_ENABLED: "false",
       DATABASE_PATH: path.join(dir, "demo.db"),
-      BIRTH_DATE: "1990-01-01",
-      SEX: "male",
       TZ: "Asia/Kolkata",
-      NODE_ENV: "development",
-      DEV_ACCESS_BYPASS: "1",
     });
     const { createWorker } = await import("./worker");
     const { seedSource } = await import("./sources/seed/generate");
     const { recomputeIfNeeded, lastRun, recompute } = await import("./pipeline");
     const { getDb } = await import("./db");
     const { getConfig } = await import("./config");
+    const { getProfile } = await import("./profile");
     const { ensureDefaultTags } = await import("./journalTags");
     const { getHome } = await import("./queries/home");
     const { defaultCtx, todayOf } = await import("./queries/common");
@@ -43,7 +40,7 @@ describe.skipIf(!process.env.PULSE_E2E)("demo end to end", () => {
 
     const db = getDb();
     const cfg = getConfig();
-    const opts = { timeZone: cfg.timeZone, profile: cfg.profile };
+    const opts = { timeZone: cfg.timeZone, profile: getProfile(db)! };
     // Full recompute timing: force stage 1 for every day, then a no-op run.
     db.$client.prepare("update daily_scores set scoring_version = 0").run();
     const full = { ...recompute(db, opts) };

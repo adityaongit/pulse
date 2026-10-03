@@ -1,6 +1,7 @@
 // Shared by the screen queries: the query context, batched day loaders and the Metric builders.
-import { getConfig, type Config } from "../config";
+import { getConfig } from "../config";
 import { type Db, getDb } from "../db";
+import { getProfile, type Profile } from "../profile";
 import type {
   EnergyBankRow,
   FitnessRow,
@@ -22,7 +23,7 @@ import type { ActivityKind, DayPoint, Metric, MetricTag, ReasonCode, SleepPlanVM
 export type QueryCtx = {
   db: Db;
   timeZone: string;
-  profile: Config["profile"];
+  profile: Profile;
   mode: "demo" | "google";
   /** Unix seconds. */
   now: number;
@@ -30,7 +31,11 @@ export type QueryCtx = {
 
 export function defaultCtx(): QueryCtx {
   const cfg = getConfig();
-  return { db: getDb(), timeZone: cfg.timeZone, profile: cfg.profile, mode: cfg.googleOAuthEnabled ? "google" : "demo", now: Math.floor(Date.now() / 1000) };
+  const db = getDb();
+  const profile = getProfile(db);
+  // The proxy sends a signed-in visitor without a profile to /onboarding before any screen query runs.
+  if (!profile) throw new Error("profile_missing");
+  return { db, timeZone: cfg.timeZone, profile, mode: cfg.googleOAuthEnabled ? "google" : "demo", now: Math.floor(Date.now() / 1000) };
 }
 
 export const todayOf = (ctx: QueryCtx) => localDay(ctx.now, ctx.timeZone);

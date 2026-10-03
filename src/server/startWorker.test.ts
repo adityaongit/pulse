@@ -16,11 +16,7 @@ afterEach(() => {
 it("startWorker() is a process-wide singleton that logs one start", async () => {
   vi.useFakeTimers();
   vi.stubEnv("GOOGLE_OAUTH_ENABLED", "false");
-  vi.stubEnv("BIRTH_DATE", "1990-06-15");
-  vi.stubEnv("SEX", "female");
   vi.stubEnv("TZ", "UTC");
-  vi.stubEnv("NODE_ENV", "development");
-  vi.stubEnv("DEV_ACCESS_BYPASS", "1");
   const info = vi.spyOn(console, "info").mockImplementation(() => {});
   const { startWorker } = await import("./worker");
   startWorker();

@@ -9,8 +9,9 @@ import { DEFAULT_JOURNAL_TAGS, ensureDefaultTags } from "../journalTags";
 import { needsRecompute } from "../pipeline";
 import { addCustomTag, saveJournalEntry } from "./journal";
 
-const h = vi.hoisted(() => ({ db: undefined as unknown, revalidate: vi.fn(), requestSync: vi.fn() }));
+const h = vi.hoisted(() => ({ db: undefined as unknown, revalidate: vi.fn(), requestSync: vi.fn(), session: { kind: "demo" } as unknown }));
 vi.mock("../worker", () => ({ requestSync: h.requestSync }));
+vi.mock("../auth", async (orig) => ({ ...(await orig<object>()), currentSession: async () => h.session }));
 vi.mock("next/cache", () => ({ revalidatePath: h.revalidate }));
 vi.mock("../config", async (orig) => ({ ...(await orig<object>()), getConfig: () => ({ timeZone: "Asia/Kolkata" }) as Config }));
 vi.mock("../db", async (orig) => ({ ...(await orig<object>()), getDb: () => h.db as Db }));
@@ -36,6 +37,15 @@ beforeEach(() => {
   db.delete(intradayDirty).run();
   h.revalidate.mockClear();
   h.requestSync.mockClear();
+  h.session = { kind: "demo" };
+});
+
+it("signed out, both writes are refused and nothing is stored", async () => {
+  h.session = null;
+  expect(await saveJournalEntry({ day: "2026-10-01", tag: "alcohol", value: true })).toEqual({ ok: false, error: "Signed out. Sign in again." });
+  expect(await addCustomTag({ label: "Signed out tag" })).toMatchObject({ ok: false });
+  expect(entries()).toEqual([]);
+  expect(db.select().from(journalTags).all().some((t) => t.tag === "signed_out_tag")).toBe(false);
 });
 
 describe("ensureDefaultTags", () => {

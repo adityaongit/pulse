@@ -1,13 +1,18 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { openDb, type Db } from "../../db";
 import { oauthTokens } from "../../db/schema";
-import { authUrl, consumeState, createState, exchangeCode, getAccessToken, GoogleError, SCOPES } from "./oauth";
+import { authUrl, consumeState, createState, exchangeCode, getAccessToken, GoogleError, LOGIN_SCOPES, SCOPES } from "./oauth";
 
 const google = { clientId: "cid", clientSecret: "csecret" };
 const NOW = Date.parse("2026-10-02T06:00:00Z");
 const T = NOW / 1000;
 const json = (status: number, body: unknown) => new Response(JSON.stringify(body), { status });
 const tokenStub = (...responses: Response[]) => vi.fn<typeof fetch>(async () => responses.shift()!);
+/** An ID token as Google's token endpoint returns it; exchangeCode reads it without a signature check. */
+const idToken = (claims: Record<string, unknown> = {}) =>
+  ["{}", JSON.stringify({ aud: "cid", email: "Me@Example.com", email_verified: true, ...claims }), ""]
+    .map((p, i) => (i < 2 ? Buffer.from(p).toString("base64url") : "sig"))
+    .join(".");
 const sent = (f: { mock: { calls: unknown[][] } }, i = 0) =>
   Object.fromEntries(new URLSearchParams(String((f.mock.calls[i][1] as RequestInit).body)));
 
@@ -34,18 +39,19 @@ const expectGoogleError = async (p: Promise<unknown>, code: string) => {
 };
 
 describe("authUrl", () => {
-  it("asks for offline access with forced consent and every read scope", () => {
-    const u = new URL(authUrl({ clientId: "cid", redirectUri: "https://p.example/oauth/callback", state: "st" }));
+  it("asks for offline access, the given prompt, sign-in and every read scope", () => {
+    const u = new URL(authUrl({ clientId: "cid", redirectUri: "https://p.example/oauth/callback", state: "st", prompt: "consent" }));
     expect(`${u.origin}${u.pathname}`).toBe("https://accounts.google.com/o/oauth2/v2/auth");
     expect(Object.fromEntries(u.searchParams)).toEqual({
       client_id: "cid",
       redirect_uri: "https://p.example/oauth/callback",
       response_type: "code",
-      scope: SCOPES.join(" "),
+      scope: ["openid", "email", ...SCOPES].join(" "),
       access_type: "offline",
       prompt: "consent",
       state: "st",
     });
+    expect(LOGIN_SCOPES).toEqual(["openid", "email"]);
     expect(SCOPES).toHaveLength(12);
     // Read-only everywhere except nutrition, which has no read-only scope.
     for (const s of SCOPES)
@@ -77,12 +83,14 @@ describe("state", () => {
 });
 
 describe("exchangeCode", () => {
-  const exchange = (fetch: typeof globalThis.fetch) =>
-    exchangeCode(db, { google, redirectUri: "https://p.example/oauth/callback", code: "c0de", fetch, now: () => NOW });
+  const exchange = (fetch: typeof globalThis.fetch, allow: (email: string) => boolean = () => true) =>
+    exchangeCode(db, { google, redirectUri: "https://p.example/oauth/callback", code: "c0de", allow, fetch, now: () => NOW });
+  const grant = (o: Record<string, unknown> = {}) =>
+    json(200, { access_token: "at-1", refresh_token: "rt-1", expires_in: 3600, id_token: idToken(), ...o });
 
-  it("posts the code and stores the grant in the single row", async () => {
-    const f = tokenStub(json(200, { access_token: "at-1", refresh_token: "rt-1", expires_in: 3599, scope: "a b" }));
-    await exchange(f);
+  it("posts the code, stores the grant in the single row and returns the lowercased email", async () => {
+    const f = tokenStub(grant({ expires_in: 3599, scope: "a b" }));
+    expect(await exchange(f)).toBe("me@example.com");
     expect(sent(f)).toEqual({
       code: "c0de",
       client_id: "cid",
@@ -103,17 +111,39 @@ describe("exchangeCode", () => {
 
   it("reconnecting replaces the grant and clears a revocation", async () => {
     seed({ revokedAt: T - 10 });
-    await exchange(tokenStub(json(200, { access_token: "at-1", refresh_token: "rt-1", expires_in: 3600 })));
+    await exchange(tokenStub(grant()));
     expect(row()).toMatchObject({ accessToken: "at-1", refreshToken: "rt-1", revokedAt: null, scope: SCOPES.join(" ") });
     expect(db.select().from(oauthTokens).all()).toHaveLength(1);
   });
 
-  it("without a refresh_token stores nothing and surfaces auth_revoked", async () => {
-    seed();
+  it("without a refresh_token and no working grant stores nothing and surfaces auth_revoked", async () => {
+    seed({ revokedAt: T - 10 });
     const before = row();
-    const err = await expectGoogleError(exchange(tokenStub(json(200, { access_token: "at-1", expires_in: 3600 }))), "auth_revoked");
+    const err = await expectGoogleError(exchange(tokenStub(grant({ refresh_token: undefined }))), "auth_revoked");
     expect(err.message).not.toContain("at-1");
     expect(row()).toEqual(before);
+  });
+
+  it("without a refresh_token (sign-in, no consent screen) updates a working grant's access token only", async () => {
+    seed();
+    await exchange(tokenStub(grant({ refresh_token: undefined, expires_in: 100 })));
+    expect(row()).toMatchObject({ accessToken: "at-1", refreshToken: "rt-old", expiresAt: T + 100, revokedAt: null });
+  });
+
+  it("an account allow() refuses stores nothing and throws not_owner", async () => {
+    const allow = vi.fn(() => false);
+    await expectGoogleError(exchange(tokenStub(grant()), allow), "not_owner");
+    expect(allow).toHaveBeenCalledWith("me@example.com");
+    expect(row()).toBeUndefined();
+  });
+
+  it("an unverified email, a missing ID token or one for another client is refused before allow()", async () => {
+    const allow = vi.fn(() => true);
+    await expectGoogleError(exchange(tokenStub(grant({ id_token: idToken({ email_verified: false }) })), allow), "email_unverified");
+    await expectGoogleError(exchange(tokenStub(grant({ id_token: undefined })), allow), "no_id_token");
+    await expectGoogleError(exchange(tokenStub(grant({ id_token: idToken({ aud: "other" }) })), allow), "no_id_token");
+    expect(allow).not.toHaveBeenCalled();
+    expect(row()).toBeUndefined();
   });
 
   it("a rejected code surfaces Google's code but no body text, and stores nothing", async () => {
