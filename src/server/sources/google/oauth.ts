@@ -11,6 +11,8 @@ import { oauthTokens } from "../../db/schema";
 
 const AUTH_URL = "https://accounts.google.com/o/oauth2/v2/auth";
 const TOKEN_URL = "https://oauth2.googleapis.com/token";
+const REVOKE_URL = "https://oauth2.googleapis.com/revoke";
+const IDENTITY_URL = "https://health.googleapis.com/v4/users/me/identity";
 const STATE_TTL_MS = 10 * 60_000;
 const EXPIRY_MARGIN_S = 60;
 export const FETCH_TIMEOUT_MS = 30_000;
@@ -190,6 +192,8 @@ export async function exchangeCode(
   );
   if (!r.ok) throw new GoogleError(r.code, r.status, "token exchange");
   const email = verifiedEmail(r.idToken, o.google.clientId);
+  // Before the owner claim: an account without Google Health would claim the instance and then sync nothing.
+  await requireHealthProfile(fetchFn, r.accessToken);
   if (!o.allow(email)) throw new GoogleError("not_owner");
   const t = Math.floor(now() / 1000);
   if (!r.refreshToken) {
@@ -212,6 +216,37 @@ export async function exchangeCode(
     .onConflictDoUpdate({ target: oauthTokens.id, set: row })
     .run();
   return email;
+}
+
+/**
+ * Throws `account_not_linked` when the Google account has no Google Health profile (never set up, or a
+ * Fitbit account not yet moved to Google). Any other answer passes: a 5xx must not block sign-in, and the
+ * sync reports it.
+ */
+async function requireHealthProfile(fetchFn: typeof fetch, accessToken: string) {
+  const res = await fetchFn(IDENTITY_URL, { headers: { authorization: `Bearer ${accessToken}` }, signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) });
+  if (res.ok) return void (await res.body?.cancel());
+  if (errorCode(parseJson(await res.text())) === "ACCOUNT_NOT_LINKED") throw new GoogleError("account_not_linked", res.status, "identity");
+}
+
+/**
+ * Disconnect: revokes the grant at Google (every scope Pulse holds, as if removed under Google Account ›
+ * Third-party access), then forgets it. The stored data stays. Google answering 400 means the token was
+ * already invalid, which is the goal anyway; a network failure throws and keeps the row, so it can be retried.
+ */
+export async function revokeGrant(db: Db, o: Deps = {}): Promise<void> {
+  const { fetch: fetchFn = fetch } = o;
+  const row = db.select().from(oauthTokens).get();
+  if (!row) return;
+  const res = await fetchFn(REVOKE_URL, {
+    method: "POST",
+    headers: { "content-type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({ token: row.refreshToken }),
+    signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
+  });
+  await res.body?.cancel();
+  if (!res.ok && res.status !== 400) throw new GoogleError(`http_${res.status}`, res.status, "revoke");
+  db.delete(oauthTokens).where(eq(oauthTokens.id, 1)).run();
 }
 
 export function markRevoked(db: Db, now = Date.now()) {

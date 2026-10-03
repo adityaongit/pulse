@@ -6,7 +6,7 @@ import * as React from "react"
 export type ShellStatus = {
   mode: "demo" | "google"
   sync: { state: "ok" | "syncing" | "stale" | "error"; lastSuccessAt: number | null }
-  connection: "connected" | "not_connected" | "importing" | "auth_revoked" | "stale"
+  connection: "connected" | "not_connected" | "not_linked" | "importing" | "auth_revoked" | "stale"
   importProgress?: { done: number; total: number }
   /** Today (YYYY-MM-DD) in the user's zone, from the server, so client and server agree. */
   today: string

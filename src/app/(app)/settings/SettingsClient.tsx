@@ -45,7 +45,7 @@ export function DisconnectButton() {
     setPending(false)
     if (!r.ok) return setError(true)
     setOpen(false)
-    toast.success("Google disconnected")
+    toast.success("Google access removed")
   }
   return (
     <>
@@ -56,11 +56,11 @@ export function DisconnectButton() {
         <DialogContent showCloseButton={false} className="ring-1 ring-border">
           <DialogHeader>
             <DialogTitle>Disconnect Google?</DialogTitle>
-            <DialogDescription>Sync stops. Your stored data stays on this server.</DialogDescription>
+            <DialogDescription>Removes every permission Pulse has in your Google account, so you don&apos;t have to do it in Google. Sync stops; your stored data stays on this server.</DialogDescription>
           </DialogHeader>
           {error && (
             <p role="alert" className="text-xs leading-4 font-medium text-recovery-red-text">
-              Couldn&apos;t disconnect. Check your connection and try again.
+              Couldn&apos;t reach Google to remove access. Check your connection and try again.
             </p>
           )}
           <DialogFooter>

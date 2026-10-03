@@ -63,7 +63,8 @@ describe("GET /oauth/callback", () => {
     const state = createState();
     expect((await call({ state, code: "c" })).status).toBe(302);
     expect((await call({ state, code: "c" })).status).toBe(400);
-    expect(fetchMock).toHaveBeenCalledTimes(1);
+    // One sign-in: the token exchange and the Google Health identity check.
+    expect(fetchMock).toHaveBeenCalledTimes(2);
   });
 
   it("the first sign-in claims the instance, stores the grant, starts the import and lands on Home signed in", async () => {
@@ -129,6 +130,19 @@ describe("GET /oauth/callback", () => {
     expect(tokens()).toEqual(before);
     expect(String(errors.mock.calls[0][0])).toContain("auth_revoked");
     expect(String(errors.mock.calls[0][0])).not.toContain("at-NEW");
+  });
+
+  it("an account without Google Health can't claim the instance", async () => {
+    fetchMock.mockImplementation(async (url) =>
+      String(url).endsWith("/identity")
+        ? new Response(JSON.stringify({ error: { details: [{ reason: "ACCOUNT_NOT_LINKED" }] } }), { status: 400 })
+        : tokenResponse(),
+    );
+    const res = await call({ state: createState(), code: "c" });
+    expect(res.headers.get("location")).toBe("https://pulse.example.com/login?error=account_not_linked");
+    expect(owner()).toBeNull();
+    expect(tokens()).toEqual([]);
+    fetchMock.mockImplementation(async () => tokenResponse());
   });
 
   it("a denied consent returns to /login without a token request", async () => {

@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { openDb, type Db } from "../../db";
 import { oauthTokens } from "../../db/schema";
-import { authUrl, consumeState, createState, exchangeCode, getAccessToken, GoogleError, LOGIN_SCOPES, SCOPES } from "./oauth";
+import { authUrl, consumeState, createState, exchangeCode, getAccessToken, GoogleError, LOGIN_SCOPES, revokeGrant, SCOPES } from "./oauth";
 
 const google = { clientId: "cid", clientSecret: "csecret" };
 const NOW = Date.parse("2026-10-02T06:00:00Z");
@@ -83,8 +83,16 @@ describe("state", () => {
 });
 
 describe("exchangeCode", () => {
-  const exchange = (fetch: typeof globalThis.fetch, allow: (email: string) => boolean = () => true) =>
-    exchangeCode(db, { google, redirectUri: "https://p.example/oauth/callback", code: "c0de", allow, fetch, now: () => NOW });
+  /** `f` answers the token endpoint; the Google Health identity check answers `identity` (linked by default). */
+  const exchange = (f: typeof globalThis.fetch, allow: (email: string) => boolean = () => true, identity = () => json(200, { healthUserId: "u" })) =>
+    exchangeCode(db, {
+      google,
+      redirectUri: "https://p.example/oauth/callback",
+      code: "c0de",
+      allow,
+      fetch: (async (url, init) => (String(url).endsWith("/users/me/identity") ? identity() : f(url, init))) as typeof fetch,
+      now: () => NOW,
+    });
   const grant = (o: Record<string, unknown> = {}) =>
     json(200, { access_token: "at-1", refresh_token: "rt-1", expires_in: 3600, id_token: idToken(), ...o });
 
@@ -137,6 +145,17 @@ describe("exchangeCode", () => {
     expect(row()).toBeUndefined();
   });
 
+  it("an account without a Google Health profile is refused before allow(), storing nothing", async () => {
+    const allow = vi.fn(() => true);
+    const notLinked = () =>
+      json(400, { error: { status: "FAILED_PRECONDITION", details: [{ reason: "ACCOUNT_NOT_LINKED", metadata: { redirect_uri: "https://fitbit.google.com/auth/signup" } }] } });
+    await expectGoogleError(exchange(tokenStub(grant()), allow, notLinked), "account_not_linked");
+    expect(allow).not.toHaveBeenCalled();
+    expect(row()).toBeUndefined();
+    // Any other identity failure (Google having a bad day) doesn't block sign-in.
+    expect(await exchange(tokenStub(grant()), allow, () => json(503, {}))).toBe("me@example.com");
+  });
+
   it("an unverified email, a missing ID token or one for another client is refused before allow()", async () => {
     const allow = vi.fn(() => true);
     await expectGoogleError(exchange(tokenStub(grant({ id_token: idToken({ email_verified: false }) })), allow), "email_unverified");
@@ -157,6 +176,25 @@ describe("exchangeCode", () => {
   it("a non-JSON error body falls back to the status", async () => {
     const err = await expectGoogleError(exchange(tokenStub(new Response("<html>SECRET</html>", { status: 502 }))), "http_502");
     expect(err.message).not.toContain("SECRET");
+  });
+});
+
+describe("revokeGrant", () => {
+  it("revokes the refresh token at Google, then forgets the grant", async () => {
+    seed();
+    const f = tokenStub(new Response("", { status: 200 }));
+    await revokeGrant(db, { fetch: f });
+    expect(String(f.mock.calls[0][0])).toBe("https://oauth2.googleapis.com/revoke");
+    expect(sent(f)).toEqual({ token: "rt-old" });
+    expect(row()).toBeUndefined();
+  });
+
+  it("an already-invalid token (400) still forgets the grant; a 5xx keeps it for a retry", async () => {
+    seed();
+    await expectGoogleError(revokeGrant(db, { fetch: tokenStub(new Response("", { status: 503 })) }), "http_503");
+    expect(row()).toBeDefined();
+    await revokeGrant(db, { fetch: tokenStub(new Response("", { status: 400 })) });
+    expect(row()).toBeUndefined();
   });
 });
 

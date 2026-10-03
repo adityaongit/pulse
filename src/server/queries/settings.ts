@@ -40,9 +40,29 @@ function syncRows(ctx: QueryCtx) {
     .all() as SyncRow[];
 }
 
-function authState(ctx: QueryCtx): "not_connected" | "connected" | "revoked" {
+/** "not_linked": the grant works but the Google account has no Google Health profile, so every type fails the same way. */
+function authState(ctx: QueryCtx, rows: SyncRow[]): "not_connected" | "not_linked" | "connected" | "revoked" {
   const t = ctx.db.$client.prepare("select revoked_at revokedAt from oauth_tokens where id = 1").get() as { revokedAt: number | null } | undefined;
-  return !t ? "not_connected" : t.revokedAt != null ? "revoked" : "connected";
+  if (!t) return "not_connected";
+  if (t.revokedAt != null) return "revoked";
+  return rows.some((r) => r.lastError?.includes("ACCOUNT_NOT_LINKED")) ? "not_linked" : "connected";
+}
+
+/**
+ * A sync error as a person reads it. `last_error` is `[google] <type>: <CODE> (HTTP n)` (GoogleError); the
+ * code is kept in brackets for a bug report, the rest is dropped.
+ */
+export function syncErrorText(raw: string): string {
+  const code = /: ([A-Za-z_0-9]+)(?: \(HTTP \d+\))?$/.exec(raw)?.[1] ?? raw;
+  const text: Record<string, string> = {
+    ACCOUNT_NOT_LINKED: "No Google Health profile",
+    auth_revoked: "Access revoked",
+    not_connected: "Not connected",
+    RESOURCE_EXHAUSTED: "Rate limited, retrying",
+    http_429: "Rate limited, retrying",
+    PERMISSION_DENIED: "Permission missing",
+  };
+  return text[code] ?? (/^http_5\d\d$/.test(code) ? "Google is having trouble, retrying" : `Failed (${code})`);
 }
 
 function importProgress(rows: SyncRow[]) {
@@ -57,19 +77,21 @@ export function getSettings(ctx: QueryCtx = defaultCtx()): SettingsVM {
   const rows = syncRows(ctx);
   const statusOf = (last: number | null, error: string | null) =>
     error ? "error" : last == null ? "never" : nowMs - last * 1000 > STALE_MS ? "stale" : "ok";
+  const auth = authState(ctx, rows);
+  // Not linked is one account-level problem, said once in Data source, not on every row.
+  const rowError = (e: string | null) => (e && auth !== "not_linked" ? syncErrorText(e) : null);
   const sync: SettingsVM["sync"] =
     ctx.mode === "demo"
       ? rows
           .filter((r) => r.type === "seed")
-          .map((r) => ({ key: "seed", label: "Demo generator", lastSuccessAt: r.lastSuccessAt && r.lastSuccessAt * 1000, status: statusOf(r.lastSuccessAt, r.lastError), error: r.lastError }))
+          .map((r) => ({ key: "seed", label: "Demo generator", lastSuccessAt: r.lastSuccessAt && r.lastSuccessAt * 1000, status: statusOf(r.lastSuccessAt, r.lastError), error: rowError(r.lastError) }))
       : GROUPS.map((g) => {
           const members = rows.filter((r) => g.types.includes(r.type));
           const successes = members.map((r) => r.lastSuccessAt);
           const last = members.length && successes.every((s) => s != null) ? Math.min(...(successes as number[])) : null;
-          const error = members.find((r) => r.lastError)?.lastError ?? null;
+          const error = rowError(members.find((r) => r.lastError)?.lastError ?? null);
           return { key: g.key, label: g.label, lastSuccessAt: last && last * 1000, status: statusOf(last, error), error };
         });
-  const auth = authState(ctx);
   const p = ctx.profile;
   const today = todayOf(ctx);
   return {
@@ -78,7 +100,7 @@ export function getSettings(ctx: QueryCtx = defaultCtx()): SettingsVM {
       ctx.mode === "demo"
         ? { label: "Demo data", status: "demo" }
         : { label: "Google Health", status: auth },
-    import: ctx.mode === "google" ? importProgress(rows) : null,
+    import: ctx.mode === "google" && auth === "connected" ? importProgress(rows) : null,
     sync,
     profile: {
       birthDate: p.birthDate,
@@ -137,14 +159,14 @@ export function getShellStatus(ctx: QueryCtx = defaultCtx()): ShellStatusVM {
   const lastSuccessAt = successes.length ? Math.max(...successes) * 1000 : null;
   const stale = lastSuccessAt == null || ctx.now * 1000 - lastSuccessAt > STALE_MS;
   const error = rows.some((r) => r.lastError);
-  const progress = ctx.mode === "google" ? importProgress(rows) : null;
-  const auth = ctx.mode === "google" ? authState(ctx) : "connected";
+  const auth = ctx.mode === "google" ? authState(ctx, rows) : "connected";
+  const progress = ctx.mode === "google" && auth === "connected" ? importProgress(rows) : null;
   const first = firstDay(ctx);
   const connection: ShellStatusVM["connection"] =
     ctx.mode === "demo"
       ? "connected"
-      : auth === "not_connected"
-        ? "not_connected"
+      : auth === "not_connected" || auth === "not_linked"
+        ? auth
         : auth === "revoked"
           ? "auth_revoked"
           : progress

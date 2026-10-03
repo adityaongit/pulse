@@ -346,7 +346,7 @@ export type ReportVM = {
 export type ShellStatusVM = {
   mode: "demo" | "google";
   sync: { state: "ok" | "syncing" | "stale" | "error"; lastSuccessAt: number | null };
-  connection: "connected" | "not_connected" | "importing" | "auth_revoked" | "stale";
+  connection: "connected" | "not_connected" | "not_linked" | "importing" | "auth_revoked" | "stale";
   importProgress?: { done: number; total: number };
   today: string;
   firstDay?: string;
@@ -357,7 +357,7 @@ export type ShellStatusVM = {
 
 export type SettingsVM = {
   mode: "demo" | "google";
-  source: { label: "Demo data" | "Google Health"; status: "demo" | "not_connected" | "connected" | "revoked" };
+  source: { label: "Demo data" | "Google Health"; status: "demo" | "not_connected" | "not_linked" | "connected" | "revoked" };
   import: { done: number; total: number } | null;
   sync: { key: string; label: string; lastSuccessAt: number | null; status: "ok" | "stale" | "error" | "never"; error: string | null }[];
   profile: { birthDate: string; age: number; sex: "male" | "female"; maxHr: number; maxHrSource: "set" | "estimated"; timeZone: string; heightCm: number | null };

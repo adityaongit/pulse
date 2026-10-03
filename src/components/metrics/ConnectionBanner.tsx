@@ -1,8 +1,8 @@
 "use client"
 
 import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { CloudDownload, Plug, TriangleAlert, Unplug } from "lucide-react"
+import { usePathname, useRouter } from "next/navigation"
+import { CloudDownload, Plug, TriangleAlert, Unplug, UserX } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { ago, clock } from "@/lib/format"
 import { useNow } from "@/hooks/use-now"
@@ -20,7 +20,10 @@ export function ConnectionBanner({ className }: { className?: string }) {
   const s = useShellStatus()
   const router = useRouter()
   const now = useNow()
+  const pathname = usePathname()
   if (s.mode === "demo" || s.connection === "connected") return null
+  // Settings' Data source card already explains it, with the fix next to it.
+  if (s.connection === "not_linked" && pathname === "/settings") return null
 
   const total = s.importProgress?.total ?? 180
   const done = s.importProgress?.done ?? 0
@@ -37,6 +40,17 @@ export function ConnectionBanner({ className }: { className?: string }) {
       body: "Pulse reads your Fitbit data from Google Health. Nothing syncs until you connect.",
       action: connect("Connect Google"),
       role: "status",
+    },
+    not_linked: {
+      icon: <UserX className="text-warning" />,
+      title: "No Google Health on this account",
+      body: "This Google account has no Google Health profile, so there is nothing to sync. Settings has the fix.",
+      action: (
+        <Button asChild size="touch" variant="secondary">
+          <Link href="/settings#source">Open Settings</Link>
+        </Button>
+      ),
+      role: "alert",
     },
     importing: {
       icon: <CloudDownload className="text-coach" />,
