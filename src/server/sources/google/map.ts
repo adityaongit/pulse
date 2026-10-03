@@ -6,7 +6,7 @@
 // read goes through num/str and treats "absent" as "unknown", never as zero.
 import type { dailyMetrics, exercises, sleepSessions } from "../../db/schema";
 import type { DataTypeId } from "./catalogue";
-import { localDay } from "./client";
+import { localDay } from "../../time";
 
 type Obj = Record<string, unknown>;
 const isObj = (v: unknown): v is Obj => typeof v === "object" && v !== null && !Array.isArray(v);

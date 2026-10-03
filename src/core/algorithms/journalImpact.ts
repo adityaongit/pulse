@@ -54,8 +54,8 @@ export interface TagImpact {
   effects: Record<ImpactMetric, Effect>;
 }
 
-// Copied from seed/generate.ts (core cannot import server): mulberry32 and FNV-1a.
-function mulberry32(seed: number) {
+/** Seeded PRNG (mulberry32); also drives the demo seed in server/sources/seed/generate.ts. */
+export function mulberry32(seed: number) {
   let a = seed >>> 0;
   return () => {
     a = (a + 0x6d2b79f5) | 0;
@@ -64,7 +64,8 @@ function mulberry32(seed: number) {
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
   };
 }
-function hash(s: string) {
+/** FNV-1a. */
+export function hash(s: string) {
   let h = 0x811c9dc5;
   for (let i = 0; i < s.length; i++) h = Math.imul(h ^ s.charCodeAt(i), 0x01000193);
   return h >>> 0;

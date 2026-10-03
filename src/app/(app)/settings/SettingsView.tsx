@@ -9,9 +9,8 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { DisconnectButton } from "./SettingsClient"
+import { CAPTION, LABEL } from "@/components/metrics/primitives"
 
-const LABEL = "text-xs leading-4 font-bold tracking-[0.08em] uppercase"
-const CAPTION = "text-xs leading-4 font-medium text-muted-foreground"
 const BODY = "max-w-[65ch] text-[15px] leading-[22px] text-pretty text-foreground-secondary"
 const TAG = "h-5 rounded-full border-border px-2 text-[11px] font-bold tracking-[0.06em] text-foreground-secondary uppercase"
 

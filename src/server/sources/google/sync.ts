@@ -14,7 +14,8 @@ import { type Db, getDb } from "../../db";
 import { dailyMetrics, exercises, oauthTokens, sleepSessions, syncState } from "../../db/schema";
 import type { Source } from "../types";
 import { DATA_TYPES, type DataTypeId } from "./catalogue";
-import { addDays, type ClientDeps, createGoogleClient, localDay, localMidnight, localWindows, type TimeWindow } from "./client";
+import { addDays, localDay, localMidnight } from "../../time";
+import { type ClientDeps, createGoogleClient, localWindows, type TimeWindow } from "./client";
 import {
   DAILY_TYPES,
   type DailyRow,

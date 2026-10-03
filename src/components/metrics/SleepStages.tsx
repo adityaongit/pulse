@@ -9,6 +9,7 @@ import { EmptyState } from "@/components/shells/EmptyState"
 import { MetricState } from "@/components/shells/MetricState"
 import { useOptionalShellStatus } from "@/components/shells/ShellStatus"
 import { ReasonPlaceholder } from "./ReasonPlaceholder"
+import { CAPTION, LABEL } from "./primitives"
 
 type Stage = "awake" | "rem" | "light" | "deep"
 export type SleepStagesNight = {
@@ -20,8 +21,6 @@ export type SleepStagesNight = {
 
 // WHOOP's order, top to bottom [latest-sleep-stages-1].
 const ORDER: Stage[] = ["awake", "light", "deep", "rem"]
-const LABEL = "text-xs leading-4 font-bold tracking-[0.08em] uppercase"
-const CAPTION = "text-xs leading-4 font-medium text-muted-foreground"
 const EMPTY = "No stage data for this night. Fitbit only stages sleeps longer than about 3 hours."
 
 function Rows({ night }: { night: SleepStagesNight }) {

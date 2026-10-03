@@ -1,31 +1,13 @@
 // View models returned by server/queries, one per screen (spec §7). Shapes mirror the U12 kit props
-// (src/lib/reasons.ts Metric, ZoneBars' ZoneRow, DriverList's DriverItem…) without importing UI code.
+// (src/lib/reasons.ts Metric, ZoneBars' ZoneRow, DriverList's DriverItem…), importing only types from the kit.
 // Conventions: instants are epoch **milliseconds** (as the kit's charts and cards take them), days are
 // local `YYYY-MM-DD`, Strain is on WHOOP's 0–21 scale, and no number is ever NaN or ±Infinity.
 
-export type ReasonCode =
-  | "calibrating"
-  | "no_hrv_last_night"
-  | "awaiting_sleep_sync"
-  | "insufficient_hr_data"
-  | "band_not_worn"
-  | "no_data";
-export type MetricTag = "stale_baseline" | "updated";
+import type { ChipTone, GoodDirection, RecoveryBand as Band, StressLevel } from "@/lib/bands";
+import type { Metric, MetricTag, ReasonCode } from "@/lib/reasons";
 
-/** One nullable metric (spec §4.8). `value: null` always carries a reason. */
-export type Metric<T> = {
-  value: T | null;
-  reason: ReasonCode | null;
-  provisional: boolean;
-  tags?: MetricTag[];
-  /** For `calibrating`. */
-  nightsLeft?: number;
-};
-
-export type Band = "green" | "yellow" | "red";
-export type StressLevel = "low" | "medium" | "high";
-export type GoodDirection = "up" | "down" | "neutral" | "toward_zero";
-export type ChipTone = "optimal" | "warning" | "alert" | "neutral";
+// Type-only: shared with the kit, erased at build, so no UI code reaches the server bundle.
+export type { Band, ChipTone, GoodDirection, Metric, MetricTag, ReasonCode, StressLevel };
 export type SleepStatus = "poor" | "sufficient" | "optimal";
 export type ActivityKind = "run" | "ride" | "walk" | "strength" | "workout";
 
@@ -163,7 +145,7 @@ export type RecoveryVM = {
 
 // ── Strain and Activity ──────────────────────────────────────────────────────
 
-export type HrChart = { points: TimePoint[]; zones: ZoneRow[]; spans: Span[]; now: number | null; domain: [number, number] };
+export type HrChart = { points: TimePoint[]; zones: ZoneRow[]; spans: Span[]; now: number | null };
 
 export type ActivityItem = Extract<TimelineItem, { kind: "activity" }>;
 

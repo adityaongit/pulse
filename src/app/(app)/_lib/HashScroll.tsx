@@ -8,7 +8,12 @@ import * as React from "react"
  */
 export function HashScroll() {
   React.useEffect(() => {
-    const id = decodeURIComponent(window.location.hash.slice(1))
+    let id: string
+    try {
+      id = decodeURIComponent(window.location.hash.slice(1))
+    } catch {
+      return // malformed escape in the hash
+    }
     if (id) document.getElementById(id)?.scrollIntoView({ block: "start" })
   }, [])
   return null

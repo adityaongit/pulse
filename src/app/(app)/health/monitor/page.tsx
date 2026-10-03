@@ -1,9 +1,6 @@
-import { redirect } from "next/navigation"
 import { CircleAlert } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { parseDay, todayIn } from "@/lib/url"
 import { reasonCopy } from "@/lib/reasons"
-import { getConfig } from "@/server/config"
 import { getMonitor } from "@/server/queries/health"
 import type { MonitorVM } from "@/server/queries/types"
 import { StatusChip } from "@/components/metrics/primitives"
@@ -11,6 +8,7 @@ import { DetailShell } from "@/components/shells/DetailShell"
 import { SectionShell } from "@/components/shells/SectionShell"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { VitalTiles } from "./VitalTiles"
+import { pageDay, type SearchParams } from "../../_lib/day"
 
 export const metadata = { title: "Health Monitor" }
 
@@ -57,9 +55,7 @@ function Count({ count }: { count: MonitorVM["count"] }) {
 
 /** Health Monitor `/health/monitor?d=` (spec §7.8). */
 export default async function MonitorPage({ searchParams }: PageProps<"/health/monitor">) {
-  const today = todayIn(getConfig().timeZone)
-  const { d, rejected } = parseDay((await searchParams).d, today)
-  if (rejected) redirect("/health/monitor")
+  const { d } = await pageDay(searchParams as SearchParams, "/health/monitor")
   const vm = getMonitor(d)
 
   return (

@@ -7,7 +7,7 @@ import { reasonCopy, type Metric, type ReasonCode } from "@/lib/reasons"
 import { CARD_MATERIAL } from "@/components/ui/card"
 import { SkeletonText } from "@/components/ui/skeleton"
 import { MetricState, type MetricMeta } from "@/components/shells/MetricState"
-import { DeltaMark, MetricTags, StatusChip, ValueUnit } from "./primitives"
+import { CAPTION, DeltaMark, LABEL, MetricTags, StatusChip, ValueUnit } from "./primitives"
 
 export type SleepStatus = "poor" | "sufficient" | "optimal"
 
@@ -39,8 +39,6 @@ export type KeyStatRowProps = {
   className?: string
 }
 
-const LABEL = "text-xs leading-4 font-bold tracking-[0.08em] uppercase"
-const CAPTION = "text-xs leading-4 font-medium text-muted-foreground"
 const TILE_LABEL = "text-[10px] leading-3 font-bold tracking-[0.1em] uppercase"
 const TILE_CHIP = "min-h-5 px-1.5 py-0.5 text-[11px] leading-4"
 const STATUS_ACTIVE: Record<SleepStatus, string> = {

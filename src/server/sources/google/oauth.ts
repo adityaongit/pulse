@@ -12,6 +12,7 @@ const AUTH_URL = "https://accounts.google.com/o/oauth2/v2/auth";
 const TOKEN_URL = "https://oauth2.googleapis.com/token";
 const STATE_TTL_MS = 10 * 60_000;
 const EXPIRY_MARGIN_S = 60;
+export const FETCH_TIMEOUT_MS = 30_000;
 
 // Every read scope the API has, so one consent covers all data. Nutrition has no read-only scope:
 // `nutrition.writeonly` is the only one that lets dataPoints.list return food and hydration logs.
@@ -110,6 +111,7 @@ async function tokenRequest(fetchFn: typeof fetch, params: Record<string, string
     method: "POST",
     headers: { "content-type": "application/x-www-form-urlencoded" },
     body: new URLSearchParams(params),
+    signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
   });
   const body = parseJson(await res.text()) as
     | { access_token?: unknown; refresh_token?: unknown; expires_in?: unknown; scope?: unknown }

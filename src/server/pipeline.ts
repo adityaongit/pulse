@@ -6,6 +6,7 @@
 //
 // Determinism: the same database gives byte-identical daily_scores, and writes only touch rows whose
 // JSON differs, so an unchanged recompute writes nothing.
+import type { ReasonCode } from "@/lib/reasons";
 import { createHash } from "node:crypto";
 import { getConfig } from "./config";
 import { type Db, getDb } from "./db";
@@ -61,8 +62,6 @@ export const lastRun = { stage1Days: [] as string[], ms: 0, stage1Ms: 0, stage2M
 // ---------------------------------------------------------------------------------------------
 // Stored shapes (daily_scores JSON columns). Queries read these.
 
-export type Reason = "calibrating" | "no_hrv_last_night" | "awaiting_sleep_sync" | "insufficient_hr_data" | "band_not_worn" | "no_data";
-
 export type BaselineSummary = { mean: number; sd: number; status: BaselineState["status"]; nValid: number } | null;
 
 /** Stage 1, `daily_scores.strain`. */
@@ -100,7 +99,7 @@ export type Stage1Activity = {
 
 export type RecoveryRow = {
   value: number | null;
-  reason: Reason | null;
+  reason: ReasonCode | null;
   nightsLeft?: number;
   provisional: boolean;
   /** Inputs whose baseline is stale today. */
@@ -118,7 +117,7 @@ export type RecoveryRow = {
 };
 
 export type SleepRow = {
-  reason: Reason | null;
+  reason: ReasonCode | null;
   main: {
     id: string;
     start: number;
@@ -160,7 +159,7 @@ export type StressRow = {
 };
 
 export type EnergyBankRow =
-  | { value: null; reason: Reason; provisional: boolean }
+  | { value: null; reason: ReasonCode; provisional: boolean }
   | {
       value: number;
       reason: null;
@@ -187,19 +186,19 @@ export type TrainingLoadRow = {
   tsb: number | null;
 };
 
-export type StrainTargetRow = ({ reason: null } & StrainTarget) | { reason: Reason; nightsLeft?: number };
+export type StrainTargetRow = ({ reason: null } & StrainTarget) | { reason: ReasonCode; nightsLeft?: number };
 
 export type SleepPlannerRow =
   | ({ reason: null; wakeDay: string; nights: number } & SleepPlan)
-  | { reason: Reason; nightsLeft?: number; needMin: number };
+  | { reason: ReasonCode; nightsLeft?: number; needMin: number };
 
-export type HealthMonitorRow = (HealthMonitorResult & { reason: null; stale: string[] }) | { reason: Reason };
+export type HealthMonitorRow = (HealthMonitorResult & { reason: null; stale: string[] }) | { reason: ReasonCode };
 
-export type HealthspanRow = (HealthspanResult & { reason: null; age: number }) | { reason: Reason; dataDays: number };
+export type HealthspanRow = (HealthspanResult & { reason: null; age: number }) | { reason: ReasonCode; dataDays: number };
 
 export type FitnessRow =
   | { reason: null; vo2max: number; source: "run" | "daily"; sourceDay: string; percentile: number; category: FitnessCategory; age: number }
-  | { reason: Reason };
+  | { reason: ReasonCode };
 
 export type JournalImpactRow = { key: string; impacts: TagImpact[] };
 
@@ -648,7 +647,7 @@ function stage2(db: Db, data: Data, opts: PipelineOptions) {
     const creditedMin = creditedSleepMin(main?.asleepMin ?? null, yesterdayNaps.reduce((a, s) => a + (s.asleepMin ?? 0), 0));
     ledgerSeries.push([day, creditedMin]);
     const debtMin = ledger(ledgerSeries, needHours).magnitudeMin;
-    const sleepReason: Reason | null = !mainSession
+    const sleepReason: ReasonCode | null = !mainSession
       ? "band_not_worn"
       : !mainSession.processed
         ? "awaiting_sleep_sync"
@@ -686,7 +685,7 @@ function stage2(db: Db, data: Data, opts: PipelineOptions) {
       .map(([k]) => k);
     const rhrUsable = rhrB && isUsable(rhrB) ? rhrB : null;
     const respUsable = respB && isUsable(respB) ? respB : null;
-    let recReason: Reason | null = null;
+    let recReason: ReasonCode | null = null;
     let nightsLeft: number | undefined;
     let value: number | null = null;
     let drivers: ChargeDriver[] = [];
@@ -974,6 +973,7 @@ function stage2(db: Db, data: Data, opts: PipelineOptions) {
     `insert into intraday_series (day, kind, data) values (?, ?, ?)
      on conflict(day, kind) do update set data = excluded.data where data is not excluded.data`,
   );
+  const dropEnergy = c.prepare("delete from intraday_series where day = ? and kind = 'energy_bank'");
   const report = c.prepare(
     "insert into reports (period, data) values (?, ?) on conflict(period) do update set data = excluded.data where data is not excluded.data",
   );
@@ -985,7 +985,7 @@ function stage2(db: Db, data: Data, opts: PipelineOptions) {
       series.run(day, "stress", JSON.stringify(stressSeries.get(day)));
       const eb = energySeries.get(day);
       if (eb) series.run(day, "energy_bank", JSON.stringify(eb));
-      else c.prepare("delete from intraday_series where day = ? and kind = 'energy_bank'").run(day);
+      else dropEnergy.run(day);
     }
     for (const period of periods) {
       const { end } = periodBounds(period);
@@ -994,6 +994,7 @@ function stage2(db: Db, data: Data, opts: PipelineOptions) {
     }
     c.prepare(`delete from reports where period not in (${periods.map(() => "?").join(", ") || "''"})`).run(...periods);
     c.prepare("delete from daily_scores where day < ? or day > ?").run(data.first, data.last);
+    c.prepare("delete from intraday_series where day < ? or day > ?").run(data.first, data.last);
   })();
 }
 

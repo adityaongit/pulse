@@ -4,7 +4,8 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { openDb, type Db } from "../../db";
 import { oauthTokens, rawPayloads } from "../../db/schema";
 import { DATA_TYPE_IDS, DATA_TYPES } from "./catalogue";
-import { archivePage, buildFilter, createGoogleClient, localDay, localMidnight, localWindows } from "./client";
+import { localDay, localMidnight } from "../../time";
+import { archivePage, buildFilter, createGoogleClient, localWindows } from "./client";
 import { GoogleError } from "./oauth";
 
 const TZ = "Asia/Kolkata"; // UTC+5:30, so a UTC date and the local date differ before 05:30

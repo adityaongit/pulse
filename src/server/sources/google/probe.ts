@@ -7,7 +7,8 @@
 import { getConfig } from "../../config";
 import { getDb } from "../../db";
 import { DATA_TYPE_IDS, DATA_TYPES, type DataTypeId } from "./catalogue";
-import { addDays, createGoogleClient, localDay, localMidnight, type GoogleClient } from "./client";
+import { addDays, localDay, localMidnight } from "../../time";
+import { createGoogleClient, type GoogleClient } from "./client";
 import { GoogleError } from "./oauth";
 
 type Obj = Record<string, unknown>;

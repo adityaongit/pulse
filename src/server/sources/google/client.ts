@@ -9,7 +9,7 @@ import type { Db } from "../../db";
 import { rawPayloads } from "../../db/schema";
 import { addDays, localDay, localMidnight, wall } from "../../time";
 import { DATA_TYPES, type DataType, type DataTypeId, type FilterMember } from "./catalogue";
-import { errorCode, getAccessToken, GoogleError, markRevoked, parseJson } from "./oauth";
+import { errorCode, FETCH_TIMEOUT_MS, getAccessToken, GoogleError, markRevoked, parseJson } from "./oauth";
 
 const API = "https://health.googleapis.com/v4/users/me/dataTypes";
 const MIN_GAP_MS = 250; // 4 req/s, under the documented 5 QPS per user
@@ -19,8 +19,6 @@ const MAX_WAIT_MS = 5 * 60_000;
 const MAX_PAGES = 1000; // a nextPageToken that never advances must not loop forever
 
 // --- Local days ---------------------------------------------------------------------------------
-
-export { addDays, localDay, localMidnight };
 
 /** The first local midnight at or after `s`. */
 function ceilMidnight(s: number, tz: string): number {
@@ -141,13 +139,15 @@ export function createGoogleClient({
           method: body ? "POST" : "GET",
           headers: { authorization: `Bearer ${token}`, ...(body && { "content-type": "application/json" }) },
           body,
+          signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
         });
+        // Inside the try: a body cut off mid-read is a network failure too.
+        if (res.ok) return await res.text();
       } catch {
         if (++tries >= MAX_TRIES) throw new GoogleError("network", undefined, where);
         await sleep(BACKOFF_MS * 2 ** (tries - 1));
         continue;
       }
-      if (res.ok) return res.text();
       const { status } = res;
       if (status === 401) {
         await res.body?.cancel();

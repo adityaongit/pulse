@@ -5,6 +5,7 @@ import type { Metric } from "@/lib/reasons"
 import { Skeleton, SkeletonText } from "@/components/ui/skeleton"
 import { EmptyState } from "@/components/shells/EmptyState"
 import { MetricState } from "@/components/shells/MetricState"
+import { LABEL } from "@/components/metrics/primitives"
 
 export type ZoneRow = { zone: number; min: number; max: number | null; seconds: number }
 export type StackedSegment = { key: string; label: string; count: number; color: DataColor }
@@ -24,8 +25,6 @@ export type ZoneBarsProps =
       data: Metric<StackedSegment[]> | null | undefined
       emptyCopy?: string
     }
-
-const LABEL = "text-xs leading-4 font-bold tracking-[0.08em] uppercase"
 
 function share(part: number, total: number) {
   if (!total || !part) return "0%"

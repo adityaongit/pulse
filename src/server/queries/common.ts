@@ -15,8 +15,9 @@ import type {
   StressRow,
   TrainingLoadRow,
 } from "../pipeline";
+import { stressLevel } from "@/lib/bands";
 import { addDays, localDay, localMidnight } from "../time";
-import type { ActivityKind, DayPoint, Metric, MetricTag, ReasonCode, SleepPlanVM, TimelineItem, TimePoint } from "./types";
+import type { ActivityKind, DayPoint, Metric, MetricTag, ReasonCode, SleepPlanVM, Span, TimelineItem, TimePoint } from "./types";
 
 export type QueryCtx = {
   db: Db;
@@ -246,6 +247,18 @@ export function timeline(ctx: QueryCtx, row: DayRow | undefined, day: string): T
   return items.sort((a, b) => a.start - b.start);
 }
 
+const SPAN_LABEL: Record<ActivityKind, string> = { run: "Run", ride: "Ride", walk: "Walk", strength: "Strength", workout: "Workout" };
+
+/** Chart spans for the day: main sleep (clipped to `dayStart`), naps and workouts. */
+export function daySpans(ctx: QueryCtx, row: DayRow | undefined, day: string, dayStart: number): Span[] {
+  const spans: Span[] = [];
+  const s = row?.sleep;
+  if (s?.main) spans.push({ kind: "sleep", label: "Sleep", start: ms(Math.max(s.main.start, dayStart)), end: ms(s.main.end) });
+  for (const n of s?.naps ?? []) spans.push({ kind: "nap", label: "Nap", start: ms(n.start), end: ms(n.end) });
+  for (const e of exercisesBetween(ctx, day, day)) spans.push({ kind: "workout", label: SPAN_LABEL[activityKind(e.type)], start: ms(e.startTs), end: ms(e.endTs) });
+  return spans;
+}
+
 const PLAN_LABELS = [
   ["peak", "Peak"],
   ["perform", "Perform"],
@@ -273,8 +286,7 @@ export function planVM(ctx: QueryCtx, row: DayRow | undefined, isToday: boolean)
   });
 }
 
-export const recoveryBand = (v: number) => (v >= 67 ? "green" : v >= 34 ? "yellow" : "red");
-export const stressLevel = (v: number) => (v >= 2 ? "high" : v >= 1 ? "medium" : "low");
+export { recoveryBand, stressLevel } from "@/lib/bands";
 
 /** Recovery tags: stale baselines and a late-gained term. */
 export const recoveryTags = (r: RecoveryRow): MetricTag[] => [...(r.stale.length ? ["stale_baseline" as const] : []), ...(r.updated ? ["updated" as const] : [])];
