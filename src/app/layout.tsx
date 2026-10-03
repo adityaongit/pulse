@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   applicationName: "Pulse",
   appleWebApp: { capable: true, title: "Pulse", statusBarStyle: "black-translucent" },
   formatDetection: { telephone: false, email: false, address: false },
-  // Private, single-user app behind Cloudflare Access: keep it out of search indexes.
+  // Private, single-user app behind its own sign-in: keep it out of search indexes.
   robots: { index: false, follow: false, nocache: true },
   openGraph: { title: "Pulse", description: DESCRIPTION, siteName: "Pulse", type: "website" },
 };

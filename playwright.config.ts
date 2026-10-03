@@ -3,16 +3,14 @@ import { defineConfig, devices } from "@playwright/test";
 import { E2E_DB } from "./e2e/days";
 
 // The e2e server is a second `next dev` on its own port, build dir and throwaway demo DB, so it
-// never touches the user's dev server on :3000 or data/demo.db. NODE_ENV=development is what lets
-// DEV_ACCESS_BYPASS through (src/server/config.ts), which rules out `next start`.
+// never touches the user's dev server on :3000 or data/demo.db. The `setup` project signs in to the
+// demo once and every other project reuses that session (STORAGE).
 const PORT = 3300;
+
+const STORAGE = "test-results/.auth/demo.json";
 
 const env = {
   GOOGLE_OAUTH_ENABLED: "false",
-  DEV_ACCESS_BYPASS: "1",
-  NODE_ENV: "development",
-  BIRTH_DATE: "1990-01-01",
-  SEX: "male",
   TZ: "Asia/Kolkata",
   DATABASE_PATH: E2E_DB,
   NEXT_DIST_DIR: ".next/e2e",
@@ -23,13 +21,15 @@ const env = {
 const JOURNEYS = new Set(["390", "1440"]);
 const touch = (name: string, width: number, height: number, deviceScaleFactor = 3) => ({
   name,
-  testIgnore: JOURNEYS.has(name) ? [] : ["**/journeys.spec.ts"],
-  use: { viewport: { width, height }, deviceScaleFactor, hasTouch: true, isMobile: true },
+  testIgnore: JOURNEYS.has(name) ? [] : ["**/journeys.spec.ts", "**/auth.spec.ts"],
+  dependencies: ["setup"],
+  use: { viewport: { width, height }, deviceScaleFactor, hasTouch: true, isMobile: true, storageState: STORAGE },
 });
 const desktop = (name: string, width: number, height: number) => ({
   name,
-  testIgnore: JOURNEYS.has(name) ? [] : ["**/journeys.spec.ts"],
-  use: { viewport: { width, height }, deviceScaleFactor: 1 },
+  testIgnore: JOURNEYS.has(name) ? [] : ["**/journeys.spec.ts", "**/auth.spec.ts"],
+  dependencies: ["setup"],
+  use: { viewport: { width, height }, deviceScaleFactor: 1, storageState: STORAGE },
 });
 
 export default defineConfig({
@@ -49,6 +49,7 @@ export default defineConfig({
     trace: "retain-on-failure",
   },
   projects: [
+    { name: "setup", testMatch: "auth.setup.ts" },
     touch("361", 361, 800, 3.5), // OnePlus 13R
     touch("390", 390, 844),
     touch("820", 820, 1180, 2),

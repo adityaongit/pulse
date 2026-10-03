@@ -9,9 +9,8 @@ import { TitleHeader } from "@/components/shells/TopBar"
 const RELOAD_FLAG = "pulse:access-reload"
 
 /**
- * Is the Cloudflare Access session gone? Access answers an expired session with a redirect to its
- * login domain: a manual-redirect probe sees an opaque redirect, and a followed one fails as an opaque
- * network error (CORS). A plain server error answers 200/500 from our own origin.
+ * Is the session gone? The proxy answers a page request without a valid session with a redirect to
+ * /login: a manual-redirect probe sees an opaque redirect. A plain server error answers 200/500.
  */
 async function accessExpired() {
   try {
@@ -33,7 +32,7 @@ export default function AppError({ error, retry }: { error: Error & { digest?: s
     void accessExpired().then((expired) => {
       if (!expired || cancelled) return
       try {
-        // One full reload per session (it takes the browser through the Access login); never a loop.
+        // One full reload per session (it lands on /login); never a loop.
         if (sessionStorage.getItem(RELOAD_FLAG)) return
         sessionStorage.setItem(RELOAD_FLAG, String(Date.now()))
       } catch {

@@ -5,6 +5,7 @@
 // body. JSON.parse's own error quotes the input, so bodies are parsed through parseJson.
 import { randomBytes } from "node:crypto";
 import { eq } from "drizzle-orm";
+import { decodeJwt } from "jose";
 import type { Db } from "../../db";
 import { oauthTokens } from "../../db/schema";
 
@@ -31,6 +32,9 @@ export const SCOPES = [
   "settings.readonly",
   "nutrition.writeonly",
 ].map((s) => `https://www.googleapis.com/auth/googlehealth.${s}`);
+
+/** Sign-in (U20) rides on the same consent: the ID token's verified email decides who may in. */
+export const LOGIN_SCOPES = ["openid", "email"];
 
 /**
  * `code` is ours (`auth_revoked`, `not_connected`, `http_503`, ...) or Google's own error code
@@ -68,7 +72,9 @@ export function errorCode(body: unknown): string | undefined {
   return typeof code === "string" && /^[A-Za-z_]{1,64}$/.test(code) ? code : undefined;
 }
 
-export const redirectUri = (appUrl: string) => `${appUrl}/oauth/callback`;
+/** APP_URL when set, else the origin the request came in on (localhost, a LAN address, a tunnel host). */
+export const appOrigin = (req: Request, appUrl: string | null) => appUrl ?? new URL(req.url).origin;
+export const redirectUri = (origin: string) => `${origin}/oauth/callback`;
 
 // globalThis, not module scope: Next bundles /oauth/start and /oauth/callback separately.
 const g = globalThis as typeof globalThis & { __pulseOAuthStates?: Map<string, number> };
@@ -90,17 +96,21 @@ export function consumeState(state: string | null, now = Date.now()): boolean {
   return expires !== undefined && expires > now;
 }
 
-export function authUrl(o: { clientId: string; redirectUri: string; state: string }): string {
+/**
+ * `consent` the first time and whenever the stored grant is unusable: only a consent screen returns a
+ * refresh token. A returning owner with a working grant just picks the account.
+ */
+export function authUrl(o: { clientId: string; redirectUri: string; state: string; prompt: "consent" | "select_account" }): string {
   const url = new URL(AUTH_URL);
   url.search = new URLSearchParams({
     client_id: o.clientId,
     redirect_uri: o.redirectUri,
     response_type: "code",
-    scope: SCOPES.join(" "),
+    scope: [...LOGIN_SCOPES, ...SCOPES].join(" "),
     // offline + consent is what returns a refresh token. Without prompt=consent, a second grant to
     // the same client (localhost, then production) returns an access token only.
     access_type: "offline",
-    prompt: "consent",
+    prompt: o.prompt,
     state: o.state,
   }).toString();
   return url.toString();
@@ -114,7 +124,7 @@ async function tokenRequest(fetchFn: typeof fetch, params: Record<string, string
     signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
   });
   const body = parseJson(await res.text()) as
-    | { access_token?: unknown; refresh_token?: unknown; expires_in?: unknown; scope?: unknown }
+    | { access_token?: unknown; refresh_token?: unknown; expires_in?: unknown; scope?: unknown; id_token?: unknown }
     | undefined;
   if (!res.ok) return { ok: false as const, status: res.status, code: errorCode(body) ?? `http_${res.status}` };
   if (typeof body?.access_token !== "string" || typeof body.expires_in !== "number") {
@@ -127,18 +137,45 @@ async function tokenRequest(fetchFn: typeof fetch, params: Record<string, string
     expiresIn: body.expires_in,
     refreshToken: typeof body.refresh_token === "string" && body.refresh_token ? body.refresh_token : undefined,
     scope: typeof body.scope === "string" ? body.scope : undefined,
+    idToken: typeof body.id_token === "string" ? body.id_token : undefined,
   };
 }
 
+/** True when a grant is stored and not revoked: sign-in can skip the consent screen. */
+export function hasGrant(db: Db): boolean {
+  const row = db.select({ revokedAt: oauthTokens.revokedAt }).from(oauthTokens).get();
+  return !!row && row.revokedAt === null;
+}
+
 /**
- * Exchanges an authorization code and stores the grant in the single `oauth_tokens` row, clearing
- * any revocation. A response without a refresh token stores nothing and throws `auth_revoked`:
- * accepting it would give a connection that syncs for an hour and then stops.
+ * The verified email in an ID token. The token came straight from Google's token endpoint over TLS,
+ * so per OpenID Connect Core 3.1.3.7 its signature needn't be checked; audience still is.
+ */
+function verifiedEmail(idToken: string | undefined, clientId: string): string {
+  let claims: ReturnType<typeof decodeJwt>;
+  try {
+    claims = decodeJwt(idToken ?? "");
+  } catch {
+    throw new GoogleError("no_id_token");
+  }
+  const aud = Array.isArray(claims.aud) ? claims.aud : [claims.aud];
+  if (!aud.includes(clientId) || typeof claims.email !== "string") throw new GoogleError("no_id_token");
+  if (claims.email_verified !== true) throw new GoogleError("email_unverified");
+  return claims.email.toLowerCase();
+}
+
+/**
+ * Exchanges an authorization code, checks the signed-in account with `allow`, and stores the grant in
+ * the single `oauth_tokens` row, clearing any revocation. Returns the account's email.
+ * - An account `allow` refuses stores nothing and throws `not_owner`.
+ * - Without a refresh token (no consent screen), only the access token of a still-working grant is
+ *   updated. With no such grant it stores nothing and throws `auth_revoked`: accepting it would give
+ *   a connection that syncs for an hour and then stops.
  */
 export async function exchangeCode(
   db: Db,
-  o: { google: Google; redirectUri: string; code: string } & Deps,
-): Promise<void> {
+  o: { google: Google; redirectUri: string; code: string; allow: (email: string) => boolean } & Deps,
+): Promise<string> {
   const { fetch: fetchFn = fetch, now = Date.now } = o;
   const r = await tokenRequest(
     fetchFn,
@@ -152,10 +189,16 @@ export async function exchangeCode(
     "token exchange",
   );
   if (!r.ok) throw new GoogleError(r.code, r.status, "token exchange");
-  if (!r.refreshToken) {
-    throw new GoogleError("auth_revoked", r.status, "token exchange returned no refresh_token; revoke the app's access in your Google account and connect again");
-  }
+  const email = verifiedEmail(r.idToken, o.google.clientId);
+  if (!o.allow(email)) throw new GoogleError("not_owner");
   const t = Math.floor(now() / 1000);
+  if (!r.refreshToken) {
+    if (!hasGrant(db)) {
+      throw new GoogleError("auth_revoked", r.status, "token exchange returned no refresh_token; revoke the app's access in your Google account and connect again");
+    }
+    db.update(oauthTokens).set({ accessToken: r.accessToken, expiresAt: t + r.expiresIn, updatedAt: t }).where(eq(oauthTokens.id, 1)).run();
+    return email;
+  }
   const row = {
     accessToken: r.accessToken,
     refreshToken: r.refreshToken,
@@ -168,6 +211,7 @@ export async function exchangeCode(
     .values({ id: 1, ...row })
     .onConflictDoUpdate({ target: oauthTokens.id, set: row })
     .run();
+  return email;
 }
 
 export function markRevoked(db: Db, now = Date.now()) {

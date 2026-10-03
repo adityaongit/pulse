@@ -9,6 +9,7 @@
 import type { ReasonCode } from "@/lib/reasons";
 import { createHash } from "node:crypto";
 import { getConfig } from "./config";
+import { getProfile } from "./profile";
 import { type Db, getDb } from "./db";
 import { daysBetween, addDays, fractionalYears, localDay, localMidnight, localMinutes, wholeYears } from "./time";
 import {
@@ -209,8 +210,10 @@ export type JournalImpactRow = { key: string; impacts: TagImpact[] };
 export async function recomputeIfNeeded(changed: boolean): Promise<void> {
   const db = getDb();
   if (!changed && !needsRecompute(db)) return;
-  const cfg = getConfig();
-  recompute(db, { timeZone: cfg.timeZone, profile: cfg.profile });
+  // Scores need age and sex: before onboarding, sync keeps importing and scoring waits.
+  const profile = getProfile(db);
+  if (!profile) return;
+  recompute(db, { timeZone: getConfig().timeZone, profile });
   console.info(`[pipeline] recomputed in ${lastRun.ms} ms (stage 1: ${lastRun.stage1Days.length} days)`);
 }
 

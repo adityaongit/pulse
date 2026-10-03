@@ -21,6 +21,7 @@ import {
   syncState,
 } from "../../db/schema";
 import { ensureDefaultTags } from "../../journalTags";
+import { getProfile, saveProfile } from "../../profile";
 import { addDays, daysBetween, localDay, localMidnight } from "../../time";
 import type { Source } from "../types";
 import {
@@ -511,9 +512,13 @@ export function seedPull(db: Db, { now, timeZone, maxHr }: SeedOptions): { chang
   })();
 }
 
+/** The demo person: 36 in 2026, max HR estimated (183). Settings › Profile can change it like any profile. */
+export const DEMO_PROFILE = { birthDate: "1990-01-01", sex: "male", maxHr: null, heightCm: null } as const;
+
 export const seedSource: Source = {
   pull: async () => {
-    const { timeZone, profile } = getConfig();
-    return seedPull(getDb(), { now: Math.floor(Date.now() / 1000), timeZone, maxHr: profile.maxHr });
+    const db = getDb();
+    if (!getProfile(db)) saveProfile(db, DEMO_PROFILE);
+    return seedPull(db, { now: Math.floor(Date.now() / 1000), timeZone: getConfig().timeZone, maxHr: getProfile(db)!.maxHr });
   },
 };

@@ -3,6 +3,7 @@
 import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import { currentSession, SIGNED_OUT } from "../auth";
 import { getConfig } from "../config";
 import { getDb } from "../db";
 import { intradayDirty, journalEntries, journalTags } from "../db/schema";
@@ -23,6 +24,7 @@ const Entry = z.object({
 
 /** Upserts (or, with value null, deletes) one (day, tag) for today or a past day. Repeating it changes nothing. */
 export async function saveJournalEntry(input: z.input<typeof Entry>): Promise<ActionResult> {
+  if (!(await currentSession())) return SIGNED_OUT;
   const r = Entry.safeParse(input);
   if (!r.success) return { ok: false, error: r.error.issues[0].message };
   const { day, tag, value } = r.data;
@@ -49,6 +51,7 @@ const CustomTag = z.object({ label: z.string().trim().min(1).max(40) });
 
 /** Adds a custom tag; its key is the label as snake_case. Fails when that key already exists. */
 export async function addCustomTag(input: z.input<typeof CustomTag>): Promise<ActionResult<{ tag: string }>> {
+  if (!(await currentSession())) return SIGNED_OUT;
   const r = CustomTag.safeParse(input);
   if (!r.success) return { ok: false, error: r.error.issues[0].message };
   const { label } = r.data;

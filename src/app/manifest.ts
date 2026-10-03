@@ -1,7 +1,6 @@
 import type { MetadataRoute } from "next";
 
-// The root layout links this with crossorigin="use-credentials": without cookies, Cloudflare Access
-// would redirect the manifest fetch and Chrome would see no manifest (plan U12).
+// Open to signed-out visitors (src/proxy.ts skips files with an extension), so install works from /login.
 export default function manifest(): MetadataRoute.Manifest {
   return {
     name: "Pulse: recovery, strain and sleep",
