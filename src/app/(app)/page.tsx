@@ -109,8 +109,9 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
                 {/* The end of the collapse distance: the dial labels' bottom (spec §4.3). */}
                 {/* -mt-4 cancels the stack's gap, so the card below sits 24 px under the labels as in WHOOP (spec §11 F1). */}
                 <div aria-hidden className="-mt-3 md:-mt-4" {...{ [HEADER_SENTINEL]: "" }} />
+                {/* The sentinel above pulls the stack up to the labels; give the note its own 12 px back. */}
                 {dials.reason && (
-                  <p className="text-center">
+                  <p className="pt-3 text-center md:pt-4">
                     <ReasonPlaceholder reason={dials.reason.reason} nightsLeft={dials.reason.nightsLeft} size="sm" />
                   </p>
                 )}
