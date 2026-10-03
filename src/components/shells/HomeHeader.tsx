@@ -104,8 +104,8 @@ function Avatar() {
   return (
     // The 3 px ring is the page ground itself (the header's own fill), so it cuts the pill exactly where WHOOP's does.
     <Link
-      href="/more"
-      aria-label="More and settings"
+      href="/settings"
+      aria-label="Settings"
       className={cn(
         HEADER_FILL,
         "relative z-10 -ml-[calc(var(--u)*3px)] grid size-[calc(var(--u)*46px)] shrink-0 place-items-center rounded-full p-[calc(var(--u)*3px)] after:absolute after:-inset-[max(0px,calc((44px-var(--u)*46px)/2))] transition-[scale,color] duration-150 ease-standard outline-none hover:text-foreground-secondary focus-visible:ring-3 focus-visible:ring-ring/50 active:scale-[0.96]"

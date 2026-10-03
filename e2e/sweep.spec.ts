@@ -4,7 +4,24 @@ import { DAY_KEYS, days, withDay, type DayKey } from "./days";
 
 // Every screen, at every viewport (the projects), on every scenario day that applies to it.
 const DAY_ROUTES = ["/", "/recovery", "/strain", "/sleep", "/health/healthspan", "/health/monitor", "/health/stress", "/journal"];
-const OTHER_ROUTES = ["/activity", "/health", "/health/fitness", "/journal/insights", "/reports/week", "/reports/month", "/more", "/settings"];
+const OTHER_ROUTES = [
+  "/activity",
+  "/health",
+  "/health/fitness",
+  "/journal/insights",
+  "/reports/week",
+  "/reports/month",
+  "/more",
+  "/settings",
+  // The More hub (U21).
+  "/reports",
+  "/trends",
+  "/trends?metric=hrv&r=1y",
+  "/more/behaviours",
+  "/more/data",
+  "/more/how-it-works",
+  "/more/how-it-works/recovery",
+];
 
 /** Text that is ellipsised by design, matched with `closest()`. */
 const ELLIPSIS_OK: string[] = [];
@@ -132,7 +149,7 @@ test.describe("sweep", () => {
   test("headers share one top padding", async ({ page }) => {
     // The first row of every screen's header sits at the same height: its controls' vertical centre.
     const centres: Record<string, number> = {};
-    for (const route of ["/", "/recovery", "/strain", "/sleep", "/health", "/health/healthspan", "/health/monitor", "/health/stress", "/health/fitness", "/journal", "/journal/insights", "/more", "/settings"]) {
+    for (const route of ["/", "/recovery", "/strain", "/sleep", "/health", "/health/healthspan", "/health/monitor", "/health/stress", "/health/fitness", "/journal", "/journal/insights", "/more", "/settings", "/trends", "/reports", "/more/behaviours"]) {
       await page.goto(route);
       await settle(page);
       centres[route] = await page.evaluate(() => {

@@ -26,7 +26,7 @@ const Buttons = () => (
   </div>
 )
 
-/** Settings: SettingsView's one 640 px column of Account, Data source, Profile, About, with static labels (spec §7.14, §5.19). */
+/** Settings: SettingsView's one 640 px column of Account, Data source, Profile, with static labels (spec §7.14, §5.19). */
 export default function Loading() {
   return (
     <DetailShell
@@ -58,18 +58,6 @@ export default function Loading() {
               ))}
             </dl>
             <SkeletonText className="mt-2 w-56 text-xs leading-4" />
-          </SectionShell>
-          <SectionShell variant="card" level={2} title="About">
-            <SkeletonText className={`${BODY} w-full md:w-3/4`} />
-            <SkeletonText className={`${BODY} w-2/3 md:hidden`} />
-            <dl className="mt-3 divide-y divide-border">
-              {["Version", "Scoring version"].map((k) => (
-                <div key={k} className={ROW}>
-                  <dt className={BODY}>{k}</dt>
-                  <SkeletonText className={`${BODY} w-10`} />
-                </div>
-              ))}
-            </dl>
           </SectionShell>
         </div>
       }

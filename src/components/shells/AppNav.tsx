@@ -3,8 +3,7 @@
 import * as React from "react"
 import Link from "next/link"
 import { usePathname, useSearchParams } from "next/navigation"
-import { getISOWeek, getISOWeekYear, parseISO, subWeeks } from "date-fns"
-import { CalendarRange, HeartPulse, House, Menu, NotebookPen, Settings, type LucideIcon } from "lucide-react"
+import { HeartPulse, House, Menu, NotebookPen, Settings, type LucideIcon } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Mark } from "@/components/brand/Mark"
 import { Wordmark } from "@/components/brand/Wordmark"
@@ -29,12 +28,6 @@ const ROOTS = new Set(Object.values(TAB_ROOT))
 export const GLASS = "bg-linear-to-b from-glass-top to-glass-bottom backdrop-blur-md backdrop-saturate-150 shadow-glass ring-1 ring-glass-rim"
 const PRESS = "transition-[color,scale] duration-150 ease-standard outline-none active:scale-[0.96] focus-visible:ring-3 focus-visible:ring-ring/50"
 const ITEM_TONE = (active: boolean) => (active ? "text-foreground" : "text-muted-foreground hover:text-foreground-secondary")
-
-/** Latest complete ISO week, e.g. "2026-W39". */
-function lastWeekPeriod(today: string) {
-  const d = subWeeks(parseISO(today), 1)
-  return `${getISOWeekYear(d)}-W${String(getISOWeek(d)).padStart(2, "0")}`
-}
 
 /**
  * The active item's lens: one element that slides between items (150 ms), a soft pool of light that
@@ -112,13 +105,10 @@ function Rail({ current }: { current: number }) {
   )
 }
 
-/** Laptop sidebar, 232 px, floating (inferred, I2), with Reports and Settings under a hairline. */
+/** Laptop sidebar, 232 px, floating (inferred, I2), with Settings under a hairline. */
 function Sidebar({ current, pathname }: { current: number; pathname: string }) {
-  const { today } = useShellCalendar()
-  const extra = [
-    { href: `/reports/${lastWeekPeriod(today)}`, match: "/reports", label: "Reports", icon: CalendarRange },
-    { href: "/settings", match: "/settings", label: "Settings", icon: Settings },
-  ]
+  // Reports, Trends and the rest live in More (U21), so each destination is listed once.
+  const extra = [{ href: "/settings", match: "/settings", label: "Settings", icon: Settings }]
   const extraActive = extra.some((e) => pathname.startsWith(e.match))
   const tab = extraActive ? -1 : current
   const item = (href: string, label: string, Icon: LucideIcon, active: boolean, lit = false) => (

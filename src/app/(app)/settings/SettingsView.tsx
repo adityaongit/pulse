@@ -214,30 +214,9 @@ export function Profile({ profile }: { profile: SettingsVM["profile"] }) {
   )
 }
 
-export function About({ version, scoringVersion }: { version: string; scoringVersion: number }) {
-  return (
-    <SectionShell variant="card" level={2} title="About">
-      <p className={BODY}>
-        Scoring is ported from noop. Pulse is for personal use and is not a medical device.
-      </p>
-      <dl className="mt-3 divide-y divide-border">
-        {[
-          ["Version", version],
-          ["Scoring version", String(scoringVersion)],
-        ].map(([k, v]) => (
-          <div key={k} className={ROW}>
-            <dt className={ROW_LABEL}>{k}</dt>
-            <dd className={cn(ROW_VALUE, "font-numeric font-semibold")}>{v}</dd>
-          </div>
-        ))}
-      </dl>
-    </SectionShell>
-  )
-}
-
 /**
- * Settings body: Account, Data source (with sync), Profile, About, as one 640 px column at every width. A list of
- * settings reads top to bottom; the old two-column grid stretched short cards to their neighbour's height.
+ * Settings body: configuration only (U21): Account, Data source (with sync), Profile, as one 640 px column at every
+ * width. About, reports, exports and help live in More.
  */
 export function SettingsView({ vm, now, account }: { vm: SettingsVM; now: number; account: SettingsAccount }) {
   return (
@@ -245,7 +224,6 @@ export function SettingsView({ vm, now, account }: { vm: SettingsVM; now: number
       <Account account={account} />
       <DataSource vm={vm} now={now} />
       <Profile profile={vm.profile} />
-      <About version={vm.version} scoringVersion={vm.scoringVersion} />
     </div>
   )
 }
