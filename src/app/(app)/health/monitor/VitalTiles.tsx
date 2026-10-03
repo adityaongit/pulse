@@ -5,7 +5,7 @@ import { Activity, Droplet, Heart, Thermometer, Wind } from "lucide-react"
 import { formatValue, isSymbolUnit, type FormatKey } from "@/lib/format"
 import type { Vital, VitalKey } from "@/server/queries/types"
 import { TrendChart } from "@/components/charts/TrendChart"
-import { KeyStatRow } from "@/components/metrics/KeyStatRow"
+import { KeyStatRow, KeyStatRowSkeleton } from "@/components/metrics/KeyStatRow"
 import { StatusChip, ValueUnit } from "@/components/metrics/primitives"
 import { ResponsiveSheet } from "@/components/shells/ResponsiveSheet"
 
@@ -79,6 +79,29 @@ export function VitalTiles({ vitals }: { vitals: Vital[] }) {
           </div>
         )}
       </ResponsiveSheet>
+    </>
+  )
+}
+
+const SKELETON_LABEL: [VitalKey, string][] = [
+  ["resp", "Respiratory rate"],
+  ["spo2", "Blood oxygen"],
+  ["restingHr", "RHR"],
+  ["hrv", "HRV"],
+  ["skinTempDev", "Skin temp (from baseline)"],
+]
+
+/** Loading shape (spec §5.19): the same grid of five tiles and the note, with bars for the readings. */
+export function VitalTilesSkeleton() {
+  return (
+    <>
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-5 xl:gap-4">
+        {SKELETON_LABEL.map(([k, l]) => (
+          <KeyStatRowSkeleton key={k} variant="tile" label={l} icon={ICON[k]} />
+        ))}
+        <p className="p-4 text-xs leading-4 font-medium text-pretty text-muted-foreground xl:hidden">{NOTE}</p>
+      </div>
+      <p className="mt-3 hidden text-xs leading-4 font-medium text-muted-foreground xl:block">{NOTE}</p>
     </>
   )
 }

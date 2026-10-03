@@ -101,10 +101,10 @@ export function ActivityCard({ name, kind, strain, start, end, href, timeZone }:
 }
 
 /** Two timeline rows in their real box: the row, its chip, bars for the name and times. */
-export function TimelineSkeleton() {
+export function TimelineSkeleton({ rows = 2 }: { rows?: number }) {
   return (
     <div aria-hidden className="space-y-1.5">
-      {[0, 1].map((i) => (
+      {Array.from({ length: rows }, (_, i) => (
         <div key={i} className={ROW}>
           <Skeleton className={cn(CHIP, "bg-muted")} />
           <SkeletonText className="w-20 flex-1 text-[15px] leading-5" />

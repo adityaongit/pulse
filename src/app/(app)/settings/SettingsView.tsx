@@ -218,8 +218,7 @@ export function About({ version, scoringVersion }: { version: string; scoringVer
   return (
     <SectionShell variant="card" level={2} title="About">
       <p className={BODY}>
-        Scoring is ported from noop (PolyForm Noncommercial 1.0.0). Google Health ingestion follows Hælan (AGPL-3.0). Pulse is for personal use and is
-        not a medical device.
+        Scoring is ported from noop. Pulse is for personal use and is not a medical device.
       </p>
       <dl className="mt-3 divide-y divide-border">
         {[

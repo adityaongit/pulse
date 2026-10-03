@@ -1,5 +1,5 @@
-import { DetailSkeleton } from "../_lib/skeletons"
+import { SleepSkeleton } from "../_lib/skeletons"
 
 export default function Loading() {
-  return <DetailSkeleton title="Sleep" chart="stages" />
+  return <SleepSkeleton />
 }

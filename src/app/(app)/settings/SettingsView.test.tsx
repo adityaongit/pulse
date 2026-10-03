@@ -56,12 +56,11 @@ describe("Settings view", () => {
     expect(screen.getByText("HTTP 429")).toBeInTheDocument()
   })
 
-  it("demo mode has no actions and names the switch; About carries the attributions", () => {
+  it("demo mode has no actions and names the switch; About credits noop", () => {
     render(<SettingsView vm={{ ...base, mode: "demo", source: { label: "Demo data", status: "demo" } }} now={NOW} account={account} />)
     expect(within(source()).queryByRole("link")).not.toBeInTheDocument()
     expect(screen.getByText(/GOOGLE_OAUTH_ENABLED=true/)).toBeInTheDocument()
-    expect(screen.getByText(/noop \(PolyForm Noncommercial 1\.0\.0\)/)).toBeInTheDocument()
-    expect(screen.getByText(/Hælan \(AGPL-3\.0\)/)).toBeInTheDocument()
+    expect(screen.getByText(/Scoring is ported from noop/)).toBeInTheDocument()
   })
 
   it("profile is editable and the account can sign out with a plain form post", () => {

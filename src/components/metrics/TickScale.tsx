@@ -33,7 +33,7 @@ const BAND_TICK = { optimal: "bg-optimal/60", warning: "bg-warning/60" }
 /** A DOM tick ruler or meter (spec §5.15, D5). */
 export function TickScale(p: TickScaleProps) {
   return (
-    <MetricState metric={p.metric} skeleton={<TickScaleSkeleton />} empty={<Scale p={p} value={null} />} renderReason={() => <Scale p={p} value={null} />}>
+    <MetricState metric={p.metric} skeleton={<TickScaleSkeleton variant={p.variant} />} empty={<Scale p={p} value={null} />} renderReason={() => <Scale p={p} value={null} />}>
       {(v, meta) => <Scale p={p} value={v} provisional={meta.provisional} />}
     </MetricState>
   )
@@ -117,7 +117,8 @@ function Scale({ p, value, provisional }: { p: TickScaleProps; value: number | n
   )
 }
 
-export function TickScaleSkeleton() {
-  return <Skeleton aria-hidden className="h-8 w-full" />
+/** The scale's box: the meter's 32 px row, or the marker's 84 px (value row, ticks, end labels). */
+export function TickScaleSkeleton({ variant = "meter" }: { variant?: TickScaleProps["variant"] }) {
+  return <Skeleton aria-hidden className={variant === "marker" ? "h-[84px] w-full rounded-lg" : "h-8 w-full"} />
 }
 TickScale.Skeleton = TickScaleSkeleton

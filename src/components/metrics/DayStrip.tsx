@@ -11,7 +11,7 @@ import { useReducedMotion } from "@/hooks/use-reduced-motion"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { Skeleton } from "@/components/ui/skeleton"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
-import { useShellStatus } from "@/components/shells/ShellStatus"
+import { useShellCalendar } from "@/components/shells/ShellStatus"
 
 export type DayStripDay = {
   /** YYYY-MM-DD. */
@@ -29,7 +29,7 @@ export type DayStripProps = {
 }
 
 function Strip({ indicator, days }: DayStripProps) {
-  const { today } = useShellStatus()
+  const { today } = useShellCalendar()
   const router = useRouter()
   const pathname = usePathname()
   const params = useSearchParams()
@@ -120,8 +120,9 @@ export function DayStrip(props: DayStripProps) {
 
 export function DayStripSkeleton({ indicator = "recovery" }: { indicator?: DayStripProps["indicator"] }) {
   return (
+    // The strip's 30 tiles, clipped like the real one, so wide columns fill too.
     <div aria-hidden className="flex gap-1 overflow-hidden px-4 md:px-1">
-      {Array.from({ length: 7 }, (_, i) => (
+      {Array.from({ length: 30 }, (_, i) => (
         <Skeleton key={i} className={cn("w-11 shrink-0 rounded-xl", indicator === "journal" ? "h-18" : "h-15")} />
       ))}
     </div>

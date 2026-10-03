@@ -38,15 +38,17 @@ export function InsightCard({ title, body, action }: InsightCardProps) {
   )
 }
 
-export function InsightCardSkeleton() {
+/** `title` / `action`: room for the card's title line and its link line ("See what shaped it"). */
+export function InsightCardSkeleton({ title = false, action = false }: { title?: boolean; action?: boolean }) {
   return (
     <div aria-hidden className={FRAME}>
       <div className={INNER}>
+        {title && <SkeletonText className="w-40 text-base leading-[22px]" />}
         <span className="block text-[15px] leading-[22px]">
           <SkeletonText className="w-full" />
-          <SkeletonText className="w-11/12" />
           <SkeletonText className="w-2/3" />
         </span>
+        {action && <SkeletonText className="mt-auto w-36 text-xs leading-4" />}
       </div>
     </div>
   )

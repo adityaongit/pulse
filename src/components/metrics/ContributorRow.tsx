@@ -205,13 +205,27 @@ export function ContributorRow(p: ContributorRowProps) {
   const render = (value: number | null, meta?: MetricMeta) =>
     p.variant === "recovery" ? <RecoveryRow p={p} value={value} meta={meta} /> : <HealthspanRow p={p} value={value} meta={meta} />
   return (
-    <MetricState metric={p.metric} skeleton={<ContributorRowSkeleton />} empty={render(null)} renderReason={(_, meta) => render(null, meta)}>
+    <MetricState metric={p.metric} skeleton={<ContributorRowSkeleton variant={p.variant} />} empty={render(null)} renderReason={(_, meta) => render(null, meta)}>
       {(v, meta) => render(v, meta)}
     </MetricState>
   )
 }
 
-export function ContributorRowSkeleton() {
+export function ContributorRowSkeleton({ variant = "recovery" }: { variant?: ContributorRowProps["variant"] }) {
+  if (variant === "healthspan")
+    return (
+      // The healthspan row's box: the header line, the gradient track with its marker room, the end labels.
+      <div aria-hidden className="space-y-1.5 py-3">
+        <div className="flex items-center gap-3">
+          <SkeletonText className={cn(LABEL, "w-36 flex-1")} />
+          <SkeletonText className="w-[6ch] font-numeric text-xl leading-6 font-bold" />
+        </div>
+        <div className="py-3">
+          <div className="h-1.5 rounded-full bg-dial-track" />
+        </div>
+        <SkeletonText className={cn(CAPTION, "w-full")} />
+      </div>
+    )
   return (
     // The recovery row's box: a 24 px header line, the 6 px track, a caption line.
     <div aria-hidden className="space-y-2 py-3">

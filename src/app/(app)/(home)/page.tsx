@@ -25,11 +25,11 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { CARD_MATERIAL } from "@/components/ui/card"
 import { getHome } from "@/server/queries/home"
 import type { HomeVM, StressLevel } from "@/server/queries/types"
-import { pageDay, type SearchParams } from "./_lib/day"
-import { HomeInsight } from "./_lib/HomeInsight"
-import { ENERGY_INFO, STRAIN_RECOVERY_INFO, TONIGHT_INFO } from "./_lib/info"
-import { TonightPlan } from "./_lib/TonightPlan"
-import { CAPTION, energySeries, LABEL, statProps } from "./_lib/view"
+import { pageDay, type SearchParams } from "../_lib/day"
+import { HomeInsight } from "../_lib/HomeInsight"
+import { ENERGY_INFO, STRAIN_RECOVERY_INFO, TONIGHT_INFO } from "../_lib/info"
+import { TonightPlan } from "../_lib/TonightPlan"
+import { CAPTION, energySeries, LABEL, statProps } from "../_lib/view"
 
 export const metadata = { title: "Today", description: "Today's Sleep, Recovery and Strain at a glance." }
 
