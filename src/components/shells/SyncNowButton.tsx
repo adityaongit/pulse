@@ -6,6 +6,7 @@ import { RefreshCw } from "lucide-react"
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"
 import { syncNow } from "@/server/actions/sync"
+import { startSyncing } from "@/lib/sync-activity"
 import { Button } from "@/components/ui/button"
 
 /**
@@ -17,7 +18,10 @@ export function SyncNowButton({ className, size = "touch" }: { className?: strin
   const [pending, start] = React.useTransition()
   const run = () =>
     start(async () => {
-      const r = await syncNow().catch(() => ({ ok: false as const, error: "Couldn't reach Pulse" }))
+      const end = startSyncing()
+      const r = await syncNow()
+        .catch(() => ({ ok: false as const, error: "Couldn't reach Pulse" }))
+        .finally(end)
       router.refresh()
       if (r.ok) toast.success("Synced", { id: "sync-now" })
       else toast.error(r.error, { id: "sync-now" })

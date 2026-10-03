@@ -176,6 +176,9 @@ export function getWearStreak(ctx: QueryCtx = defaultCtx()): { days: number; asO
 }
 
 /** The AppShell's ShellStatus (top bar, sync dot, demo chip, ConnectionBanner). */
+/** True while the sync worker is mid-run (read off its global, so queries don't import the worker and its sources). */
+const workerRunning = () => !!(globalThis as { __pulseWorker?: { state?: { running?: boolean } } }).__pulseWorker?.state?.running
+
 export function getShellStatus(ctx: QueryCtx = defaultCtx()): ShellStatusVM {
   const rows = syncRows(ctx).filter((r) => (ctx.mode === "demo" ? r.type === "seed" : r.type !== "seed"));
   const successes = rows.map((r) => r.lastSuccessAt).filter((s): s is number => s != null);
@@ -199,7 +202,7 @@ export function getShellStatus(ctx: QueryCtx = defaultCtx()): ShellStatusVM {
               : "connected";
   return {
     mode: ctx.mode,
-    sync: { state: error ? "error" : stale ? "stale" : "ok", lastSuccessAt },
+    sync: { state: workerRunning() ? "syncing" : error ? "error" : stale ? "stale" : "ok", lastSuccessAt },
     connection,
     ...(progress && { importProgress: progress }),
     today: todayOf(ctx),

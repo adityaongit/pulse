@@ -3,6 +3,7 @@
 import * as React from "react"
 import { FlaskConical } from "lucide-react"
 import { BandIcon } from "@/components/brand/BandIcon"
+import { useSyncing } from "@/lib/sync-activity"
 import { cn } from "@/lib/utils"
 import { COLUMN_WIDTH } from "./column"
 import { ago, agoShort, clock } from "@/lib/format"
@@ -38,12 +39,23 @@ function syncView(s: ShellStatus, nowMs: number | null): SyncView {
   return { dot: "bg-optimal", label: rel ? `Synced ${rel}` : "Synced", line: at ? `Last sync ${at}` : "Synced" }
 }
 
-/** The Fitbit Air band with its status dot, in WHOOP's battery slot (spec §4.3.2). */
-function Band({ dot }: { dot: string }) {
+/**
+ * The Fitbit Air band in WHOOP's battery slot (spec §4.3.2): steady, a status dot; syncing, two blue arcs turning
+ * around it in place of the dot (still under reduced motion, where the arcs alone say it).
+ */
+function Band({ dot, syncing }: { dot: string; syncing: boolean }) {
   return (
     <span aria-hidden className="relative grid size-6 place-items-center">
       <BandIcon className="size-[22px]" />
-      <span className={cn("absolute -top-0.5 -right-0.5 size-2 rounded-full ring-2 ring-background-top", dot)} />
+      {syncing ? (
+        <svg viewBox="0 0 36 36" className="absolute -inset-1.5 size-9 text-strain-text motion-safe:animate-spin motion-safe:[animation-duration:1.4s]">
+          <circle cx="18" cy="18" r="16" fill="none" stroke="currentColor" strokeOpacity=".18" strokeWidth="1.8" />
+          {/* Two 25-unit arcs opposite each other on a 100.5-unit circumference. */}
+          <circle cx="18" cy="18" r="16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeDasharray="25 25.3" />
+        </svg>
+      ) : (
+        <span className={cn("absolute -top-0.5 -right-0.5 size-2 rounded-full ring-2 ring-background-top", dot)} />
+      )}
     </span>
   )
 }
@@ -58,7 +70,8 @@ const SYNC_TRIGGER =
 export function SyncStatus({ variant = "header" }: { variant?: "header" | "icon" | "line" }) {
   const s = useShellStatus()
   const nowMs = useNow()
-  const v = syncView(s, nowMs)
+  const syncing = useSyncing() || s.sync.state === "syncing"
+  const v = syncView(syncing ? { ...s, sync: { ...s.sync, state: "syncing" } } : s, nowMs)
   const short = s.mode === "demo" ? "Demo" : s.sync.lastSuccessAt && nowMs ? agoShort(s.sync.lastSuccessAt, nowMs) : ""
   return (
     <Popover>
@@ -83,7 +96,7 @@ export function SyncStatus({ variant = "header" }: { variant?: "header" | "icon"
                 {short}
               </span>
             )}
-            <Band dot={v.dot} />
+            <Band dot={v.dot} syncing={syncing} />
           </>
         )}
       </PopoverTrigger>
