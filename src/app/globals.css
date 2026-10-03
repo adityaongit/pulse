@@ -114,16 +114,22 @@
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-in-quick: cubic-bezier(0.4, 0, 1, 1);
 
-  /* The sign-in mark's heartbeat: lub, then dub (Mark animated). One beat a second, like a resting heart. */
-  --animate-beat: beat 1.2s var(--ease-out-expo) infinite;
-  --animate-beat-glow: beat-glow 1.2s var(--ease-out-expo) infinite;
-  @keyframes beat {
-    0%, 30%, 100% { transform: scaleY(1); }
-    9% { transform: scaleY(1.16); }
+  /* The sign-in mark's heartbeat (Mark animated): the upper beat lifts (lub), the lower one drops (dub), about
+     one beat a second like a resting heart. A move, not a stretch: scaling would squash the round caps. */
+  --animate-beat-up: beat-up 1.2s cubic-bezier(0.37, 0, 0.63, 1) infinite;
+  --animate-beat-down: beat-down 1.2s cubic-bezier(0.37, 0, 0.63, 1) 0.16s infinite;
+  --animate-beat-glow: beat-glow 1.2s cubic-bezier(0.37, 0, 0.63, 1) infinite;
+  @keyframes beat-up {
+    0%, 32%, 100% { transform: translateY(0); }
+    14% { transform: translateY(-1.1px); }
+  }
+  @keyframes beat-down {
+    0%, 32%, 100% { transform: translateY(0); }
+    14% { transform: translateY(1.1px); }
   }
   @keyframes beat-glow {
     0%, 100% { opacity: 0.32; transform: scale(1); }
-    14% { opacity: 0.55; transform: scale(1.06); }
+    18% { opacity: 0.55; transform: scale(1.06); }
   }
 }
 
