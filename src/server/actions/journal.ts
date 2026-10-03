@@ -1,6 +1,6 @@
 "use server";
 // Journal writes (KTD1): Server Actions validated with zod. Results are returned, not thrown, so a form can show them.
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { getConfig } from "../config";
@@ -15,11 +15,12 @@ const localToday = () => new Intl.DateTimeFormat("en-CA", { timeZone: getConfig(
 const Entry = z.object({
   day: z.iso.date(),
   tag: z.string().min(1).max(64),
-  // A yes/no behaviour, or a count (e.g. drinks); stored as an integer.
-  value: z.union([z.boolean(), z.number().int().min(0).max(1000)]).transform(Number),
+  // A yes/no behaviour, or a count (e.g. drinks); stored as an integer. null clears the answer: no row
+  // means "not answered", which journal impact keeps apart from an answered "no" (0).
+  value: z.union([z.boolean(), z.number().int().min(0).max(1000)]).transform(Number).nullable(),
 });
 
-/** Upserts one (day, tag, value) for today or a past day. Repeating it changes nothing. */
+/** Upserts (or, with value null, deletes) one (day, tag) for today or a past day. Repeating it changes nothing. */
 export async function saveJournalEntry(input: z.input<typeof Entry>): Promise<ActionResult> {
   const r = Entry.safeParse(input);
   if (!r.success) return { ok: false, error: r.error.issues[0].message };
@@ -27,10 +28,12 @@ export async function saveJournalEntry(input: z.input<typeof Entry>): Promise<Ac
   if (day > localToday()) return { ok: false, error: "Can't log a future day" };
   const db = getDb();
   if (!db.select().from(journalTags).where(eq(journalTags.tag, tag)).get()) return { ok: false, error: `Unknown tag: ${tag}` };
-  db.insert(journalEntries)
-    .values({ day, tag, value })
-    .onConflictDoUpdate({ target: [journalEntries.day, journalEntries.tag], set: { value } })
-    .run();
+  if (value === null) db.delete(journalEntries).where(and(eq(journalEntries.day, day), eq(journalEntries.tag, tag))).run();
+  else
+    db.insert(journalEntries)
+      .values({ day, tag, value })
+      .onConflictDoUpdate({ target: [journalEntries.day, journalEntries.tag], set: { value } })
+      .run();
   revalidatePath("/journal");
   revalidatePath("/");
   return { ok: true, data: undefined };
