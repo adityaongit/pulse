@@ -8,7 +8,7 @@ import { SectionShell } from "@/components/shells/SectionShell"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
-import { DisconnectButton } from "./SettingsClient"
+import { DisconnectButton, EditProfileButton } from "./SettingsClient"
 import { CAPTION, LABEL } from "@/components/metrics/primitives"
 
 const BODY = "max-w-[65ch] text-[15px] leading-[22px] text-pretty text-foreground-secondary"
@@ -110,6 +110,7 @@ export function Profile({ profile }: { profile: SettingsVM["profile"] }) {
     ["Age", String(profile.age)],
     ["Sex", profile.sex === "male" ? "Male" : "Female"],
     ["Max heart rate", `${profile.maxHr} bpm, ${profile.maxHrSource}`],
+    ["Height", profile.heightCm ? `${profile.heightCm} cm` : "Not set"],
     ["Time zone", profile.timeZone],
   ]
   return (
@@ -122,7 +123,12 @@ export function Profile({ profile }: { profile: SettingsVM["profile"] }) {
           </div>
         ))}
       </dl>
-      <p className={cn(CAPTION, "mt-3")}>Set in the server environment. Change it there and restart.</p>
+      <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
+        <EditProfileButton
+          defaults={{ birthDate: profile.birthDate, sex: profile.sex, maxHr: profile.maxHrSource === "set" ? profile.maxHr : null, heightCm: profile.heightCm }}
+        />
+        <p className={CAPTION}>Time zone comes from the server (TZ).</p>
+      </div>
     </SectionShell>
   )
 }
@@ -155,7 +161,21 @@ export function About({ version, scoringVersion }: { version: string; scoringVer
  * two columns, Data source over Profile on the left and Sync status over About on the right (U18 ST-01). Each row's
  * cards share their top and bottom (SYM9).
  */
-export function SettingsView({ vm, now }: { vm: SettingsVM; now: number }) {
+/** Who is signed in, and Sign out (U20): a plain form post, so it works before hydration. */
+export function Account({ email }: { email: string | null }) {
+  return (
+    <div className="flex flex-col items-center gap-3 pt-3 text-center">
+      <p className={CAPTION}>{email ? `Signed in as ${email}` : "Signed in to the demo"}</p>
+      <form method="post" action="/logout" className="w-full max-w-[400px]">
+        <Button type="submit" variant="outline-pill" size="sheet">
+          Sign out
+        </Button>
+      </form>
+    </div>
+  )
+}
+
+export function SettingsView({ vm, now, email = null }: { vm: SettingsVM; now: number; email?: string | null }) {
   return (
     <div className="grid grid-cols-1 gap-3 xl:grid-cols-2 xl:gap-4">
       <div className="flex min-w-0 flex-col *:flex-1 xl:col-start-1 xl:row-start-1">
@@ -169,6 +189,9 @@ export function SettingsView({ vm, now }: { vm: SettingsVM; now: number }) {
       </div>
       <div className="flex min-w-0 flex-col *:flex-1 xl:col-start-2 xl:row-start-2">
         <About version={vm.version} scoringVersion={vm.scoringVersion} />
+      </div>
+      <div className="xl:col-span-2">
+        <Account email={email} />
       </div>
     </div>
   )

@@ -5,6 +5,8 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { ResponsiveSheet } from "@/components/shells/ResponsiveSheet"
+import { ProfileForm, SaveButton, type ProfileDefaults } from "@/components/profile/ProfileForm"
 import { disconnectGoogle } from "./actions"
 
 /** Landing back from Google with `?oauth=connected` or `?oauth=<code>` shows one toast, then drops the param. */
@@ -71,6 +73,27 @@ export function DisconnectButton() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+    </>
+  )
+}
+
+/** Settings › Profile's "Edit": the onboarding fields in a sheet (U19). Saving recomputes every day's scores. */
+export function EditProfileButton({ defaults }: { defaults: ProfileDefaults }) {
+  const [open, setOpen] = React.useState(false)
+  const saved = React.useCallback(() => {
+    setOpen(false)
+    toast.success("Profile saved. Scores are being recomputed.")
+  }, [])
+  return (
+    <>
+      <Button variant="secondary" size="touch" onClick={() => setOpen(true)}>
+        Edit profile
+      </Button>
+      <ResponsiveSheet open={open} onOpenChange={setOpen} title="Profile" description="Changing it recomputes every day's scores.">
+        <div className="px-4 pb-[max(env(safe-area-inset-bottom),16px)] md:px-6 md:pb-6">
+          <ProfileForm defaults={defaults} onSaved={saved} footer={(pending) => <SaveButton pending={pending} label="Save" />} />
+        </div>
+      </ResponsiveSheet>
     </>
   )
 }

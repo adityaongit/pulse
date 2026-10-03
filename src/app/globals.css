@@ -113,6 +113,18 @@
   --ease-standard: cubic-bezier(0.2, 0, 0, 1);
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-in-quick: cubic-bezier(0.4, 0, 1, 1);
+
+  /* The sign-in mark's heartbeat: lub, then dub (Mark animated). One beat a second, like a resting heart. */
+  --animate-beat: beat 1.2s var(--ease-out-expo) infinite;
+  --animate-beat-glow: beat-glow 1.2s var(--ease-out-expo) infinite;
+  @keyframes beat {
+    0%, 30%, 100% { transform: scaleY(1); }
+    9% { transform: scaleY(1.16); }
+  }
+  @keyframes beat-glow {
+    0%, 100% { opacity: 0.32; transform: scale(1); }
+    14% { opacity: 0.55; transform: scale(1.06); }
+  }
 }
 
 :root {
