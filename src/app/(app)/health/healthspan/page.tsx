@@ -1,10 +1,7 @@
 import type { Viewport } from "next"
-import { redirect } from "next/navigation"
 import { Rabbit, Turtle } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { AGE_LABEL, formatValue, MISSING } from "@/lib/format"
-import { parseDay, todayIn } from "@/lib/url"
-import { getConfig } from "@/server/config"
 import { getHealthspan } from "@/server/queries/health"
 import type { HealthspanVM } from "@/server/queries/types"
 import { TrendChart } from "@/components/charts/TrendChart"
@@ -15,12 +12,12 @@ import { DetailShell } from "@/components/shells/DetailShell"
 import { EmptyState } from "@/components/shells/EmptyState"
 import { SectionShell } from "@/components/shells/SectionShell"
 import { ContributorCard } from "./ContributorCard"
+import { pageDay, type SearchParams } from "../../_lib/day"
+import { CAPTION } from "@/components/metrics/primitives"
 
 export const metadata = { title: "Healthspan" }
 // The browser bar matches the page's darker ground (spec §11 M3).
 export const viewport: Viewport = { themeColor: "#101518" }
-
-const CAPTION = "text-xs leading-4 font-medium text-muted-foreground"
 
 const INFO = {
   title: "About Healthspan",
@@ -56,9 +53,7 @@ function Orb({ vm, compact }: { vm: HealthspanVM; compact?: boolean }) {
 
 /** Healthspan `/health/healthspan?d=` (spec §7.7): the ISO week containing `d`. */
 export default async function HealthspanPage({ searchParams }: PageProps<"/health/healthspan">) {
-  const today = todayIn(getConfig().timeZone)
-  const { d, rejected } = parseDay((await searchParams).d, today)
-  if (rejected) redirect("/health/healthspan")
+  const { d } = await pageDay(searchParams as SearchParams, "/health/healthspan")
   const vm = getHealthspan(d)
   const r = vm.result.value
   const pace = r ? { value: r.pace, reason: null, provisional: r.paceProvisional } : { value: null, reason: vm.result.reason, provisional: false }

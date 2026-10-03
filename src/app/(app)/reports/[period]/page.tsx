@@ -15,7 +15,7 @@ import { ZoneBars } from "@/components/charts/ZoneBars"
 import { DriverList } from "@/components/metrics/DriverList"
 import { InsightCard } from "@/components/metrics/InsightCard"
 import { KeyStatRow } from "@/components/metrics/KeyStatRow"
-import { MetricTags } from "@/components/metrics/primitives"
+import { CAPTION, MetricTags } from "@/components/metrics/primitives"
 import { ScoreDial } from "@/components/metrics/ScoreDial"
 import { DetailShell } from "@/components/shells/DetailShell"
 import { EmptyState } from "@/components/shells/EmptyState"
@@ -23,7 +23,6 @@ import { SectionShell } from "@/components/shells/SectionShell"
 
 const WEEK = /^\d{4}-W\d{2}$/
 const MONTH = /^\d{4}-\d{2}$/
-const CAPTION = "text-xs leading-4 font-medium text-muted-foreground"
 const STEP =
   "relative grid size-9 place-items-center rounded-full text-foreground transition-[background-color,scale] duration-150 ease-standard outline-none after:absolute after:-inset-1 hover:bg-accent focus-visible:ring-3 focus-visible:ring-ring/50 active:scale-[0.96] aria-disabled:pointer-events-none aria-disabled:opacity-40"
 const SEGMENT =

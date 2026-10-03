@@ -1,9 +1,9 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import type { Db } from "./db";
-import { lastRun, recompute, type RecoveryRow, SCORING_VERSION, type SleepRow, type StrainTargetRow } from "./pipeline";
+import { type Db, openDb } from "./db";
+import { lastRun, needsRecompute, recompute, type RecoveryRow, SCORING_VERSION, type SleepRow, type StrainTargetRow } from "./pipeline";
 import { seedPull } from "./sources/seed/generate";
 import { localMidnight } from "./time";
-import { cleanup, copyDb, DAY_S, dayAt, dump, NOW, OPTS, seeded, TZ, PROFILE } from "./testing";
+import { cleanup, copyDb, DAY_S, dayAt, dump, NOW, OPTS, seeded, TZ, PROFILE, tempFile } from "./testing";
 
 afterAll(cleanup);
 
@@ -70,6 +70,28 @@ describe("recompute on the 180-day seed", () => {
     expect(rowsBefore(later, dayAt(179))).toBe(rowsBefore(db, dayAt(179)));
     // Today itself gained the rest of the day, so its strain moves; its recovery does not.
     expect(json<RecoveryRow>(later, "recovery", dayAt(179))).toEqual(json<RecoveryRow>(db, "recovery", dayAt(179)));
+  });
+});
+
+describe("needsRecompute", () => {
+  it("is false after a full recompute", () => {
+    expect(needsRecompute(db)).toBe(false);
+  });
+
+  it("is true with a dirty day", () => {
+    const dirty = copyDb(db);
+    dirty.$client.prepare("insert into intraday_dirty (day) values (?)").run(dayAt(10));
+    expect(needsRecompute(dirty)).toBe(true);
+  });
+
+  it("is true when a row carries another scoring version", () => {
+    const old = copyDb(db);
+    old.$client.prepare("update daily_scores set scoring_version = ? where day = ?").run(SCORING_VERSION - 1, dayAt(10));
+    expect(needsRecompute(old)).toBe(true);
+  });
+
+  it("is false on an empty database", () => {
+    expect(needsRecompute(openDb(tempFile()))).toBe(false);
   });
 });
 

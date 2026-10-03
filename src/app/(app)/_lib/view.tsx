@@ -8,14 +8,13 @@ import type { FormatKey } from "@/lib/format"
 import { dayHref, RANGE_DAYS, type TrendRange } from "@/lib/url"
 import type { EnergyBankVM, HrChart, KeyStat, Metric, Trend } from "@/server/queries/types"
 
-export const CAPTION = "text-xs leading-4 font-medium text-muted-foreground"
-export const LABEL = "text-xs leading-4 font-bold tracking-[0.08em] uppercase"
+export { CAPTION, LABEL } from "@/components/metrics/primitives"
 /** The inset legend strip under a summary card (spec §7.2, §7.3, §7.5). */
 export const LEGEND = "mt-1 mb-3 rounded-lg bg-inset px-3 py-2 text-xs leading-4 font-medium text-foreground-secondary"
 
 /** Maps a metric's value, keeping its reason and tags. */
 export const mapMetric = <A, B>(m: Metric<A>, f: (a: A) => B): Metric<B> =>
-  m.value === null ? (m as unknown as Metric<B>) : { ...m, value: f(m.value) }
+  ({ ...m, value: m.value === null ? null : f(m.value) })
 
 const FORMAT_BY_UNIT: Record<string, FormatKey> = { ms: "int", bpm: "int", rpm: "decimal1", "%": "int", kcal: "grouped", "°C": "signed1", min: "duration" }
 

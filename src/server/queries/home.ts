@@ -1,3 +1,4 @@
+import { hmm } from "@/lib/format";
 import { addDays, localMinutes } from "../time";
 import { insightOf as recoveryInsight } from "./recovery";
 import { insightOf as sleepInsight } from "./sleep";
@@ -44,7 +45,7 @@ export function getHome(day: string, ctx: QueryCtx = defaultCtx()): HomeVM {
   const today = todayOf(ctx);
   const isToday = day === today;
   const stripStart = day < addDays(today, -29) ? day : addDays(today, -29);
-  const rows = loadDays(ctx, addDays(stripStart < day ? stripStart : day, -30), today);
+  const rows = loadDays(ctx, addDays(stripStart, -30), today);
   const row = rows.get(day);
 
   const recovery = recoveryMetric(row, isToday);
@@ -94,12 +95,7 @@ export function getHome(day: string, ctx: QueryCtx = defaultCtx()): HomeVM {
 
 /** WHOOP's banners switch from outlook to review at 17:00 (inferred, spec §12 I15). */
 export const REVIEW_FROM_MIN = 17 * 60;
-const BAND_WORD = { green: "green", yellow: "yellow", red: "red" } as const;
 const f1 = (x: number) => x.toFixed(1);
-const hmm = (min: number) => {
-  const m = Math.round(min);
-  return `${Math.floor(m / 60)}:${String(m % 60).padStart(2, "0")}`;
-};
 
 type DayScores = { recovery: Metric<number>; strain: Metric<number>; target: [number, number] | null };
 
@@ -110,7 +106,7 @@ export function outlookOf(ctx: QueryCtx, row: DayRow | undefined, s: DayScores, 
   const target = s.target ? `${f1(s.target[0])} - ${f1(s.target[1])}` : null;
   const parts: string[] = [];
   if (!review) {
-    if (rec != null) parts.push(`Your Recovery is ${Math.round(rec)}%, ${BAND_WORD[recoveryBand(rec)]}.`);
+    if (rec != null) parts.push(`Your Recovery is ${Math.round(rec)}%, ${recoveryBand(rec)}.`);
     if (target) parts.push(`Today's Strain Target is ${target}.`);
     const main = row?.sleep?.main;
     if (main && row?.sleep?.needHours) parts.push(`You slept ${hmm(main.asleepMin)} of the ${hmm(row.sleep.needHours * 60)} you needed.`);
@@ -163,9 +159,9 @@ function monitorAlert(row: DayRow | undefined): HomeVM["monitorAlert"] {
   const hm = row?.healthMonitor;
   if (!hm || hm.reason !== null) return null;
   const flagged = hm.vitals.filter((v) => v.status === "high" || v.status === "low");
-  if (illnessRaised(hm)) return { kind: "illness", count: flagged.length, names: flagged.map((v) => VITAL_LABEL[v.key]) };
-  if (flagged.length) return { kind: "flagged", count: flagged.length, names: flagged.map((v) => VITAL_LABEL[v.key]) };
-  return null;
+  const illness = illnessRaised(hm);
+  if (!illness && !flagged.length) return null;
+  return { kind: illness ? "illness" : "flagged", count: flagged.length, names: flagged.map((v) => VITAL_LABEL[v.key]) };
 }
 
 function monitorSummary(row: DayRow | undefined, isToday: boolean): HomeVM["monitor"] {

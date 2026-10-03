@@ -9,7 +9,7 @@ const env = { BIRTH_DATE: "1990-06-15", SEX: "male", TZ: "Asia/Kolkata" };
 const access = parseConfig({ ...env, CF_ACCESS_TEAM_DOMAIN: teamDomain, CF_ACCESS_AUD: aud }).access;
 
 let getKey: ReturnType<typeof createLocalJWKSet>;
-let sign: (o?: { aud?: string; exp?: string | number }) => Promise<string>;
+let sign: (o?: { aud?: string; exp?: string | number; iss?: string }) => Promise<string>;
 
 beforeAll(async () => {
   const { publicKey, privateKey } = await generateKeyPair("RS256");
@@ -17,7 +17,7 @@ beforeAll(async () => {
   sign = (o = {}) =>
     new SignJWT({ email: "me@example.com" })
       .setProtectedHeader({ alg: "RS256", kid: "k1" })
-      .setIssuer(teamDomain)
+      .setIssuer(o.iss ?? teamDomain)
       .setAudience(o.aud ?? aud)
       .setIssuedAt()
       .setExpirationTime(o.exp ?? "1h")
@@ -46,6 +46,27 @@ describe("checkAccess", () => {
 
   it("rejects the wrong aud", async () => {
     expect(await status(req("/", await sign({ aud: "other-app" })))).toBe(403);
+  });
+
+  it("rejects the wrong issuer", async () => {
+    expect(await status(req("/", await sign({ iss: "https://evil.cloudflareaccess.com" })))).toBe(403);
+  });
+
+  it("rejects an HS256-signed assertion", async () => {
+    const token = await new SignJWT({ email: "me@example.com" })
+      .setProtectedHeader({ alg: "HS256", kid: "k1" })
+      .setIssuer(teamDomain)
+      .setAudience(aud)
+      .setExpirationTime("1h")
+      .sign(new TextEncoder().encode("a-shared-secret-of-at-least-32-bytes"));
+    expect(await status(req("/", token))).toBe(403);
+  });
+
+  it("rejects an alg:none assertion", async () => {
+    const b64 = (o: object) => Buffer.from(JSON.stringify(o)).toString("base64url");
+    const exp = Math.floor(Date.now() / 1000) + 3600;
+    const token = `${b64({ alg: "none", kid: "k1" })}.${b64({ email: "me@example.com", iss: teamDomain, aud, exp })}.`;
+    expect(await status(req("/", token))).toBe(403);
   });
 
   it("passes a valid assertion", async () => {

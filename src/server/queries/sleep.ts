@@ -15,6 +15,7 @@ import {
   sleepMetric,
   todayOf,
   vitalReason,
+  trendPoints,
 } from "./common";
 import type { KeyStat, Metric, SleepStatus, SleepVM } from "./types";
 
@@ -91,11 +92,7 @@ export function getSleep(day: string, ctx: QueryCtx = defaultCtx()): SleepVM {
     hoursVsNeed,
     details,
     debtTrend: {
-      points: Array.from({ length: 182 }, (_, k) => {
-        const d = addDays(day, k - 181);
-        const r = rows.get(d)?.sleep;
-        return { day: d, value: r?.main ? r.debtMin / 60 : null };
-      }),
+      points: trendPoints(rows, day, (r) => (r.sleep?.main ? r.sleep.debtMin / 60 : null)),
     },
     planner: plan.value ? ok({ ...plan.value, weekdayWake: !plan.value.weekend }) : (plan as Metric<never>),
   };

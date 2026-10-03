@@ -98,7 +98,6 @@ function Chart({ s, variant }: { s: StressSeries; variant: "full" | "spark" }) {
 
 /** Intraday stress 0-3 with level-coloured lines (spec §5.10). */
 export function StressChart({ data, variant }: StressChartProps) {
-  const h = variant === "full" ? "h-[200px]" : "h-11"
   const empty =
     variant === "full" ? (
       <div className="grid h-[200px] place-items-center">
@@ -110,7 +109,7 @@ export function StressChart({ data, variant }: StressChartProps) {
   return (
     <MetricState
       metric={data}
-      skeleton={<Skeleton aria-hidden className={`${h} rounded-lg`} />}
+      skeleton={<StressChartSkeleton variant={variant} />}
       empty={empty}
       reasonSize={variant === "full" ? "md" : "sm"}
       renderReason={(r) =>

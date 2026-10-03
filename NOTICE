@@ -9,7 +9,9 @@ Credits
 
 - noop (https://github.com/ryanbr/noop), PolyForm Noncommercial 1.0.0.
   The recovery, strain, sleep, baseline and readiness scoring in
-  src/core/scoring/ is a TypeScript port of noop's Kotlin analytics.
+  src/core/scoring/ is a TypeScript port of noop's Kotlin analytics, and
+  the healthspan, stress, health monitor and sleep planner models in
+  src/core/algorithms/ follow its methods.
 - Hælan (https://github.com/bardesss/haelan) for documenting how the
   Google Health API behaves in practice: filters, rate limits and payload
   shapes.

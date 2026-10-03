@@ -1,5 +1,6 @@
 // Pure parts of the WHOOP Age orb (docs/design/orb.md): colour mapping, shape noise, seeded RNG.
 // Kept free of DOM so they can be unit tested; the canvas code lives in WhoopAgeOrb.tsx.
+import { lerp } from "./collapse";
 
 export type RGB = readonly [number, number, number];
 
@@ -56,7 +57,6 @@ export const ORB = {
 } as const;
 
 const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));
-const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 
 export const mixRGB = (a: RGB, b: RGB, t: number): RGB => [lerp(a[0], b[0], t), lerp(a[1], b[1], t), lerp(a[2], b[2], t)];
 export const shadeRGB = (c: RGB, k: number): RGB => [Math.min(255, c[0] * k), Math.min(255, c[1] * k), Math.min(255, c[2] * k)];

@@ -38,6 +38,7 @@ export function DisconnectButton() {
   const [error, setError] = React.useState(false)
   const run = async () => {
     setPending(true)
+    setError(false)
     const r = await disconnectGoogle().catch(() => ({ ok: false as const, error: "network" }))
     setPending(false)
     if (!r.ok) return setError(true)

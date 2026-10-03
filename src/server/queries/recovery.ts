@@ -14,8 +14,9 @@ import {
   recoveryMetric,
   todayOf,
   vitalReason,
+  trendPoints,
 } from "./common";
-import type { Band, Contributor, DriverItem, Metric, RecoveryVM } from "./types";
+import type { Contributor, DriverItem, Metric, RecoveryVM } from "./types";
 
 const SUBJECT: Record<ChargeDriver["label"], string> = {
   HEART_RATE_VARIABILITY: "HRV",
@@ -73,21 +74,17 @@ export function getRecovery(day: string, ctx: QueryCtx = defaultCtx()): Recovery
   let forecast: RecoveryVM["forecast"];
   if (r?.value == null) forecast = fromReason(recovery.reason, isToday, recovery.nightsLeft);
   else if (!r.forecast) forecast = none("calibrating", Math.max(1, r.forecastNightsLeft));
-  else forecast = ok({ value: r.forecast.charge, low: r.forecast.low, high: r.forecast.high, band: recoveryBand(r.forecast.charge) as Band });
+  else forecast = ok({ value: r.forecast.charge, low: r.forecast.low, high: r.forecast.high, band: recoveryBand(r.forecast.charge) });
 
   return {
     day,
     isToday,
     recovery,
-    band: recovery.value != null ? (recoveryBand(recovery.value) as Band) : null,
+    band: recovery.value != null ? recoveryBand(recovery.value) : null,
     contributors: contributors(row, isToday),
     insight: r?.value != null ? insightOf(r.drivers) : null,
     trend: {
-      points: Array.from({ length: 182 }, (_, k) => {
-        const d = addDays(day, k - 181);
-        const rr = rows.get(d)?.recovery;
-        return { day: d, value: rr?.value ?? null, ...(rr?.provisional && { provisional: true }) };
-      }),
+      points: trendPoints(rows, day, (r) => r.recovery?.value, 182, (r) => !!r.recovery?.provisional),
     },
     drivers,
     forecast,

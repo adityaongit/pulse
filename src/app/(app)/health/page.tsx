@@ -6,7 +6,7 @@ import type { ChipTone } from "@/lib/bands"
 import { getHealthHub } from "@/server/queries/health"
 import type { HealthHubVM, VitalKey } from "@/server/queries/types"
 import { StressChart } from "@/components/charts/StressChart"
-import { StatusChip, ValueUnit } from "@/components/metrics/primitives"
+import { CAPTION, LABEL, StatusChip, ValueUnit } from "@/components/metrics/primitives"
 import { TickScale } from "@/components/metrics/TickScale"
 import { WhoopAgeOrb } from "@/components/metrics/WhoopAgeOrb"
 import { MetricState } from "@/components/shells/MetricState"
@@ -17,8 +17,6 @@ import { categoryTone, categoryWord, ordinal } from "./format"
 
 export const metadata = { title: "Health" }
 
-const LABEL = "text-xs leading-4 font-bold tracking-[0.08em] uppercase"
-const CAPTION = "text-xs leading-4 font-medium text-muted-foreground"
 const TILE = "font-numeric text-4xl leading-10 font-bold tracking-[-0.01em]"
 const EMPTY = "text-[15px] leading-[22px] text-pretty text-foreground-secondary"
 

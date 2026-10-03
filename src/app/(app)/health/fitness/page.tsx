@@ -5,7 +5,7 @@ import { formatValue } from "@/lib/format"
 import { getFitness } from "@/server/queries/health"
 import type { FitnessVM } from "@/server/queries/types"
 import { TrendChart } from "@/components/charts/TrendChart"
-import { MetricTags, StatusChip, ValueUnit } from "@/components/metrics/primitives"
+import { CAPTION, LABEL, MetricTags, StatusChip, ValueUnit } from "@/components/metrics/primitives"
 import { ReasonPlaceholder } from "@/components/metrics/ReasonPlaceholder"
 import { TickScale } from "@/components/metrics/TickScale"
 import { DetailShell } from "@/components/shells/DetailShell"
@@ -16,8 +16,6 @@ import { LoadChart } from "./LoadChart"
 
 export const metadata = { title: "Fitness" }
 
-const LABEL = "text-xs leading-4 font-bold tracking-[0.08em] uppercase"
-const CAPTION = "text-xs leading-4 font-medium text-muted-foreground"
 const BODY = "text-[15px] leading-[22px] text-pretty text-foreground-secondary"
 const NO_LOAD = "Training load needs 28 days of strain."
 

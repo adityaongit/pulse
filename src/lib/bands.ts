@@ -116,11 +116,6 @@ export const CHIP_TONE_CLASS: Record<ChipTone, string> = {
   alert: "bg-recovery-red/15 text-recovery-red-text",
   neutral: "bg-secondary text-foreground-secondary",
 };
-export const TONE_TEXT: Record<Tone, string> = {
-  good: "text-optimal",
-  bad: "text-warning",
-  neutral: "text-foreground-secondary",
-};
 
 /** Training load (ACWR): 0.8-1.3 optimal, 1.3-1.5 warning, above 1.5 alert, below 0.8 neutral. */
 export function acwrTone(acwr: number): ChipTone {

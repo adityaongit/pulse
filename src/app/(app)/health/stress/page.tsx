@@ -1,8 +1,5 @@
-import { redirect } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { clock, dayLabel, durationWords, hmm } from "@/lib/format"
-import { parseDay, todayIn } from "@/lib/url"
-import { getConfig } from "@/server/config"
 import { getStress } from "@/server/queries/health"
 import type { StressVM } from "@/server/queries/types"
 import { StressChart } from "@/components/charts/StressChart"
@@ -14,6 +11,7 @@ import { EmptyState } from "@/components/shells/EmptyState"
 import { MetricState } from "@/components/shells/MetricState"
 import { SectionShell } from "@/components/shells/SectionShell"
 import { Skeleton } from "@/components/ui/skeleton"
+import { pageDay, type SearchParams } from "../../_lib/day"
 
 export const metadata = { title: "Stress Monitor" }
 
@@ -104,10 +102,7 @@ function typicalLine(l: NonNullable<StressVM["levels"]["value"]>) {
 
 /** Stress Monitor `/health/stress?d=` (spec §7.9). */
 export default async function StressPage({ searchParams }: PageProps<"/health/stress">) {
-  const { timeZone } = getConfig()
-  const today = todayIn(timeZone)
-  const { d, rejected } = parseDay((await searchParams).d, today)
-  if (rejected) redirect("/health/stress")
+  const { d, today, timeZone } = await pageDay(searchParams as SearchParams, "/health/stress")
   const vm = getStress(d)
   const g = vm.gauge
 

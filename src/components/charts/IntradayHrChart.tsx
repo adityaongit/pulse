@@ -130,7 +130,7 @@ export function IntradayHrChart({ data, variant = "day" }: IntradayHrChartProps)
   return (
     <MetricState
       metric={data}
-      skeleton={<Skeleton aria-hidden className={`${h} rounded-lg bg-muted/60`} />}
+      skeleton={<IntradayHrChartSkeleton variant={variant} />}
       empty={empty}
       renderReason={(r) => (
         <div className={`grid place-items-center ${h}`}>

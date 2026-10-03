@@ -14,7 +14,8 @@ import {
   meanSd,
   minutePoints,
   ms,
-  nightReason,
+  fromReason,
+  daySpans,
   none,
   ok,
   type QueryCtx,
@@ -22,10 +23,10 @@ import {
   todayOf,
   toStrain,
   type ExerciseRow,
+  trendPoints,
 } from "./common";
-import type { ActivityKind, HrChart, KeyStat, Metric, Span, StrainVM, ZoneRow } from "./types";
+import type { HrChart, KeyStat, Metric, StrainVM, ZoneRow } from "./types";
 
-const SHORT: Record<ActivityKind, string> = { run: "Run", ride: "Ride", walk: "Walk", strength: "Strength", workout: "Workout" };
 const isStrength = (e: ExerciseRow) => activityKind(e.type) === "strength";
 
 /** Strain `/strain` for `day` (spec §7.3). */
@@ -40,7 +41,7 @@ export function getStrain(day: string, ctx: QueryCtx = defaultCtx()): StrainVM {
     !t
       ? none(isToday ? "awaiting_sleep_sync" : "band_not_worn")
       : t.reason !== null
-        ? none(nightReason(t.reason, isToday), t.nightsLeft)
+        ? fromReason(t.reason, isToday, t.nightsLeft)
         : ok({ low: t.low, high: t.high, estimate: t.coldStart, acwrRule: t.acwrRule });
 
   const exs = exercisesBetween(ctx, addDays(day, -30), day);
@@ -60,11 +61,7 @@ export function getStrain(day: string, ctx: QueryCtx = defaultCtx()): StrainVM {
     stat("steps", "Steps", (d) => rows.get(d)?.metrics?.steps ?? null, undefined),
   ];
 
-  const pts = Array.from({ length: 182 }, (_, k) => {
-    const d = addDays(day, k - 181);
-    const e = rows.get(d)?.s1?.effort;
-    return { day: d, value: finite(e) ? toStrain(e) : null };
-  });
+  const pts = trendPoints(rows, day, (r) => (finite(r.s1?.effort) ? toStrain(r.s1.effort) : null));
 
   return {
     day,
@@ -117,20 +114,12 @@ export function hrChart(ctx: QueryCtx, row: DayRow | undefined, day: string, isT
   const fromM = from == null ? 0 : Math.floor((from - start) / 60);
   const toM = to == null ? Infinity : Math.ceil((to - start) / 60);
   const points = minutePoints(series, start, from == null ? 2 : 1, fromM, toM);
-  const vals = points.map((p) => p.v).filter(finite);
-  if (!vals.length) return none("insufficient_hr_data");
-  const lo = Math.floor((Math.min(...vals) - 10) / 10) * 10;
-  const hi = Math.ceil((Math.max(...vals) + 10) / 10) * 10;
-  const spans: Span[] = [];
-  const s = row?.sleep;
-  if (s?.main) spans.push({ kind: "sleep", label: "Sleep", start: ms(Math.max(s.main.start, start)), end: ms(s.main.end) });
-  for (const n of s?.naps ?? []) spans.push({ kind: "nap", label: "Nap", start: ms(n.start), end: ms(n.end) });
-  for (const e of exercisesBetween(ctx, day, day)) spans.push({ kind: "workout", label: SHORT[activityKind(e.type)], start: ms(e.startTs), end: ms(e.endTs) });
+  if (!points.some((p) => finite(p.v))) return none("insufficient_hr_data");
+  const spans = daySpans(ctx, row, day, start);
   return ok({
     points,
     zones: zoneBounds(s1.zoneLower),
     spans: from == null ? spans : spans.filter((x) => x.end > ms(from) && x.start < ms(to!)),
     now: isToday && from == null && s1.lastHrTs != null ? ms(s1.lastHrTs) : null,
-    domain: [lo, hi],
   });
 }

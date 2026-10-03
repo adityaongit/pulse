@@ -5,7 +5,7 @@ import { formatValue, isSymbolUnit, MISSING, spoken, type FormatKey } from "@/li
 import type { Metric } from "@/lib/reasons"
 import { SkeletonText } from "@/components/ui/skeleton"
 import { MetricState, type MetricMeta } from "@/components/shells/MetricState"
-import { MetricTags, ValueUnit } from "./primitives"
+import { CAPTION, LABEL, MetricTags, ValueUnit } from "./primitives"
 
 type Common = {
   icon?: React.ReactNode
@@ -39,8 +39,6 @@ export type ContributorRowProps =
       onSelect?: () => void
     })
 
-const LABEL = "text-xs leading-4 font-bold tracking-[0.08em] uppercase"
-const CAPTION = "text-xs leading-4 font-medium text-muted-foreground"
 const pct = (v: number, lo: number, hi: number) => `${Math.min(100, Math.max(0, ((v - lo) / (hi - lo)) * 100))}%`
 const MARKER: Record<Tone, string> = { good: "bg-optimal", bad: "bg-warning", neutral: "bg-foreground" }
 

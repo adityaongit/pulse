@@ -1,12 +1,13 @@
 // Health hub and its four detail screens (spec §7.6–7.10).
 import type { HealthspanContribution } from "@/core/algorithms/healthspan";
+import { acwrTone } from "@/lib/bands";
+import { weekOf } from "@/lib/url";
 import { addDays, daysBetween, wall } from "../time";
 import { illnessRaised, VITAL_LABEL } from "./home";
 import {
   type DayRow,
   dayStartOf,
   defaultCtx,
-  exercisesBetween,
   finite,
   loadDays,
   loadSeries,
@@ -20,7 +21,8 @@ import {
   stressNow,
   todayOf,
   vitalReason,
-  activityKind,
+  trendPoints,
+  daySpans,
 } from "./common";
 import type {
   ChipTone,
@@ -30,7 +32,6 @@ import type {
   HealthspanVM,
   Metric,
   MonitorVM,
-  Span,
   StressVM,
   Vital,
   VitalKey,
@@ -38,8 +39,6 @@ import type {
 
 const WEEKDAY = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 const weekdayOf = (day: string) => new Date(`${day}T00:00:00Z`).getUTCDay();
-const isoDow = (day: string) => (weekdayOf(day) + 6) % 7;
-const weekOf = (day: string): [string, string] => [addDays(day, -isoDow(day)), addDays(day, 6 - isoDow(day))];
 const lastStored = (ctx: QueryCtx, today: string) =>
   (ctx.db.$client.prepare("select max(day) from daily_scores where day <= ?").pluck().get(today) as string | null) ?? today;
 
@@ -300,12 +299,7 @@ export function getMonitor(day: string, ctx: QueryCtx = defaultCtx(), preloaded?
       status,
       chip,
       trend: {
-        points: Array.from({ length: 30 }, (_, k) => {
-          const d = addDays(day, k - 29);
-          const r = rows.get(d);
-          const x = r ? v.pick(r) : null;
-          return { day: d, value: finite(x) ? x : null };
-        }),
+        points: trendPoints(rows, day, v.pick, 30),
         baseline: range && v.key !== "spo2" ? { mean: (range.low + range.high) / 2, sd: (range.high - range.low) / 2 } : null,
       },
     };
@@ -342,14 +336,7 @@ export function getStress(day: string, ctx: QueryCtx = defaultCtx()): StressVM {
   const typicalOf = (pick: (x: NonNullable<DayRow["stress"]>) => number) => meanSd(sameStress.map((x) => pick(x!))).mean ?? 0;
   const typical = sameStress.length ? typicalOf((x) => x.highMin) : null;
 
-  const spans: Span[] = [];
-  const s = row?.sleep;
-  if (s?.main) spans.push({ kind: "sleep", label: "Sleep", start: ms(Math.max(s.main.start, start)), end: ms(s.main.end) });
-  for (const n of s?.naps ?? []) spans.push({ kind: "nap", label: "Nap", start: ms(n.start), end: ms(n.end) });
-  for (const e of exercisesBetween(ctx, day, day)) {
-    const k = activityKind(e.type);
-    spans.push({ kind: "workout", label: { run: "Run", ride: "Ride", walk: "Walk", strength: "Strength", workout: "Workout" }[k], start: ms(e.startTs), end: ms(e.endTs) });
-  }
+  const spans = daySpans(ctx, row, day, start);
   const scored = st && st.average != null;
   const empty = row?.s1?.hrCount ? "no_data" : "band_not_worn";
 
@@ -373,11 +360,7 @@ export function getStress(day: string, ctx: QueryCtx = defaultCtx()): StressVM {
         )
       : none(empty),
     trend: {
-      points: Array.from({ length: 30 }, (_, k) => {
-        const d = addDays(day, k - 29);
-        const a = rows.get(d)?.stress?.average;
-        return { day: d, value: finite(a) ? a : null };
-      }),
+      points: trendPoints(rows, day, (r) => r.stress?.average, 30),
     },
   };
 }
@@ -396,14 +379,11 @@ function stressInsight(st: NonNullable<DayRow["stress"]>, tz: string) {
 
 // ── Fitness ─────────────────────────────────────────────────────────────────
 
-const ACWR_STATUS = (acwr: number): { status: "detraining" | "optimal" | "pushing" | "high_risk"; tone: ChipTone } =>
-  acwr < 0.8
-    ? { status: "detraining", tone: "neutral" }
-    : acwr <= 1.3
-      ? { status: "optimal", tone: "optimal" }
-      : acwr <= 1.5
-        ? { status: "pushing", tone: "warning" }
-        : { status: "high_risk", tone: "alert" };
+const ACWR_STATUS = { neutral: "detraining", optimal: "optimal", warning: "pushing", alert: "high_risk" } as const satisfies Record<ChipTone, string>;
+const acwrStatus = (acwr: number) => {
+  const tone = acwrTone(acwr);
+  return { status: ACWR_STATUS[tone], tone };
+};
 
 /** Fitness `/health/fitness`: latest values (spec §7.10). */
 export function getFitness(ctx: QueryCtx = defaultCtx()): FitnessVM {
@@ -423,7 +403,7 @@ export function getFitness(ctx: QueryCtx = defaultCtx()): FitnessVM {
   const tl = row?.trainingLoad;
   const effortDays = [...rows.values()].filter((r) => r.s1?.effort != null).length;
   const trainingLoad: Metric<NonNullable<FitnessVM["trainingLoad"]["value"]>> =
-    tl?.acwr != null ? ok({ acwr: tl.acwr, ...ACWR_STATUS(tl.acwr) }) : none("calibrating", Math.max(1, 28 - effortDays));
+    tl?.acwr != null ? ok({ acwr: tl.acwr, ...acwrStatus(tl.acwr) }) : none("calibrating", Math.max(1, 28 - effortDays));
   const load = Array.from({ length: 90 }, (_, k) => {
     const d = addDays(last, k - 89);
     const t = rows.get(d)?.trainingLoad;
@@ -432,12 +412,7 @@ export function getFitness(ctx: QueryCtx = defaultCtx()): FitnessVM {
   return {
     vo2,
     trend: {
-      points: Array.from({ length: 182 }, (_, k) => {
-        const d = addDays(last, k - 181);
-        const m = rows.get(d)?.metrics;
-        const v = m?.vo2maxRun ?? m?.vo2maxDaily;
-        return { day: d, value: finite(v) ? v : null };
-      }),
+      points: trendPoints(rows, last, (r) => r.metrics?.vo2maxRun ?? r.metrics?.vo2maxDaily),
     },
     trainingLoad,
     load,

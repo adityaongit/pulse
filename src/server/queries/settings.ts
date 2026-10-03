@@ -139,6 +139,7 @@ export function getShellStatus(ctx: QueryCtx = defaultCtx()): ShellStatusVM {
   const error = rows.some((r) => r.lastError);
   const progress = ctx.mode === "google" ? importProgress(rows) : null;
   const auth = ctx.mode === "google" ? authState(ctx) : "connected";
+  const first = firstDay(ctx);
   const connection: ShellStatusVM["connection"] =
     ctx.mode === "demo"
       ? "connected"
@@ -157,7 +158,7 @@ export function getShellStatus(ctx: QueryCtx = defaultCtx()): ShellStatusVM {
     connection,
     ...(progress && { importProgress: progress }),
     today: todayOf(ctx),
-    ...(firstDay(ctx) && { firstDay: firstDay(ctx)! }),
+    ...(first && { firstDay: first }),
     timeZone: ctx.timeZone,
     streak: getWearStreak(ctx),
   };

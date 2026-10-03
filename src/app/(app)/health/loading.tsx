@@ -1,8 +1,7 @@
 import { PageShell } from "@/components/shells/PageShell"
 import { SectionShell } from "@/components/shells/SectionShell"
 import { Skeleton, SkeletonText } from "@/components/ui/skeleton"
-
-const LABEL = "text-xs leading-4 font-bold tracking-[0.08em] uppercase"
+import { LABEL } from "@/components/metrics/primitives"
 
 /** Health hub loading (spec §7.6, §5.19): the real ground, card titles and boxes; the orb as its rim track. */
 export default function Loading() {

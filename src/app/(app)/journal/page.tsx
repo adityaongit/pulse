@@ -1,11 +1,9 @@
 import Link from "next/link"
-import { redirect } from "next/navigation"
 import { format, parseISO } from "date-fns"
 import { ChevronRight } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { dayLabel } from "@/lib/format"
-import { dayHref, parseDay, todayIn } from "@/lib/url"
-import { getConfig } from "@/server/config"
+import { dayHref } from "@/lib/url"
 import { getJournal } from "@/server/queries/journal"
 import { DayStrip } from "@/components/metrics/DayStrip"
 import { InsightCard } from "@/components/metrics/InsightCard"
@@ -15,14 +13,13 @@ import { SectionShell } from "@/components/shells/SectionShell"
 import { Badge } from "@/components/ui/badge"
 import { Card } from "@/components/ui/card"
 import { CheckIn, TAG_CLASS } from "./CheckIn"
+import { pageDay, type SearchParams } from "../_lib/day"
 
 export const metadata = { title: "Journal" }
 
 /** Journal `/journal?d=` (spec §7.11, journey 7). */
 export default async function JournalPage({ searchParams }: PageProps<"/journal">) {
-  const today = todayIn(getConfig().timeZone)
-  const { d, rejected } = parseDay((await searchParams).d, today)
-  if (rejected) redirect("/journal")
+  const { d, today } = await pageDay(searchParams as SearchParams, "/journal")
   const vm = getJournal(d)
   const date = format(parseISO(d), "EEE, MMM d")
   const half = Math.ceil(vm.history.length / 2)
