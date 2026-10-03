@@ -110,11 +110,32 @@ function RecoveryRow({ p, value, meta }: { p: Extract<ContributorRowProps, { var
   )
 }
 
+/**
+ * "Target X" centred under its ▲ (spec §11 M5). The box is centred on the marker and reaches only to the near end
+ * label (its width bounded by `ch`: digits are tabular, punctuation narrower), so when the label is wider than the
+ * box, `safe center` pins it to that end label instead of overlapping it or the row edge. Right of centre the box runs
+ * right to left, so the pinned side is the right one.
+ */
+function TargetLabel({ at, lo, hi, children }: { at: number; lo: string; hi: string; children: React.ReactNode }) {
+  const t = Math.min(1, Math.max(0, at))
+  const start = t <= 0.5
+  const edge = `(${(start ? lo : hi).length}ch + 8px)`
+  return (
+    <span
+      className={cn("absolute inset-y-0 flex items-center justify-center-safe", !start && "[direction:rtl]")}
+      style={{ [start ? "left" : "right"]: `calc${edge}`, width: `calc(2 * (${(start ? t : 1 - t) * 100}% - ${edge}))` }}
+    >
+      <span className="inline-flex shrink-0 items-center gap-2 whitespace-nowrap [direction:ltr]">{children}</span>
+    </span>
+  )
+}
+
 function HealthspanRow({ p, value, meta }: { p: Extract<ContributorRowProps, { variant: "healthspan" }>; value: number | null; meta?: MetricMeta }) {
   const [lo, hi] = p.domain
   // Under 0.05 years rounds to "0.0": no change, neither younger nor older.
   const years = value === null || p.years === null ? null : Math.abs(p.years) < 0.05 ? 0 : p.years
   const yearsText = years === null ? MISSING : formatValue("decimal1", years)
+  const [loText, hiText] = [formatValue(p.format, lo), formatValue(p.format, hi)]
   const sentence =
     value === null
       ? `${p.label}: ${p.reasonCopy ?? "No data"}`
@@ -149,15 +170,15 @@ function HealthspanRow({ p, value, meta }: { p: Extract<ContributorRowProps, { v
           />
           <Triangle className="absolute bottom-0 size-2 -translate-x-1/2 fill-muted-foreground text-muted-foreground" strokeWidth={0} style={{ left: pct(p.target, lo, hi) }} />
         </span>
-        <span className="flex justify-between font-numeric text-xs leading-4 font-medium text-muted-foreground tabular-nums">
-          <span>{formatValue(p.format, lo)}</span>
+        <span className="relative flex h-4 justify-between font-numeric text-xs leading-4 font-medium text-muted-foreground tabular-nums">
+          <span>{loText}</span>
           {value !== null && (
-            <span className="inline-flex items-center gap-2">
+            <TargetLabel at={(p.target - lo) / (hi - lo)} lo={loText} hi={hiText}>
               Target {formatValue(p.format, p.target)}
               {meta && <MetricTags provisional={meta.provisional} tags={meta.tags} />}
-            </span>
+            </TargetLabel>
           )}
-          <span>{formatValue(p.format, hi)}</span>
+          <span>{hiText}</span>
         </span>
         {/* Reason copy can be a sentence; it gets its own line rather than squeezing between the end labels. */}
         {value === null && <span className="block text-xs leading-4 font-medium text-pretty text-muted-foreground">{p.reasonCopy ?? "No data"}</span>}

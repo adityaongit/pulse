@@ -54,8 +54,8 @@ export function getStrain(day: string, ctx: QueryCtx = defaultCtx()): StrainVM {
   };
   const worn = (d: string) => (rows.get(d)?.s1?.hrCount ?? 0) > 0;
   const summary: KeyStat[] = [
-    stat("zones13", "Heart rate zones 1-3", (d) => zoneMin(rows.get(d), 0, 3), "min"),
-    stat("zones45", "Heart rate zones 4-5", (d) => zoneMin(rows.get(d), 3, 5), "min"),
+    stat("zones13", "Heart rate zones 1‑3", (d) => zoneMin(rows.get(d), 0, 3), "min"),
+    stat("zones45", "Heart rate zones 4‑5", (d) => zoneMin(rows.get(d), 3, 5), "min"),
     stat("strength", "Strength activity time", (d) => (worn(d) ? strengthMin(d) : null), "min"),
     stat("steps", "Steps", (d) => rows.get(d)?.metrics?.steps ?? null, undefined),
   ];

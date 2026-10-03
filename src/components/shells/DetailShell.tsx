@@ -17,7 +17,7 @@ export type DetailShellProps = {
   /** `placement: "header"` makes the date the header title (Recovery, Strain, Sleep); else the pill sits under the header. */
   dateSwitcher?: DateSwitcherProps
   dismiss?: DetailHeaderProps["dismiss"]
-  /** Page ground (spec §2.1): Healthspan is near black. */
+  /** Page ground (spec §2.1): Healthspan is WHOOP's darker `#101518`; the collapsed band paints the same ground. */
   ground?: "default" | "healthspan"
   /** The hero component. With `collapse`, it must accept `compact` (or forward it to the component inside). */
   hero?: React.ReactNode
@@ -58,7 +58,9 @@ export function DetailShell({ title, subtitle, info, backHref, dateSwitcher, dis
           {(hero || side) && (
             <div className={cn("flex flex-col gap-6", side && "xl:grid xl:grid-cols-[minmax(360px,max-content)_minmax(0,1fr)] xl:items-center xl:gap-8 xl:has-data-[hero-align=start]:items-start")}>
               {hero && (
-                <div {...(compact ? { [COLLAPSE_HERO]: "" } : {})} className="flex min-w-0 justify-center">
+                // Full-bleed on phone and clipped at the screen edge: a hero's glow (the orb canvas overhangs its
+                // 300 px box by 45 px a side) may bleed to the edge but never widens the page (spec §11 M1).
+                <div {...(compact ? { [COLLAPSE_HERO]: "" } : {})} className="flex min-w-0 justify-center max-md:-mx-4 max-md:overflow-x-clip max-md:px-4">
                   {hero}
                 </div>
               )}

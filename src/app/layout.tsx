@@ -31,8 +31,10 @@ export const metadata: Metadata = {
   openGraph: { title: "Pulse", description: DESCRIPTION, siteName: "Pulse", type: "website" },
 };
 
-// viewport-fit=cover for the safe-area insets; zoom is never disabled (spec §9).
+// width=device-width, initial-scale=1, viewport-fit=cover for the safe-area insets; zoom is never disabled (spec §9).
 export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
   viewportFit: "cover",
   themeColor: "#262e33",
   colorScheme: "dark",

@@ -31,7 +31,7 @@ const HOME_STATS: [string, string][] = [
   ["skin", "Skin temperature"],
 ]
 const SUMMARY: Record<string, string[]> = {
-  Strain: ["Strain Target", "Heart rate zones 1-3", "Heart rate zones 4-5", "Strength activity time", "Steps"],
+  Strain: ["Strain Target", "Heart rate zones 1‑3", "Heart rate zones 4‑5", "Strength activity time", "Steps"],
   Sleep: ["Hours vs. needed", "Sleep consistency", "Sleep efficiency", "Restorative sleep"],
 }
 const SECONDARY: Record<string, string[]> = {
@@ -127,11 +127,22 @@ export function HomeSkeleton() {
 const PRIMARY: Record<string, string> = { hr: "Heart rate", stages: "Sleep stages" }
 const DIAL: Record<string, "recovery" | "strain" | "sleep"> = { Recovery: "recovery", Strain: "strain", Sleep: "sleep" }
 
-export function DetailSkeleton({ title, chart = "trend", dateSwitcher = true }: { title: string; chart?: "trend" | "hr" | "stages"; dateSwitcher?: boolean }) {
+export function DetailSkeleton({
+  title,
+  chart = "trend",
+  dateSwitcher = true,
+  ground,
+}: {
+  title: string
+  chart?: "trend" | "hr" | "stages"
+  dateSwitcher?: boolean
+  ground?: "default" | "healthspan"
+}) {
   const labels = SUMMARY[title] ?? ["", "", "", ""]
   return (
     <DetailShell
       title={title}
+      ground={ground}
       dateSwitcher={dateSwitcher ? { mode: "day", placement: DIAL[title] ? "header" : "body" } : undefined}
       hero={<ScoreDialSkeleton size="lg" variant={DIAL[title] ?? "stat"} />}
       summary={

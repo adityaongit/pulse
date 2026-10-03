@@ -63,7 +63,7 @@ export function SyncStatus({ variant = "header" }: { variant?: "header" | "icon"
         aria-label={s.mode === "demo" ? `Demo data. ${v.label}` : v.label}
         className={cn(
           SYNC_TRIGGER,
-          variant === "line" ? "h-11 w-full gap-2.5 px-3 hover:bg-white/5" : variant === "icon" ? "size-11 justify-center" : "h-11 pr-0.5 pl-2"
+          variant === "line" ? "h-11 w-full gap-2.5 px-3 hover:bg-white/5" : variant === "icon" ? "size-11 justify-center" : "h-11 min-w-11 justify-end pr-0.5 pl-2"
         )}
       >
         {variant === "line" ? (
@@ -75,7 +75,10 @@ export function SyncStatus({ variant = "header" }: { variant?: "header" | "icon"
           <>
             {variant === "header" && (
               // Reserves the text width before hydration fills in the relative age.
-              <span className="min-w-[3ch] text-right font-numeric text-[15px] leading-5 font-semibold text-muted-foreground tabular-nums">{short}</span>
+              // Home's top row may hide it on narrow phones (`data-sync-text`); the band, its dot, the popover and the accessible name still carry it.
+              <span data-sync-text className="min-w-[3ch] text-right font-numeric text-[15px] leading-5 font-semibold text-muted-foreground tabular-nums">
+                {short}
+              </span>
             )}
             <Band dot={v.dot} />
           </>
