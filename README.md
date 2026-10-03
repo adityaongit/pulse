@@ -3,6 +3,20 @@
 A WHOOP-style personal health app for the Fitbit Air: one Next.js app (frontend, sync worker and scoring) on SQLite.
 See `docs/plans/` for the plan.
 
+## Screenshots
+
+Demo mode, seeded data.
+
+<p>
+  <img src="docs/screenshots/mobile-home.png" width="220" alt="Home: sleep, recovery and strain rings">
+  <img src="docs/screenshots/mobile-sleep.png" width="220" alt="Sleep performance">
+  <img src="docs/screenshots/mobile-healthspan.png" width="220" alt="Healthspan: Pulse Age orb">
+</p>
+
+<img src="docs/screenshots/desktop-home.png" alt="Desktop home">
+<img src="docs/screenshots/desktop-strain.png" alt="Desktop strain">
+<img src="docs/screenshots/desktop-health.png" alt="Desktop health">
+
 ## Run in demo mode
 
 Demo mode generates deterministic data into `data/demo.db`, so no Google account is needed.
