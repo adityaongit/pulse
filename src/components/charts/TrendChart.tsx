@@ -40,14 +40,17 @@ export type TrendChartProps = {
   fixedRange?: TrendRange
   /** Range when `?r=` is absent (default `m`; Fitness VO2 max uses `6m`). */
   defaultRange?: TrendRange
+  /** The toggle's ranges (default W, M, 6M; Trends adds 1Y). `data` must hold enough days for the longest. */
+  ranges?: readonly TrendRange[]
   /** A labelled horizontal line ("Your age" on WHOOP Age history). */
   reference?: { y: number; label: string }
 }
 
-const RANGE_ARIA: Record<TrendRange, string> = { w: "1 week", m: "1 month", "6m": "6 months" }
-const RANGE_PRIOR: Record<TrendRange, string> = { w: "vs. prior week", m: "vs. prior month", "6m": "vs. prior 6 months" }
-const RANGE_WORD: Record<TrendRange, string> = { w: "week", m: "month", "6m": "6 months" }
-const RANGE_LABEL: Record<TrendRange, string> = { w: "W", m: "M", "6m": "6M" }
+const RANGE_ARIA: Record<TrendRange, string> = { w: "1 week", m: "1 month", "6m": "6 months", "1y": "1 year" }
+const RANGE_PRIOR: Record<TrendRange, string> = { w: "vs. prior week", m: "vs. prior month", "6m": "vs. prior 6 months", "1y": "vs. prior year" }
+const RANGE_WORD: Record<TrendRange, string> = { w: "week", m: "month", "6m": "6 months", "1y": "year" }
+const RANGE_LABEL: Record<TrendRange, string> = { w: "W", m: "M", "6m": "6M", "1y": "1Y" }
+const DEFAULT_RANGES: readonly TrendRange[] = ["w", "m", "6m"]
 
 function colorFor(colorBy: TrendChartProps["colorBy"], v: number) {
   if (colorBy === "band") return DATA_COLORS[recoveryColor(v)].css
@@ -64,7 +67,9 @@ function Trend({ points, p }: { points: TrendPoint[]; p: TrendChartProps }) {
   const today = useOptionalShellCalendar()?.today ?? points.at(-1)?.date ?? ""
   const anim = useSeriesAnimation()
   const fallback = p.defaultRange ?? "m"
-  const urlRange = params.get("r") ? parseRange(params.get("r") ?? undefined) : fallback
+  const ranges = p.ranges ?? DEFAULT_RANGES
+  const parsed = params.get("r") ? parseRange(params.get("r") ?? undefined) : fallback
+  const urlRange = ranges.includes(parsed) ? parsed : fallback
   const [range, setRange] = React.useState<TrendRange>(p.fixedRange ?? urlRange)
   const [active, setActive] = React.useState<number | null>(null)
   // Follow `?r=` when it changes elsewhere (another chart, back/forward) without an effect.
@@ -85,7 +90,7 @@ function Trend({ points, p }: { points: TrendPoint[]; p: TrendChartProps }) {
   const delta = p.deltas?.[range] ?? null
   const tone = delta === null || !p.direction || delta === 0 ? null : deltaTone(p.direction, delta, 0).tone
   const scrubbed = active !== null ? rows[active] : null
-  const line = range === "6m"
+  const line = range === "6m" || range === "1y"
   // A single-hue 6M line (WHOOP Age, VO2 max, vitals) fits its data; bars always start at zero.
   const domain: [number | "auto", number | "auto"] =
     p.colorBy === "band" ? [0, 100] : p.colorBy === "stress" ? [0, 3] : line && p.colorBy === "single" ? ["auto", "auto"] : [0, "auto"]
@@ -134,7 +139,7 @@ function Trend({ points, p }: { points: TrendPoint[]; p: TrendChartProps }) {
         </div>
         {!p.fixedRange && (
           <ToggleGroup type="single" value={range} onValueChange={changeRange} spacing={0} className="shrink-0 gap-0.5 rounded-lg bg-muted p-0.5" aria-label="Range">
-            {(["w", "m", "6m"] as const).map((r) => (
+            {ranges.map((r) => (
               <ToggleGroupItem
                 key={r}
                 value={r}
@@ -247,9 +252,9 @@ function Trend({ points, p }: { points: TrendPoint[]; p: TrendChartProps }) {
 /** One metric over W, M or 6M (spec §5.5). The range lives in `?r=` (default `m`). */
 export function TrendChart(p: TrendChartProps) {
   return (
-    <MetricState metric={p.data} skeleton={<TrendChartSkeleton />} empty={<EmptyState body="No data in this range yet." />}>
+    <MetricState metric={p.data} skeleton={<TrendChartSkeleton ranges={p.ranges} />} empty={<EmptyState body="No data in this range yet." />}>
       {(points) => (
-        <React.Suspense fallback={<TrendChartSkeleton />}>
+        <React.Suspense fallback={<TrendChartSkeleton ranges={p.ranges} />}>
           <Trend points={points} p={p} />
         </React.Suspense>
       )}
@@ -259,9 +264,13 @@ export function TrendChart(p: TrendChartProps) {
 
 /**
  * `chip`: room for the change-vs-prior chip under the average, which charts with a prior period show.
- * `caption`: the baseline / target line under the plot.
+ * `caption`: the baseline / target line under the plot. `ranges`: the toggle's ranges, as on the chart.
  */
-export function TrendChartSkeleton({ chip = false, caption = false }: { chip?: boolean; caption?: boolean }) {
+export function TrendChartSkeleton({
+  chip = false,
+  caption = false,
+  ranges = DEFAULT_RANGES,
+}: { chip?: boolean; caption?: boolean; ranges?: readonly TrendRange[] } = {}) {
   // The header's real label and a disabled range toggle; bars for the numbers; the plot at its fixed height (spec §5.19).
   return (
     <div aria-hidden className="min-w-0">
@@ -272,7 +281,7 @@ export function TrendChartSkeleton({ chip = false, caption = false }: { chip?: b
           {chip && <Skeleton className="mt-1 h-6 w-28 rounded-md" />}
         </div>
         <div className="flex shrink-0 gap-0.5 rounded-lg bg-muted p-0.5">
-          {(["w", "m", "6m"] as const).map((r) => (
+          {ranges.map((r) => (
             <span key={r} className="grid h-10 min-w-11 place-items-center rounded-md px-3 font-numeric text-[13px] font-bold text-muted-foreground/60">
               {RANGE_LABEL[r]}
             </span>

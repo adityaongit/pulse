@@ -59,6 +59,7 @@ describe("other URL state", () => {
   it("range defaults to m", () => {
     expect(parseRange("w")).toBe("w");
     expect(parseRange("6m")).toBe("6m");
+    expect(parseRange("1y")).toBe("1y");
     expect(parseRange("year")).toBe("m");
     expect(parseRange(undefined)).toBe("m");
   });
@@ -70,7 +71,8 @@ describe("other URL state", () => {
   it("maps routes to tabs and parents", () => {
     expect(tabForPath("/")).toBe("home");
     expect(tabForPath("/activity/abc")).toBe("home");
-    expect(tabForPath("/reports/2026-W39")).toBe("home");
+    expect(tabForPath("/reports/2026-W39")).toBe("more");
+    expect(tabForPath("/trends")).toBe("more");
     expect(tabForPath("/health/monitor")).toBe("health");
     expect(tabForPath("/journal/insights")).toBe("journal");
     expect(tabForPath("/settings")).toBe("more");

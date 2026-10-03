@@ -42,9 +42,9 @@ export function parseDay(raw: string | string[] | undefined, today: string) {
   return { d: v, isToday: v === today, rejected: false };
 }
 
-export const RANGES = ["w", "m", "6m"] as const;
+export const RANGES = ["w", "m", "6m", "1y"] as const;
 export type TrendRange = (typeof RANGES)[number];
-export const RANGE_DAYS: Record<TrendRange, number> = { w: 7, m: 30, "6m": 182 };
+export const RANGE_DAYS: Record<TrendRange, number> = { w: 7, m: 30, "6m": 182, "1y": 365 };
 
 /** Reads `?r=`; anything else is the default `m`. */
 export function parseRange(raw: string | string[] | undefined): TrendRange {
@@ -82,7 +82,7 @@ export function tabForPath(pathname: string): Tab {
   const first = pathname.split("/")[1] ?? "";
   if (first === "health") return "health";
   if (first === "journal") return "journal";
-  if (first === "more" || first === "settings") return "more";
+  if (["more", "settings", "reports", "trends"].includes(first)) return "more";
   return "home";
 }
 
