@@ -1,7 +1,8 @@
 "use client"
 
 import * as React from "react"
-import { FlaskConical, Watch } from "lucide-react"
+import { FlaskConical } from "lucide-react"
+import { BandIcon } from "@/components/brand/BandIcon"
 import { cn } from "@/lib/utils"
 import { COLUMN_WIDTH } from "./column"
 import { ago, agoShort, clock } from "@/lib/format"
@@ -37,11 +38,11 @@ function syncView(s: ShellStatus, nowMs: number | null): SyncView {
   return { dot: "bg-optimal", label: rel ? `Synced ${rel}` : "Synced", line: at ? `Last sync ${at}` : "Synced" }
 }
 
-/** The band outline with its status dot (WHOOP's battery icon, spec §4.3.2). */
+/** The Fitbit Air band with its status dot, in WHOOP's battery slot (spec §4.3.2). */
 function Band({ dot }: { dot: string }) {
   return (
     <span aria-hidden className="relative grid size-6 place-items-center">
-      <Watch className="size-[22px]" strokeWidth={1.6} />
+      <BandIcon className="size-[22px]" />
       <span className={cn("absolute -top-0.5 -right-0.5 size-2 rounded-full ring-2 ring-background-top", dot)} />
     </span>
   )
@@ -97,7 +98,7 @@ export function SyncStatus({ variant = "header" }: { variant?: "header" | "icon"
       >
         <div className="flex items-center gap-3 p-4">
           <span aria-hidden className="grid size-10 shrink-0 place-items-center rounded-xl bg-white/[0.06]">
-            <Watch className="size-5" strokeWidth={1.75} />
+            <BandIcon className="size-5" strokeWidth={1.75} />
           </span>
           <div className="min-w-0">
             <p className="text-[15px] leading-5 font-semibold">{s.mode === "demo" ? "Demo data" : "Google Health"}</p>

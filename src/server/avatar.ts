@@ -1,5 +1,5 @@
 // The avatar (Home header, Settings › Account): an uploaded photo, else the owner's Google photo, else
-// AVATAR_URL or public/avatar.*, else null, which the UI draws as a blobatar seeded by the account.
+// AVATAR_URL or public/avatar.*, else null, which the UI draws as the outline person icon.
 import { existsSync } from "node:fs";
 import path from "node:path";
 import { getConfig } from "./config";

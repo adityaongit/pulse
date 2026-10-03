@@ -31,7 +31,6 @@ export default async function SettingsPage() {
             account={{
               email: session?.kind === "owner" ? session.email : null,
               avatar,
-              seed: session?.kind === "owner" ? session.email : "pulse-demo",
               customPhoto: avatar?.startsWith("/avatar?") ?? false,
             }}
           />
