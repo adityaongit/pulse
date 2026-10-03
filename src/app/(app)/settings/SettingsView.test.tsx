@@ -5,6 +5,7 @@ import { SettingsView } from "./SettingsView"
 
 // The Disconnect button's server action touches the database; the view only needs its shape.
 vi.mock("./actions", () => ({ disconnectGoogle: vi.fn() }))
+vi.mock("@/server/actions/profile", () => ({ saveProfileAction: vi.fn() }))
 
 const NOW = Date.parse("2026-10-02T10:00:00Z")
 const base: SettingsVM = {
@@ -55,5 +56,16 @@ describe("Settings view", () => {
     expect(screen.getByText(/GOOGLE_OAUTH_ENABLED=true/)).toBeInTheDocument()
     expect(screen.getByText(/noop \(PolyForm Noncommercial 1\.0\.0\)/)).toBeInTheDocument()
     expect(screen.getByText(/Hælan \(AGPL-3\.0\)/)).toBeInTheDocument()
+  })
+
+  it("profile is editable and the account can sign out with a plain form post", () => {
+    render(<SettingsView vm={base} now={NOW} email="me@example.com" />)
+    const profile = screen.getByRole("region", { name: "Profile" })
+    expect(within(profile).getByRole("button", { name: "Edit profile" })).toBeInTheDocument()
+    expect(within(profile).getByText("Not set")).toBeInTheDocument()
+    expect(screen.getByText("Signed in as me@example.com")).toBeInTheDocument()
+    const out = screen.getByRole("button", { name: "Sign out" })
+    expect(out.closest("form")).toHaveAttribute("action", "/logout")
+    expect(out.closest("form")).toHaveAttribute("method", "post")
   })
 })

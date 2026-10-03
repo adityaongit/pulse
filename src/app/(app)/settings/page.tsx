@@ -1,4 +1,5 @@
 import { connection } from "next/server"
+import { currentSession } from "@/server/auth"
 import { getSettings } from "@/server/queries/settings"
 import { DetailShell } from "@/components/shells/DetailShell"
 import { OAuthToast } from "./SettingsClient"
@@ -13,6 +14,7 @@ export const metadata = { title: "Settings" }
 export default async function SettingsPage() {
   await connection()
   const vm = getSettings()
+  const session = await currentSession()
   return (
     <DetailShell
       title="Settings"
@@ -20,7 +22,7 @@ export default async function SettingsPage() {
       primary={
         <>
           <OAuthToast />
-          <SettingsView vm={vm} now={requestTime()} />
+          <SettingsView vm={vm} now={requestTime()} email={session?.kind === "owner" ? session.email : null} />
         </>
       }
     />
