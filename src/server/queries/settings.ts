@@ -3,7 +3,7 @@ import { SCORING_VERSION } from "../pipeline";
 import { addDays, wholeYears } from "../time";
 import { defaultCtx, firstDay, type QueryCtx, todayOf } from "./common";
 import { latestReport } from "./home";
-import type { MoreVM, SettingsVM, ShellStatusVM } from "./types";
+import type { MoreVM, SettingsVM, ShellStatusVM, YourDataVM } from "./types";
 
 export { requestSync } from "../worker";
 
@@ -118,7 +118,30 @@ export function getSettings(ctx: QueryCtx = defaultCtx()): SettingsVM {
 
 /** More `/more`. */
 export function getMore(ctx: QueryCtx = defaultCtx()): MoreVM {
-  return { latestWeek: latestReport(ctx, "week"), latestMonth: latestReport(ctx, "month"), mode: ctx.mode, version: APP_VERSION, scoringVersion: SCORING_VERSION };
+  const c = ctx.db.$client;
+  const tags = c.prepare("select count(*) total, coalesce(sum(hidden = 0), 0) shown from journal_tags").get() as { total: number; shown: number };
+  return {
+    latestWeek: latestReport(ctx, "week"),
+    latestMonth: latestReport(ctx, "month"),
+    reportCount: c.prepare("select count(*) from reports where json_extract(data, '$.days') > 0").pluck().get() as number,
+    behaviours: { shown: tags.shown, total: tags.total },
+    mode: ctx.mode,
+    version: APP_VERSION,
+    scoringVersion: SCORING_VERSION,
+  };
+}
+
+/** Your data `/more/data`: what each export holds. */
+export function getYourData(ctx: QueryCtx = defaultCtx()): YourDataVM {
+  const c = ctx.db.$client;
+  const first = firstDay(ctx);
+  const today = todayOf(ctx);
+  return {
+    first,
+    days: first ? (c.prepare("select count(*) from daily_scores where day <= ?").pluck().get(today) as number) : 0,
+    answers: c.prepare("select count(*) from journal_entries").pluck().get() as number,
+    mode: ctx.mode,
+  };
 }
 
 /** Today counts toward the streak once it has this many minutes of heart rate; until then the streak ends yesterday. */

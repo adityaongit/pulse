@@ -13,4 +13,13 @@ export async function currentSession(): Promise<Session | null> {
   });
 }
 
-export const SIGNED_OUT = { ok: false as const, error: "Signed out. Sign in again." };
+/** The same check for a route handler, from the request's own cookie (as /oauth/callback does). */
+export function requestSession(req: { cookies: { get(name: string): { value: string } | undefined } }): Promise<Session | null> {
+  const { google } = getConfig();
+  return verifySession(getDb(), req.cookies.get(SESSION_COOKIE)?.value, {
+    googleEnabled: !!google,
+    ownerEmail: google?.ownerEmail ?? null,
+  });
+}
+
+export const SIGNED_OUT ={ ok: false as const, error: "Signed out. Sign in again." };
