@@ -137,6 +137,10 @@ export const journalTags = sqliteTable("journal_tags", {
   tag: text("tag").primaryKey(),
   label: text("label").notNull(),
   isDefault: bool("is_default").notNull().default(false),
+  /** Hidden from the check-in sheet (More › Behaviours). Past answers stay and still count in insights. */
+  hidden: bool("hidden").notNull().default(false),
+  /** Order within the tag's check-in group; ties fall back to insertion order (rowid). */
+  position: integer("position").notNull().default(0),
 });
 
 export const journalEntries = sqliteTable(

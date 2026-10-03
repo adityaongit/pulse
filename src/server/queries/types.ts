@@ -299,7 +299,10 @@ export type FitnessVM = {
 
 // ── Journal ──────────────────────────────────────────────────────────────────
 
-export type JournalTag = { tag: string; label: string; group: "evening" | "recovery" | "context" | "custom"; isDefault: boolean };
+export type JournalTag = { tag: string; label: string; group: "evening" | "recovery" | "context" | "custom"; isDefault: boolean; hidden: boolean };
+
+/** More › Behaviours: every tag in check-in order, hidden ones included, with its answered-day count. */
+export type BehavioursVM = { tags: (JournalTag & { answers: number })[] };
 
 export type JournalVM = {
   day: string;
@@ -368,9 +371,24 @@ export type SettingsVM = {
 export type MoreVM = {
   latestWeek: { period: string; start: string; end: string } | null;
   latestMonth: { period: string; start: string; end: string } | null;
+  /** Periods with data, for the archive row's caption. */
+  reportCount: number;
+  /** Behaviours on the check-in sheet, and all of them. */
+  behaviours: { shown: number; total: number };
   mode: "demo" | "google";
   version: string;
   scoringVersion: number;
+};
+
+/** Your data `/more/data`. */
+export type YourDataVM = {
+  /** First day with scores; null before any data. */
+  first: string | null;
+  /** Days in the daily-scores export. */
+  days: number;
+  /** Rows in the journal export. */
+  answers: number;
+  mode: "demo" | "google";
 };
 
 // ── Calendar (DateSwitcher month panel) ─────────────────────────────────────

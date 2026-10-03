@@ -28,7 +28,7 @@ describe("changedEntries", () => {
 
 describe("CheckIn", () => {
   it("unselecting a saved Yes and saving clears it", async () => {
-    const tags: JournalTag[] = [{ tag: "alcohol", label: "Alcohol", group: "evening", isDefault: true }]
+    const tags: JournalTag[] = [{ tag: "alcohol", label: "Alcohol", group: "evening", isDefault: true, hidden: false }]
     render(
       <CheckIn
         day="2026-10-02"

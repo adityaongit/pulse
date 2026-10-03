@@ -7,6 +7,7 @@ import { currentSession, SIGNED_OUT } from "../auth";
 import { getConfig } from "../config";
 import { getDb } from "../db";
 import { intradayDirty, journalEntries, journalTags } from "../db/schema";
+import { addTag, reorderTags, setTagHidden, tagKey } from "../journalTags";
 import { requestSync } from "../worker";
 
 export type ActionResult<T = undefined> = { ok: true; data: T } | { ok: false; error: string };
@@ -55,10 +56,38 @@ export async function addCustomTag(input: z.input<typeof CustomTag>): Promise<Ac
   const r = CustomTag.safeParse(input);
   if (!r.success) return { ok: false, error: r.error.issues[0].message };
   const { label } = r.data;
-  const tag = label.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, "");
+  const tag = tagKey(label);
   if (!tag) return { ok: false, error: "Label needs a letter or digit" };
-  const added = getDb().insert(journalTags).values({ tag, label, isDefault: false }).onConflictDoNothing().run().changes;
-  if (!added) return { ok: false, error: `Tag already exists: ${tag}` };
-  revalidatePath("/journal");
+  if (!addTag(getDb(), tag, label)) return { ok: false, error: `Tag already exists: ${tag}` };
+  revalidateTags();
   return { ok: true, data: { tag } };
+}
+
+const revalidateTags = () => {
+  revalidatePath("/journal");
+  revalidatePath("/more/behaviours");
+};
+
+const Hidden = z.object({ tag: z.string().min(1).max(64), hidden: z.boolean() });
+
+/** Hides a behaviour from the check-in sheet, or shows it again. Its past answers stay and still count in insights. */
+export async function setBehaviourHidden(input: z.input<typeof Hidden>): Promise<ActionResult> {
+  if (!(await currentSession())) return SIGNED_OUT;
+  const r = Hidden.safeParse(input);
+  if (!r.success) return { ok: false, error: r.error.issues[0].message };
+  if (!setTagHidden(getDb(), r.data.tag, r.data.hidden)) return { ok: false, error: `Unknown tag: ${r.data.tag}` };
+  revalidateTags();
+  return { ok: true, data: undefined };
+}
+
+const Order = z.object({ tags: z.array(z.string().min(1).max(64)).min(1).max(200) });
+
+/** Sets the order of one check-in group's behaviours. */
+export async function reorderBehaviours(input: z.input<typeof Order>): Promise<ActionResult> {
+  if (!(await currentSession())) return SIGNED_OUT;
+  const r = Order.safeParse(input);
+  if (!r.success) return { ok: false, error: r.error.issues[0].message };
+  if (!reorderTags(getDb(), r.data.tags)) return { ok: false, error: "Unknown or repeated tag" };
+  revalidateTags();
+  return { ok: true, data: undefined };
 }

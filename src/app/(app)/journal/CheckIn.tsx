@@ -2,9 +2,9 @@
 
 import * as React from "react"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
-import { Bath, Coffee, Flower2, Plane, Smartphone, StretchHorizontal, Tag, Thermometer, Utensils, Wine, type LucideIcon } from "lucide-react"
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"
+import { TAG_GROUPS, tagIcon } from "@/lib/journal"
 import { withParam } from "@/lib/url"
 import { addCustomTag, saveJournalEntry } from "@/server/actions/journal"
 import type { JournalTag, JournalVM } from "@/server/queries/types"
@@ -19,23 +19,6 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 
-const ICON: Record<string, LucideIcon> = {
-  alcohol: Wine,
-  late_caffeine: Coffee,
-  late_meal: Utensils,
-  screen_in_bed: Smartphone,
-  meditation: Flower2,
-  stretching: StretchHorizontal,
-  sauna: Bath,
-  travel: Plane,
-  illness: Thermometer,
-}
-const GROUPS: { key: JournalTag["group"]; title: string }[] = [
-  { key: "evening", title: "Evening" },
-  { key: "recovery", title: "Recovery" },
-  { key: "context", title: "Context" },
-  { key: "custom", title: "Your behaviours" },
-]
 const ITEM =
   "h-11 min-w-14 rounded-lg px-3 text-[13px] font-bold tracking-[0.06em] uppercase transition-[background-color,color] duration-150 ease-standard"
 export const TAG_CLASS = "h-7 rounded-full px-3 text-[13px] font-semibold"
@@ -195,7 +178,7 @@ export function CheckIn({ day, dayLabel, tags, checkIn }: CheckInProps) {
           </>
         }
       >
-        {GROUPS.map((g) => {
+        {TAG_GROUPS.map((g) => {
           const items = tags.filter((t) => t.group === g.key)
           if (!items.length && g.key !== "custom") return null
           return (
@@ -205,7 +188,7 @@ export function CheckIn({ day, dayLabel, tags, checkIn }: CheckInProps) {
               </h3>
               <ul>
                 {items.map((t) => {
-                  const Icon = ICON[t.tag] ?? Tag
+                  const Icon = tagIcon(t.tag)
                   const v = values[t.tag]
                   return (
                     <li key={t.tag} className="flex min-h-14 items-center gap-3 border-b border-border">

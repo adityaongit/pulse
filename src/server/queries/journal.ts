@@ -2,7 +2,7 @@ import type { ImpactMetric, TagImpact } from "@/core/algorithms/journalImpact";
 import type { JournalImpactRow } from "../pipeline";
 import { addDays } from "../time";
 import { defaultCtx, finite, loadDays, meanSd, type QueryCtx, todayOf } from "./common";
-import type { ImpactMetricKey, JournalInsightsVM, JournalTag, JournalVM } from "./types";
+import type { BehavioursVM, ImpactMetricKey, JournalInsightsVM, JournalTag, JournalVM } from "./types";
 
 const GROUP: Record<string, JournalTag["group"]> = {
   alcohol: "evening",
@@ -16,9 +16,23 @@ const GROUP: Record<string, JournalTag["group"]> = {
   illness: "context",
 };
 
+/** Every tag, hidden ones included, in check-in order (position inside a group, then insertion order). */
 function tagsOf(ctx: QueryCtx): JournalTag[] {
-  const rows = ctx.db.$client.prepare("select tag, label, is_default isDefault from journal_tags order by rowid").all() as { tag: string; label: string; isDefault: number }[];
-  return rows.map((r) => ({ tag: r.tag, label: r.label, isDefault: !!r.isDefault, group: GROUP[r.tag] ?? "custom" }));
+  const rows = ctx.db.$client.prepare("select tag, label, is_default isDefault, hidden from journal_tags order by position, rowid").all() as {
+    tag: string;
+    label: string;
+    isDefault: number;
+    hidden: number;
+  }[];
+  return rows.map((r) => ({ tag: r.tag, label: r.label, isDefault: !!r.isDefault, hidden: !!r.hidden, group: GROUP[r.tag] ?? "custom" }));
+}
+
+/** More › Behaviours: every tag, hidden ones included, with how many days answered it. */
+export function getBehaviours(ctx: QueryCtx = defaultCtx()): BehavioursVM {
+  const counts = new Map(
+    (ctx.db.$client.prepare("select tag, count(*) n from journal_entries group by tag").all() as { tag: string; n: number }[]).map((r) => [r.tag, r.n]),
+  );
+  return { tags: tagsOf(ctx).map((t) => ({ ...t, answers: counts.get(t.tag) ?? 0 })) };
 }
 
 function entriesBetween(ctx: QueryCtx, from: string, to: string) {
@@ -71,7 +85,8 @@ export function getJournal(day: string, ctx: QueryCtx = defaultCtx()): JournalVM
     day,
     today,
     strip,
-    tags,
+    // Hidden behaviours leave the check-in sheet; their answers stay, still label History and still count in insights.
+    tags: tags.filter((t) => !t.hidden),
     checkIn: { done: mine.length > 0, entries: Object.fromEntries(mine.map((e) => [e.tag, e.value])), yes: yesOf(mine) },
     teaser,
     history,
