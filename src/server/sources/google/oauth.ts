@@ -13,6 +13,7 @@ const AUTH_URL = "https://accounts.google.com/o/oauth2/v2/auth";
 const TOKEN_URL = "https://oauth2.googleapis.com/token";
 const REVOKE_URL = "https://oauth2.googleapis.com/revoke";
 const IDENTITY_URL = "https://health.googleapis.com/v4/users/me/identity";
+const PROFILE_URL = "https://health.googleapis.com/v4/users/me/profile";
 const STATE_TTL_MS = 10 * 60_000;
 const EXPIRY_MARGIN_S = 60;
 export const FETCH_TIMEOUT_MS = 30_000;
@@ -227,6 +228,27 @@ async function requireHealthProfile(fetchFn: typeof fetch, accessToken: string) 
   const res = await fetchFn(IDENTITY_URL, { headers: { authorization: `Bearer ${accessToken}` }, signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) });
   if (res.ok) return void (await res.body?.cancel());
   if (errorCode(parseJson(await res.text())) === "ACCOUNT_NOT_LINKED") throw new GoogleError("account_not_linked", res.status, "identity");
+}
+
+/**
+ * The age Google Health holds for the account, in whole years, or null. Google's profile has no birth date
+ * and no sex, only `age`, so onboarding still asks for both and uses this to open the date picker on the
+ * right year. Best effort: any failure is just null.
+ */
+export async function googleAge(db: Db, google: Google, o: Deps = {}): Promise<number | null> {
+  const { fetch: fetchFn = fetch } = o;
+  try {
+    const token = await getAccessToken(db, google, o);
+    const res = await fetchFn(PROFILE_URL, { headers: { authorization: `Bearer ${token}` }, signal: AbortSignal.timeout(5_000) });
+    if (!res.ok) {
+      await res.body?.cancel();
+      return null;
+    }
+    const age = (parseJson(await res.text()) as { age?: unknown } | undefined)?.age;
+    return typeof age === "number" && age >= 13 && age <= 100 ? age : null;
+  } catch {
+    return null;
+  }
 }
 
 /**

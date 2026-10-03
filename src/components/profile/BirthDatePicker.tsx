@@ -30,12 +30,15 @@ export function BirthDatePicker({
   defaultValue,
   invalid,
   describedBy,
+  startYear = START_YEAR,
 }: {
   id: string
   name: string
   defaultValue: string
   invalid?: boolean
   describedBy?: string
+  /** The year an empty picker opens on. */
+  startYear?: number
 }) {
   const today = React.useMemo(() => new Date(), [])
   const youngest = today.getFullYear() - 13
@@ -43,14 +46,14 @@ export function BirthDatePicker({
   const picked = value ? parseISO(value) : undefined
   const [open, setOpen] = React.useState(false)
   const [view, setView] = React.useState<"year" | "month" | "day">(picked ? "day" : "year")
-  const [month, setMonth] = React.useState<Date>(picked ?? new Date(START_YEAR, 0, 1))
+  const [month, setMonth] = React.useState<Date>(picked ?? new Date(startYear, 0, 1))
   const year = month.getFullYear()
 
   const onOpenChange = (o: boolean) => {
     setOpen(o)
     if (o) {
       setView(picked ? "day" : "year")
-      setMonth(picked ?? new Date(START_YEAR, 0, 1))
+      setMonth(picked ?? new Date(startYear, 0, 1))
     }
   }
 

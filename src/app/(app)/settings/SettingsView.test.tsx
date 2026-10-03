@@ -38,7 +38,7 @@ describe("Settings view", () => {
 
   it("journey 10: revoked asks to reconnect", () => {
     render(<SettingsView vm={{ ...base, source: { label: "Google Health", status: "revoked" } }} now={NOW} />)
-    expect(within(source()).getByText("Reconnect needed")).toBeInTheDocument()
+    expect(within(source()).getByText("Access revoked")).toBeInTheDocument()
     expect(within(source()).getByRole("link", { name: "Reconnect Google" })).toHaveAttribute("href", "/oauth/start")
   })
 
