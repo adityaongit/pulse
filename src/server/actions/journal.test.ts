@@ -4,11 +4,13 @@ import path from "node:path";
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import type { Config } from "../config";
 import { type Db, openDb } from "../db";
-import { journalEntries, journalTags } from "../db/schema";
+import { intradayDirty, journalEntries, journalTags } from "../db/schema";
 import { DEFAULT_JOURNAL_TAGS, ensureDefaultTags } from "../journalTags";
+import { needsRecompute } from "../pipeline";
 import { addCustomTag, saveJournalEntry } from "./journal";
 
-const h = vi.hoisted(() => ({ db: undefined as unknown, revalidate: vi.fn() }));
+const h = vi.hoisted(() => ({ db: undefined as unknown, revalidate: vi.fn(), requestSync: vi.fn() }));
+vi.mock("../worker", () => ({ requestSync: h.requestSync }));
 vi.mock("next/cache", () => ({ revalidatePath: h.revalidate }));
 vi.mock("../config", async (orig) => ({ ...(await orig<object>()), getConfig: () => ({ timeZone: "Asia/Kolkata" }) as Config }));
 vi.mock("../db", async (orig) => ({ ...(await orig<object>()), getDb: () => h.db as Db }));
@@ -31,7 +33,9 @@ afterAll(() => {
 });
 beforeEach(() => {
   db.delete(journalEntries).run();
+  db.delete(intradayDirty).run();
   h.revalidate.mockClear();
+  h.requestSync.mockClear();
 });
 
 describe("ensureDefaultTags", () => {
@@ -56,10 +60,20 @@ describe("saveJournalEntry", () => {
     expect(h.revalidate.mock.calls).toEqual([["/journal"], ["/"], ["/journal"], ["/"]]);
   });
 
+  it("marks a recompute needed and kicks the worker past its gate", async () => {
+    expect(needsRecompute(db)).toBe(false);
+    await saveJournalEntry({ day: "2026-09-30", tag: "alcohol", value: true });
+    await saveJournalEntry({ day: "2026-09-30", tag: "alcohol", value: null });
+    expect(db.select().from(intradayDirty).all()).toEqual([{ day: "2026-09-30" }]);
+    expect(needsRecompute(db)).toBe(true);
+    expect(h.requestSync.mock.calls).toEqual([[{ force: true }], [{ force: true }]]);
+  });
+
   it("rejects a future day", async () => {
     expect(await saveJournalEntry({ day: "2026-10-04", tag: "alcohol", value: true })).toEqual({ ok: false, error: "Can't log a future day" });
     expect(entries()).toEqual([]);
     expect(h.revalidate).not.toHaveBeenCalled();
+    expect(h.requestSync).not.toHaveBeenCalled();
   });
 
   it("rejects an unknown tag and malformed input", async () => {

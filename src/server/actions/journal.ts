@@ -5,7 +5,8 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { getConfig } from "../config";
 import { getDb } from "../db";
-import { journalEntries, journalTags } from "../db/schema";
+import { intradayDirty, journalEntries, journalTags } from "../db/schema";
+import { requestSync } from "../worker";
 
 export type ActionResult<T = undefined> = { ok: true; data: T } | { ok: false; error: string };
 
@@ -34,6 +35,11 @@ export async function saveJournalEntry(input: z.input<typeof Entry>): Promise<Ac
       .values({ day, tag, value })
       .onConflictDoUpdate({ target: [journalEntries.day, journalEntries.tag], set: { value } })
       .run();
+  // Stage 2 reads the journal (impact, Insights, Monitor context) but a check-in is no source change, so
+  // mark the day dirty (persistent, survives a restart; stage 1 redoes only that day, to the same result)
+  // and kick the worker past its 5-minute gate. Fire-and-forget: the action doesn't wait on the recompute.
+  db.insert(intradayDirty).values({ day }).onConflictDoNothing().run();
+  requestSync({ force: true });
   revalidatePath("/journal");
   revalidatePath("/");
   return { ok: true, data: undefined };
