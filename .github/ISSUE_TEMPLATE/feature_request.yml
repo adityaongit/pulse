@@ -1,0 +1,23 @@
+name: Feature request
+description: Suggest an idea or an improvement.
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: The problem
+      description: What are you trying to do, and what gets in the way?
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: The idea
+      description: What would you like Pulse to do? Screens from WHOOP or other apps help, described in words (please don't attach their screenshots).
+    validations:
+      required: true
+  - type: textarea
+    id: data
+    attributes:
+      label: Data it needs
+      description: Which Fitbit Air / Google Health data would this use, if you know?

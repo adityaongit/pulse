@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Report a security vulnerability
+    url: https://github.com/adityaongit/pulse/security/advisories/new
+    about: Please report vulnerabilities privately, never in a public issue. See SECURITY.md.
+  - name: Setup help
+    url: https://github.com/adityaongit/pulse/blob/main/docs/setup.md
+    about: Start with the setup guide; most setup questions are answered there.

@@ -1,0 +1,51 @@
+name: Bug report
+description: Something in Pulse is wrong or broken.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting. Please never paste real health data, OAuth tokens, `.env` values or database files. Reproduce in demo mode if you can.
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What did you see, and what did you expect instead?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Open ...
+        2. Tap ...
+        3. See ...
+    validations:
+      required: true
+  - type: dropdown
+    id: mode
+    attributes:
+      label: Data mode
+      options:
+        - Demo data
+        - Google Health (real data)
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Pulse version
+      description: Shown in More › About (for example 0.1.0, scoring v3), or the commit you run.
+    validations:
+      required: true
+  - type: input
+    id: device
+    attributes:
+      label: Browser and device
+      placeholder: Chrome 140 on a Android phone
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs or screenshots
+      description: Server logs (`docker compose logs pulse`) and screenshots. Check them for personal data first.
