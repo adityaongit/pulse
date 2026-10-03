@@ -40,3 +40,6 @@ npm-debug.log*
 
 # e2e screenshots (review locally)
 /e2e/__screens__/
+
+# Design reference screenshots (third-party, not for publishing)
+/docs/design/reference/
