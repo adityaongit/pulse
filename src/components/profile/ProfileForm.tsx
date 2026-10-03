@@ -4,6 +4,7 @@ import * as React from "react"
 import { cn } from "@/lib/utils"
 import { saveProfileAction, type ProfileFormState } from "@/server/actions/profile"
 import { Button } from "@/components/ui/button"
+import { BirthDatePicker } from "./BirthDatePicker"
 
 export type ProfileDefaults = { birthDate: string; sex: "male" | "female" | null; maxHr: number | null; heightCm: number | null }
 
@@ -35,8 +36,8 @@ function Field({ id, label, hint, error, optional, children }: { id: string; lab
 }
 
 /**
- * The profile fields (U19), shared by onboarding and Settings › Profile. Native controls: the date input opens
- * the platform picker on phones, and the sex choice is a radio pair styled as a segmented control.
+ * The profile fields (U19), shared by onboarding and Settings › Profile: a year-first birth date picker, and
+ * the sex choice as a radio pair styled as a segmented control.
  * `footer` renders the submit, so each host places it (onboarding pins it to the bottom, the sheet to its foot).
  */
 export function ProfileForm({
@@ -55,14 +56,13 @@ export function ProfileForm({
   React.useEffect(() => {
     if (state?.ok) onSaved?.()
   }, [state, onSaved])
-  const today = new Date().toISOString().slice(0, 10)
   const described = (id: keyof NonNullable<typeof f>) => ({ "aria-invalid": !!f?.[id] || undefined, "aria-describedby": `${id}-${f?.[id] ? "error" : "hint"}` })
 
   return (
     <form action={action} className="flex flex-col gap-6" noValidate>
       {onboarding && <input type="hidden" name="onboarding" value="1" />}
       <Field id="birthDate" label="Birth date" hint="Sets your age for heart rate zones, sleep need and Pulse Age." error={f?.birthDate}>
-        <input id="birthDate" name="birthDate" type="date" required max={today} min="1920-01-01" defaultValue={defaults.birthDate} className={cn(FIELD, "invalid:text-muted-foreground")} {...described("birthDate")} />
+        <BirthDatePicker id="birthDate" name="birthDate" defaultValue={defaults.birthDate} invalid={!!f?.birthDate} describedBy={described("birthDate")["aria-describedby"]} />
       </Field>
 
       <fieldset className="flex flex-col gap-2" aria-describedby={f?.sex ? "sex-error" : "sex-hint"}>

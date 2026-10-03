@@ -19,11 +19,11 @@ export function Mark({
   animated?: boolean
 }) {
   const mono = color === "mono"
-  const beat = animated ? "motion-safe:animate-beat [transform-box:fill-box]" : undefined
+  // translate is in viewBox units (the mark is 15 units tall), so the beat scales with the mark.
   return (
-    <svg viewBox="4.5 4.5 15 15" role="img" aria-label={title ?? "Pulse"} className={cn("size-6 shrink-0", className)}>
+    <svg viewBox="4.5 4.5 15 15" role="img" aria-label={title ?? "Pulse"} className={cn("size-6 shrink-0", animated && "overflow-visible", className)}>
       {title && <title>{title}</title>}
-      <rect x={6.9} y={4.5} width={4.2} height={11} rx={2.1} fill={mono ? "currentColor" : "var(--optimal)"} className={cn(beat, "origin-bottom")} />
+      <rect x={6.9} y={4.5} width={4.2} height={11} rx={2.1} fill={mono ? "currentColor" : "var(--optimal)"} className={animated ? "motion-safe:animate-beat-up" : undefined} />
       <rect
         x={12.9}
         y={8.5}
@@ -31,7 +31,7 @@ export function Mark({
         height={11}
         rx={2.1}
         fill={mono ? "currentColor" : "var(--strain-text)"}
-        className={cn(beat, "origin-top [animation-delay:180ms]")}
+        className={animated ? "motion-safe:animate-beat-down" : undefined}
       />
     </svg>
   )

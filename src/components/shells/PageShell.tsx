@@ -37,7 +37,8 @@ export function PageShell({ title, dateSwitcher, actions, layout = "stack", slot
     <div data-ground={ground === "health" ? "health" : undefined}>
       {layout === "home" ? <HomeHeader rings={rings} /> : <TitleHeader title={title} dateSwitcher={dateSwitcher} />}
       <div className={CONTENT_COLUMN}>
-        <ConnectionBanner className="mb-4 xl:mb-6" />
+        {/* Home's top row pulls itself up under the header (-mt-2), so the banner keeps 24 px above the wordmark. */}
+        <ConnectionBanner className={layout === "home" ? "mb-8 xl:mb-6" : "mb-4 xl:mb-6"} />
         {actions && <div className="mb-4 flex justify-end gap-2">{actions}</div>}
         {layout === "home" && slots ? (
           <div className="flex flex-col gap-8 xl:grid xl:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] xl:gap-x-6 xl:gap-y-10">
