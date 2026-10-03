@@ -17,6 +17,11 @@ export type SectionShellProps = {
   /** Heading level; cards default to h3 inside a section, h2 otherwise. */
   level?: 2 | 3
   id?: string
+  /**
+   * Card only: the body fills a card stretched to its row's height (SYM). The body is a flex column, so content
+   * can anchor with `mt-auto` (a footer level with the neighbour's) or centre with `my-auto`.
+   */
+  fill?: boolean
   className?: string
   children: React.ReactNode
 }
@@ -44,7 +49,7 @@ export const CARD_LINK = cn(
 )
 
 /** A titled section or card (spec §4.7). Owns the card padding step at 1280 px. */
-export function SectionShell({ variant, title, info, action, aside, href, level, id, className, children }: SectionShellProps) {
+export function SectionShell({ variant, title, info, action, aside, href, level, id, fill, className, children }: SectionShellProps) {
   const headingId = `${id ?? slug(title)}-title`
   const actionNode = isLinkAction(action) ? <ActionLink {...action} /> : action
 
@@ -88,7 +93,7 @@ export function SectionShell({ variant, title, info, action, aside, href, level,
   const cardClass = cn("scroll-mt-20 gap-0 py-0", className)
   if (href)
     return (
-      <Link id={id} href={href} aria-labelledby={headingId} className={cn(CARD_LINK, "scroll-mt-20 min-w-0 p-4 xl:p-5", className)}>
+      <Link id={id} href={href} aria-labelledby={headingId} className={cn(CARD_LINK, "scroll-mt-20 min-w-0 p-4 xl:p-5", fill && "flex flex-col", className)}>
         {header}
         {children}
       </Link>
@@ -96,7 +101,7 @@ export function SectionShell({ variant, title, info, action, aside, href, level,
 
   return (
     <Card id={id} aria-labelledby={headingId} role="region" className={cardClass}>
-      <div className="min-w-0 p-4 xl:p-5">
+      <div className={cn("min-w-0 p-4 xl:p-5", fill && "flex flex-1 flex-col")}>
         {header}
         {children}
       </div>

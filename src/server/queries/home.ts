@@ -85,7 +85,9 @@ export function getHome(day: string, ctx: QueryCtx = defaultCtx()): HomeVM {
       const r = rows.get(d);
       const e = r?.s1?.effort;
       const rec = r?.recovery?.value;
-      return { day: d, strain: finite(e) ? toStrain(e) : null, recovery: finite(rec) ? rec : null };
+      // Today has no Strain score until effort accrues: a 0.0 would plot as a dive to the floor, so it is a gap (SYM4).
+      const scored = finite(e) && (d !== today || e > 0);
+      return { day: d, strain: scored ? toStrain(e) : null, recovery: finite(rec) ? rec : null };
     }),
   };
 }

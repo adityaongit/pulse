@@ -72,7 +72,7 @@ export default async function StrainPage({ searchParams }: PageProps<"/strain">)
         </SectionShell>
       }
       secondary={[
-        <SectionShell key="zones" variant="card" title="Time in zones" level={2} className="xl:row-span-2">
+        <SectionShell key="zones" variant="card" title="Time in zones" level={2} fill className="xl:row-span-2">
           <ZoneBars variant="rows" data={vm.zones} maxHr={vm.maxHr} emptyCopy={vm.isToday ? "No heart-rate zones yet today." : "No heart-rate zones on this day."} />
         </SectionShell>,
         <SectionShell key="activities" variant="card" title="Activities" level={2}>

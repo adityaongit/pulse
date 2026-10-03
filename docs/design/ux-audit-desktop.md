@@ -122,3 +122,80 @@ Severity: **high** blocks or hides content or a control, or breaks a keyboard pa
   - `pnpm typecheck`: clean.
   - `pnpm lint`: clean.
   - `pnpm test`: 601 passed and 1 skipped when the machine is idle. Under load, three seed-heavy server tests (`home.test.ts`, `pipeline.test.ts`, `sleep.test.ts`) can hit vitest's 5 s and 10 s timeouts; none of them touches UI code.
+
+## Symmetry pass
+
+Second pass, 2026-10-03, after the user's reports on Journal (strip, ✨ Insights pill, one-sided heading, empty left column), the DayStrip tile, and Home at 2000 px (uneven bottoms, Strain & recovery diving to 0.0 on today). Spec rows: §11 SYM1 to SYM11.
+
+### Method
+
+```mermaid
+flowchart LR
+  A[User screenshots<br/>Journal, DayStrip, Home 2000 px] --> B[docs/design/symmetry-measure.js<br/>16 routes x 7 widths in hidden iframes]
+  B --> C[Flags per route and width:<br/>edges, strip inset, top line, heading parity,<br/>bottoms, empty areas, stretched cards,<br/>orphans, rhythm, overflow]
+  C --> D[Fix with the shells:<br/>SectionShell fill, grid stretch,<br/>rebalanced columns]
+  D --> E[Re-measure every route and width,<br/>typecheck, lint, test, e2e]
+```
+
+- **Script.** `docs/design/symmetry-measure.js` is one function for the browser MCP's `evaluate_script`. It loads each route in a hidden same-origin iframe at the given width and, inside the content column, reports:
+  - outermost cards past the column's edges, and a scroll strip's first and last tiles against the edges (more than 1 px);
+  - for every container whose children form two or more columns of 200+ px blocks, grouped into visual rows and then into columns by left edge (so a `row-span` card's stacked neighbours count as one column):
+    - the first card's top per column (flag above 4 px);
+    - whether every column, or none, has a section heading;
+    - the card bottoms (flag above 24 px);
+    - empty space under a column (flag above 120 px);
+  - cards whose content ends more than 120 px above their bottom (stretched);
+  - single items alone in a row of a multi-track grid (orphans);
+  - uneven gaps between sibling sections;
+  - `scrollWidth - clientWidth`.
+- **Routes and widths.** The 16 routes of the first pass, at 361, 390, 820, 1280, 1440, 1600 and 1920 px, against the demo data (today = Sat 3 Oct 2026).
+
+### Before and after
+
+Flags per route. Laptop widths (1280, 1440, 1600, 1920) gave the same flags with slightly different numbers; the range is shown.
+
+| Route | Before | After |
+|---|---|---|
+| `/` | My Day and My Dashboard bottoms 62 px apart; Tonight's sleep 129-137 px empty inside; today plotted as 0.0 Strain | Bottoms equal; footers anchored, times centred; today is a gap until it has a score |
+| `/recovery` | Tomorrow's forecast ends 197 px above What shaped it | Equal bottoms, forecast centred in its card |
+| `/strain` | Time in zones 134 px empty inside | Rows share the height, equal bottoms |
+| `/activity/…` | Card tops 863 / 837 px; heading on one column only | Both columns headed; tops and bottoms equal |
+| `/health/healthspan` | Strain column 240-256 px short | Equal bottoms, rows spread evenly |
+| `/journal` | Strip tiles inset 16 / 16 px (also at 820); heading on one column only; bottoms 1185 px apart; 1185 px empty; ✨ pill orphaned above the strip | Strip on the column edges; one heading per section; check-in row and History both full width with equal tops and bottoms; Insights is the section heading's action |
+| `/journal/insights` | 500 px empty under the hero column; Keep logging to unlock alone in a half row (not caught by the script, seen in the screenshot) | Unlock fills the hero column; 178 px left under it (see below) |
+| `/settings` | Row bottoms 52-74 and 106 px apart | Equal |
+| `/health/monitor` at 820 | 140 px under the range legend | Unchanged, accepted (below) |
+| All other routes | Clean | Clean |
+| Phone (361, 390) | Clean, no overflow | Clean, no overflow; same order on every route except Journal, where Insights moved from a pill above the strip to the Check-in heading (the requested fix) |
+
+**Totals.** Before: 66 flags (16 per laptop width and 2 at 820). After: 17. Sixteen of them are on `/journal/insights` at the four laptop widths, and 1 is the 820 px legend; both are accepted. `scrollWidth` equals `clientWidth` on all 112 route-width pairs.
+
+**Accepted.**
+- **Journal Insights.** The hero column is sticky, so it pins under the header until its bottom meets the list's, and the 178 px closes as you scroll. The script flags four things there:
+  - the card tops (412 / 116 px), because the hero's first card is the unlock list under the intro;
+  - heading parity, because the list column has the impact legend rather than a heading;
+  - the 178 px of empty space;
+  - the bottoms, 178 px apart.
+  The two columns' text tops (the title and the legend) are level. The remaining gap depends on the data: the number of behaviours, and how many still need logging.
+- **Health Monitor at 820 px.** The sixth cell of the three-column vital grid holds the range legend as text, not an empty hole.
+
+### Fixes
+
+- **DayStrip tile (SYM1).** 8 px above and below the contents (`h-auto py-2`), so the badge sits inside the lit tile: 72 px with the journal badge, 60 px with the recovery bar.
+- **Journal (SYM2, SYM3).**
+  - Strip edges on the column from 768 px.
+  - One pattern for actions beside a section: the section heading's quiet action link ("INSIGHTS ›", as "View all" elsewhere). The pill is gone.
+  - "Check-in" section: the day's card and the teaser share a row, with equal heights and actions at their feet. Edit is a full-width "Edit check-in".
+  - "History" fills the width in two columns, read down the first column and then the second.
+- **Home (SYM4).**
+  - Both laptop columns fill the row. The shorter one grows its last card: the Energy Bank / Tonight's sleep pair, or the Strain & recovery chart through `ChartFigure grow`.
+  - `getHome` leaves today's Strain null until effort accrues. A test covers it in `home.test.ts`.
+- **Strain, Healthspan, Recovery, Activity, Settings (SYM5 to SYM9).** Stretched cards use `SectionShell fill`: the body becomes a flex column, so rows share the height, footers anchor and single figures centre. Activity's Heart rate recovery became a headed section.
+- **Journal Insights (SYM10).** Keep logging to unlock moved into the hero column on laptop; phone keeps it after the list. The title follows the outcome.
+- **Copy and guidelines (SYM11).**
+  - The monitor reads "N/5 within range" with "Out of range" as the status, on Home and on Monitor.
+  - Home's monitor caption wraps.
+  - No `transition-all` left.
+  - The behaviour input is 16 px.
+  - Home's monitor cards are `h2`.
+  - The full guideline review is in docs/design/guidelines-review.md.

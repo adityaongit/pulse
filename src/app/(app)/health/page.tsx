@@ -150,7 +150,7 @@ function Monitor({ m }: { m: HealthHubVM["monitor"] }) {
                 {all ? <Check aria-hidden className="size-3.5" strokeWidth={3} /> : <TriangleAlert aria-hidden className="size-3" strokeWidth={2.5} />}
               </span>
               <span className="text-[15px] leading-[22px] tabular-nums">
-                {v.inRange}/{v.total} metrics within range
+                {v.inRange}/{v.total} within range
               </span>
             </div>
           </div>

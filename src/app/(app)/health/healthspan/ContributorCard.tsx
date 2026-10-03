@@ -50,13 +50,14 @@ export function ContributorCard({ title, items, className }: { title: string; it
   const scale = (v: number) => v * (show?.scale ?? 1)
 
   return (
-    <SectionShell variant="card" title={title} className={className}>
-      <div className="divide-y divide-border">
+    // Stretched to its row (Strain beside Sleep and Fitness), the rows share the spare height evenly (SYM6).
+    <SectionShell variant="card" title={title} className={className} fill>
+      <div className="flex flex-1 flex-col divide-y divide-border">
         {items.map((c) => {
           const s = SHOW[c.key] ?? { format: "decimal1" as const }
           const k = s.scale ?? 1
           return (
-            <div key={c.key}>
+            <div key={c.key} className="flex flex-1 flex-col justify-center">
               <ContributorRow
                 variant="healthspan"
                 icon={ICON[c.key]}

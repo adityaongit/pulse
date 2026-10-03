@@ -17,9 +17,10 @@ export function TonightPlan({ plan, timeZone }: { plan: SleepPlanVM; timeZone: s
   const chosen = plan.plans.find((p) => p.key === key) ?? plan.plans[0]
   const bed = clock(chosen.bedtimeAt, timeZone)
   return (
-    <div role="group" aria-label={`Bed by ${bed} for ${chosen.label.toLowerCase()}`} className="@container space-y-4">
+    <div role="group" aria-label={`Bed by ${bed} for ${chosen.label.toLowerCase()}`} className="@container flex flex-1 flex-col gap-4">
       {/* WHOOP's "(sunset) 11:20 - - - - (alarm) 8:30" [latest-home-top-1]: two time blocks joined by a dashed rule. */}
-      <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1.5">
+      {/* Stretched, the times centre in the space above the toggle rather than leaving it all under them (SYM4). */}
+      <div className="my-auto grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1.5">
         <span className="flex items-center gap-2">
           <Sunset aria-hidden className="size-6 shrink-0 text-foreground-secondary" strokeWidth={1.5} />
           <span className={TIME} aria-live="polite">
@@ -41,7 +42,8 @@ export function TonightPlan({ plan, timeZone }: { plan: SleepPlanVM; timeZone: s
         onValueChange={(v) => v && setKey(v as typeof key)}
         spacing={0}
         aria-label="Sleep goal"
-        className="grid w-full grid-cols-3 gap-0.5 rounded-lg bg-muted p-0.5"
+        // At the foot of a stretched card, level with the Energy Bank's Charged / Drained tiles beside it (SYM4).
+        className="mt-auto grid w-full grid-cols-3 gap-0.5 rounded-lg bg-muted p-0.5"
       >
         {plan.plans.map((p) => (
           <ToggleGroupItem

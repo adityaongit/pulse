@@ -9,16 +9,22 @@ export function ChartFigure({
   summary,
   config,
   className,
+  grow,
   children,
 }: {
   summary: string
   config: ChartConfig
-  /** A fixed height class, e.g. "h-[200px]". */
+  /** A fixed height class, e.g. "h-[200px]". With `grow`, the minimum height. */
   className: string
+  /**
+   * Fill a card stretched to its row (SYM4): the plot takes the spare height. Recharts needs a definite height, so
+   * `className` keeps a fixed one where the card is not stretched (below 1280 px) and a minimum from there.
+   */
+  grow?: boolean
   children: React.ComponentProps<typeof ChartContainer>["children"]
 }) {
   return (
-    <figure className="min-w-0">
+    <figure className={cn("min-w-0", grow && "flex flex-1 flex-col")}>
       <figcaption className="sr-only">{summary}</figcaption>
       {/* Recharts' keyboard layer makes the plot a tab stop (arrows scrub the tooltip). No outline box on the plot:
           Chrome treated a click as focus-visible and drew a box round the chart; keyboard focus already shows as the
@@ -27,7 +33,8 @@ export function ChartFigure({
         config={config}
         className={cn(
           "aspect-auto w-full font-numeric text-xs font-medium [&_.recharts-surface]:rounded-md [&_.recharts-surface]:outline-none [&_.recharts-wrapper]:outline-none",
-          className
+          className,
+          grow && "xl:flex-1"
         )}
       >
         {children}

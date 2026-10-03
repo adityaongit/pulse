@@ -37,8 +37,10 @@ function Rows({ zones, maxHr }: { zones: ZoneRow[]; maxHr?: number }) {
   const total = zones.reduce((a, z) => a + z.seconds, 0)
   const sorted = [...zones].sort((a, b) => b.zone - a.zone)
   return (
-    <div>
-      <ul role="list" className="space-y-2">
+    // In a stretched card (Strain's Time in zones beside two stacked cards) the five rows share the spare height
+    // evenly instead of leaving it under the last row (SYM5). In a natural-height parent nothing grows.
+    <div className="flex flex-1 flex-col">
+      <ul role="list" className="flex flex-1 flex-col gap-2">
         {sorted.map((z) => {
           const range = z.max === null ? `${z.min}+ bpm` : `${z.min}-${z.max} bpm`
           const sh = share(z.seconds, total)
@@ -48,7 +50,7 @@ function Rows({ zones, maxHr }: { zones: ZoneRow[]; maxHr?: number }) {
             <li
               key={z.zone}
               aria-label={`Zone ${z.zone}, ${range.replace("-", " to ").replace("+", " and above")}, ${durationWords(minutes)}, ${sh === "<1%" ? "under 1 percent" : sh.replace("%", " percent")}`}
-              className={cn("space-y-2 rounded-lg bg-secondary px-3 py-2.5", !z.seconds && "opacity-40")}
+              className={cn("flex flex-1 flex-col justify-center gap-2 rounded-lg bg-secondary px-3 py-2.5", !z.seconds && "opacity-40")}
             >
               <div aria-hidden className="flex items-baseline gap-3">
                 <span className={LABEL}>Zone {z.zone}</span>

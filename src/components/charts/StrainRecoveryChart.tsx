@@ -77,7 +77,7 @@ function StrainLabel({ x, y, value }: LabelProps) {
  * Recovery on the right (0-100 %, band colours), hollow dots with value labels, today's column lit.
  * Missing days are gaps, never interpolated.
  */
-export function StrainRecoveryChart({ points, today }: { points: StrainRecoveryPoint[]; today: string }) {
+export function StrainRecoveryChart({ points, today, grow }: { points: StrainRecoveryPoint[]; today: string; grow?: boolean }) {
   const anim = useSeriesAnimation()
   const rows: Row[] = points.map((p) => ({
     ...p,
@@ -93,7 +93,7 @@ export function StrainRecoveryChart({ points, today }: { points: StrainRecoveryP
   }, Recovery ${recs.length ? `from ${Math.round(Math.min(...recs))} to ${Math.round(Math.max(...recs))} percent` : "not recorded"}.`
 
   return (
-    <ChartFigure summary={summary} config={{ strain: { label: "Strain" }, recovery: { label: "Recovery" } }} className="h-[232px]">
+    <ChartFigure summary={summary} config={{ strain: { label: "Strain" }, recovery: { label: "Recovery" } }} className={grow ? "h-[232px] xl:h-auto xl:min-h-[232px]" : "h-[232px]"} grow={grow}>
       <ComposedChart data={rows} accessibilityLayer margin={{ top: 20, right: 4, bottom: 0, left: 4 }} barCategoryGap="18%">
         <CartesianGrid {...GRID} yAxisId="s" />
         <XAxis dataKey="label" interval={0} height={40} tick={<XTick rows={rows} />} {...AXIS} tickMargin={4} />

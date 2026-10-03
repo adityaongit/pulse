@@ -130,12 +130,13 @@ export function Profile({ profile }: { profile: SettingsVM["profile"] }) {
 
 export function About({ version, scoringVersion }: { version: string; scoringVersion: number }) {
   return (
-    <SectionShell variant="card" level={2} title="About">
+    <SectionShell variant="card" level={2} title="About" fill>
       <p className={BODY}>
         Scoring is ported from noop (PolyForm Noncommercial 1.0.0). Google Health ingestion follows Hælan (AGPL-3.0). Pulse is for personal use and is
         not a medical device.
       </p>
-      <dl className="mt-3 divide-y divide-border">
+      {/* At the foot when the card is stretched to Profile's height beside it (SYM9). */}
+      <dl className="mt-auto divide-y divide-border pt-3">
         {[
           ["Version", version],
           ["Scoring version", String(scoringVersion)],
@@ -152,21 +153,22 @@ export function About({ version, scoringVersion }: { version: string; scoringVer
 
 /**
  * Settings body: Data source and Sync status, Profile, About. One column through tablet (spec §7.14); from 1280 px
- * two columns, Data source over Profile on the left and Sync status over About on the right (U18 ST-01).
+ * two columns, Data source over Profile on the left and Sync status over About on the right (U18 ST-01). Each row's
+ * cards share their top and bottom (SYM9).
  */
 export function SettingsView({ vm, now }: { vm: SettingsVM; now: number }) {
   return (
-    <div className="grid grid-cols-1 items-start gap-3 xl:grid-cols-2 xl:gap-4">
-      <div className="min-w-0 xl:col-start-1 xl:row-start-1">
+    <div className="grid grid-cols-1 gap-3 xl:grid-cols-2 xl:gap-4">
+      <div className="flex min-w-0 flex-col *:flex-1 xl:col-start-1 xl:row-start-1">
         <DataSource source={vm.source} />
       </div>
-      <div className="min-w-0 xl:col-start-2 xl:row-start-1">
+      <div className="flex min-w-0 flex-col *:flex-1 xl:col-start-2 xl:row-start-1">
         <SyncStatus vm={vm} now={now} />
       </div>
-      <div className="min-w-0 xl:col-start-1 xl:row-start-2">
+      <div className="flex min-w-0 flex-col *:flex-1 xl:col-start-1 xl:row-start-2">
         <Profile profile={vm.profile} />
       </div>
-      <div className="min-w-0 xl:col-start-2 xl:row-start-2">
+      <div className="flex min-w-0 flex-col *:flex-1 xl:col-start-2 xl:row-start-2">
         <About version={vm.version} scoringVersion={vm.scoringVersion} />
       </div>
     </div>
