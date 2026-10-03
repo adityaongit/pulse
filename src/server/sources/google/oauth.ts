@@ -37,7 +37,8 @@ export const SCOPES = [
 ].map((s) => `https://www.googleapis.com/auth/googlehealth.${s}`);
 
 /** Sign-in (U20) rides on the same consent: the ID token's verified email decides who may in. */
-export const LOGIN_SCOPES = ["openid", "email"];
+// `profile` adds the photo (`picture`) to the ID token, for the avatar.
+export const LOGIN_SCOPES = ["openid", "email", "profile"];
 
 /**
  * `code` is ours (`auth_revoked`, `not_connected`, `http_503`, ...) or Google's own error code
@@ -154,7 +155,7 @@ export function hasGrant(db: Db): boolean {
  * The verified email in an ID token. The token came straight from Google's token endpoint over TLS,
  * so per OpenID Connect Core 3.1.3.7 its signature needn't be checked; audience still is.
  */
-function verifiedEmail(idToken: string | undefined, clientId: string): string {
+function verifiedAccount(idToken: string | undefined, clientId: string): { email: string; picture: string | null } {
   let claims: ReturnType<typeof decodeJwt>;
   try {
     claims = decodeJwt(idToken ?? "");
@@ -164,12 +165,13 @@ function verifiedEmail(idToken: string | undefined, clientId: string): string {
   const aud = Array.isArray(claims.aud) ? claims.aud : [claims.aud];
   if (!aud.includes(clientId) || typeof claims.email !== "string") throw new GoogleError("no_id_token");
   if (claims.email_verified !== true) throw new GoogleError("email_unverified");
-  return claims.email.toLowerCase();
+  const picture = typeof claims.picture === "string" && claims.picture.startsWith("https://") ? claims.picture : null;
+  return { email: claims.email.toLowerCase(), picture };
 }
 
 /**
  * Exchanges an authorization code, checks the signed-in account with `allow`, and stores the grant in
- * the single `oauth_tokens` row, clearing any revocation. Returns the account's email.
+ * the single `oauth_tokens` row, clearing any revocation. Returns the account's email and Google photo.
  * - An account `allow` refuses stores nothing and throws `not_owner`.
  * - Without a refresh token (no consent screen), only the access token of a still-working grant is
  *   updated. With no such grant it stores nothing and throws `auth_revoked`: accepting it would give
@@ -178,7 +180,7 @@ function verifiedEmail(idToken: string | undefined, clientId: string): string {
 export async function exchangeCode(
   db: Db,
   o: { google: Google; redirectUri: string; code: string; allow: (email: string) => boolean } & Deps,
-): Promise<string> {
+): Promise<{ email: string; picture: string | null }> {
   const { fetch: fetchFn = fetch, now = Date.now } = o;
   const r = await tokenRequest(
     fetchFn,
@@ -192,7 +194,8 @@ export async function exchangeCode(
     "token exchange",
   );
   if (!r.ok) throw new GoogleError(r.code, r.status, "token exchange");
-  const email = verifiedEmail(r.idToken, o.google.clientId);
+  const account = verifiedAccount(r.idToken, o.google.clientId);
+  const { email } = account;
   // Before the owner claim: an account without Google Health would claim the instance and then sync nothing.
   await requireHealthProfile(fetchFn, r.accessToken);
   if (!o.allow(email)) throw new GoogleError("not_owner");
@@ -202,7 +205,7 @@ export async function exchangeCode(
       throw new GoogleError("auth_revoked", r.status, "token exchange returned no refresh_token; revoke the app's access in your Google account and connect again");
     }
     db.update(oauthTokens).set({ accessToken: r.accessToken, expiresAt: t + r.expiresIn, updatedAt: t }).where(eq(oauthTokens.id, 1)).run();
-    return email;
+    return account;
   }
   const row = {
     accessToken: r.accessToken,
@@ -216,7 +219,7 @@ export async function exchangeCode(
     .values({ id: 1, ...row })
     .onConflictDoUpdate({ target: oauthTokens.id, set: row })
     .run();
-  return email;
+  return account;
 }
 
 /**

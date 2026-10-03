@@ -46,12 +46,12 @@ describe("authUrl", () => {
       client_id: "cid",
       redirect_uri: "https://p.example/oauth/callback",
       response_type: "code",
-      scope: ["openid", "email", ...SCOPES].join(" "),
+      scope: [...LOGIN_SCOPES, ...SCOPES].join(" "),
       access_type: "offline",
       prompt: "consent",
       state: "st",
     });
-    expect(LOGIN_SCOPES).toEqual(["openid", "email"]);
+    expect(LOGIN_SCOPES).toEqual(["openid", "email", "profile"]);
     expect(SCOPES).toHaveLength(12);
     // Read-only everywhere except nutrition, which has no read-only scope.
     for (const s of SCOPES)
@@ -98,7 +98,7 @@ describe("exchangeCode", () => {
 
   it("posts the code, stores the grant in the single row and returns the lowercased email", async () => {
     const f = tokenStub(grant({ expires_in: 3599, scope: "a b" }));
-    expect(await exchange(f)).toBe("me@example.com");
+    expect(await exchange(f)).toEqual({ email: "me@example.com", picture: null });
     expect(sent(f)).toEqual({
       code: "c0de",
       client_id: "cid",
@@ -138,6 +138,12 @@ describe("exchangeCode", () => {
     expect(row()).toMatchObject({ accessToken: "at-1", refreshToken: "rt-old", expiresAt: T + 100, revokedAt: null });
   });
 
+  it("returns the Google photo from the ID token, https only", async () => {
+    const pic = "https://lh3.googleusercontent.com/a/x";
+    expect((await exchange(tokenStub(grant({ id_token: idToken({ picture: pic }) })))).picture).toBe(pic);
+    expect((await exchange(tokenStub(grant({ id_token: idToken({ picture: "javascript:alert(1)" }) })))).picture).toBeNull();
+  });
+
   it("an account allow() refuses stores nothing and throws not_owner", async () => {
     const allow = vi.fn(() => false);
     await expectGoogleError(exchange(tokenStub(grant()), allow), "not_owner");
@@ -153,7 +159,7 @@ describe("exchangeCode", () => {
     expect(allow).not.toHaveBeenCalled();
     expect(row()).toBeUndefined();
     // Any other identity failure (Google having a bad day) doesn't block sign-in.
-    expect(await exchange(tokenStub(grant()), allow, () => json(503, {}))).toBe("me@example.com");
+    expect((await exchange(tokenStub(grant()), allow, () => json(503, {}))).email).toBe("me@example.com");
   });
 
   it("an unverified email, a missing ID token or one for another client is refused before allow()", async () => {

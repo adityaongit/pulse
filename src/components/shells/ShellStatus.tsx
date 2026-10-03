@@ -16,8 +16,9 @@ export type ShellStatus = {
   timeZone?: string
   /** Consecutive worn days (Home header streak pill, spec §4.3); null or missing at 0. */
   streak?: { days: number; asOf: string } | null
-  /** The Home avatar photo (AVATAR_URL or `public/avatar.*`); null shows the outlined icon (spec §11 M6). */
+  /** The avatar photo (src/server/avatar.ts); null draws a blobatar from `avatarSeed`. */
   avatar?: string | null
+  avatarSeed?: string
 }
 
 const Ctx = React.createContext<ShellStatus | null>(null)

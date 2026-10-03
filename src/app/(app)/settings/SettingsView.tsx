@@ -1,21 +1,57 @@
 import Link from "next/link"
 import { format, parseISO } from "date-fns"
-import { Check, CircleAlert, Minus, TriangleAlert } from "lucide-react"
+import { Check, ChevronDown, CircleAlert, Minus, TriangleAlert } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { ago } from "@/lib/format"
+import { HEALTH_SIGNUP_URL } from "@/lib/google"
 import type { SettingsVM } from "@/server/queries/types"
 import { SectionShell } from "@/components/shells/SectionShell"
+import { SyncNowButton } from "@/components/shells/SyncNowButton"
+import { UserAvatar } from "@/components/shells/UserAvatar"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
-import { HEALTH_SIGNUP_URL } from "@/lib/google"
-import { GoogleG } from "@/components/brand/GoogleG"
+import { GoogleFit } from "@/components/brand/GoogleFit"
 import { Mark } from "@/components/brand/Mark"
-import { DisconnectButton, EditProfileButton } from "./SettingsClient"
-import { CAPTION, LABEL } from "@/components/metrics/primitives"
+import { AvatarButtons, DisconnectButton, EditProfileButton } from "./SettingsClient"
+import { CAPTION } from "@/components/metrics/primitives"
 
 const BODY = "max-w-[65ch] text-[15px] leading-[22px] text-pretty text-foreground-secondary"
+/** One settings row: label left, value right, 52 px tall, hairline between rows. */
+const ROW = "flex min-h-13 items-center justify-between gap-3 py-2"
+const ROW_LABEL = "text-[15px] leading-[22px]"
+const ROW_VALUE = "truncate text-right text-[15px] leading-[22px] text-foreground-secondary tabular-nums"
+/** The logo tile beside a row's name (account photo, data source mark). */
+const TILE = "grid size-11 shrink-0 place-items-center overflow-hidden rounded-xl bg-white/[0.06]"
 
-/** The status line under the source name, and what to do about it. Connected says nothing more: its line has the account and sync. */
+export type SettingsAccount = { email: string | null; avatar: string | null; seed: string; customPhoto: boolean }
+
+/** Who is signed in: photo, account, change photo, sign out (U20). Sign out is a plain form post, so it works before hydration. */
+export function Account({ account }: { account: SettingsAccount }) {
+  const owner = account.email !== null
+  return (
+    <SectionShell variant="card" level={2} id="account" title="Account">
+      <div className="flex min-h-11 items-center gap-3">
+        <span className="size-14 shrink-0">
+          <UserAvatar src={account.avatar} seed={account.seed} />
+        </span>
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-[15px] leading-[22px] font-semibold">{owner ? account.email : "Demo"}</p>
+          <p className="text-[13px] leading-[18px] text-muted-foreground">{owner ? "Google account" : "Signed in to the demo"}</p>
+        </div>
+      </div>
+      <div className="mt-4 grid grid-cols-2 gap-2">
+        {owner && <AvatarButtons customPhoto={account.customPhoto} />}
+        <form method="post" action="/logout" className={cn(!owner && "col-span-2")}>
+          <Button type="submit" variant="outline" size="touch" className="w-full">
+            Sign out
+          </Button>
+        </form>
+      </div>
+    </SectionShell>
+  )
+}
+
+/** The status line under the source name, and what to do about it. Connected says nothing more: its line has the last sync. */
 const SOURCE: Record<SettingsVM["source"]["status"], { line?: string; tone?: string; body?: string }> = {
   demo: {
     line: "180 days of generated data",
@@ -31,9 +67,9 @@ const SOURCE: Record<SettingsVM["source"]["status"], { line?: string; tone?: str
   revoked: { line: "Access revoked", tone: "text-recovery-red-text", body: "Google access was revoked or expired. Sync is paused until you reconnect." },
 }
 
-function OAuthLink({ label, variant }: { label: string; variant: "default" | "secondary" }) {
+function OAuthLink({ label }: { label: string }) {
   return (
-    <Button asChild size="touch" variant={variant} className="w-full">
+    <Button asChild size="touch" variant="default" className="w-full">
       <Link href="/oauth/start" prefetch={false}>
         {label}
       </Link>
@@ -41,26 +77,59 @@ function OAuthLink({ label, variant }: { label: string; variant: "default" | "se
   )
 }
 
+function SyncIcon({ status }: { status: SettingsVM["sync"][number]["status"] }) {
+  if (status === "ok") return <Check aria-hidden className="size-4 text-optimal" strokeWidth={2.5} />
+  if (status === "stale") return <TriangleAlert aria-hidden className="size-4 text-warning" strokeWidth={2} />
+  if (status === "error") return <CircleAlert aria-hidden className="size-4 text-recovery-red-text" strokeWidth={2} />
+  return <Minus aria-hidden className="size-4 text-muted-foreground" strokeWidth={2} />
+}
+
+const STATUS_WORD = { ok: "up to date", stale: "behind", error: "failed", never: "not synced yet" }
+
+/** Per data type, folded under one summary line; it opens itself when something failed or fell behind. */
+function DataTypes({ rows, now }: { rows: SettingsVM["sync"]; now: number }) {
+  const failing = rows.filter((r) => r.status === "error").length
+  const behind = rows.filter((r) => r.status === "stale").length
+  const summary = failing ? `${failing} failing` : behind ? `${behind} behind` : rows.every((r) => r.status === "ok") ? "All up to date" : "Waiting for first sync"
+  return (
+    <details id="sync" open={failing + behind > 0} className="group mt-4 border-t border-border">
+      <summary className="flex min-h-13 cursor-pointer list-none items-center justify-between gap-3 rounded-md py-2 outline-none select-none focus-visible:ring-3 focus-visible:ring-ring/50 [&::-webkit-details-marker]:hidden">
+        <span className={ROW_LABEL}>Data types</span>
+        <span className="flex items-center gap-2">
+          <span className={cn("text-[13px] leading-[18px]", failing ? "text-recovery-red-text" : behind ? "text-warning" : "text-muted-foreground")}>{summary}</span>
+          <ChevronDown aria-hidden className="size-4 text-muted-foreground transition-transform duration-200 ease-standard group-open:rotate-180" strokeWidth={2} />
+        </span>
+      </summary>
+      <ul className="divide-y divide-border border-t border-border">
+        {rows.map((r) => (
+          <li key={r.key} className="flex min-h-12 items-center gap-3 py-2">
+            <span className="flex min-w-0 flex-1 flex-col">
+              <span className="truncate text-[15px] leading-[22px]">{r.label}</span>
+              {r.status === "error" && r.error && <span className={cn(CAPTION, "text-recovery-red-text")}>{r.error}</span>}
+            </span>
+            <span className={cn(CAPTION, "shrink-0 font-numeric tabular-nums")}>{r.lastSuccessAt ? ago(r.lastSuccessAt, now) : "Never"}</span>
+            <SyncIcon status={r.status} />
+            <span className="sr-only">, {STATUS_WORD[r.status]}</span>
+          </li>
+        ))}
+      </ul>
+    </details>
+  )
+}
+
 /**
- * Data source (spec §7.14): the source as one row (logo, name, last sync) with no status pill;
- * the status only shows when something needs doing, and the actions sit in an even two-column row.
+ * Data source (spec §7.14): the source as one row (logo, name, last sync), its status only when something needs
+ * doing, Sync now, and the per-type sync status folded underneath.
  */
-export function DataSource({
-  source,
-  lastSyncAt = null,
-  now,
-}: {
-  source: SettingsVM["source"]
-  lastSyncAt?: number | null
-  now: number
-}) {
+export function DataSource({ vm, now }: { vm: Pick<SettingsVM, "source" | "sync" | "import">; now: number }) {
+  const { source } = vm
   const s = SOURCE[source.status]
-  // The account itself is named once, beside Sign out.
-  const line = s.line ?? (lastSyncAt ? `Synced ${ago(lastSyncAt, now)}` : "Not synced yet")
+  const last = vm.sync.reduce<number | null>((m, r) => (r.lastSuccessAt && (!m || r.lastSuccessAt > m) ? r.lastSuccessAt : m), null)
+  const line = s.line ?? (last ? `Synced ${ago(last, now)}` : "Not synced yet")
   const actions =
     source.status === "connected" ? (
       <>
-        <OAuthLink label="Reconnect" variant="secondary" />
+        <SyncNowButton className="w-full" />
         <DisconnectButton />
       </>
     ) : source.status === "not_linked" ? (
@@ -74,19 +143,23 @@ export function DataSource({
       </>
     ) : source.status === "revoked" ? (
       <>
-        <OAuthLink label="Reconnect Google" variant="default" />
+        <OAuthLink label="Reconnect Google" />
         <DisconnectButton />
       </>
     ) : source.status === "not_connected" ? (
       <div className="col-span-2">
-        <OAuthLink label="Connect Google" variant="default" />
+        <OAuthLink label="Connect Google" />
       </div>
-    ) : null
+    ) : (
+      <div className="col-span-2">
+        <SyncNowButton className="w-full" />
+      </div>
+    )
   return (
     <SectionShell variant="card" level={2} id="source" title="Data source">
       <div className="flex min-h-11 items-center gap-3">
-        <span aria-hidden className="grid size-11 shrink-0 place-items-center rounded-xl bg-white/[0.06]">
-          {source.status === "demo" ? <Mark className="size-5" /> : <GoogleG className="size-5" />}
+        <span aria-hidden className={TILE}>
+          {source.status === "demo" ? <Mark className="size-5" /> : <GoogleFit className="size-6" />}
         </span>
         <div className="min-w-0 flex-1">
           <p className="text-[15px] leading-[22px] font-semibold">{source.label}</p>
@@ -94,49 +167,16 @@ export function DataSource({
         </div>
       </div>
       {s.body && <p className={cn(BODY, "mt-3")}>{s.body}</p>}
-      {actions && <div className="mt-4 grid grid-cols-2 gap-2">{actions}</div>}
-    </SectionShell>
-  )
-}
-
-function SyncIcon({ status }: { status: SettingsVM["sync"][number]["status"] }) {
-  if (status === "ok") return <Check aria-hidden className="size-4 text-optimal" strokeWidth={2.5} />
-  if (status === "stale") return <TriangleAlert aria-hidden className="size-4 text-warning" strokeWidth={2} />
-  if (status === "error") return <CircleAlert aria-hidden className="size-4 text-recovery-red-text" strokeWidth={2} />
-  return <Minus aria-hidden className="size-4 text-muted-foreground" strokeWidth={2} />
-}
-
-const STATUS_WORD = { ok: "up to date", stale: "behind", error: "failed", never: "not synced yet" }
-
-export function SyncStatus({ vm, now }: { vm: Pick<SettingsVM, "mode" | "sync" | "import">; now: number }) {
-  return (
-    <SectionShell variant="card" level={2} id="sync" title="Sync status">
       {vm.import && (
-        <div className="mb-3 space-y-2" role="status" aria-live="polite">
+        <div className="mt-4 space-y-2" role="status" aria-live="polite">
           <p className="text-[15px] leading-[22px] tabular-nums">
             Importing history: {vm.import.done} of {vm.import.total} days
           </p>
           <Progress value={(vm.import.done / vm.import.total) * 100} aria-label="Import progress" className="h-1.5 bg-muted" />
         </div>
       )}
-      <ul className="divide-y divide-border">
-        {vm.sync.map((r) => {
-          const when = r.lastSuccessAt ? ago(r.lastSuccessAt, now) : "Never"
-          const text = vm.mode === "demo" && r.lastSuccessAt ? `Updated ${when}` : when
-          return (
-            <li key={r.key} className="flex min-h-13 items-center gap-3 py-2">
-              <span className="flex min-w-0 flex-1 flex-col">
-                <span className="truncate text-[15px] leading-[22px]">{r.label}</span>
-                {r.status === "error" && r.error && <span className={cn(CAPTION, "text-recovery-red-text")}>{r.error}</span>}
-              </span>
-              <span className={cn(CAPTION, "shrink-0 font-numeric tabular-nums")}>{text}</span>
-              <SyncIcon status={r.status} />
-              <span className="sr-only">, {STATUS_WORD[r.status]}</span>
-            </li>
-          )
-        })}
-        {vm.sync.length === 0 && <li className={cn(CAPTION, "py-3")}>Nothing has synced yet.</li>}
-      </ul>
+      <div className="mt-4 grid grid-cols-2 gap-2">{actions}</div>
+      {source.status !== "demo" && vm.sync.length > 0 && <DataTypes rows={vm.sync} now={now} />}
     </SectionShell>
   )
 }
@@ -146,46 +186,49 @@ export function Profile({ profile }: { profile: SettingsVM["profile"] }) {
     ["Birth date", format(parseISO(profile.birthDate), "d MMM yyyy")],
     ["Age", String(profile.age)],
     ["Sex", profile.sex === "male" ? "Male" : "Female"],
-    ["Max heart rate", `${profile.maxHr} bpm, ${profile.maxHrSource}`],
     ["Height", profile.heightCm ? `${profile.heightCm} cm` : "Not set"],
+    ["Max heart rate", `${profile.maxHr} bpm, ${profile.maxHrSource}`],
     ["Time zone", profile.timeZone],
   ]
   return (
-    <SectionShell variant="card" level={2} title="Profile">
-      <dl className="divide-y divide-border">
-        {rows.map(([k, v]) => (
-          <div key={k} className="flex min-h-13 items-center justify-between gap-3 py-2">
-            <dt className={LABEL}>{k}</dt>
-            <dd className="truncate text-right text-[15px] leading-[22px] tabular-nums">{v}</dd>
-          </div>
-        ))}
-      </dl>
-      <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
+    <SectionShell
+      variant="card"
+      level={2}
+      title="Profile"
+      action={
         <EditProfileButton
           defaults={{ birthDate: profile.birthDate, sex: profile.sex, maxHr: profile.maxHrSource === "set" ? profile.maxHr : null, heightCm: profile.heightCm }}
         />
-        <p className={CAPTION}>Time zone comes from the server (TZ).</p>
-      </div>
+      }
+    >
+      <dl className="divide-y divide-border">
+        {rows.map(([k, v]) => (
+          <div key={k} className={ROW}>
+            <dt className={ROW_LABEL}>{k}</dt>
+            <dd className={ROW_VALUE}>{v}</dd>
+          </div>
+        ))}
+      </dl>
+      <p className={cn(CAPTION, "mt-2")}>The time zone comes from the server&apos;s TZ setting.</p>
     </SectionShell>
   )
 }
 
 export function About({ version, scoringVersion }: { version: string; scoringVersion: number }) {
   return (
-    <SectionShell variant="card" level={2} title="About" fill>
+    <SectionShell variant="card" level={2} title="About">
       <p className={BODY}>
         Scoring is ported from noop (PolyForm Noncommercial 1.0.0). Google Health ingestion follows Hælan (AGPL-3.0). Pulse is for personal use and is
         not a medical device.
       </p>
-      {/* At the foot when the card is stretched to Profile's height beside it (SYM9). */}
-      <dl className="mt-auto divide-y divide-border pt-3">
+      <dl className="mt-3 divide-y divide-border">
         {[
           ["Version", version],
           ["Scoring version", String(scoringVersion)],
         ].map(([k, v]) => (
-          <div key={k} className="flex min-h-13 items-center justify-between gap-3 py-2">
-            <dt className="text-[15px] leading-[22px]">{k}</dt>
-            <dd className="font-numeric text-[15px] font-semibold tabular-nums">{v}</dd>
+          <div key={k} className={ROW}>
+            <dt className={ROW_LABEL}>{k}</dt>
+            <dd className={cn(ROW_VALUE, "font-numeric font-semibold")}>{v}</dd>
           </div>
         ))}
       </dl>
@@ -194,44 +237,16 @@ export function About({ version, scoringVersion }: { version: string; scoringVer
 }
 
 /**
- * Settings body: Data source and Sync status, Profile, About. One column through tablet (spec §7.14); from 1280 px
- * two columns, Data source over Profile on the left and Sync status over About on the right (U18 ST-01). Each row's
- * cards share their top and bottom (SYM9).
+ * Settings body: Account, Data source (with sync), Profile, About, as one 640 px column at every width. A list of
+ * settings reads top to bottom; the old two-column grid stretched short cards to their neighbour's height.
  */
-/** Who is signed in, and Sign out (U20): a plain form post, so it works before hydration. */
-export function Account({ email }: { email: string | null }) {
+export function SettingsView({ vm, now, account }: { vm: SettingsVM; now: number; account: SettingsAccount }) {
   return (
-    <div className="flex flex-col items-center gap-3 pt-3 text-center">
-      <p className={CAPTION}>{email ? `Signed in as ${email}` : "Signed in to the demo"}</p>
-      <form method="post" action="/logout" className="w-full max-w-[400px]">
-        <Button type="submit" variant="outline-pill" size="sheet">
-          Sign out
-        </Button>
-      </form>
-    </div>
-  )
-}
-
-const lastSync = (rows: SettingsVM["sync"]) => rows.reduce<number | null>((m, r) => (r.lastSuccessAt && (!m || r.lastSuccessAt > m) ? r.lastSuccessAt : m), null)
-
-export function SettingsView({ vm, now, email = null }: { vm: SettingsVM; now: number; email?: string | null }) {
-  return (
-    <div className="grid grid-cols-1 gap-3 xl:grid-cols-2 xl:gap-4">
-      <div className="flex min-w-0 flex-col *:flex-1 xl:col-start-1 xl:row-start-1">
-        <DataSource source={vm.source} lastSyncAt={lastSync(vm.sync)} now={now} />
-      </div>
-      <div className="flex min-w-0 flex-col *:flex-1 xl:col-start-2 xl:row-start-1">
-        <SyncStatus vm={vm} now={now} />
-      </div>
-      <div className="flex min-w-0 flex-col *:flex-1 xl:col-start-1 xl:row-start-2">
-        <Profile profile={vm.profile} />
-      </div>
-      <div className="flex min-w-0 flex-col *:flex-1 xl:col-start-2 xl:row-start-2">
-        <About version={vm.version} scoringVersion={vm.scoringVersion} />
-      </div>
-      <div className="xl:col-span-2">
-        <Account email={email} />
-      </div>
+    <div className="mx-auto flex w-full max-w-[640px] flex-col gap-3 md:gap-4">
+      <Account account={account} />
+      <DataSource vm={vm} now={now} />
+      <Profile profile={vm.profile} />
+      <About version={vm.version} scoringVersion={vm.scoringVersion} />
     </div>
   )
 }

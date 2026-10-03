@@ -33,7 +33,7 @@ describe("GET /oauth/start", () => {
     expect(url.searchParams.get("access_type")).toBe("offline");
     expect(url.searchParams.get("prompt")).toBe("consent");
     expect(url.searchParams.get("client_id")).toBe("cid");
-    expect(url.searchParams.get("scope")).toMatch(/^openid email /);
+    expect(url.searchParams.get("scope")).toMatch(/^openid email profile /);
     // No APP_URL: the redirect follows the host the request came in on.
     expect(url.searchParams.get("redirect_uri")).toBe("http://192.168.1.71:3000/oauth/callback");
     const state = url.searchParams.get("state");

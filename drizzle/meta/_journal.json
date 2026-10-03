@@ -15,6 +15,13 @@
       "when": 1791006219164,
       "tag": "0001_auth_profile",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1791010288003,
+      "tag": "0002_avatar",
+      "breakpoints": true
     }
   ]
 }

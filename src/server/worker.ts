@@ -27,10 +27,11 @@ export function createWorker({ name, source, recompute, intervalMs = INTERVAL_MS
     lastRunAt: null as number | null,
     lastSuccessAt: null as number | null,
     lastError: null as string | null,
+    running: false,
   };
 
   async function run() {
-    running = true;
+    running = state.running = true;
     clearTimeout(timer);
     try {
       const { changed } = await source.pull();
@@ -42,7 +43,7 @@ export function createWorker({ name, source, recompute, intervalMs = INTERVAL_MS
       log.error(`[worker] run failed: ${state.lastError}`);
     } finally {
       state.lastRunAt = Date.now();
-      running = false;
+      running = state.running = false;
       timer = setTimeout(run, again ? 0 : intervalMs);
       again = false;
     }
@@ -97,4 +98,26 @@ export function startWorker() {
  */
 export function requestSync(opts?: { force?: boolean }) {
   g.__pulseWorker?.requestSync(opts);
+}
+
+/**
+ * "Sync now": a forced run, resolved when it has finished (a run already going finishes first, then the
+ * forced one). Gives up waiting after `timeoutMs`; the run itself carries on.
+ */
+export async function syncAndWait(timeoutMs = 60_000): Promise<{ ok: boolean; error: string | null }> {
+  const w = g.__pulseWorker;
+  if (!w) return { ok: false, error: "The sync worker isn't running" };
+  let runs = w.state.running ? 2 : 1;
+  let seen = w.state.lastRunAt;
+  w.requestSync({ force: true });
+  const end = Date.now() + timeoutMs;
+  while (runs > 0 && Date.now() < end) {
+    await new Promise((r) => setTimeout(r, 200));
+    if (w.state.lastRunAt !== seen) {
+      seen = w.state.lastRunAt;
+      runs--;
+    }
+  }
+  if (runs > 0) return { ok: true, error: null }; // still going: the status updates when it lands
+  return { ok: w.state.lastError === null, error: w.state.lastError };
 }

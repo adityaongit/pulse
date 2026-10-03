@@ -20,7 +20,7 @@ export function AuthShell({
 }) {
   return (
     <div className="relative isolate flex min-h-dvh flex-col overflow-x-clip md:justify-center md:py-24">
-      <header className="flex justify-center pt-[max(env(safe-area-inset-top),20px)] pb-2 md:absolute md:inset-x-0 md:top-0">
+      <header className="flex justify-center pt-[max(env(safe-area-inset-top),32px)] pb-2 md:absolute md:inset-x-0 md:top-0 md:pt-12">
         <Wordmark className="h-4 text-foreground" />
       </header>
       <main className={cn("mx-auto flex w-full max-w-[400px] flex-1 flex-col px-5", align === "center" ? "justify-center md:flex-none" : "pt-6 md:flex-none md:pt-0", className)}>

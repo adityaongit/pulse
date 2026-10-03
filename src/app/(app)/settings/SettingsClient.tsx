@@ -2,7 +2,9 @@
 
 import * as React from "react"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
+import { Camera, Pencil, X } from "lucide-react"
 import { toast } from "sonner"
+import { removeAvatar, uploadAvatar } from "@/server/actions/avatar"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { ResponsiveSheet } from "@/components/shells/ResponsiveSheet"
@@ -88,8 +90,14 @@ export function EditProfileButton({ defaults }: { defaults: ProfileDefaults }) {
   }, [])
   return (
     <>
-      <Button variant="secondary" size="touch" onClick={() => setOpen(true)}>
-        Edit profile
+      <Button
+        variant="ghost"
+        aria-label="Edit profile"
+        onClick={() => setOpen(true)}
+        className="-my-2 h-9 gap-1.5 rounded-full px-3 text-[13px] font-semibold text-foreground-secondary hover:bg-white/[0.06] hover:text-foreground"
+      >
+        <Pencil aria-hidden strokeWidth={2} className="size-3.5" />
+        Edit
       </Button>
       <ResponsiveSheet open={open} onOpenChange={setOpen} title="Profile" description="Changing it recomputes every day's scores.">
         <div className="px-4 pb-[max(env(safe-area-inset-bottom),16px)] md:px-6 md:pb-6">
@@ -97,5 +105,53 @@ export function EditProfileButton({ defaults }: { defaults: ProfileDefaults }) {
         </div>
       </ResponsiveSheet>
     </>
+  )
+}
+
+/** Settings › Account: change the photo (a file picker, uploaded on choice) and, for an uploaded one, remove it. */
+export function AvatarButtons({ customPhoto }: { customPhoto: boolean }) {
+  const router = useRouter()
+  const input = React.useRef<HTMLInputElement>(null)
+  const [pending, start] = React.useTransition()
+  const done = (r: { ok: boolean; error?: string }, ok: string) => {
+    if (!r.ok) {
+      toast.error(r.error ?? "Couldn't update the photo", { id: "avatar" })
+      return
+    }
+    router.refresh()
+    toast.success(ok, { id: "avatar" })
+  }
+  const upload = (file: File | undefined) => {
+    if (!file) return
+    const form = new FormData()
+    form.set("photo", file)
+    start(async () => {
+      done(await uploadAvatar(form), "Photo updated")
+    })
+  }
+  return (
+    <div className="flex gap-2">
+      <input ref={input} type="file" accept="image/jpeg,image/png,image/webp" hidden onChange={(e) => upload(e.target.files?.[0])} />
+      <Button variant="secondary" size="touch" className="flex-1" disabled={pending} onClick={() => input.current?.click()}>
+        <Camera aria-hidden strokeWidth={2} />
+        {pending ? "Saving…" : "Photo"}
+      </Button>
+      {customPhoto && (
+        <Button
+          variant="ghost"
+          size="icon-touch"
+          aria-label="Remove photo, use the Google one"
+          disabled={pending}
+          onClick={() =>
+            start(async () => {
+              done(await removeAvatar(), "Photo removed")
+            })
+          }
+          className="rounded-xl text-muted-foreground hover:bg-white/[0.06] hover:text-foreground"
+        >
+          <X aria-hidden strokeWidth={2} />
+        </Button>
+      )}
+    </div>
   )
 }
