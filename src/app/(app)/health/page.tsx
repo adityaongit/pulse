@@ -1,5 +1,5 @@
 import { connection } from "next/server"
-import { Activity, Check, Droplet, Heart, Thermometer, TriangleAlert, Wind } from "lucide-react"
+import { Activity, Check, Droplet, Heart, Rabbit, Thermometer, TriangleAlert, Turtle, Wind } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { formatValue, hmm } from "@/lib/format"
 import type { ChipTone } from "@/lib/bands"
@@ -7,6 +7,7 @@ import { getHealthHub } from "@/server/queries/health"
 import type { HealthHubVM, VitalKey } from "@/server/queries/types"
 import { StressChart } from "@/components/charts/StressChart"
 import { StatusChip, ValueUnit } from "@/components/metrics/primitives"
+import { TickScale } from "@/components/metrics/TickScale"
 import { WhoopAgeOrb } from "@/components/metrics/WhoopAgeOrb"
 import { MetricState } from "@/components/shells/MetricState"
 import { PageShell } from "@/components/shells/PageShell"
@@ -33,21 +34,62 @@ const ACWR_WORD: Record<ChipTone, string> = { optimal: "Optimal", warning: "Push
 
 const skeleton = <Skeleton className="h-16 w-full" />
 
+/** "Slower vs. last week" / "Faster vs. last week" / "No change vs. last week" (spec §6), from the week-on-week pace change. */
+function paceChip(delta: number | null) {
+  if (delta === null) return null
+  if (Math.abs(delta) < 0.05) return { tone: "neutral" as const, dir: "flat" as const, text: "No change vs. last week" }
+  return delta < 0 ? { tone: "optimal" as const, dir: "down" as const, text: "Slower vs. last week" } : { tone: "warning" as const, dir: "up" as const, text: "Faster vs. last week" }
+}
+
+/**
+ * The hub's hero [latest-health-tab-1]: the 200 px orb on the Healthspan card, then WHOOP's Pace of Aging
+ * ruler with the week-on-week chip. On laptop the orb and the ruler sit side by side.
+ */
 function Healthspan({ m }: { m: HealthHubVM["healthspan"] }) {
   return (
     <MetricState metric={m} skeleton={skeleton} renderReason={() => <p className={EMPTY}>Healthspan needs 20 days of data.</p>}>
-      {(v, meta) => (
-        <div className="flex flex-col items-center gap-4">
-          <WhoopAgeOrb age={v.whoopAge} deltaYears={v.deltaYears} provisional={meta.provisional} size={200} />
-          <div className="flex w-full items-end justify-between gap-4">
-            <div>
-              <p className={LABEL}>Pace of Aging</p>
-              <ValueUnit value={formatValue("decimal1", v.pace)} unit="x" className="mt-1 block font-numeric text-xl leading-6 font-bold" />
+      {(v, meta) => {
+        const chip = paceChip(v.paceDelta)
+        return (
+          <div className="flex flex-col gap-6 xl:grid xl:grid-cols-2 xl:items-center xl:gap-8">
+            <div className="flex justify-center">
+              <WhoopAgeOrb age={v.whoopAge} deltaYears={v.deltaYears} provisional={meta.provisional} size={200} />
             </div>
-            <p className={CAPTION}>Updated weekly</p>
+            <div className="space-y-3">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <p className={LABEL}>Pace of Aging</p>
+                {chip && (
+                  <StatusChip tone={chip.tone} delta={chip.dir}>
+                    {chip.text}
+                  </StatusChip>
+                )}
+              </div>
+              <TickScale
+                variant="marker"
+                label="Pace of Aging"
+                metric={{ value: v.pace, reason: null, provisional: meta.provisional }}
+                min={-1}
+                max={3}
+                format="decimal1"
+                unit="x"
+                describe={v.pace < 1 ? "aging slower than your 6-month average" : v.pace > 1 ? "aging faster than your 6-month average" : "aging at the normal rate"}
+                ends={["−1.0x", "1.0x", "3.0x"]}
+                leading={
+                  <>
+                    <Turtle aria-hidden strokeWidth={1.75} /> Slow
+                  </>
+                }
+                trailing={
+                  <>
+                    Fast <Rabbit aria-hidden strokeWidth={1.75} />
+                  </>
+                }
+              />
+              <p className={CAPTION}>Updated weekly</p>
+            </div>
           </div>
-        </div>
-      )}
+        )
+      }}
     </MetricState>
   )
 }
@@ -172,25 +214,32 @@ function Fitness({ m }: { m: HealthHubVM["fitness"] }) {
   )
 }
 
-/** Health hub `/health` (spec §7.6): today's values, each card links to its detail screen. */
+/** Health hub `/health` (spec §7.6): today's values on the teal-glow ground; each card links to its detail screen. */
 export default async function HealthPage() {
   await connection()
   const vm = getHealthHub()
   return (
-    <PageShell title="Health" layout="grid-2">
-      <SectionShell variant="card" level={2} title="Healthspan" href="/health/healthspan">
-        <Healthspan m={vm.healthspan} />
-      </SectionShell>
-      <SectionShell variant="card" level={2} title="Health Monitor" href="/health/monitor">
-        <Monitor m={vm.monitor} />
-      </SectionShell>
-      <SectionShell variant="card" level={2} title="Stress Monitor" href="/health/stress">
-        <Stress m={vm.stress} />
-      </SectionShell>
-      <SectionShell variant="card" level={2} title="Fitness" href="/health/fitness">
-        <Fitness m={vm.fitness} />
-      </SectionShell>
-      <p className={cn(CAPTION, "pt-3 text-center md:col-span-2")}>Estimates for personal insight, not medical advice.</p>
+    <PageShell title="Health" ground="health">
+      <HealthCards>
+        <SectionShell variant="card" level={2} title="Healthspan" href="/health/healthspan" className="xl:col-span-2">
+          <Healthspan m={vm.healthspan} />
+        </SectionShell>
+        <SectionShell variant="card" level={2} title="Health Monitor" href="/health/monitor">
+          <Monitor m={vm.monitor} />
+        </SectionShell>
+        <SectionShell variant="card" level={2} title="Stress Monitor" href="/health/stress">
+          <Stress m={vm.stress} />
+        </SectionShell>
+        <SectionShell variant="card" level={2} title="Fitness" href="/health/fitness" className="xl:col-span-2">
+          <Fitness m={vm.fitness} />
+        </SectionShell>
+      </HealthCards>
+      <p className={cn(CAPTION, "text-center")}>Estimates for personal insight, not medical advice.</p>
     </PageShell>
   )
+}
+
+/** One column on phone and tablet, as WHOOP stacks them; two on laptop (spec §7.6 v2). */
+function HealthCards({ children }: { children: React.ReactNode }) {
+  return <div className="grid grid-cols-1 gap-3 xl:grid-cols-2 xl:gap-4">{children}</div>
 }

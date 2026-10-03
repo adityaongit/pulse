@@ -26,7 +26,7 @@ export const metadata = { title: "Strain", description: "Day Strain, your Strain
 
 /** Strain `/strain?d=` (spec §7.3). */
 export default async function StrainPage({ searchParams }: PageProps<"/strain">) {
-  const { d, today, timeZone } = await pageDay(searchParams as SearchParams, "/strain")
+  const { d, today, timeZone, weekly } = await pageDay(searchParams as SearchParams, "/strain")
   const vm = getStrain(d)
   const s = vm.strain
   const t = vm.target.value
@@ -37,6 +37,7 @@ export default async function StrainPage({ searchParams }: PageProps<"/strain">)
       title="Strain"
       info={STRAIN_INFO}
       dateSwitcher={{ mode: "day", placement: "header" }}
+      notch
       hero={
         <ScoreDial
           variant="strain"
@@ -85,7 +86,7 @@ export default async function StrainPage({ searchParams }: PageProps<"/strain">)
             <EmptyState body="No activities on this day." />
           )}
         </SectionShell>,
-        <SectionShell key="trend" variant="card" title="Strain trend" level={2} className="lg:col-span-2">
+        <SectionShell key="trend" variant="card" title={weekly ? "Weekly trends" : "Strain trend"} level={2} className="lg:col-span-2">
           <TrendChart label="Strain" format="decimal1" colorBy="strain" {...trend} />
         </SectionShell>,
       ]}

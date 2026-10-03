@@ -37,7 +37,8 @@ export function VitalTiles({ vitals }: { vitals: Vital[] }) {
             key={x.key}
             variant="tile"
             icon={ICON[x.key]}
-            label={x.label}
+            // WHOOP's tiles abbreviate the two heart metrics ("RHR", "HRV") [latest-health-monitor-1]; the sheet keeps the full name.
+            label={x.key === "restingHr" || x.key === "hrv" ? x.short : x.label}
             metric={x.metric}
             unit={x.unit}
             format={FORMAT[x.key]}

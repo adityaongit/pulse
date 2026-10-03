@@ -1,10 +1,12 @@
 import Link from "next/link"
-import { CalendarRange, Check, ChevronRight, CircleAlert, Maximize2, Plus, TriangleAlert } from "lucide-react"
+import { format, parseISO } from "date-fns"
+import { CalendarRange, Check, ChevronRight, CircleAlert, Lightbulb, Maximize2, Moon, Plus, Sun, TriangleAlert } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { clock, formatValue, MISSING, rangeLabel } from "@/lib/format"
 import { reasonCopy } from "@/lib/reasons"
 import { dayHref } from "@/lib/url"
 import { EnergyBankChart } from "@/components/charts/EnergyBankChart"
+import { StrainRecoveryChart } from "@/components/charts/StrainRecoveryChart"
 import { ActivityCard } from "@/components/metrics/ActivityCard"
 import { KeyStatRow } from "@/components/metrics/KeyStatRow"
 import { ReasonPlaceholder } from "@/components/metrics/ReasonPlaceholder"
@@ -13,6 +15,7 @@ import { SleepCard } from "@/components/metrics/SleepCard"
 import { TickScale } from "@/components/metrics/TickScale"
 import { MetricTags } from "@/components/metrics/primitives"
 import { EmptyState } from "@/components/shells/EmptyState"
+import { InfoCardTrigger } from "@/components/shells/InfoButton"
 import { HEADER_SENTINEL, HOME_DIALS, HOME_DIALS_CLASS } from "@/lib/header-state"
 import { MetricState } from "@/components/shells/MetricState"
 import { PageShell } from "@/components/shells/PageShell"
@@ -22,7 +25,8 @@ import { CARD_MATERIAL } from "@/components/ui/card"
 import { getHome } from "@/server/queries/home"
 import type { HomeVM, StressLevel } from "@/server/queries/types"
 import { pageDay, type SearchParams } from "./_lib/day"
-import { ENERGY_INFO, TONIGHT_INFO } from "./_lib/info"
+import { HomeInsight } from "./_lib/HomeInsight"
+import { ENERGY_INFO, STRAIN_RECOVERY_INFO, TONIGHT_INFO } from "./_lib/info"
 import { TonightPlan } from "./_lib/TonightPlan"
 import { CAPTION, energySeries, LABEL, statProps } from "./_lib/view"
 
@@ -34,6 +38,22 @@ const STRESS_TONE: Record<StressLevel, { chip: string; text: string; word: strin
   high: { chip: "bg-stress-high/15 text-stress-high", text: "text-stress-high", word: "High" },
 }
 const CHIP_BOX = "grid h-7 min-w-7 shrink-0 place-items-center rounded-md px-1"
+/** The 48 px secondary button at a card's foot ("+ Add activity", "Behaviour insights") [latest-home-collapsed-1]. */
+const CARD_BUTTON =
+  "mt-3 flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-secondary text-[13px] leading-4 font-bold tracking-[0.08em] uppercase transition-[background-color,scale] duration-150 ease-standard outline-none hover:bg-accent focus-visible:ring-3 focus-visible:ring-ring/50 active:scale-[0.96]"
+/** The 56 px gradient banner rows: day outlook / review and week in review (spec §7.1 7a, 10). */
+const BANNER =
+  "flex h-14 w-full items-center gap-3 rounded-2xl px-4 text-left shadow-card transition-[filter,scale] duration-150 ease-standard outline-none hover:brightness-110 focus-visible:ring-3 focus-visible:ring-ring/50 active:scale-[0.96]"
+const INSIGHT_ACTION = { strain: "View Strain", recovery: "View Recovery", sleep: "View Sleep" } as const
+const ADD_ACTIVITY_INFO = {
+  title: "Add an activity",
+  body: (
+    <>
+      <p>Pulse reads your workouts from Fitbit through Google Health, so it cannot add one here.</p>
+      <p>Start or log the workout in the Fitbit app. It appears in your activities after the next sync, with its Strain.</p>
+    </>
+  ),
+}
 const ICON_LINK =
   "relative grid size-8 place-items-center rounded-md text-foreground-secondary transition-[color] duration-150 ease-standard outline-none after:absolute after:-inset-1.5 hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50"
 
@@ -58,7 +78,7 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
         top: (
           <div className="pt-4 xl:pt-2">
             <div className="flex flex-col gap-6 xl:grid xl:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] xl:items-center xl:gap-x-6">
-              <div className="space-y-4">
+              <div className="space-y-4 xl:col-start-1 xl:row-start-1">
                 <p aria-hidden className="text-center text-[13px] leading-4 font-semibold tracking-[0.35em] text-foreground-secondary uppercase">
                   Pulse
                 </p>
@@ -93,12 +113,17 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
                   </p>
                 )}
               </div>
+              {vm.insights.length > 0 && (
+                <div className="xl:col-span-2 xl:row-start-2">
+                  <HomeInsight items={vm.insights.map((i) => ({ ...i, href: at(i.href), action: INSIGHT_ACTION[i.key] }))} />
+                </div>
+              )}
               {vm.monitorAlert && (
-                <div className="xl:order-last xl:col-span-2">
+                <div className="xl:col-span-2 xl:row-start-3">
                   <MonitorAlert alert={vm.monitorAlert} href={at("/health/monitor")} />
                 </div>
               )}
-              <div className="grid grid-cols-2 gap-3 xl:gap-4">
+              <div className="grid grid-cols-2 gap-3 xl:col-start-2 xl:row-start-1 xl:gap-4">
                 <MonitorCard vm={vm} href={at("/health/monitor")} />
                 <StressCard vm={vm} href={at("/health/stress")} timeZone={timeZone} />
               </div>
@@ -122,6 +147,7 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
             }
           >
             <div className="space-y-3 xl:space-y-4">
+              {vm.outlook && <DayBanner outlook={vm.outlook} />}
               <SectionShell
                 variant="card"
                 title={vm.activities.title}
@@ -144,7 +170,15 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
                 ) : (
                   <EmptyState body={vm.isToday ? "No activities yet today. Workouts appear after Fitbit syncs them." : "No activities on this day."} />
                 )}
+                {vm.isToday && (
+                  // WHOOP's "+ Add activity" [latest-home-collapsed-1]. Pulse imports workouts, so it explains where they come from (§11 R2).
+                  <InfoCardTrigger info={ADD_ACTIVITY_INFO} className={CARD_BUTTON}>
+                    <Plus aria-hidden className="size-5" strokeWidth={2} />
+                    Add activity
+                  </InfoCardTrigger>
+                )}
               </SectionShell>
+              <JournalWeek vm={vm} at={at} />
               <div className="grid grid-cols-1 gap-3 xl:grid-cols-2 xl:gap-4">
                 <EnergyCard vm={vm} timeZone={timeZone} />
                 <SectionShell
@@ -186,13 +220,16 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
                 </li>
               ))}
             </ul>
+            {/* Hidden with fewer than two scored days: one point is not a trend (spec §7.1 row 9). */}
+            {vm.strainRecovery.filter((p) => p.strain !== null || p.recovery !== null).length >= 2 && (
+              <SectionShell variant="card" title="Strain & recovery" info={STRAIN_RECOVERY_INFO} className="mt-3 xl:mt-4">
+                <StrainRecoveryChart points={vm.strainRecovery} today={d} />
+              </SectionShell>
+            )}
           </SectionShell>
         ),
         bottom: vm.weeklyTeaser && (
-          <Link
-            href={`/reports/${vm.weeklyTeaser.period}`}
-            className="flex h-14 items-center gap-3 rounded-2xl bg-linear-to-r from-banner-from to-banner-to px-4 shadow-card transition-[filter,scale] duration-150 ease-standard outline-none hover:brightness-110 focus-visible:ring-3 focus-visible:ring-ring/50 active:scale-[0.96]"
-          >
+          <Link href={`/reports/${vm.weeklyTeaser.period}`} className={cn(BANNER, "bg-linear-to-r from-banner-from to-banner-to")}>
             <CalendarRange aria-hidden className="size-[22px] shrink-0" strokeWidth={1.5} />
             <span className="min-w-0 flex-1 truncate text-base leading-[22px] font-semibold">Your week in review</span>
             <span className="shrink-0 font-numeric text-xs leading-4 font-medium text-foreground-secondary tabular-nums">
@@ -203,6 +240,68 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
         ),
       }}
     />
+  )
+}
+
+/** "Your daily outlook" before 17:00, "Your day in review" after it and on past days; opens the day's summary (spec §7.1 7a). */
+function DayBanner({ outlook }: { outlook: NonNullable<HomeVM["outlook"]> }) {
+  const review = outlook.kind === "review"
+  const Icon = review ? Moon : Sun
+  return (
+    <InfoCardTrigger
+      info={{ title: outlook.title, icon: <Icon />, body: <p>{outlook.body}</p> }}
+      className={cn(BANNER, review ? "bg-linear-to-r from-banner-from to-banner-to" : "bg-linear-to-r from-outlook-from to-outlook-to")}
+    >
+      <Icon aria-hidden className="size-[22px] shrink-0 text-foreground-secondary" strokeWidth={1.5} />
+      <span className="min-w-0 flex-1 truncate text-base leading-[22px] font-semibold">{outlook.title}</span>
+      <ChevronRight aria-hidden className="size-5 shrink-0 text-coach" strokeWidth={1.75} />
+    </InfoCardTrigger>
+  )
+}
+
+/** "My journal": the week's check-ins as circles, then Behaviour insights [latest-home-collapsed-1]. */
+function JournalWeek({ vm, at }: { vm: HomeVM; at: (href: string) => string }) {
+  return (
+    <SectionShell
+      variant="card"
+      title="My journal"
+      action={
+        <Link href={at("/journal")} aria-label="Open Journal" className={ICON_LINK}>
+          <ChevronRight aria-hidden className="size-[18px]" strokeWidth={1.75} />
+        </Link>
+      }
+    >
+      <ol className="grid grid-cols-7 pt-1">
+        {vm.journalWeek.map((w) => {
+          const date = parseISO(w.day)
+          const current = w.day === vm.day
+          return (
+            <li key={w.day}>
+              <Link
+                href={dayHref("/journal", w.day, vm.today)}
+                aria-label={`${format(date, "EEEE d MMMM")}: ${w.done ? "checked in" : "no check-in"}`}
+                aria-current={current ? "date" : undefined}
+                className="flex min-h-16 flex-col items-center justify-center gap-2 rounded-lg transition-[background-color] duration-150 ease-standard outline-none hover:bg-white/5 focus-visible:ring-3 focus-visible:ring-ring/50 active:bg-accent"
+              >
+                <span aria-hidden className={cn("text-xs leading-4 font-bold tracking-[0.08em] uppercase", current ? "text-foreground" : "text-muted-foreground")}>
+                  {format(date, "EEE")}
+                </span>
+                <span
+                  aria-hidden
+                  className={cn("grid size-7 place-items-center rounded-full", w.done ? "bg-optimal text-background" : "ring-1 ring-white/25 ring-inset")}
+                >
+                  {w.done && <Check className="size-4" strokeWidth={3} />}
+                </span>
+              </Link>
+            </li>
+          )
+        })}
+      </ol>
+      <Link href="/journal/insights" className={CARD_BUTTON}>
+        <Lightbulb aria-hidden className="size-5" strokeWidth={2} />
+        Behaviour insights
+      </Link>
+    </SectionShell>
   )
 }
 

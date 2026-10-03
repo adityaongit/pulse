@@ -50,7 +50,13 @@ export function getHealthHub(ctx: QueryCtx = defaultCtx()): HealthHubVM {
   const today = todayOf(ctx);
   const rows = loadDays(ctx, addDays(today, -35), today);
   const row = rows.get(today);
-  const hs = getHealthspan(today, ctx).result;
+  const hsVm = getHealthspan(today, ctx);
+  const hs = hsVm.result;
+  // Healthspan updates weekly: compare the shown week's pace with the stored week before it.
+  const prevPace = (() => {
+    const r = loadDays(ctx, addDays(hsVm.asOf, -7), addDays(hsVm.asOf, -7)).get(addDays(hsVm.asOf, -7))?.healthspan;
+    return r && r.reason === null ? r.paceOfAging : null;
+  })();
   const monitor = getMonitor(today, ctx, rows);
   const st = row?.stress;
   const sameDays = [7, 14, 21, 28].map((k) => rows.get(addDays(today, -k))?.stress?.highMin).filter(finite);
@@ -58,7 +64,7 @@ export function getHealthHub(ctx: QueryCtx = defaultCtx()): HealthHubVM {
   const tl = fit.trainingLoad.value;
   return {
     day: today,
-    healthspan: hs.value ? ok({ whoopAge: hs.value.whoopAge, deltaYears: hs.value.deltaYears, pace: hs.value.pace }, hs.provisional) : none(hs.reason ?? "no_data", hs.nightsLeft),
+    healthspan: hs.value ? ok({ whoopAge: hs.value.whoopAge, deltaYears: hs.value.deltaYears, pace: hs.value.pace, paceDelta: prevPace == null ? null : hs.value.pace - prevPace }, hs.provisional) : none(hs.reason ?? "no_data", hs.nightsLeft),
     monitor: monitor.count.value
       ? ok({ vitals: monitor.vitals.map((v) => ({ key: v.key, short: v.short, status: v.status })), inRange: monitor.count.value.inRange, total: 5 })
       : none(monitor.count.reason ?? "no_data"),
@@ -222,6 +228,7 @@ export function getHealthspan(day: string, ctx: QueryCtx = defaultCtx()): Health
     day,
     weekStart,
     weekEnd,
+    asOf: shown,
     nextUpdateInDays: weekEnd > last ? Math.max(0, daysBetween(today, weekEnd)) : 0,
     age: hs && hs.reason === null ? hs.age : ageAt(ctx.profile.birthDate, shown),
     result,
@@ -331,8 +338,9 @@ export function getStress(day: string, ctx: QueryCtx = defaultCtx()): StressVM {
   const st = row?.stress;
   const gauge = stressNow(row, isToday);
   const start = dayStartOf(ctx, day);
-  const sameDays = [7, 14, 21, 28].map((k) => rows.get(addDays(day, -k))?.stress?.highMin).filter(finite);
-  const typical = sameDays.length ? meanSd(sameDays).mean : null;
+  const sameStress = [7, 14, 21, 28].map((k) => rows.get(addDays(day, -k))?.stress).filter((x) => !!x && x.average != null);
+  const typicalOf = (pick: (x: NonNullable<DayRow["stress"]>) => number) => meanSd(sameStress.map((x) => pick(x!))).mean ?? 0;
+  const typical = sameStress.length ? typicalOf((x) => x.highMin) : null;
 
   const spans: Span[] = [];
   const s = row?.sleep;
@@ -352,7 +360,17 @@ export function getStress(day: string, ctx: QueryCtx = defaultCtx()): StressVM {
     insight: scored ? stressInsight(st, ctx.timeZone) : null,
     chart: scored ? ok({ points: minutePoints(loadSeries(ctx, day, "stress"), start, 2), spans, now: isToday && st.latest ? ms(st.latest.ts) : null }, st.provisional) : none(empty),
     levels: scored
-      ? ok({ lowMin: st.lowMin, mediumMin: st.mediumMin, highMin: st.highMin, typicalDeltaMin: typical == null ? null : st.highMin - typical, weekday: WEEKDAY[weekdayOf(day)] }, st.provisional)
+      ? ok(
+          {
+            lowMin: st.lowMin,
+            mediumMin: st.mediumMin,
+            highMin: st.highMin,
+            typicalDeltaMin: typical == null ? null : st.highMin - typical,
+            weekday: WEEKDAY[weekdayOf(day)],
+            typical: sameStress.length ? { lowMin: typicalOf((x) => x.lowMin), mediumMin: typicalOf((x) => x.mediumMin), highMin: typical! } : null,
+          },
+          st.provisional,
+        )
       : none(empty),
     trend: {
       points: Array.from({ length: 30 }, (_, k) => {

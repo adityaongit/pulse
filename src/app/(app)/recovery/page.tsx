@@ -25,7 +25,7 @@ const FORMAT: Record<Contributor["key"], FormatKey> = { hrv: "int", rhr: "int", 
 
 /** Recovery `/recovery?d=` (spec §7.2). */
 export default async function RecoveryPage({ searchParams }: PageProps<"/recovery">) {
-  const { d } = await pageDay(searchParams as SearchParams, "/recovery")
+  const { d, weekly } = await pageDay(searchParams as SearchParams, "/recovery")
   const vm = getRecovery(d)
   const r = vm.recovery
   const trend = trendProps(vm.trend)
@@ -35,6 +35,7 @@ export default async function RecoveryPage({ searchParams }: PageProps<"/recover
       title="Recovery"
       info={RECOVERY_INFO}
       dateSwitcher={{ mode: "day", placement: "header" }}
+      notch
       hero={<ScoreDial variant="recovery" size="lg" value={r.value} reason={r.reason} nightsLeft={r.nightsLeft} provisional={r.provisional} tags={r.tags} />}
       summary={
         <Card className="gap-0 px-4 py-1 ring-0">
@@ -48,7 +49,7 @@ export default async function RecoveryPage({ searchParams }: PageProps<"/recover
       }
       insight={vm.insight && <InsightCard body={vm.insight} action={{ label: "See what shaped it", href: "#drivers" }} />}
       primary={
-        <SectionShell variant="card" title="Recovery trend" level={2}>
+        <SectionShell variant="card" title={weekly ? "Weekly trends" : "Recovery trend"} level={2}>
           <TrendChart label="Recovery" unit="%" format="int" colorBy="band" direction="up" {...trend} />
         </SectionShell>
       }

@@ -115,3 +115,13 @@ export const ENERGY_INFO: InfoContent = {
     </>
   ),
 }
+
+export const STRAIN_RECOVERY_INFO: InfoContent = {
+  title: "Strain & recovery",
+  body: (
+    <>
+      <p>Your last 7 days side by side: Day Strain in blue on the left scale, from 0 to 21, and Recovery on the right scale, from 0 to 100%.</p>
+      <p>High strain on one day often shows up as lower Recovery the next morning. Days without a score are left as gaps.</p>
+    </>
+  ),
+}

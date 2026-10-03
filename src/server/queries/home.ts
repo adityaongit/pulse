@@ -1,4 +1,7 @@
-import { addDays } from "../time";
+import { addDays, localMinutes } from "../time";
+import { insightOf as recoveryInsight } from "./recovery";
+import { insightOf as sleepInsight } from "./sleep";
+import { coach } from "./strain";
 import {
   type DayRow,
   defaultCtx,
@@ -22,6 +25,9 @@ import {
   todayOf,
   vitalReason,
   dayStartOf,
+  finite,
+  recoveryBand,
+  toStrain,
 } from "./common";
 import type { EnergyBankVM, HomeVM, KeyStat, Metric, VitalKey } from "./types";
 
@@ -71,7 +77,80 @@ export function getHome(day: string, ctx: QueryCtx = defaultCtx()): HomeVM {
     tonight: planVM(ctx, row, isToday),
     keyStats: keyStats(rows, day, isToday),
     weeklyTeaser: latestReport(ctx, "week"),
+    outlook: outlookOf(ctx, row, { recovery, strain, target }, isToday),
+    insights: isToday ? insightsOf(ctx, rows, row, day, { strain, target }) : [],
+    journalWeek: journalWeek(ctx, day),
+    strainRecovery: Array.from({ length: 7 }, (_, k) => {
+      const d = addDays(day, k - 6);
+      const r = rows.get(d);
+      const e = r?.s1?.effort;
+      const rec = r?.recovery?.value;
+      return { day: d, strain: finite(e) ? toStrain(e) : null, recovery: finite(rec) ? rec : null };
+    }),
   };
+}
+
+/** WHOOP's banners switch from outlook to review at 17:00 (inferred, spec §12 I15). */
+export const REVIEW_FROM_MIN = 17 * 60;
+const BAND_WORD = { green: "green", yellow: "yellow", red: "red" } as const;
+const f1 = (x: number) => x.toFixed(1);
+const hmm = (min: number) => {
+  const m = Math.round(min);
+  return `${Math.floor(m / 60)}:${String(m % 60).padStart(2, "0")}`;
+};
+
+type DayScores = { recovery: Metric<number>; strain: Metric<number>; target: [number, number] | null };
+
+/** "Your daily outlook" / "Your day in review": a templated summary of the day's stored scores (spec §7.1 7a). */
+export function outlookOf(ctx: QueryCtx, row: DayRow | undefined, s: DayScores, isToday: boolean): HomeVM["outlook"] {
+  const review = !isToday || localMinutes(ctx.now, ctx.timeZone) >= REVIEW_FROM_MIN;
+  const rec = s.recovery.value;
+  const target = s.target ? `${f1(s.target[0])} - ${f1(s.target[1])}` : null;
+  const parts: string[] = [];
+  if (!review) {
+    if (rec != null) parts.push(`Your Recovery is ${Math.round(rec)}%, ${BAND_WORD[recoveryBand(rec)]}.`);
+    if (target) parts.push(`Today's Strain Target is ${target}.`);
+    const main = row?.sleep?.main;
+    if (main && row?.sleep?.needHours) parts.push(`You slept ${hmm(main.asleepMin)} of the ${hmm(row.sleep.needHours * 60)} you needed.`);
+  } else {
+    const n = row?.activities.length ?? 0;
+    const acts = n ? `, with ${n} ${n === 1 ? "activity" : "activities"}` : "";
+    if (s.strain.value != null) parts.push(`Day Strain ${isToday ? "is" : "was"} ${f1(s.strain.value)}${target ? ` against a target of ${target}` : ""}${acts}.`);
+    if (rec != null) parts.push(`Recovery ${isToday ? "is" : "was"} ${Math.round(rec)}%.`);
+    const st = row?.stress;
+    if (st && st.average != null) parts.push(`You spent ${hmm(st.highMin)} in high stress.`);
+  }
+  if (!parts.length) return null;
+  return { kind: review ? "review" : "outlook", title: review ? "Your day in review" : "Your daily outlook", body: parts.join(" ") };
+}
+
+const RECOVERY_TITLE = { green: "Ready for strain", yellow: "A steady day", red: "Time to recover" } as const;
+
+/** Today's coach cards from the same templates the detail screens use (Strain Coach, Recovery, Sleep). */
+function insightsOf(ctx: QueryCtx, rows: Map<string, DayRow>, row: DayRow | undefined, day: string, s: Pick<DayScores, "strain" | "target">): HomeVM["insights"] {
+  const out: HomeVM["insights"] = [];
+  const target = s.target ? { low: s.target[0], high: s.target[1] } : null;
+  const c = coach(s.strain, target, row);
+  if (c && target && s.strain.value != null) {
+    const v = s.strain.value;
+    const red = row?.recovery?.value != null && row.recovery.value < 34;
+    const title = red ? "Keep strain light" : v < target.low ? "Room for more strain" : v <= target.high ? "Reaching optimal strain" : "Past your target";
+    out.push({ key: "strain", title, body: c, href: "/strain" });
+  }
+  const r = row?.recovery;
+  if (r?.value != null) out.push({ key: "recovery", title: RECOVERY_TITLE[recoveryBand(r.value)], body: recoveryInsight(r.drivers), href: "/recovery" });
+  const sl = sleepInsight(rows, day, ctx.timeZone);
+  if (sl) out.push({ key: "sleep", title: "Last night's sleep", body: sl, href: "/sleep" });
+  return out;
+}
+
+function journalWeek(ctx: QueryCtx, day: string): HomeVM["journalWeek"] {
+  const from = addDays(day, -6);
+  const done = new Set(ctx.db.$client.prepare("select distinct day from journal_entries where day >= ? and day <= ?").pluck().all(from, day) as string[]);
+  return Array.from({ length: 7 }, (_, k) => {
+    const d = addDays(from, k);
+    return { day: d, done: done.has(d) };
+  });
 }
 
 /** Raised (or agreeing with a logged illness) counts as the illness flag. */

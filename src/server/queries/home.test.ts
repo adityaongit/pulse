@@ -47,7 +47,25 @@ describe("getHome", () => {
   it("has every Home section for today", () => {
     const vm = getHome(dayAt(179), ctxFor(db));
     expect(Object.keys(vm).sort()).toEqual(
-      ["activities", "day", "dials", "energyBank", "isToday", "keyStats", "monitor", "monitorAlert", "stress", "strip", "today", "tonight", "weeklyTeaser"].sort(),
+      [
+        "activities",
+        "day",
+        "dials",
+        "energyBank",
+        "insights",
+        "isToday",
+        "journalWeek",
+        "keyStats",
+        "monitor",
+        "monitorAlert",
+        "outlook",
+        "strainRecovery",
+        "stress",
+        "strip",
+        "today",
+        "tonight",
+        "weeklyTeaser",
+      ].sort(),
     );
     expect(vm.isToday).toBe(true);
     expect(vm.strip).toHaveLength(30);
@@ -101,6 +119,45 @@ describe("getHome", () => {
     expect(morning.keyStats.find((s) => s.key === "hrv")!.metric.reason).toBe("awaiting_sleep_sync");
   });
 
+  it("switches the day banner from outlook to review at 17:00, and past days always review", () => {
+    const at = (h: number) => Date.parse(`2026-10-02T${String(h).padStart(2, "0")}:00:00+05:30`) / 1000;
+    const morning = getHome(dayAt(179), ctxFor(db, at(14))).outlook;
+    expect(morning).toMatchObject({ kind: "outlook", title: "Your daily outlook" });
+    expect(morning!.body).toMatch(/^Your Recovery is \d+%, (green|yellow|red)\./);
+    expect(getHome(dayAt(179), ctxFor(db, at(17))).outlook).toMatchObject({ kind: "review", title: "Your day in review" });
+    const past = getHome(dayAt(170), ctxFor(db)).outlook!;
+    expect(past.kind).toBe("review");
+    expect(past.body).toMatch(/Day Strain was \d+\.\d/);
+    // A day with no band data has nothing to summarise.
+    expect(getHome(dayAt(156), ctxFor(db)).outlook).toBeNull();
+  });
+
+  it("lists today's coach cards (strain first) and none on past days", () => {
+    const today = getHome(dayAt(179), ctxFor(db));
+    expect(today.insights.length).toBeGreaterThan(0);
+    expect(today.insights[0].key).toBe("strain");
+    for (const i of today.insights) {
+      expect(i.title.length).toBeGreaterThan(0);
+      expect(i.body).not.toMatch(/WHOOP|!/);
+      expect(i.href).toMatch(/^\/(strain|recovery|sleep)$/);
+    }
+    expect(getHome(dayAt(170), ctxFor(db)).insights).toEqual([]);
+  });
+
+  it("gives the journal week and the 7-day Strain and Recovery series ending on the day", () => {
+    const vm = getHome(dayAt(170), ctxFor(db));
+    expect(vm.journalWeek.map((w) => w.day)).toEqual([164, 165, 166, 167, 168, 169, 170].map(dayAt));
+    expect(vm.journalWeek.some((w) => w.done)).toBe(true);
+    expect(vm.strainRecovery.map((p) => p.day)).toEqual(vm.journalWeek.map((w) => w.day));
+    for (const p of vm.strainRecovery) {
+      if (p.strain !== null) expect(p.strain >= 0 && p.strain <= 21).toBe(true);
+      if (p.recovery !== null) expect(p.recovery >= 0 && p.recovery <= 100).toBe(true);
+    }
+    // The band-off day has neither score.
+    const off = getHome(dayAt(158), ctxFor(db)).strainRecovery.find((p) => p.day === dayAt(156))!;
+    expect(off).toEqual({ day: dayAt(156), strain: null, recovery: null });
+  });
+
   it("raises the Health Monitor alert in the seeded illness week", () => {
     const flagged = [118, 119, 120, 121, 122].map((i) => getHome(dayAt(i), ctxFor(db)).monitorAlert);
     expect(flagged.some((a) => a?.kind === "illness")).toBe(true);
@@ -127,6 +184,15 @@ describe("every screen query", () => {
     expect(seen).toContain("calibrating");
     expect(getActivity("nope", ctx)).toBeNull();
     expect(getReport("1999-W01", ctx)).toBeNull();
+  });
+
+  it("Stress Monitor gives the typical weekday minutes per level, and the hub a week-on-week pace change", () => {
+    const l = getStress(dayAt(170), ctxFor(db)).levels.value!;
+    expect(l.typical).not.toBeNull();
+    expect(l.typical!.highMin).toBeCloseTo(l.highMin - l.typicalDeltaMin!, 6);
+    expect(getStress(dayAt(3), ctxFor(db)).levels.value?.typical ?? null).toBeNull();
+    const hs = getHealthHub(ctxFor(db)).healthspan.value;
+    if (hs) expect(hs.paceDelta === null || Number.isFinite(hs.paceDelta)).toBe(true);
   });
 
   it("Journal Insights shows the seeded alcohol effect as negative", () => {

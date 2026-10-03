@@ -1,5 +1,6 @@
 "use client"
 
+import * as React from "react"
 import Link from "next/link"
 import { ChevronRight } from "lucide-react"
 import { Pie, PieChart, PolarAngleAxis, RadialBar, RadialBarChart } from "recharts"
@@ -38,6 +39,8 @@ export type ScoreDialProps = {
   unit?: string
   /** `gauge`: "Last updated 15:05" or "Day average". */
   caption?: string
+  /** `sleep lg`: WHOOP's three-segment status bar under the label, the matching segment lit [latest-sleep-1]. */
+  status?: "poor" | "sufficient" | "optimal"
   /** Home: the dial and label become one link. */
   href?: string
   /** Loading (spec §5.19): the real track and label, bars where the numbers go. */
@@ -58,6 +61,7 @@ const SIZE = {
 const COMPACT = { box: "size-16", d: 64, ring: 5, value: "text-[20px] leading-none" } as const
 
 const DIAL_LABEL = "text-xs leading-4 font-bold tracking-[0.08em] uppercase"
+const STATUS_LIT = { poor: "bg-warning", sufficient: "bg-foreground-secondary", optimal: "bg-optimal" } as const
 const TRACK = "var(--dial-track)"
 // Every current ring opens with a 4° gap each side of 12 o'clock ([latest-recovery-1], [latest-home-top-1]).
 const ARC = { startAngle: 86, endAngle: -266 } as const
@@ -119,6 +123,16 @@ export function ScoreDial(props: ScoreDialProps) {
   const empty = value === null
   const reason = empty ? reasonCopy(props.reason, props.nightsLeft) : null
   const gauge = variant === "gauge"
+  const gid = React.useId().replace(/:/g, "")
+  // Gauge geometry as fractions of the radius, so the 768 px size step needs no JS: a thin arc inset 4 px
+  // (room for the needle's overhang) and a needle reaching 22 px inside it, fading out toward the centre.
+  const gauge_ = (() => {
+    const r = s.d / 2
+    const ring = compact ? 4 : lg ? 7 : 4
+    const pct = (px: number) => `${Math.round((px / r) * 1000) / 10}%`
+    const inner = r - 4 - ring
+    return { ring, outer: pct(r - 4), inner: pct(inner), needleInner: pct(inner - 22), tailStart: (inner - 22) / r, headStart: (inner - 2) / r }
+  })()
   const target = variant === "strain" ? props.target : null
   const tagNode = (
     <MetricTags provisional={!empty && props.provisional} tags={empty ? undefined : props.tags} extra={props.extraTags} />
@@ -132,7 +146,7 @@ export function ScoreDial(props: ScoreDialProps) {
     unit: r.unit,
     provisional: props.provisional,
     reasonText: reason?.long,
-    bandWord: r.word?.text,
+    bandWord: r.word?.text ?? (props.status && value !== null ? props.status[0].toUpperCase() + props.status.slice(1) : undefined),
     target,
     soFar: props.extraTags?.includes("so_far"),
   })
@@ -147,23 +161,39 @@ export function ScoreDial(props: ScoreDialProps) {
         <PieChart margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
           {gauge ? (
             <>
+              {/* One continuous arc, blue → teal → green → yellow → orange, thin with round ends, and a white
+                  needle that fades in from the centre [latest-stress-monitor-1] (spec §5.1 v2, C14). */}
+              <defs>
+                <linearGradient id={`${gid}-arc`} x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0" stopColor="var(--stress-low)" />
+                  <stop offset="0.5" stopColor="var(--stress-medium)" />
+                  <stop offset="0.78" stopColor="var(--recovery-yellow)" />
+                  <stop offset="1" stopColor="var(--stress-high)" />
+                </linearGradient>
+                <radialGradient id={`${gid}-needle`} gradientUnits="userSpaceOnUse" cx="50%" cy="50%" r="50%">
+                  <stop offset={gauge_.tailStart} stopColor="var(--foreground)" stopOpacity={0} />
+                  <stop offset={gauge_.headStart} stopColor="var(--foreground)" stopOpacity={1} />
+                  <stop offset="1" stopColor="var(--foreground)" stopOpacity={1} />
+                </radialGradient>
+              </defs>
               <Pie
                 {...pieBase}
-                data={empty ? [{ v: 1, fill: TRACK }] : (["low", "medium", "high"] as const).map((l) => ({ v: 1, fill: DATA_COLORS[STRESS_COLOR[l]].css }))}
-                startAngle={210}
-                endAngle={-30}
-                paddingAngle={empty ? 0 : 2}
-                innerRadius={radii.inner}
-                outerRadius={radii.outer}
+                data={[{ v: 1, fill: empty ? TRACK : `url(#${gid}-arc)` }]}
+                startAngle={215}
+                endAngle={-35}
+                cornerRadius={gauge_.ring / 2}
+                innerRadius={gauge_.inner}
+                outerRadius={gauge_.outer}
               />
               {!empty && (
                 <Pie
                   {...pieBase}
-                  data={markerSlices(value, 3, 0.06).map((v, i) => ({ v, fill: i === 1 ? "var(--foreground)" : "transparent" }))}
-                  startAngle={210}
-                  endAngle={-30}
-                  innerRadius={radii.tickInner}
-                  outerRadius={radii.tickOuter}
+                  data={markerSlices(value, 3, 0.04).map((v, i) => ({ v, fill: i === 1 ? `url(#${gid}-needle)` : "transparent" }))}
+                  startAngle={215}
+                  endAngle={-35}
+                  cornerRadius={1.5}
+                  innerRadius={gauge_.needleInner}
+                  outerRadius="100%"
                 />
               )}
             </>
@@ -239,6 +269,13 @@ export function ScoreDial(props: ScoreDialProps) {
           <>
             <span className={cn(DIAL_LABEL, "mt-2 max-w-36 text-balance")}>{r.label}</span>
             {r.word && <span className={cn(DIAL_LABEL, "mt-1", r.word.className)}>{r.word.text}</span>}
+            {props.status && !empty && !loading && (
+              <span aria-hidden className="mt-3 flex gap-1">
+                {(["poor", "sufficient", "optimal"] as const).map((k) => (
+                  <span key={k} className={cn("h-1 w-5 rounded-full", props.status === k ? STATUS_LIT[k] : "bg-dial-track")} />
+                ))}
+              </span>
+            )}
             {!loading && <span className="mt-2 empty:hidden">{tagNode}</span>}
           </>
         )}

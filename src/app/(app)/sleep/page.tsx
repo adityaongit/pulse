@@ -1,11 +1,11 @@
 import { cn } from "@/lib/utils"
 import { clock, hmm } from "@/lib/format"
-import { Hypnogram } from "@/components/charts/Hypnogram"
 import { TrendChart } from "@/components/charts/TrendChart"
 import { InsightCard } from "@/components/metrics/InsightCard"
 import { KeyStatRow } from "@/components/metrics/KeyStatRow"
 import { ReasonPlaceholder } from "@/components/metrics/ReasonPlaceholder"
 import { ScoreDial } from "@/components/metrics/ScoreDial"
+import { SleepStages } from "@/components/metrics/SleepStages"
 import { ValueUnit } from "@/components/metrics/primitives"
 import { DetailShell } from "@/components/shells/DetailShell"
 import { SectionShell } from "@/components/shells/SectionShell"
@@ -15,11 +15,10 @@ import type { SleepVM } from "@/server/queries/types"
 import { pageDay, type SearchParams } from "../_lib/day"
 import { HashScroll } from "../_lib/HashScroll"
 import { SLEEP_INFO, TONIGHT_INFO } from "../_lib/info"
-import { CAPTION, LABEL, LEGEND, mapMetric, statProps, trendProps } from "../_lib/view"
+import { CAPTION, LABEL, LEGEND, statProps, trendProps } from "../_lib/view"
 
 export const metadata = { title: "Sleep", description: "Sleep performance, stages, need and debt, plus tonight's bedtime plan." }
 
-const STAGE_SWATCH = { awake: "bg-stage-awake", rem: "bg-stage-rem", light: "bg-stage-light", deep: "bg-stage-deep" } as const
 const STATUS_LEGEND = [
   ["bg-warning", "Poor"],
   ["bg-foreground-secondary", "Sufficient"],
@@ -39,7 +38,20 @@ export default async function SleepPage({ searchParams }: PageProps<"/sleep">) {
       title="Sleep"
       info={SLEEP_INFO}
       dateSwitcher={{ mode: "day", placement: "header" }}
-      hero={<ScoreDial variant="sleep" size="lg" value={p.value} reason={p.reason} nightsLeft={p.nightsLeft} provisional={p.provisional} tags={p.tags} />}
+      notch
+      hero={
+        <ScoreDial
+          variant="sleep"
+          size="lg"
+          value={p.value}
+          reason={p.reason}
+          nightsLeft={p.nightsLeft}
+          provisional={p.provisional}
+          tags={p.tags}
+          // Same cut-offs as the sleep insight: optimal from 85%, sufficient from 70% (server/queries/sleep.ts).
+          status={p.value === null ? undefined : p.value >= 85 ? "optimal" : p.value >= 70 ? "sufficient" : "poor"}
+        />
+      }
       summary={
         <Card className="gap-0 px-4 py-1 ring-0">
           <div className="divide-y divide-border">
@@ -61,7 +73,7 @@ export default async function SleepPage({ searchParams }: PageProps<"/sleep">) {
       insight={vm.insight && <InsightCard body={vm.insight} />}
       primary={
         <SectionShell variant="card" title="Sleep stages" level={2}>
-          <Stages vm={vm} />
+          <SleepStages data={vm.stages} />
         </SectionShell>
       }
       secondary={[
@@ -84,32 +96,6 @@ export default async function SleepPage({ searchParams }: PageProps<"/sleep">) {
         </SectionShell>,
       ]}
     />
-  )
-}
-
-function Stages({ vm }: { vm: SleepVM }) {
-  const night = vm.stages && mapMetric(vm.stages, (s) => ({ bed: s.bed, wake: s.wake, segments: s.segments }))
-  return (
-    <div className="space-y-3">
-      <Hypnogram data={night} />
-      {vm.stages?.value && (
-        <div className="divide-y divide-border xl:grid xl:grid-cols-4 xl:gap-4 xl:divide-y-0">
-          {vm.stages.value.rows.map((r) => (
-            <KeyStatRow
-              key={r.stage}
-              variant="row"
-              icon={<span className={cn("size-2 rounded-[2px]", STAGE_SWATCH[r.stage])} />}
-              label={r.label}
-              caption={`Typical ${r.typical[0]}-${r.typical[1]}%`}
-              metric={{ value: r.pct, reason: null, provisional: false }}
-              unit="%"
-              format="int"
-              direction="none"
-            />
-          ))}
-        </div>
-      )}
-    </div>
   )
 }
 
