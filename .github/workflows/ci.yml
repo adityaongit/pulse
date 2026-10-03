@@ -50,11 +50,21 @@ jobs:
           node-version: 24
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - uses: actions/cache@v4
+        id: browsers
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
       - run: pnpm exec playwright install --with-deps chromium
-      # Demo mode on its own server and throwaway database (playwright.config.ts); no secrets needed.
-      - run: pnpm e2e
+        if: steps.browsers.outputs.cache-hit != 'true'
+      - run: pnpm exec playwright install-deps chromium
+        if: steps.browsers.outputs.cache-hit == 'true'
+      # Demo mode against a production build on its own port and throwaway database (playwright.config.ts);
+      # no secrets needed. Pull requests run the phone (361) and laptop (1440) widths; main runs all five.
+      - run: pnpm e2e ${{ github.event_name == 'pull_request' && '--project=setup --project=361 --project=1440' || '' }}
         env:
           CI: "true"
+          E2E_PROD: "1"
       - uses: actions/upload-artifact@v4
         if: failure()
         with:
