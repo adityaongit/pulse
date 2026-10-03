@@ -31,6 +31,8 @@ const Env = z
     CF_ACCESS_TEAM_DOMAIN: z.url({ protocol: /^https$/ }).optional(),
     CF_ACCESS_AUD: z.string().optional(),
     DEV_ACCESS_BYPASS: z.stringbool().default(false),
+    /** The Home avatar photo: an absolute URL or a path under public/ ("/me.jpg"). */
+    AVATAR_URL: z.string().optional(),
   })
   .superRefine((e, ctx) => {
     const need = (keys: (keyof typeof e)[], why: string) => {
@@ -67,6 +69,7 @@ export function parseConfig(env: Record<string, string | undefined>, now = new D
     databasePath: path.resolve(e.DATABASE_PATH ?? (e.GOOGLE_OAUTH_ENABLED ? "data/pulse.db" : "data/demo.db")),
     port: e.PORT,
     timeZone: e.TZ,
+    avatarUrl: e.AVATAR_URL ?? null,
     profile: {
       birthDate: e.BIRTH_DATE,
       sex: e.SEX,

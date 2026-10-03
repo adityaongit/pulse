@@ -17,6 +17,8 @@ export type ResponsiveSheetProps = {
   /** Stacked full-width actions: `Button size="sheet"` (white primary, then `variant="outline-pill"`). */
   footer?: React.ReactNode
   size?: "default" | "tall"
+  /** Where focus goes on close when nothing opened the sheet (it opened from the URL, e.g. `?checkin=1`). */
+  fallbackFocus?: React.RefObject<HTMLElement | null>
 }
 
 /** Sheet material (spec §2.6): opaque dark gradient, a lit 1 px top edge. Not glass: sheets hold content. */
@@ -34,19 +36,20 @@ export const SHEET_SECTION =
  * sheet from 768 px (spec §4.8). X at the left, centred caps title, white pill actions. The one JS
  * breakpoint read. Focus moves in on open and back to the opener on close (Radix and vaul).
  */
-export function ResponsiveSheet({ open, onOpenChange, title, description, children, footer, size = "default" }: ResponsiveSheetProps) {
+export function ResponsiveSheet({ open, onOpenChange, title, description, children, footer, size = "default", fallbackFocus }: ResponsiveSheetProps) {
   const mobile = useIsMobile()
   // Radix returns focus to a DialogTrigger; these sheets are controlled without one, so remember the opener.
   const opener = React.useRef<HTMLElement | null>(null)
 
-  const header = (Title: React.ElementType, Description: React.ElementType, Close: React.ElementType) => (
+  // X at the left on the phone drawer [latest-sheet-edit-1]; at the right on the floating right sheet (spec §4.8, U18 O-03).
+  const header = (Title: React.ElementType, Description: React.ElementType, Close: React.ElementType, closeAt: "start" | "end") => (
     <div className="grid grid-cols-[44px_minmax(0,1fr)_44px] items-center gap-2 px-2 pt-1 pb-3">
       <Close asChild>
-        <Button variant="ghost" size="icon-touch" aria-label="Close" className={CLOSE}>
+        <Button variant="ghost" size="icon-touch" aria-label="Close" className={cn(CLOSE, closeAt === "end" && "col-start-3 row-start-1")}>
           <X aria-hidden strokeWidth={1.75} className="size-[22px]" />
         </Button>
       </Close>
-      <div className="min-w-0 text-center">
+      <div className="col-start-2 row-start-1 min-w-0 text-center">
         <Title className={TITLE}>{title}</Title>
         <Description className={cn(DESCRIPTION, "mt-0.5", !description && "sr-only")}>{description ?? title}</Description>
       </div>
@@ -68,7 +71,7 @@ export function ResponsiveSheet({ open, onOpenChange, title, description, childr
             "motion-reduce:[animation-duration:120ms]! motion-reduce:data-[state=open]:[animation-name:fadeIn]! motion-reduce:data-[state=closed]:[animation-name:fadeOut]!"
           )}
         >
-          {header(DrawerTitle, DrawerDescription, DrawerClose)}
+          {header(DrawerTitle, DrawerDescription, DrawerClose, "start")}
           <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pb-4">{children}</div>
           {foot}
         </DrawerContent>
@@ -84,16 +87,18 @@ export function ResponsiveSheet({ open, onOpenChange, title, description, childr
           opener.current = document.activeElement as HTMLElement | null
         }}
         onCloseAutoFocus={(e) => {
-          if (!opener.current?.isConnected) return
+          // Opened from the URL, the "opener" is <body>: send focus to the page's own trigger instead (U18 O-02).
+          const target = opener.current?.isConnected && opener.current !== document.body ? opener.current : fallbackFocus?.current
+          if (!target) return
           e.preventDefault()
-          opener.current.focus()
+          target.focus()
         }}
         className={cn(
           SHEET,
           "gap-0 border-l-0 pt-4 data-[side=right]:inset-y-3 data-[side=right]:right-3 data-[side=right]:h-auto data-[side=right]:w-[420px] data-[side=right]:max-w-[calc(100%-24px)] data-[side=right]:rounded-[28px] data-[side=right]:sm:max-w-[420px]"
         )}
       >
-        {header(SheetTitle, SheetDescription, SheetClose)}
+        {header(SheetTitle, SheetDescription, SheetClose, "end")}
         <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-6 pb-6">{children}</div>
         {foot}
       </SheetContent>

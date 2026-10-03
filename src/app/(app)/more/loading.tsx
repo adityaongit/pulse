@@ -6,7 +6,7 @@ import { SkeletonText } from "@/components/ui/skeleton"
 export default function Loading() {
   return (
     <PageShell title="More">
-      <div aria-hidden className="flex flex-col gap-6 xl:max-w-[720px] xl:gap-8">
+      <div aria-hidden className="flex w-full flex-col gap-6 xl:mx-auto xl:max-w-[720px] xl:gap-8">
         {[2, 2].map((n, g) => (
           <div key={g} className="space-y-2">
             <SkeletonText className="w-16 px-1 text-xs leading-4" />

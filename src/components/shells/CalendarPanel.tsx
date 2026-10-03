@@ -77,6 +77,8 @@ export function CalendarPanel(props: CalendarPanelProps) {
         className={cn(
           REGION,
           "border-b-[1.5px] border-background-top bg-background-mid pt-[env(safe-area-inset-top)] outline-none md:pt-0",
+          // ≥ 768: a floating panel like the rail, sidebar and sheets, 12 px from the right edge with 28 px lower corners (U18 O-01).
+          "md:right-3 md:rounded-b-[28px] md:shadow-overlay",
           "duration-200 ease-standard data-open:animate-in data-open:slide-in-from-top data-closed:animate-out data-closed:slide-out-to-top"
         )}
       >

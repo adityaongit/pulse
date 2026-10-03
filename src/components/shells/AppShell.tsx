@@ -16,16 +16,19 @@ export function AppShell({ status, children }: AppShellProps) {
       >
         Skip to content
       </a>
-      {/* Bottom padding clears the floating bar (62 px + its inset) or the round action, plus 24 px.
+      {/* Navigation before <main> in the DOM, so Tab reaches the rail or sidebar right after the skip link, not after the
+          whole page (U18 G-05). It is fixed, so the order changes nothing visually. */}
+      <AppNav />
+      {/* Bottom padding clears the floating bar (62 px + its inset) or the round action, plus 24 px; 40 px from 768 px,
+          where the action is docked in the rail or sidebar (D-L5).
           overflow-x-clip (not hidden, so sticky headers keep working): nothing a page paints can widen the layout
           past device-width, which makes mobile browsers zoom the page out (spec §11 M2). */}
       <main
         id="main"
-        className="min-h-svh min-w-0 flex-1 overflow-x-clip pb-[calc(62px+max(env(safe-area-inset-bottom)-6px,12px)+24px)] md:pb-24 md:pl-[112px] xl:pl-[256px]"
+        className="min-h-svh min-w-0 flex-1 overflow-x-clip pb-[calc(62px+max(env(safe-area-inset-bottom)-6px,12px)+24px)] md:pb-10 md:pl-[112px] xl:pl-[256px]"
       >
         {children}
       </main>
-      <AppNav />
     </ShellStatusProvider>
   )
 }

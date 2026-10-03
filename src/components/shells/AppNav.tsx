@@ -6,6 +6,8 @@ import { usePathname, useSearchParams } from "next/navigation"
 import { getISOWeek, getISOWeekYear, parseISO, subWeeks } from "date-fns"
 import { CalendarRange, HeartPulse, House, Menu, NotebookPen, Settings, type LucideIcon } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { Mark } from "@/components/brand/Mark"
+import { Wordmark } from "@/components/brand/Wordmark"
 import { dayLabel } from "@/lib/format"
 import { dayHref, parseDay, tabForPath, TAB_ROOT, type Tab } from "@/lib/url"
 import { useShellStatus } from "./ShellStatus"
@@ -80,8 +82,10 @@ function TabBar({ current }: { current: number }) {
 function Rail({ current }: { current: number }) {
   return (
     <nav aria-label="Primary" className={cn(GLASS, "fixed inset-y-3 left-3 z-30 hidden w-[88px] flex-col items-center rounded-[28px] py-4 md:flex xl:hidden")}>
-      <Link href="/" aria-label="Pulse home" className={cn(PRESS, "mb-5 grid size-10 place-items-center rounded-full font-numeric text-xl leading-none font-bold")}>
-        P
+      <Link href="/" aria-label="Pulse home" className={cn(PRESS, "mb-5 grid size-10 place-items-center rounded-full")}>
+        <span aria-hidden>
+          <Mark className="size-6" />
+        </span>
       </Link>
       <ul className="relative flex flex-col gap-1">
         <Lens index={current} axis="y" className="inset-x-0 top-0 h-16 rounded-[20px]" />
@@ -98,7 +102,10 @@ function Rail({ current }: { current: number }) {
           </li>
         ))}
       </ul>
-      <div className="mt-auto">
+      <div className="mt-auto flex flex-col items-center gap-3">
+        <React.Suspense>
+          <CheckInAction variant="rail" />
+        </React.Suspense>
         <SyncStatus variant="icon" />
       </div>
     </nav>
@@ -128,8 +135,15 @@ function Sidebar({ current, pathname }: { current: number; pathname: string }) {
   )
   return (
     <nav aria-label="Primary" className={cn(GLASS, "fixed inset-y-3 left-3 z-30 hidden w-[232px] flex-col rounded-[28px] p-3 xl:flex")}>
-      <Link href="/" className="flex h-14 items-center rounded-full px-3 text-[13px] leading-4 font-semibold tracking-[0.35em] uppercase outline-none focus-visible:ring-3 focus-visible:ring-ring/50">
-        Pulse
+      <Link
+        href="/"
+        aria-label="Pulse home"
+        className="flex h-14 items-center rounded-full px-3 transition-[color] duration-150 ease-standard outline-none hover:text-foreground-secondary focus-visible:ring-3 focus-visible:ring-ring/50"
+      >
+        <span aria-hidden className="flex items-center gap-2.5">
+          <Mark className="size-7" />
+          <Wordmark className="h-[17px]" />
+        </span>
       </Link>
       <ul className="relative flex flex-col gap-1">
         <Lens index={tab} axis="y" className="inset-x-0 top-0 h-12 rounded-full" />
@@ -137,44 +151,73 @@ function Sidebar({ current, pathname }: { current: number; pathname: string }) {
       </ul>
       <div aria-hidden className="mx-3 my-2 h-px bg-white/8" />
       <ul className="flex flex-col gap-1">{extra.map((e) => item(e.href, e.label, e.icon, pathname.startsWith(e.match), pathname.startsWith(e.match)))}</ul>
-      <div className="mt-auto space-y-1">
-        <div className="px-3">
-          <DemoChip />
+      <div className="mt-auto space-y-3">
+        <React.Suspense>
+          <CheckInAction variant="sidebar" />
+        </React.Suspense>
+        <div className="space-y-1">
+          <div className="px-3">
+            <DemoChip />
+          </div>
+          <SyncStatus variant="line" />
         </div>
-        <SyncStatus variant="line" />
       </div>
     </nav>
   )
 }
 
+const ACTION_FACE = "bg-linear-to-b from-glass-action-top to-glass-action-bottom ring-1 ring-action-rim-from/25 transition-[scale,filter] duration-150 ease-standard outline-none hover:brightness-110 focus-visible:ring-3 focus-visible:ring-ring/50 active:scale-[0.96]"
+
+/** WHOOP's ringed monogram: "P" in a 30 px circle with the indigo-to-blue rim. */
+function Monogram() {
+  return (
+    <span
+      aria-hidden
+      className="grid size-[30px] shrink-0 place-items-center rounded-full border-[1.5px] border-transparent font-numeric text-[15px] leading-none font-bold [background:linear-gradient(var(--action-face),var(--action-face))_padding-box,linear-gradient(135deg,var(--action-rim-from),var(--action-rim-to))_border-box]"
+    >
+      P
+    </span>
+  )
+}
+
 /**
- * The round "Check in" action (spec §4.2.1), WHOOP's coach button: indigo-rimmed glass with the "P"
- * monogram. Opens the journal check-in for the day on screen through `?checkin=1`.
+ * The "Check in" action (spec §4.2.1), WHOOP's coach button: indigo-rimmed glass with the "P" monogram. Opens the
+ * journal check-in for the day on screen through `?checkin=1`. `float`: the round button over the content (phone).
+ * `rail` and `sidebar`: the same action docked in the tablet rail and laptop sidebar, where floating over the content
+ * column hid its right-hand controls (U18 G-02, D-L5).
  */
-function FloatingAction() {
+function CheckInAction({ variant }: { variant: "float" | "rail" | "sidebar" }) {
   const { today } = useShellStatus()
   const params = useSearchParams()
   const { d } = parseDay(params.get("d") ?? undefined, today)
+  const href = `${dayHref("/journal", d, today)}${d === today ? "?" : "&"}checkin=1`
+  const label = `Check in for ${dayLabel(d, today)}`
+  if (variant === "sidebar")
+    return (
+      <Link href={href} aria-label={label} className={cn(ACTION_FACE, "flex h-12 items-center gap-3 rounded-full pr-4 pl-2.5 text-[15px] leading-5 font-semibold")}>
+        <Monogram />
+        Check in
+      </Link>
+    )
   return (
     <Link
-      href={`${dayHref("/journal", d, today)}${d === today ? "?" : "&"}checkin=1`}
-      aria-label={`Check in for ${dayLabel(d, today)}`}
-      className="group/fab relative grid size-[62px] shrink-0 place-items-center rounded-[22px] bg-linear-to-b from-glass-action-top to-glass-action-bottom shadow-glass ring-1 ring-action-rim-from/25 backdrop-blur-md backdrop-saturate-150 transition-[scale,filter] duration-150 ease-standard outline-none hover:brightness-110 focus-visible:ring-3 focus-visible:ring-ring/50 active:scale-[0.96] md:size-14 md:rounded-[20px]"
+      href={href}
+      aria-label={label}
+      className={cn(
+        ACTION_FACE,
+        "grid shrink-0 place-items-center",
+        variant === "rail" ? "size-14 rounded-[20px]" : "size-[62px] rounded-[22px] shadow-glass backdrop-blur-md backdrop-saturate-150"
+      )}
     >
-      <span
-        aria-hidden
-        className="grid size-[30px] place-items-center rounded-full border-[1.5px] border-transparent font-numeric text-[15px] leading-none font-bold [background:linear-gradient(var(--action-face),var(--action-face))_padding-box,linear-gradient(135deg,var(--action-rim-from),var(--action-rim-to))_border-box]"
-      >
-        P
-      </span>
+      <Monogram />
     </Link>
   )
 }
 
 /**
  * Navigation in three forms switched by CSS only (spec §4.2): the glass tab bar plus the round
- * action below 768 px (tab roots; detail screens show the action alone), the rail from 768 px,
- * the sidebar from 1280 px, where the action floats bottom right.
+ * action below 768 px (tab roots; detail screens show the action alone), the rail from 768 px and
+ * the sidebar from 1280 px, each with the check-in action docked at its foot (D-L5).
  */
 export function AppNav() {
   const pathname = usePathname()
@@ -184,15 +227,15 @@ export function AppNav() {
     <>
       <Rail current={index} />
       <Sidebar current={index} pathname={pathname} />
-      <div className="pointer-events-none fixed inset-x-3 bottom-[max(calc(env(safe-area-inset-bottom)-6px),12px)] z-30 flex touch-manipulation justify-end gap-2 *:pointer-events-auto md:inset-x-auto md:right-6 md:bottom-6 xl:right-8 xl:bottom-8">
+      <div className="pointer-events-none fixed inset-x-3 bottom-[max(calc(env(safe-area-inset-bottom)-6px),12px)] z-30 flex touch-manipulation justify-end gap-2 *:pointer-events-auto md:hidden">
         {root && (
-          <div className="flex min-w-0 flex-1 md:hidden">
+          <div className="flex min-w-0 flex-1">
             <TabBar current={index} />
           </div>
         )}
         {!pathname.startsWith("/settings") && (
           <React.Suspense>
-            <FloatingAction />
+            <CheckInAction variant="float" />
           </React.Suspense>
         )}
       </div>

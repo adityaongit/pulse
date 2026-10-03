@@ -56,6 +56,8 @@ export function CheckIn({ day, dayLabel, tags, checkIn }: CheckInProps) {
   const pathname = usePathname()
   const params = useSearchParams()
   const [open, setOpen] = React.useState(false)
+  // The card's Edit / Check in button: focus returns here when the sheet opened from `?checkin=1` (U18 O-02).
+  const trigger = React.useRef<HTMLButtonElement>(null)
   const [values, setValues] = React.useState<Values>({})
   const [saving, setSaving] = React.useState(false)
   const [saveError, setSaveError] = React.useState(false)
@@ -143,7 +145,7 @@ export function CheckIn({ day, dayLabel, tags, checkIn }: CheckInProps) {
                 ))}
               </ul>
             )}
-            <Button variant="secondary" size="touch" className="self-start" onClick={start}>
+            <Button ref={trigger} variant="secondary" size="touch" className="self-start" onClick={start}>
               Edit
             </Button>
           </div>
@@ -152,7 +154,7 @@ export function CheckIn({ day, dayLabel, tags, checkIn }: CheckInProps) {
             <p className="max-w-[65ch] text-[15px] leading-[22px] text-pretty text-foreground-secondary">
               Log what you did today. Pulse compares it with tomorrow&apos;s Recovery.
             </p>
-            <Button size="touch" className="w-full" onClick={start}>
+            <Button ref={trigger} size="touch" className="w-full" onClick={start}>
               Check in
             </Button>
           </div>
@@ -165,6 +167,7 @@ export function CheckIn({ day, dayLabel, tags, checkIn }: CheckInProps) {
         title="Check in"
         description={dayLabel}
         size="tall"
+        fallbackFocus={trigger}
         footer={
           <>
             {saveError && (

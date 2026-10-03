@@ -22,6 +22,7 @@ export function MiniRing({ variant, value, fill = true }: { variant: MiniRingVar
   return (
     <span aria-hidden className="block size-[22px] shrink-0">
       <RadialBarChart
+        accessibilityLayer={false}
         width={D}
         height={D}
         data={[{ v: shown }]}

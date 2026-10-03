@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils"
 import { clock, formatValue, MISSING, rangeLabel } from "@/lib/format"
 import { reasonCopy } from "@/lib/reasons"
 import { dayHref } from "@/lib/url"
+import { Wordmark } from "@/components/brand/Wordmark"
 import { EnergyBankChart } from "@/components/charts/EnergyBankChart"
 import { StrainRecoveryChart } from "@/components/charts/StrainRecoveryChart"
 import { ActivityCard } from "@/components/metrics/ActivityCard"
@@ -77,11 +78,11 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
       slots={{
         top: (
           <div className="pt-4 xl:pt-2">
-            <div className="flex flex-col gap-6 xl:grid xl:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] xl:items-center xl:gap-x-6">
+            <div className="flex flex-col gap-6 xl:grid xl:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] xl:items-center xl:gap-x-6">
               <div className="space-y-4 xl:col-start-1 xl:row-start-1">
-                <p aria-hidden className="text-center text-[13px] leading-4 font-semibold tracking-[0.35em] text-foreground-secondary uppercase">
-                  Pulse
-                </p>
+                <span aria-hidden className="flex justify-center text-foreground-secondary">
+                  <Wordmark className="h-[17px]" />
+                </span>
                 {/* The dials shrink into the header's ring row as this row scrolls under it (spec §4.3, HomeHeader). */}
                 <div {...{ [HOME_DIALS]: "" }} className={cn("grid grid-cols-3 items-start justify-items-center", HOME_DIALS_CLASS)}>
                   <ScoreDial variant="sleep" size="md" value={dials.sleep.value} reason={dials.sleep.reason} provisional={dials.sleep.provisional} tags={dials.sleep.tags} href={at("/sleep")} />
@@ -123,14 +124,14 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
                   <MonitorAlert alert={vm.monitorAlert} href={at("/health/monitor")} />
                 </div>
               )}
-              <div className="grid grid-cols-2 gap-3 xl:col-start-2 xl:row-start-1 xl:gap-4">
+              <div className="grid grid-cols-2 gap-3 xl:col-start-2 xl:row-start-1 xl:grid-cols-1 xl:gap-4">
                 <MonitorCard vm={vm} href={at("/health/monitor")} />
                 <StressCard vm={vm} href={at("/health/stress")} timeZone={timeZone} />
               </div>
             </div>
           </div>
         ),
-        right: (
+        main: (
           <SectionShell
             variant="section"
             title="My Day"
@@ -210,7 +211,7 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
             </div>
           </SectionShell>
         ),
-        left: (
+        aside: (
           <SectionShell variant="section" title="My Dashboard" aside="vs. 30-day average">
             {/* One card per metric (V9, [latest-home-dashboard-1]). */}
             <ul className="space-y-2">

@@ -45,11 +45,8 @@ Only needed for real data (`GOOGLE_OAUTH_ENABLED=true`). Demo mode needs none of
 1. In <https://console.cloud.google.com>, create a project (for example `pulse`).
 2. Under **APIs & Services > Library**, enable the **Google Health API**.
 3. Under **Google Auth Platform > Branding / Audience** (the OAuth consent screen), choose **External**. Fill in the app name and your email, and add yourself as a test user.
-4. Under **Data access**, add exactly the three read-only scopes from `SCOPES` in `src/server/sources/google/oauth.ts`:
-   - `https://www.googleapis.com/auth/googlehealth.health_metrics_and_measurements.readonly`
-   - `https://www.googleapis.com/auth/googlehealth.sleep.readonly`
-   - `https://www.googleapis.com/auth/googlehealth.activity_and_fitness.readonly`
-5. Under **Audience**, set the publishing status to **In production**. In **Testing**, refresh tokens expire after 7 days and you would have to reconnect every week. You do not need verification for your own account. The consent screen then shows "Google hasn't verified this app". This is expected: click **Advanced > Go to pulse (unsafe)**.
+4. Under **Data access > Add or remove scopes > Manually add scopes**, paste the 12 scopes from `SCOPES` in `src/server/sources/google/oauth.ts`, each prefixed with `https://www.googleapis.com/auth/googlehealth.`: the 11 `*.readonly` scopes (activity_and_fitness, health_metrics_and_measurements, sleep, ecg, irn, location, logged_symptoms, mindfulness, reproductive_health, profile, settings) and `nutrition.writeonly`. Nutrition has no read-only scope, so the write scope is the only way to read food and hydration logs. Pulse never writes.
+5. Under **Branding**, fill in an app home page (`https://pulse.portlabs.in`) and a privacy policy URL; **Publish app** stays disabled without them. Then, under **Audience**, set the publishing status to **In production**. In **Testing**, refresh tokens expire after 7 days and you would have to reconnect every week. You do not need verification for your own account. The consent screen then shows "Google hasn't verified this app". This is expected: click **Advanced > Go to pulse (unsafe)**.
 6. Under **Clients**, create an OAuth client of type **Web application** with these authorized redirect URIs:
    - `http://localhost:3000/oauth/callback`
    - `https://pulse.portlabs.in/oauth/callback`
@@ -142,7 +139,7 @@ Also check these:
 1. Do the Google Cloud setup in section 1.
 2. In `.env`, set `GOOGLE_OAUTH_ENABLED=true`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` and `APP_URL=https://pulse.portlabs.in`.
 3. Run `docker compose up -d --force-recreate`. The app now uses `data/pulse.db`. `data/demo.db` stays in the volume, untouched. To go back to demo, set the flag to false again.
-4. Open `https://pulse.portlabs.in/oauth/start`, pass the unverified-app warning and grant all three scopes. The callback stores the refresh token, and the worker starts the backfill.
+4. Open `https://pulse.portlabs.in/oauth/start`, pass the unverified-app warning and grant every scope. The callback stores the refresh token, and the worker starts the backfill.
 5. Watch `docker compose logs -f pulse` until the backfill finishes. Then check that Today shows real data.
 
 ## 6. First real probe

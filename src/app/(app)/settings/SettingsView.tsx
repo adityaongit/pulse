@@ -150,20 +150,23 @@ export function About({ version, scoringVersion }: { version: string; scoringVer
   )
 }
 
-/** Settings body: Data source and Sync status, Profile, About. Two columns from 1024 px (spec §7.14). */
+/**
+ * Settings body: Data source and Sync status, Profile, About. One column through tablet (spec §7.14); from 1280 px
+ * two columns, Data source over Profile on the left and Sync status over About on the right (U18 ST-01).
+ */
 export function SettingsView({ vm, now }: { vm: SettingsVM; now: number }) {
   return (
-    <div className="grid grid-cols-1 items-start gap-3 lg:grid-cols-2 xl:gap-4">
-      <div className="min-w-0 lg:col-start-1">
+    <div className="grid grid-cols-1 items-start gap-3 xl:grid-cols-2 xl:gap-4">
+      <div className="min-w-0 xl:col-start-1 xl:row-start-1">
         <DataSource source={vm.source} />
       </div>
-      <div className="min-w-0 lg:col-start-2 lg:row-span-3 lg:row-start-1">
+      <div className="min-w-0 xl:col-start-2 xl:row-start-1">
         <SyncStatus vm={vm} now={now} />
       </div>
-      <div className="min-w-0 lg:col-start-1">
+      <div className="min-w-0 xl:col-start-1 xl:row-start-2">
         <Profile profile={vm.profile} />
       </div>
-      <div className="min-w-0 lg:col-start-1">
+      <div className="min-w-0 xl:col-start-2 xl:row-start-2">
         <About version={vm.version} scoringVersion={vm.scoringVersion} />
       </div>
     </div>

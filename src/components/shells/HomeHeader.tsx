@@ -3,8 +3,9 @@
 import * as React from "react"
 import Link from "next/link"
 import { useSearchParams } from "next/navigation"
-import { CircleUserRound, Flame } from "lucide-react"
+import { CircleUserRound } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { COLUMN_WIDTH } from "./column"
 import { BAND_WORD, recoveryBand } from "@/lib/bands"
 import { clamp01, collapseProgress, lerp, timelineOffset } from "@/lib/collapse"
 import { formatValue } from "@/lib/format"
@@ -30,7 +31,7 @@ const BAND_MAX = 320
 /** Collapse progress samples: extras are gone by 0.35, values fade 0.35 → 0.7, the label path curves between. */
 const STOPS = [0, 0.2, 0.35, 0.5, 0.7, 0.85, 1]
 /** Content edges: the full width on phone and tablet, the 1120 px content column from 1280. */
-const ROW_EDGES = "px-4 md:px-6 xl:mx-auto xl:max-w-[1120px] xl:px-8"
+const ROW_EDGES = cn("px-4 md:px-6 xl:px-8", COLUMN_WIDTH)
 
 // Time-based fallback for the discrete state (laptop, reduced motion): the band snaps or eases, the ring row fades.
 // While the scroll-linked morph runs (`data-morph`), Web Animations own these properties and transitions stay off.
@@ -46,6 +47,34 @@ function ringLabel(key: MiniRingVariant, label: string, value: number | null) {
   return `Strain ${formatValue("decimal1", value)} of 21. Open Strain`
 }
 
+/**
+ * WHOOP's streak flame: the emoji-like two-tone fire, a red-orange body lit toward its tip with an orange-yellow core
+ * (sampled from the user's capture: tip #ff784c, body #ff6538, edge #ee4e33, core #ff9862). Sized by the row's --u.
+ */
+function StreakFlame() {
+  const id = React.useId()
+  return (
+    <svg aria-hidden viewBox="0 0 20 24" className="h-[calc(var(--u)*20px)] w-auto shrink-0">
+      <defs>
+        <linearGradient id={`${id}-body`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#ff8a52" />
+          <stop offset="0.45" stopColor="#ff6538" />
+          <stop offset="1" stopColor="#ee4e33" />
+        </linearGradient>
+        <linearGradient id={`${id}-core`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#ffc56e" />
+          <stop offset="1" stopColor="#ff9862" />
+        </linearGradient>
+      </defs>
+      <path
+        fill={`url(#${id}-body)`}
+        d="M10.4 0.6c.6 3.8 3.2 5.6 5.1 8.3 1.6 2.3 2.5 4.6 2.5 7.2 0 4.6-3.6 7.6-8 7.6s-8-3-8-7.4c0-3 1.4-5.2 3-7 .3 1.6 1 2.8 2.1 3.5-.3-3.6.9-6.6 3.3-12.2z"
+      />
+      <path fill={`url(#${id}-core)`} d="M10.2 11.4c.5 2 2 2.9 2.9 4.4.6 1 .9 1.9.9 2.9 0 2.3-1.8 3.9-4 3.9s-4-1.5-4-3.7c0-1.6.8-2.7 1.8-3.6.2.8.6 1.4 1.1 1.7-.1-2 .3-3.7 1.3-5.6z" />
+    </svg>
+  )
+}
+
 /** "{n}-day streak" pill, hidden on past days (WHOOP shows none there, [latest-home-pastday-1]). */
 function Streak() {
   const { streak, today } = useShellStatus()
@@ -57,12 +86,39 @@ function Streak() {
       data-streak
       aria-label={`${streak.days}-day streak`}
       title="Days in a row with your band worn"
-      // Below 400 px it tightens (padding, gap, 15 px numerals) so the top row fits at 320 px (spec §11 M4).
-      className="-ml-1 inline-flex h-8 shrink-0 items-center gap-1 rounded-full bg-white/[0.05] pr-2 pl-2 min-[400px]:gap-1.5 min-[400px]:pr-3 min-[400px]:pl-2.5"
+      // Starts under the avatar (its 3 px page-colour ring plus 16 of its 40 px), so the avatar sits on the pill's left
+      // end (spec §11 M6). Every size is a multiple of --u, which the row steps down on narrow phones (M4, M6).
+      className="-ml-[calc(var(--u)*19px)] inline-flex h-[calc(var(--u)*36px)] shrink-0 items-center gap-[calc(var(--u)*10px)] rounded-full bg-white/[0.045] pr-[calc(var(--u)*12px)] pl-[calc(var(--u)*32px)]"
     >
-      <Flame aria-hidden className="size-3.5 fill-warning text-warning min-[400px]:size-4" strokeWidth={1.5} />
-      <span className="font-numeric text-[15px] leading-5 font-bold tabular-nums min-[400px]:text-[17px]">{streak.days}</span>
+      <StreakFlame />
+      <span className="font-numeric text-[length:calc(var(--u)*17px)] leading-none font-bold tabular-nums">{streak.days}</span>
     </span>
+  )
+}
+
+/**
+ * The avatar: the user's photo when one is configured (`public/avatar.*` or AVATAR_URL), else WHOOP's no-photo
+ * outline ([latest-home-collapsed-1]). Both sit on a disc ringed in the page colour, over the streak pill (M6).
+ */
+function Avatar() {
+  const { avatar } = useShellStatus()
+  return (
+    // The 3 px ring is the page ground itself (the header's own fill), so it cuts the pill exactly where WHOOP's does.
+    <Link
+      href="/more"
+      aria-label="More and settings"
+      className={cn(
+        HEADER_FILL,
+        "relative z-10 -ml-[calc(var(--u)*3px)] grid size-[calc(var(--u)*46px)] shrink-0 place-items-center rounded-full p-[calc(var(--u)*3px)] after:absolute after:-inset-[max(0px,calc((44px-var(--u)*46px)/2))] transition-[scale,color] duration-150 ease-standard outline-none hover:text-foreground-secondary focus-visible:ring-3 focus-visible:ring-ring/50 active:scale-[0.96]"
+      )}
+    >
+      {avatar ? (
+        // eslint-disable-next-line @next/next/no-img-element -- a user-supplied photo from any origin; nothing to optimise
+        <img src={avatar} alt="" width={40} height={40} className="size-full rounded-full object-cover outline-1 -outline-offset-1 outline-white/10" />
+      ) : (
+        <CircleUserRound aria-hidden className="size-full" strokeWidth={1.5} />
+      )}
+    </Link>
   )
 }
 
@@ -269,15 +325,10 @@ export function HomeHeader({ rings }: { rings?: HeaderRings }) {
               ROW_EDGES
             )}
           >
-            <div className="flex items-center">
-              {/* The outlined avatar alone, as WHOOP draws it ([latest-home-collapsed-1]); its circle ends where the streak pill starts. */}
-              <Link
-                href="/more"
-                aria-label="More and settings"
-                className="relative z-10 grid size-8 shrink-0 place-items-center rounded-full transition-[scale,color] duration-150 ease-standard outline-none after:absolute after:-inset-1.5 hover:text-foreground-secondary focus-visible:ring-3 focus-visible:ring-ring/50 active:scale-[0.96]"
-              >
-                <CircleUserRound aria-hidden className="size-7" strokeWidth={1.5} />
-              </Link>
+            {/* --u scales the avatar and streak pill as one (spec §11 M6): full size from 440 px, stepped down on
+                narrower phones so the pair always fits its half of the row and the date pill stays centred (M4). */}
+            <div className="flex items-center [--u:0.66] min-[340px]:[--u:0.74] min-[356px]:[--u:0.8] min-[380px]:[--u:0.86] min-[440px]:[--u:1]">
+              <Avatar />
               <React.Suspense>
                 <Streak />
               </React.Suspense>

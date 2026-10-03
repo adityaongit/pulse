@@ -72,10 +72,10 @@ export default async function StrainPage({ searchParams }: PageProps<"/strain">)
         </SectionShell>
       }
       secondary={[
-        <SectionShell key="zones" variant="card" title="Time in zones" level={2}>
+        <SectionShell key="zones" variant="card" title="Time in zones" level={2} className="xl:row-span-2">
           <ZoneBars variant="rows" data={vm.zones} maxHr={vm.maxHr} emptyCopy={vm.isToday ? "No heart-rate zones yet today." : "No heart-rate zones on this day."} />
         </SectionShell>,
-        <SectionShell key="activities" variant="card" title="Activities" level={2} className="lg:self-start">
+        <SectionShell key="activities" variant="card" title="Activities" level={2}>
           {vm.activities.length ? (
             <div className="space-y-1.5">
               {vm.activities.map((a) => (
@@ -86,7 +86,7 @@ export default async function StrainPage({ searchParams }: PageProps<"/strain">)
             <EmptyState body="No activities on this day." />
           )}
         </SectionShell>,
-        <SectionShell key="trend" variant="card" title={weekly ? "Weekly trends" : "Strain trend"} level={2} className="lg:col-span-2">
+        <SectionShell key="trend" variant="card" title={weekly ? "Weekly trends" : "Strain trend"} level={2}>
           <TrendChart label="Strain" format="decimal1" colorBy="strain" {...trend} />
         </SectionShell>,
       ]}

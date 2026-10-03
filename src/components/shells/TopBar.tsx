@@ -4,6 +4,7 @@ import * as React from "react"
 import Link from "next/link"
 import { FlaskConical, Watch } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { COLUMN_WIDTH } from "./column"
 import { ago, agoShort, clock } from "@/lib/format"
 import { Badge } from "@/components/ui/badge"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
@@ -149,7 +150,7 @@ export function HeaderRow({ left, center, right, className }: { left?: React.Rea
 export function TitleHeader({ title, dateSwitcher }: { title: string; dateSwitcher?: DateSwitcherProps }) {
   return (
     <HeaderFrame>
-      <HeaderRow center={<h1 className={cn(HEADER_TITLE, "truncate")}>{title}</h1>} right={<SyncStatus />} className="px-4 md:px-6 xl:mx-auto xl:max-w-[1120px] xl:px-8" />
+      <HeaderRow center={<h1 className={cn(HEADER_TITLE, "truncate")}>{title}</h1>} right={<SyncStatus />} className={cn("h-11 px-4 md:h-13 md:px-6 xl:px-8", COLUMN_WIDTH)} />
       {dateSwitcher && (
         <div className="flex justify-center pt-1">
           <DateSwitcher {...dateSwitcher} />

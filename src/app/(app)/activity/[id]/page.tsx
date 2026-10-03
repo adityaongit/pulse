@@ -55,14 +55,14 @@ export default async function ActivityPage({ params }: PageProps<"/activity/[id]
         </div>
       }
       secondary={[
-        <SectionShell key="stats" variant="section" title="Key statistics" aside="vs. 30-day average" level={2} className="lg:col-span-2">
+        <SectionShell key="stats" variant="section" title="Key statistics" aside="vs. 30-day average" level={2}>
           <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:gap-4">
             {tiles.map((k) => (
               <KeyStatRow key={k.key} variant="tile" {...statProps(k)} />
             ))}
           </div>
         </SectionShell>,
-        <SectionShell key="hrr" variant="card" title="Heart rate recovery" level={2} className="lg:self-start">
+        <SectionShell key="hrr" variant="card" title="Heart rate recovery" level={2} className="xl:self-end">
           <HeartRateRecovery hrr={vm.hrr} />
         </SectionShell>,
       ]}

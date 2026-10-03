@@ -3,6 +3,7 @@
 import { usePathname, useRouter } from "next/navigation"
 import { ChevronLeft, X } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { COLUMN_WIDTH } from "./column"
 import { dayHref, parentHref, tabForPath } from "@/lib/url"
 import { Button } from "@/components/ui/button"
 import { DateSwitcher, type DateSwitcherProps } from "./DateSwitcher"
@@ -26,10 +27,10 @@ export type DetailHeaderProps = {
 }
 
 /**
- * The 44 px bar (WHOOP's, [latest-recovery-collapsed-1]): 52 px from 768. From 1280 its edges follow the
- * 1120 px content column; the 24 px inset puts the info ring's edge on the content edge.
+ * The 44 px bar (WHOOP's, [latest-recovery-collapsed-1]): 52 px from 768. From 768 its edges follow the content
+ * column (D-L2); the inset puts the back chevron and the info ring on the content edges.
  */
-export const DETAIL_ROW = "h-11 md:h-13 xl:mx-auto xl:max-w-[1120px] xl:px-6"
+export const DETAIL_ROW = cn("h-11 md:h-13 xl:px-6", COLUMN_WIDTH)
 
 /** Back, the date or the screen name (+ subtitle), the ringed info button (spec §4.4). */
 export function DetailHeaderRow({
@@ -49,8 +50,12 @@ export function DetailHeaderRow({
   const { today } = useShellStatus()
 
   const back = () => {
-    const sameOrigin = document.referrer.startsWith(window.location.origin)
-    if (window.history.length > 1 && sameOrigin) return router.back()
+    // The Navigation API lists only this origin's entries, so canGoBack means "an in-app page is behind this one".
+    // document.referrer never changes on client navigation, so alone it sent Home → Recovery → Back to a pushed copy
+    // of Home, and the browser's Back then looped to Recovery (U18 N-01). It stays as the fallback.
+    const nav = (window as Window & { navigation?: { canGoBack: boolean } }).navigation
+    const canGoBack = nav ? nav.canGoBack : window.history.length > 1 && document.referrer.startsWith(window.location.origin)
+    if (canGoBack) return router.back()
     if (backHref) return router.push(backHref)
     const parent = parentHref(pathname)
     // Home details return to Home on the same day.
@@ -64,25 +69,39 @@ export function DetailHeaderRow({
     </Button>
   )
 
+  // A subtitle never moves the title: the title line keeps the plain bar's position (centred in the 44 / 52 px row,
+  // level with back and info) and the subtitle hangs under it, so the bar grows downward. Before, the title and
+  // subtitle were centred together and the title sat 4 px from the top (Healthspan, Activity; U18 header check).
+  const sideLine = "flex h-11 shrink-0 items-center md:h-13"
   if (align === "start")
     return (
-      <div className={cn("flex items-center gap-2 px-2 md:px-4", DETAIL_ROW, "h-auto min-h-11 md:min-h-13", className)}>
-        {backButton}
-        {titleIcon && <span className="grid size-7 shrink-0 place-items-center [&_svg]:size-6 [&_svg]:stroke-[1.75]">{titleIcon}</span>}
-        <div data-collapse-keep className="min-w-0 flex-1 py-1">
+      <div className={cn("flex items-start gap-2 px-2 md:px-4", DETAIL_ROW, "h-auto min-h-11 md:min-h-13", subtitle && "pb-1", className)}>
+        <span className={sideLine}>{backButton}</span>
+        {titleIcon && (
+          <span className={sideLine}>
+            <span className="grid size-7 shrink-0 place-items-center [&_svg]:size-6 [&_svg]:stroke-[1.75]">{titleIcon}</span>
+          </span>
+        )}
+        <div data-collapse-keep className="min-w-0 flex-1 pt-3 md:pt-4">
           <h1 className={cn(HEADER_TITLE, "truncate")}>{title}</h1>
           {subtitle && <p className="truncate text-[15px] leading-5 text-foreground-secondary tabular-nums">{subtitle}</p>}
         </div>
-        {info && <InfoButton info={info} label={title} variant="header" />}
+        {info && (
+          <span className={sideLine}>
+            <InfoButton info={info} label={title} variant="header" />
+          </span>
+        )}
       </div>
     )
 
+  const sub = !!subtitle && !dateTitle
+
   return (
     <HeaderRow
-      className={cn(DETAIL_ROW, className)}
-      left={backButton}
+      className={cn(DETAIL_ROW, sub && "h-auto items-start pb-1 md:h-auto", className)}
+      left={sub ? <span className={sideLine}>{backButton}</span> : backButton}
       center={
-        <div data-collapse-keep className={cn("flex max-w-full min-w-0 flex-col items-center", centerClassName)}>
+        <div data-collapse-keep className={cn("flex max-w-full min-w-0 flex-col items-center", sub && "pt-3 md:pt-4", centerClassName)}>
           {dateTitle ? (
             <>
               <h1 className="sr-only">{title}</h1>
@@ -96,7 +115,7 @@ export function DetailHeaderRow({
           )}
         </div>
       }
-      right={info && <InfoButton info={info} label={title} variant="header" />}
+      right={info && (sub ? <span className={sideLine}><InfoButton info={info} label={title} variant="header" /></span> : <InfoButton info={info} label={title} variant="header" />)}
     />
   )
 }

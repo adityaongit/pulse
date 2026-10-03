@@ -135,7 +135,8 @@ export default async function HealthspanPage({ searchParams }: PageProps<"/healt
       }
       secondary={[
         <ContributorCard key="sleep" title="Sleep" items={group("sleep")} />,
-        <ContributorCard key="strain" title="Strain" items={group("strain")} />,
+        // Strain (4 inputs) spans two rows; Sleep (2) and Fitness (3) stack beside it on laptop (U18 HS-01).
+        <ContributorCard key="strain" title="Strain" items={group("strain")} className="xl:row-span-2 xl:self-start" />,
         <ContributorCard key="fitness" title="Fitness" items={group("fitness")} />,
       ]}
     />
