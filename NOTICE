@@ -1,13 +1,15 @@
-Pulse is a private, personal, non-commercial project. It is not published.
+Pulse
+Copyright (c) 2026 Aditya Jindal
 
-It contains code derived from the following projects:
+Licensed under the PolyForm Noncommercial License 1.0.0 (see LICENSE).
+Use, modify and share it freely for any noncommercial purpose. Selling it,
+or using it in a commercial product, is not permitted.
 
-noop (https://github.com/ryanbr/noop)
-  Licensed under the PolyForm Noncommercial License 1.0.0.
-  The scoring code in src/core/scoring/ is ported from its Kotlin analytics
-  (android/app/src/main/java/com/noop/analytics/).
+Credits
 
-Haelan (https://github.com/bardesss/haelan)
-  Licensed under the GNU Affero General Public License v3.0.
-  The Google Health API ingestion, raw payload archive, migrations-at-boot
-  and seed patterns in src/server/ follow its implementation.
+- noop (https://github.com/ryanbr/noop), PolyForm Noncommercial 1.0.0.
+  The recovery, strain, sleep, baseline and readiness scoring in
+  src/core/scoring/ is a TypeScript port of noop's Kotlin analytics.
+- Hælan (https://github.com/bardesss/haelan) for documenting how the
+  Google Health API behaves in practice: filters, rate limits and payload
+  shapes.

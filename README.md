@@ -37,3 +37,13 @@ Production runs as one container on the server, behind Cloudflare Tunnel and Clo
 | `pnpm test` / `pnpm test:watch` | Vitest (Node for `*.test.ts`, happy-dom for `*.test.tsx`) |
 | `pnpm e2e` | Playwright |
 | `pnpm db:generate` | Generates a migration in `drizzle/` from `src/server/db/schema.ts` |
+
+## License
+
+[PolyForm Noncommercial 1.0.0](LICENSE). Use it, change it and share it for any noncommercial purpose. Selling it, or putting it inside a commercial product, is not allowed.
+
+## Credits
+
+- [noop](https://github.com/ryanbr/noop): the recovery, strain, sleep and readiness scoring is ported from its analytics engine.
+- [Hælan](https://github.com/bardesss/haelan): its notes on how the Google Health API behaves saved a lot of trial and error.
+
