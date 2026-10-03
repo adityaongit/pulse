@@ -54,12 +54,14 @@ function Streak() {
   return (
     <span
       role="img"
+      data-streak
       aria-label={`${streak.days}-day streak`}
       title="Days in a row with your band worn"
-      className="-ml-1 inline-flex h-8 items-center gap-1.5 rounded-full bg-white/[0.05] pr-3 pl-2.5"
+      // Below 400 px it tightens (padding, gap, 15 px numerals) so the top row fits at 320 px (spec §11 M4).
+      className="-ml-1 inline-flex h-8 shrink-0 items-center gap-1 rounded-full bg-white/[0.05] pr-2 pl-2 min-[400px]:gap-1.5 min-[400px]:pr-3 min-[400px]:pl-2.5"
     >
-      <Flame aria-hidden className="size-4 fill-warning text-warning" strokeWidth={1.5} />
-      <span className="font-numeric text-[17px] leading-5 font-bold tabular-nums">{streak.days}</span>
+      <Flame aria-hidden className="size-3.5 fill-warning text-warning min-[400px]:size-4" strokeWidth={1.5} />
+      <span className="font-numeric text-[15px] leading-5 font-bold tabular-nums min-[400px]:text-[17px]">{streak.days}</span>
     </span>
   )
 }
@@ -255,8 +257,19 @@ export function HomeHeader({ rings }: { rings?: HeaderRings }) {
           <div ref={fill} className={cn("absolute inset-0", HEADER_FILL, "translate-y-80 group-data-[state=rings]/hdr:translate-y-70", BAND_MOTION)} />
         </div>
         <div className="relative">
-          <div ref={topRow} className={cn("pointer-events-auto grid h-11 grid-cols-[1fr_auto_1fr] items-center gap-2 md:h-13", ROW_EDGES)}>
-            <div className="flex min-w-0 items-center">
+          {/* Equal side tracks keep the pill centred; each is at least its content, so if a side ever outgrows its half
+              the pill shifts over rather than anything overlapping it. Below 400 px the streak and pill tighten; below
+              380 px, on days without the streak (past days, whose labels run to "Mon, Sep 28"), the sync text gives way
+              so the pill still fits centred (spec §11 M4). */}
+          <div
+            ref={topRow}
+            className={cn(
+              "pointer-events-auto grid h-11 grid-cols-[minmax(max-content,1fr)_auto_minmax(max-content,1fr)] items-center gap-1 min-[400px]:gap-2 md:h-13",
+              "max-[380px]:[&:not(:has([data-streak]))_[data-sync-text]]:hidden",
+              ROW_EDGES
+            )}
+          >
+            <div className="flex items-center">
               {/* The outlined avatar alone, as WHOOP draws it ([latest-home-collapsed-1]); its circle ends where the streak pill starts. */}
               <Link
                 href="/more"
@@ -269,8 +282,8 @@ export function HomeHeader({ rings }: { rings?: HeaderRings }) {
                 <Streak />
               </React.Suspense>
             </div>
-            <DateSwitcher mode="day" />
-            <div className="-mr-0.5 flex min-w-0 justify-end">
+            <DateSwitcher mode="day" narrow />
+            <div className="-mr-0.5 flex justify-end">
               <SyncStatus />
             </div>
           </div>

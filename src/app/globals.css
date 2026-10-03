@@ -125,7 +125,7 @@
   --background: #0f1113;
   --ground: linear-gradient(180deg, var(--background-top) 0, var(--background-mid) 270px, var(--background) 740px);
   --ground-health: radial-gradient(120% 55% at 50% 0, #0f2c2a 0, transparent 70%), linear-gradient(180deg, #0a0b0c 0, #14171c 60%);
-  --ground-healthspan: linear-gradient(#050607, #050607);
+  --ground-healthspan: linear-gradient(#101518, #101518);
   /* The ground in use; a shell's data-ground attribute swaps it (base layer below). Headers paint the same value. */
   --page-ground: var(--ground);
   --foreground: #ffffff;
@@ -251,6 +251,15 @@
   }
 }
 
+/* The one page-level background switch (spec §2.1). Unlayered, like the :root tokens it overrides: inside
+   @layer base it lost to them and no shell's ground ever applied (spec §11 M3). */
+:root:has([data-ground="health"]) {
+  --page-ground: var(--ground-health);
+}
+:root:has([data-ground="healthspan"]) {
+  --page-ground: var(--ground-healthspan);
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -260,13 +269,6 @@
     background: var(--background);
     -webkit-tap-highlight-color: transparent;
     text-rendering: optimizeLegibility;
-  }
-  /* The one page-level background switch (spec §2.1). */
-  :root:has([data-ground="health"]) {
-    --page-ground: var(--ground-health);
-  }
-  :root:has([data-ground="healthspan"]) {
-    --page-ground: var(--ground-healthspan);
   }
   body {
     @apply text-foreground;

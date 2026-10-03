@@ -16,10 +16,12 @@ export function AppShell({ status, children }: AppShellProps) {
       >
         Skip to content
       </a>
-      {/* Bottom padding clears the floating bar (62 px + its inset) or the round action, plus 24 px. */}
+      {/* Bottom padding clears the floating bar (62 px + its inset) or the round action, plus 24 px.
+          overflow-x-clip (not hidden, so sticky headers keep working): nothing a page paints can widen the layout
+          past device-width, which makes mobile browsers zoom the page out (spec §11 M2). */}
       <main
         id="main"
-        className="min-h-svh min-w-0 flex-1 pb-[calc(62px+max(env(safe-area-inset-bottom)-6px,12px)+24px)] md:pb-24 md:pl-[112px] xl:pl-[256px]"
+        className="min-h-svh min-w-0 flex-1 overflow-x-clip pb-[calc(62px+max(env(safe-area-inset-bottom)-6px,12px)+24px)] md:pb-24 md:pl-[112px] xl:pl-[256px]"
       >
         {children}
       </main>

@@ -1,3 +1,4 @@
+import type { Viewport } from "next"
 import { redirect } from "next/navigation"
 import { Rabbit, Turtle } from "lucide-react"
 import { cn } from "@/lib/utils"
@@ -16,6 +17,8 @@ import { SectionShell } from "@/components/shells/SectionShell"
 import { ContributorCard } from "./ContributorCard"
 
 export const metadata = { title: "Healthspan" }
+// The browser bar matches the page's darker ground (spec §11 M3).
+export const viewport: Viewport = { themeColor: "#101518" }
 
 const CAPTION = "text-xs leading-4 font-medium text-muted-foreground"
 
@@ -79,6 +82,7 @@ export default async function HealthspanPage({ searchParams }: PageProps<"/healt
       subtitle={n > 0 ? `Next update in ${n} ${n === 1 ? "day" : "days"}` : undefined}
       dateSwitcher={{ mode: "week" }}
       info={INFO}
+      ground="healthspan"
       hero={<Orb vm={vm} />}
       stats={stats}
       collapse
