@@ -96,4 +96,34 @@ describe("createWorker", () => {
     await tick();
     expect(pull).not.toHaveBeenCalled();
   });
+
+  it("requestSync({ force }) 2 minutes after a run starts one anyway", async () => {
+    const { worker, pull } = setup();
+    worker.start();
+    await tick();
+    await tick(2 * MIN);
+    worker.requestSync({ force: true });
+    await tick();
+    expect(pull).toHaveBeenCalledTimes(2);
+  });
+
+  it("requestSync({ force }) during a run queues one more run right after it", async () => {
+    let finish = () => {};
+    const pull = vi.fn(() => new Promise<{ changed: boolean }>((r) => (finish = () => r({ changed: false }))));
+    const { worker } = setup(pull);
+    worker.start();
+    await tick();
+    worker.requestSync({ force: true });
+    worker.requestSync({ force: true });
+    expect(pull).toHaveBeenCalledTimes(1);
+    finish();
+    await tick();
+    expect(pull).toHaveBeenCalledTimes(2); // one follow-up, however many requests
+    finish();
+    await tick();
+    await tick(14 * MIN); // then back on the 15-minute schedule
+    expect(pull).toHaveBeenCalledTimes(2);
+    await tick(MIN);
+    expect(pull).toHaveBeenCalledTimes(3);
+  });
 });
