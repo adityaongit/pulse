@@ -71,8 +71,8 @@ The user wants:
 - R23. Every metric component handles five states: loading, empty, a reason-coded null, provisional, and a value.
 
 **Hosting and privacy**
-- R24. One container on the server, reachable only through Cloudflare Tunnel plus Cloudflare Access for the user's email. The app checks the Access JWT itself and refuses to run without that configuration.
-- R25. Health data never leaves the server except as requests to Google. No third-party runtime requests: fonts are self-hosted through `next/font`.
+- R24. One container on the owner's own server, reachable only through a tunnel or HTTPS reverse proxy. (Originally Cloudflare Access; replaced by built-in sign-in in U20.)
+- R25. Health data never leaves the owner's server except as requests to Google. No third-party runtime requests: fonts are self-hosted through `next/font`.
 
 ---
 
@@ -218,11 +218,10 @@ The code worth reading or copying:
   - Biological Age uses the same nine inputs plus lifestyle and blood markers, updates weekly, and needs at least 20 days.
   - The Journal ranks behaviour impact.
 
-### Server
+### Hosting
 
-- Containers join the external `proxy` network and publish no ports.
-- `cloudflared` (config in `/opt/tunnel/`, `protocol: http2`) routes hostnames to container names.
-- Docs live in `server/`.
+- One container with no public port: a tunnel or HTTPS reverse proxy on the same machine routes a hostname to it.
+- The maintainer's own deployment notes are kept outside this repository.
 
 ---
 
@@ -1274,9 +1273,9 @@ Added 2026-10-02 at the user's request, after the Home dials shipped at unequal 
 
 ### Phase D: Ship
 
-### U15. Deploy to the server behind Cloudflare Access
+### U15. Deploy to a self-hosted server
 
-**Goal:** Production on `server`, in either mode, with a fail-closed Access check and a runbook.
+**Goal:** Production on the owner's server, in either mode, behind a tunnel. (Its Cloudflare Access check was replaced by built-in sign-in in U20; the self-hosting guide is `docs/setup.md`.)
 
 **Requirements:** R1, R24, R25
 
@@ -1285,27 +1284,13 @@ Added 2026-10-02 at the user's request, after the Home dials shipped at unequal 
 **Files:**
 - `Dockerfile`, `compose.yaml`
 - `proxy.ts` (or `middleware.ts`)
-- `docs/runbook.md`
-- Test: `src/server/access.test.ts`
+- `docs/setup.md`
 
 **Approach:**
 - The image uses Next's standalone output on `node:24-slim`, and copies `drizzle/` into the runtime stage so migrations run at boot. The data volume is mounted at `/app/data`.
-- The container joins the external `proxy` network with no published ports.
-- Setup order:
-  1. Create the Access app for `pulse.example.com` first (Allow for the user's email, about 30-day session).
-  2. Add the ingress `pulse.example.com → http://pulse:3000` (`PORT`) to `/opt/tunnel/config.yml`.
-  3. Run `cloudflared tunnel route dns tunnel pulse.example.com`, per `server/cloudflare-tunnel.md`.
-  4. Restart `cloudflared`.
-- `proxy.ts` verifies the Access JWT (`jose` with remote JWKS, checking `aud`) on every path except `/healthz`. On failure it returns 403. There is no exemption for the manifest or icons: they are fetched with credentials (U12).
-- For the Google console, add `https://pulse.example.com/oauth/callback` and confirm "In production" status.
-- The runbook covers:
-  - the Google project setup (Hælan's six steps);
-  - env for both modes;
-  - the Cloudflare route and Access setup;
-  - backups using `sqlite3 .backup` into a 0700 directory with 0600 files, a fixed retention, and encryption before anything goes offsite;
-  - mermaid diagrams of the deploy and the request flow;
-  - a "switch demo to real" procedure;
-  - a note in `server/` adding the new route.
+- The container publishes port 3000 on loopback only; a tunnel or reverse proxy on the same machine is the way in.
+- For the Google console, add `https://<host>/oauth/callback` and confirm "In production" status.
+- The setup guide covers the Google project setup (Hælan's six steps), env for both modes, Docker, HTTPS options, backups (SQLite online backup into a 0700 directory with 0600 files, fixed retention, encrypted before anything goes offsite) and troubleshooting.
 
 **Test scenarios:**
 - No assertion returns 403. A tampered, expired or wrong-`aud` assertion returns 403. A valid one passes.
@@ -1331,7 +1316,8 @@ Added 2026-10-02 at the user's request, after the Home dials shipped at unequal 
 
 ## System-Wide Impact
 
-- **Server:** one more container and tunnel route on a shared box. The `server/` docs record it.
+- **Hosting:** one container and one tunnel or proxy route on the owner's server.
+- **Security posture:** the refresh token and health data sit on the owner's server, so anyone with root there can read them. Hygiene that mitigates it:
   - Access is verified twice: at Cloudflare, and in the app's fail-closed check;
   - OAuth uses a `state` parameter;
   - no secrets or bodies are written to logs;

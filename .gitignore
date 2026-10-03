@@ -43,3 +43,6 @@ npm-debug.log*
 
 # Design reference screenshots (third-party, not for publishing)
 /docs/design/reference/
+
+# Session hand-off notes: local working notes, not published
+/docs/handoff/

@@ -18,7 +18,7 @@ flowchart LR
   G --> I[Re-capture and re-measure]
 ```
 
-- **Captures.** One background Brave tab through the browser MCP, emulating 390 x 844 at DPR 2 (and 361 x 800 at DPR 3 for the user's Android phone). Ours are saved in `docs/design/reference/raw/u16/` (gitignored, like the other raw captures): `<screen>.png` before, `<screen>-after.png` after, `p-*` / `s-*` / `z*` the side-by-side sheets.
+- **Captures.** One background Brave tab through the browser MCP, emulating 390 x 844 at DPR 2 (and 361 x 800 at DPR 3 for a narrow Android phone). Ours are saved in `docs/design/reference/raw/u16/` (gitignored, like the other raw captures): `<screen>.png` before, `<screen>-after.png` after, `p-*` / `s-*` / `z*` the side-by-side sheets.
 - **Measuring.** The references are 1179 or 1170 px wide iPhone screenshots (3 px per point; 54 or 47 pt status bar). `crop.py` puts a band of both at 3 px per point side by side, `bb.py` gives a glyph's ink box in points, `scan.py` lists runs along a line (ring edges, pill bounds), and a colour sampler reads text cores. Positions are compared relative to an anchor both screens share (the date pill's centre on Home), never to the top of the image.
 - **Rule.** A difference counts when it shows in more than one capture or is larger than the capture's noise (about 1 pt). Brand differences (Pulse naming, wordmark and mark, no battery %, Journal in Community's slot, the check-in button in the coach's) are kept.
 

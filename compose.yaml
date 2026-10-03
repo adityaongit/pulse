@@ -1,3 +1,4 @@
+# One container; the database lives in the pulse-data volume. See docs/setup.md.
 services:
   pulse:
     build: .
@@ -7,13 +8,9 @@ services:
     env_file: .env
     volumes:
       - pulse-data:/app/data
-    networks:
-      - proxy
-    # No ports: cloudflared reaches http://pulse:3000 over the proxy network.
+    ports:
+      # Loopback only: put a tunnel or an HTTPS reverse proxy on this machine in front of it.
+      - "127.0.0.1:3000:3000"
 
 volumes:
   pulse-data:
-
-networks:
-  proxy:
-    external: true

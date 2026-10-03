@@ -43,7 +43,7 @@ body:
     id: device
     attributes:
       label: Browser and device
-      placeholder: Chrome 140 on a Android phone
+      placeholder: Chrome 140 on Android
   - type: textarea
     id: logs
     attributes:

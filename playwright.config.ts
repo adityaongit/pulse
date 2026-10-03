@@ -50,7 +50,7 @@ export default defineConfig({
   },
   projects: [
     { name: "setup", testMatch: "auth.setup.ts" },
-    touch("361", 361, 800, 3.5), // Android phone
+    touch("361", 361, 800, 3.5), // a common narrow Android phone
     touch("390", 390, 844),
     touch("820", 820, 1180, 2),
     desktop("1440", 1440, 900),
