@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+  <!-- Google consent-screen logo (120 px). Google crops app logos to a circle, so the pair is sized for
+       the circle: scale 1.25 puts its farthest point at 10.1 of radius 12. -->
+  <rect width="24" height="24" fill="#0f1113"/>
+  <g transform="translate(12 12) scale(1.25) translate(-12 -12)">
+    <rect x="6.9" y="4.5" width="4.2" height="11" rx="2.1" fill="#00f19f"/>
+    <rect x="12.9" y="8.5" width="4.2" height="11" rx="2.1" fill="#1fa0f0"/>
+  </g>
+</svg>
