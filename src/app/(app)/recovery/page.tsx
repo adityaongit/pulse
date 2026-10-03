@@ -57,7 +57,7 @@ export default async function RecoveryPage({ searchParams }: PageProps<"/recover
         <SectionShell key="drivers" variant="card" title="What shaped it" id="drivers" level={2}>
           <Drivers vm={vm} />
         </SectionShell>,
-        <SectionShell key="forecast" variant="card" title="Tomorrow's forecast" level={2} className="lg:self-start">
+        <SectionShell key="forecast" variant="card" title="Tomorrow's forecast" level={2} className="xl:self-start">
           <Forecast vm={vm} />
         </SectionShell>,
       ]}

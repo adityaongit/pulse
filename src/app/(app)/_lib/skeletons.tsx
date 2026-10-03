@@ -70,7 +70,7 @@ export function HomeSkeleton() {
       slots={{
         top: (
           <div aria-busy className="pt-4 xl:pt-2">
-            <div className="flex flex-col gap-6 xl:grid xl:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] xl:items-center xl:gap-x-6">
+            <div className="flex flex-col gap-6 xl:grid xl:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] xl:items-center xl:gap-x-6">
               <div className="space-y-4">
                 <p aria-hidden className="text-center text-[13px] leading-4 font-semibold tracking-[0.35em] text-foreground-secondary uppercase">
                   Pulse
@@ -81,7 +81,7 @@ export function HomeSkeleton() {
                   <ScoreDialSkeleton size="md" variant="strain" />
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-3 xl:gap-4">
+              <div className="grid grid-cols-2 gap-3 xl:grid-cols-1 xl:gap-4">
                 <CardSkeleton title="Health Monitor">
                   <MonitorLineSkeleton />
                 </CardSkeleton>
@@ -92,7 +92,7 @@ export function HomeSkeleton() {
             </div>
           </div>
         ),
-        right: (
+        main: (
           <SectionShell variant="section" title="My Day" action={<span aria-hidden className="block size-[34px] rounded-[10px] bg-foreground/90" />}>
             <div className="space-y-3 xl:space-y-4">
               <CardSkeleton title="Today's activities">
@@ -120,7 +120,7 @@ export function HomeSkeleton() {
             </div>
           </SectionShell>
         ),
-        left: (
+        aside: (
           <SectionShell variant="section" title="My Dashboard" aside="vs. 30-day average">
             <ul aria-hidden className="space-y-2">
               {HOME_STATS.map(([key, label]) => (
@@ -178,7 +178,7 @@ export function DetailSkeleton({
         </CardSkeleton>
       }
       secondary={(SECONDARY[title] ?? ["", ""]).map((t, i) => (
-        <CardSkeleton key={`${i}-${t}`} title={t}>
+        <CardSkeleton key={`${i}-${t}`} title={t} className={t === "Time in zones" ? "xl:row-span-2" : undefined}>
           {t === "Time in zones" ? (
             <ZoneBarsSkeleton variant="rows" />
           ) : t === "Activities" ? (
@@ -216,7 +216,7 @@ export function ActivitySkeleton() {
         </div>
       }
       secondary={[
-        <SectionShell key="stats" variant="section" title="Key statistics" aside="vs. 30-day average" level={2} className="lg:col-span-2">
+        <SectionShell key="stats" variant="section" title="Key statistics" aside="vs. 30-day average" level={2}>
           <div aria-hidden className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:gap-4">
             {[
               ["avgHr", "Average heart rate"],

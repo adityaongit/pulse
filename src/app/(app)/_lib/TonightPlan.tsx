@@ -6,8 +6,9 @@ import { clock, hmm } from "@/lib/format"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import type { SleepPlanVM } from "@/server/queries/types"
 
-// 32 px once the card is 288 px wide; narrower cards (the laptop half-column) step down so the two times never overflow.
-const TIME = "font-numeric text-[26px] leading-none font-bold tabular-nums @[18rem]:text-[32px]"
+// 32 px once the card is 288 px wide; narrower cards (the laptop half-column) step down to 26 and then 22 px so the
+// two times never overflow (U18 H-01: at 1280 px the 26 px times ran into the card edge).
+const TIME = "font-numeric text-[22px] leading-none font-bold tabular-nums @[15rem]:text-[26px] @[18rem]:text-[32px]"
 const LABEL = "text-xs leading-4 font-bold tracking-[0.08em] uppercase text-foreground-secondary"
 
 /** Home's "Tonight's sleep" body: bedtime for the chosen goal, typical wake, goal toggle (spec §7.1, journey 4). */
@@ -18,7 +19,7 @@ export function TonightPlan({ plan, timeZone }: { plan: SleepPlanVM; timeZone: s
   return (
     <div role="group" aria-label={`Bed by ${bed} for ${chosen.label.toLowerCase()}`} className="@container space-y-4">
       {/* WHOOP's "(sunset) 11:20 - - - - (alarm) 8:30" [latest-home-top-1]: two time blocks joined by a dashed rule. */}
-      <div className="grid grid-cols-[auto_minmax(1rem,1fr)_auto] items-center gap-x-3 gap-y-1.5">
+      <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1.5">
         <span className="flex items-center gap-2">
           <Sunset aria-hidden className="size-6 shrink-0 text-foreground-secondary" strokeWidth={1.5} />
           <span className={TIME} aria-live="polite">

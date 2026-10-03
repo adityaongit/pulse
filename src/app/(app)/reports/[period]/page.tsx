@@ -101,7 +101,7 @@ function KindToggle({ kind, week, month }: { kind: "week" | "month"; week: strin
 function Dials({ vm }: { vm: ReportVM }) {
   const word = vm.kind === "week" ? "last week" : "last month"
   return (
-    <div className="flex w-full items-start justify-center">
+    <div className="flex w-full items-start justify-center xl:gap-4">
       {vm.dials.map((dl) => {
         const f = DIAL_FORMAT[dl.key]
         const tone = dl.delta === null || dl.key === "strain" || Math.round(dl.delta * 10) === 0 ? "text-muted-foreground" : dl.delta > 0 ? "text-optimal" : "text-warning"
@@ -195,7 +195,9 @@ export default async function ReportPage({ params }: PageProps<"/reports/[period
         </SectionShell>
       }
       secondary={[
-        <SectionShell key="avg" variant="card" title="Averages" aside={<span className={CAPTION}>vs. {word}</span>}>
+        // On laptop Averages spans two rows with Training balance and Best and worst beside it, and the journal effects
+        // take the full row under them (U18 R-01). Without a best and worst day there is nothing to stack, so no span.
+        <SectionShell key="avg" variant="card" title="Averages" className={vm.bestWorst ? "xl:row-span-2" : undefined} aside={<span className={CAPTION}>vs. {word}</span>}>
           <Averages stats={vm.averages} word={word} />
         </SectionShell>,
         <SectionShell key="balance" variant="card" title="Training balance">
@@ -209,7 +211,7 @@ export default async function ReportPage({ params }: PageProps<"/reports/[period
             <EmptyState body="Not enough data for a training balance." className="py-4" />
           )}
         </SectionShell>,
-        <SectionShell key="journal" variant="card" title="Top journal effects" action={{ label: "View all", href: "/journal/insights" }}>
+        <SectionShell key="journal" variant="card" title="Top journal effects" className={vm.bestWorst ? "xl:col-span-2" : undefined} action={{ label: "View all", href: "/journal/insights" }}>
           {vm.topImpacts.length ? (
             <DriverList variant="impact" unit="%" data={{ value: vm.topImpacts.slice(0, 3), reason: null, provisional: false }} />
           ) : (

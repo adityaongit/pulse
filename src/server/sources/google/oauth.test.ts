@@ -34,7 +34,7 @@ const expectGoogleError = async (p: Promise<unknown>, code: string) => {
 };
 
 describe("authUrl", () => {
-  it("asks for offline access with forced consent and the three read-only scopes", () => {
+  it("asks for offline access with forced consent and every read scope", () => {
     const u = new URL(authUrl({ clientId: "cid", redirectUri: "https://p.example/oauth/callback", state: "st" }));
     expect(`${u.origin}${u.pathname}`).toBe("https://accounts.google.com/o/oauth2/v2/auth");
     expect(Object.fromEntries(u.searchParams)).toEqual({
@@ -46,8 +46,10 @@ describe("authUrl", () => {
       prompt: "consent",
       state: "st",
     });
-    expect(SCOPES).toHaveLength(3);
-    for (const s of SCOPES) expect(s).toMatch(/^https:\/\/www\.googleapis\.com\/auth\/googlehealth\.\w+\.readonly$/);
+    expect(SCOPES).toHaveLength(12);
+    // Read-only everywhere except nutrition, which has no read-only scope.
+    for (const s of SCOPES)
+      expect(s).toMatch(/^https:\/\/www\.googleapis\.com\/auth\/googlehealth\.(\w+\.readonly|nutrition\.writeonly)$/);
   });
 });
 

@@ -66,7 +66,7 @@ export function CollapsingHeader({ compact, stats, ...row }: DetailHeaderProps &
         <DetailHeaderRow {...row} className="pointer-events-auto" centerClassName={CENTER_MOTION} />
         <div
           aria-hidden
-          className="absolute inset-x-0 top-full grid h-[62px] grid-cols-[1fr_auto_1fr] grid-rows-[62px] items-center gap-2 px-4 group-data-[state=collapsed]/ch:pointer-events-auto md:px-6 xl:mx-auto xl:max-w-[1120px] xl:px-8"
+          className="absolute inset-x-0 top-full grid h-[62px] grid-cols-[1fr_auto_1fr] grid-rows-[62px] items-center gap-2 px-4 group-data-[state=collapsed]/ch:pointer-events-auto md:mx-auto md:max-w-[720px] md:px-6"
         >
           <Stat stat={stats?.left} />
           <div className={cn("relative z-10 flex justify-center", HERO_MOTION)}>{compact}</div>

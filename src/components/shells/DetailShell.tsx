@@ -39,7 +39,10 @@ export type DetailShellProps = {
   notch?: boolean
   insight?: React.ReactNode
   primary?: React.ReactNode
-  /** One column; two from 1024 px. An item can span both with `className="lg:col-span-2"`. */
+  /**
+   * One column through tablet; two from 1280 px (D-L3). The page balances the columns with spans on its items:
+   * `xl:col-span-2` for a full-width card, `xl:row-span-2` for a tall card the next two stack beside. The grid packs densely.
+   */
   secondary?: React.ReactNode[]
   footer?: React.ReactNode
 }
@@ -68,7 +71,11 @@ export function DetailShell({ title, subtitle, info, backHref, dateSwitcher, dis
               {hero && (
                 // Full-bleed on phone and clipped at the screen edge: a hero's glow (the orb canvas overhangs its
                 // 300 px box by 45 px a side) may bleed to the edge but never widens the page (spec §11 M1).
-                <div {...(compact ? { [COLLAPSE_HERO]: "" } : {})} className="flex min-w-0 justify-center max-md:-mx-4 max-md:overflow-x-clip max-md:px-4">
+                // A top-aligned hero (Journal Insights) stays in view beside the long list it controls on laptop (D-L7).
+                <div
+                  {...(compact ? { [COLLAPSE_HERO]: "" } : {})}
+                  className="flex min-w-0 justify-center max-md:-mx-4 max-md:overflow-x-clip max-md:px-4 xl:has-data-[hero-align=start]:sticky xl:has-data-[hero-align=start]:top-24"
+                >
                   {hero}
                 </div>
               )}
@@ -89,7 +96,7 @@ export function DetailShell({ title, subtitle, info, backHref, dateSwitcher, dis
           {(summary || !hero) && insight}
           {primary}
           {secondary && secondary.length > 0 && (
-            <div className="grid grid-cols-1 gap-3 lg:grid-cols-2 xl:gap-4">{Children.toArray(secondary)}</div>
+            <div className="grid grid-cols-1 gap-3 xl:grid-flow-row-dense xl:grid-cols-2 xl:gap-4">{Children.toArray(secondary)}</div>
           )}
           {footer}
         </div>

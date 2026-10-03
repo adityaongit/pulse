@@ -273,6 +273,11 @@
   body {
     @apply text-foreground;
   }
+  /* Tailwind v4's preflight gives buttons the arrow cursor; links show the hand. One affordance for both (U18 G-01). */
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]) {
+    cursor: pointer;
+  }
   /* Fixed to the viewport (a fixed pseudo-element works on iOS, background-attachment: fixed does not). */
   body::before {
     content: "";

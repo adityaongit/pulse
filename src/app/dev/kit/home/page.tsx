@@ -30,7 +30,7 @@ export default function KitHomePage() {
             </div>
           </div>
         ),
-        left: (
+        aside: (
           <SectionShell variant="section" title="Key statistics" aside="vs. 30-day average">
             <div className="divide-y divide-border rounded-xl bg-card px-4 py-1">
               {fx.keyStats.map(({ key, ...s }) => (
@@ -39,7 +39,7 @@ export default function KitHomePage() {
             </div>
           </SectionShell>
         ),
-        right: (
+        main: (
           <SectionShell variant="section" title="My Day">
             <SectionShell variant="card" title="Today's activities">
               <div className="space-y-1.5">

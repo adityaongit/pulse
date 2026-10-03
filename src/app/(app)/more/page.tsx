@@ -4,6 +4,7 @@ import { format, parseISO } from "date-fns"
 import { CalendarDays, CalendarRange, ChevronRight, FlaskConical, Plug, Settings, type LucideIcon } from "lucide-react"
 import { rangeLabel } from "@/lib/format"
 import { getMore } from "@/server/queries/settings"
+import { Mark } from "@/components/brand/Mark"
 import { PageShell } from "@/components/shells/PageShell"
 import { CARD_LINK } from "@/components/shells/SectionShell"
 import { cn } from "@/lib/utils"
@@ -52,7 +53,7 @@ export default async function MorePage() {
 
   return (
     <PageShell title="More">
-      <div className="flex flex-col gap-6 xl:max-w-[720px] xl:gap-8">
+      <div className="flex w-full flex-col gap-6 xl:mx-auto xl:max-w-[720px] xl:gap-8">
         {reports.length > 0 && <Rows title="Reports" rows={reports} />}
         <Rows
           title="App"
@@ -61,9 +62,14 @@ export default async function MorePage() {
             { icon: demo ? FlaskConical : Plug, label: "Data source", caption: demo ? "Demo data" : "Google Health", href: "/settings#source" },
           ]}
         />
-        <p className="text-center text-xs leading-4 font-medium text-muted-foreground tabular-nums">
-          Pulse {vm.version} · scoring v{vm.scoringVersion}
-        </p>
+        <div className="flex flex-col items-center gap-2">
+          <span aria-hidden>
+            <Mark color="mono" className="size-8 text-muted-foreground" />
+          </span>
+          <p className="text-center text-xs leading-4 font-medium text-muted-foreground tabular-nums">
+            Pulse {vm.version} · scoring v{vm.scoringVersion}
+          </p>
+        </div>
       </div>
     </PageShell>
   )

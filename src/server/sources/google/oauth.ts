@@ -13,11 +13,23 @@ const TOKEN_URL = "https://oauth2.googleapis.com/token";
 const STATE_TTL_MS = 10 * 60_000;
 const EXPIRY_MARGIN_S = 60;
 
+// Every read scope the API has, so one consent covers all data. Nutrition has no read-only scope:
+// `nutrition.writeonly` is the only one that lets dataPoints.list return food and hydration logs.
+// Pulse never calls create, patch or batchDelete.
 export const SCOPES = [
-  "https://www.googleapis.com/auth/googlehealth.health_metrics_and_measurements.readonly",
-  "https://www.googleapis.com/auth/googlehealth.sleep.readonly",
-  "https://www.googleapis.com/auth/googlehealth.activity_and_fitness.readonly",
-] as const;
+  "activity_and_fitness.readonly",
+  "health_metrics_and_measurements.readonly",
+  "sleep.readonly",
+  "ecg.readonly",
+  "irn.readonly",
+  "location.readonly",
+  "logged_symptoms.readonly",
+  "mindfulness.readonly",
+  "reproductive_health.readonly",
+  "profile.readonly",
+  "settings.readonly",
+  "nutrition.writeonly",
+].map((s) => `https://www.googleapis.com/auth/googlehealth.${s}`);
 
 /**
  * `code` is ours (`auth_revoked`, `not_connected`, `http_503`, ...) or Google's own error code

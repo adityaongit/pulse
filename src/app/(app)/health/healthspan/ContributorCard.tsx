@@ -42,7 +42,7 @@ function yearsLine(years: number | null) {
 }
 
 /** One Healthspan group card ("Sleep", "Strain", "Fitness"); each row opens its contributor sheet (journey 5). */
-export function ContributorCard({ title, items }: { title: string; items: HealthspanContributor[] }) {
+export function ContributorCard({ title, items, className }: { title: string; items: HealthspanContributor[]; className?: string }) {
   const [open, setOpen] = React.useState<string | null>(null)
   const [last, setLast] = React.useState<HealthspanContributor | null>(null)
   const item = items.find((c) => c.key === open) ?? last
@@ -50,7 +50,7 @@ export function ContributorCard({ title, items }: { title: string; items: Health
   const scale = (v: number) => v * (show?.scale ?? 1)
 
   return (
-    <SectionShell variant="card" title={title}>
+    <SectionShell variant="card" title={title} className={className}>
       <div className="divide-y divide-border">
         {items.map((c) => {
           const s = SHOW[c.key] ?? { format: "decimal1" as const }

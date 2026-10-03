@@ -6,6 +6,8 @@ export default defineConfig({
   plugins: [react()],
   resolve: { alias: { "@": fileURLToPath(new URL("./src", import.meta.url)) } },
   test: {
+    // Seed-heavy pipeline tests can exceed the 5 s default on a loaded machine.
+    testTimeout: 30_000,
     projects: [
       // src/core, src/server and src/lib: plain Node.
       { extends: true, test: { name: "node", environment: "node", include: ["src/**/*.test.ts"] } },

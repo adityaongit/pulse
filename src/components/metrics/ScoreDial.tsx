@@ -152,13 +152,15 @@ export function ScoreDial(props: ScoreDialProps) {
   })
 
   const anim = { isAnimationActive: !reduced, animationDuration: 700, animationEasing: "ease-out" as const }
-  const pieBase = { dataKey: "v", stroke: "none", isAnimationActive: false, cx: "50%", cy: "50%" } as const
+  // Decorative layers: the ring's role="img" (or the link around it) carries the label. Recharts' keyboard layer and
+  // the Pie's own tab stop would add three invisible stops per dial (U18 K-01).
+  const pieBase = { dataKey: "v", stroke: "none", isAnimationActive: false, cx: "50%", cy: "50%", rootTabIndex: -1 } as const
 
   const ring = (
     <div data-dial-part="ring" className={cn("relative shrink-0", s.box)} role="img" aria-label={aria} aria-hidden={href ? true : undefined}>
       {/* Track layer: plain track, Strain Target band and tick, or the stress gauge arc. */}
       <ChartContainer config={{}} className={CHART_RESET} initialDimension={{ width: s.d, height: s.d }}>
-        <PieChart margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
+        <PieChart accessibilityLayer={false} margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
           {gauge ? (
             <>
               {/* One continuous arc, blue → teal → green → yellow → orange, thin with round ends, and a white
@@ -215,6 +217,7 @@ export function ScoreDial(props: ScoreDialProps) {
       {!gauge && !loading && (
         <ChartContainer config={{}} className={CHART_RESET} initialDimension={{ width: s.d, height: s.d }}>
           <RadialBarChart
+            accessibilityLayer={false}
             data={[{ value: empty ? 0 : Math.min(value, r.max) }]}
             {...ARC}
             innerRadius={radii.inner}
@@ -232,7 +235,7 @@ export function ScoreDial(props: ScoreDialProps) {
       {/* Strain Target tick: one white tick across the ring, above the fill (WHOOP, [latest-strain-1]). */}
       {target && (
         <ChartContainer config={{}} className={CHART_RESET} initialDimension={{ width: s.d, height: s.d }}>
-          <PieChart margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
+          <PieChart accessibilityLayer={false} margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
             <Pie
               {...pieBase}
               data={markerSlices((target[0] + target[1]) / 2, 21, 0.2).map((v, i) => ({ v, fill: i === 1 ? "var(--foreground)" : "transparent" }))}
