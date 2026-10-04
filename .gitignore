@@ -51,3 +51,4 @@ npm-debug.log*
 /site/.astro/
 /backups/
 /build-scripts/
+.vercel

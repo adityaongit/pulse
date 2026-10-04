@@ -18,8 +18,8 @@ export function proxy(req: NextRequest) {
 }
 
 export const config = {
-  // Open to all: better-auth's endpoints, Google's redirect (the callback validates itself), the health check, build
+  // Open to all: better-auth's endpoints, the cron (checks CRON_SECRET itself), Google's redirect (the callback validates itself), the health check, build
   // assets, and files under public/ (static extensions only, so a page path with a dot in it, /activity/a.b, is still
   // gated).
-  matcher: ["/((?!api/auth/|oauth/|healthz|_next/|.*\\.(?:ico|png|jpe?g|svg|webp|webmanifest|txt|xml|js|css|woff2?|map)$).*)"],
+  matcher: ["/((?!api/auth/|api/cron$|oauth/|healthz|_next/|.*\\.(?:ico|png|jpe?g|svg|webp|webmanifest|txt|xml|js|css|woff2?|map)$).*)"],
 };

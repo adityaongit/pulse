@@ -2,6 +2,7 @@
 // backfill can't flood Google's per-project quota for everyone. Per user: pull, then recompute. A Postgres advisory
 // lock per user keeps two processes (a second replica, a dev server beside a probe) off the same user.
 import { asc, isNull } from "drizzle-orm";
+import { after } from "next/server";
 import pg from "pg";
 import { getConfig } from "./config";
 import { type Db, getDb, row, sql } from "./db";
@@ -27,6 +28,7 @@ type WorkerDeps = {
   users: () => Promise<number[]>;
   /** Runs `fn` holding the user's lock; false (fn not run) when another process holds it. */
   lock?: (userId: number, fn: () => Promise<void>) => Promise<boolean>;
+  /** 0: no timer loop (serverless, where a cron calls runCycle instead). */
   intervalMs?: number;
   log?: Pick<Console, "info" | "error">;
 };
@@ -77,7 +79,7 @@ export function createWorker({ name, source, recompute, users, lock = (_, fn) =>
     } catch (err) {
       log.error(`[worker] listing users failed: ${err instanceof Error ? err.message : String(err)}`);
     } finally {
-      timer = setTimeout(cycle, intervalMs);
+      if (intervalMs) timer = setTimeout(cycle, intervalMs);
     }
   }
 
@@ -86,14 +88,16 @@ export function createWorker({ name, source, recompute, users, lock = (_, fn) =>
       if (started) return;
       started = true;
       log.info(`[worker] started (source: ${name})`);
-      void cycle();
+      if (intervalMs) void cycle();
     },
+    /** One scheduled cycle over every user, resolved when it has finished. */
+    runCycle: cycle,
     /**
      * Runs the user now unless their run is in progress or their last one finished under 5 minutes ago.
      * Gated on the last finished run, not the last success, so a failing source isn't retried on every page load.
      * `force` (a new Google grant, a journal write) skips that gate, and mid-run queues one more run right after.
      */
-    requestSync({ userId, force = false }: { userId: number; force?: boolean }) {
+    requestSync({ userId, force = false }: { userId: number; force?: boolean }): Promise<void> | undefined {
       if (!started) return;
       const s = stateOf(userId);
       if (s.running) {
@@ -101,7 +105,7 @@ export function createWorker({ name, source, recompute, users, lock = (_, fn) =>
         return;
       }
       if (!force && s.lastRunAt !== null && Date.now() - s.lastRunAt < FRESH_MS) return;
-      void runUser(userId);
+      return runUser(userId);
     },
     isRunning: (userId: number) => states.get(userId)?.running ?? false,
     stateOf(userId: number): UserState {
@@ -114,23 +118,21 @@ export function createWorker({ name, source, recompute, users, lock = (_, fn) =>
 export type Worker = ReturnType<typeof createWorker>;
 
 /**
- * Runs `fn` holding a session advisory lock on (LOCK_KEY, userId). A session lock lives on one connection, so on
- * a pool it takes a dedicated client for the lock and its release; PGlite (tests) is one session anyway.
+ * Runs `fn` holding an advisory lock on (LOCK_KEY, userId). On a pool, a dedicated client holds a transaction-level
+ * lock for the run: a transaction keeps one server connection even behind a transaction-mode pooler (Neon on
+ * Vercel), where a session lock and its unlock could land on different connections. PGlite (tests) is one session.
  */
 export async function withUserLock(db: Db, userId: number, fn: () => Promise<void>): Promise<boolean> {
   const pool = (db as unknown as { $client?: unknown }).$client;
   if (pool instanceof pg.Pool) {
     const client = await pool.connect();
     try {
-      const r = await client.query<{ ok: boolean }>("select pg_try_advisory_lock($1, $2) as ok", [LOCK_KEY, userId]);
-      if (!r.rows[0]?.ok) return false;
-      try {
-        await fn();
-      } finally {
-        await client.query("select pg_advisory_unlock($1, $2)", [LOCK_KEY, userId]);
-      }
-      return true;
+      await client.query("begin");
+      const r = await client.query<{ ok: boolean }>("select pg_try_advisory_xact_lock($1, $2) as ok", [LOCK_KEY, userId]);
+      if (r.rows[0]?.ok) await fn();
+      return r.rows[0]?.ok ?? false;
     } finally {
+      await client.query("rollback").catch(() => {}); // ends the transaction, releasing the lock; it wrote nothing
       client.release();
     }
   }
@@ -173,6 +175,8 @@ export function startWorker() {
     recompute: recomputeIfNeeded,
     users: google ? grantees : async () => [await demoUser()],
     lock: (userId, fn) => withUserLock(getDb(), userId, fn),
+    // Vercel freezes a function between requests, so a timer loop would stall mid-sync: /api/cron runs the cycles.
+    intervalMs: process.env.VERCEL ? 0 : INTERVAL_MS,
   });
   g.__pulseWorker.start();
 }
@@ -182,7 +186,13 @@ export function startWorker() {
  * `force` skips the 5-minute gate: for writes the next scores depend on (a new grant, a journal check-in).
  */
 export function requestSync(opts: { userId: number; force?: boolean }) {
-  g.__pulseWorker?.requestSync(opts);
+  const run = g.__pulseWorker?.requestSync(opts);
+  if (run) after(run); // keeps a serverless function alive until the run lands
+}
+
+/** The cron's cycle (Vercel): every user, one after another. */
+export async function runCycle() {
+  await g.__pulseWorker?.runCycle();
 }
 
 /**
