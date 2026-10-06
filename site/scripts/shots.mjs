@@ -17,7 +17,7 @@ const token = await demoSession()
 const browser = await chromium.launch()
 for (const [kind, opts] of Object.entries(DEVICES)) {
   const ctx = await browser.newContext({ ...opts, timezoneId: "Asia/Kolkata", reducedMotion: "reduce", colorScheme: "dark" })
-  await ctx.addCookies([{ name: "pulse_session", value: token, url: APP }])
+  await ctx.addCookies([{ name: "better-auth.session_token", value: token, url: APP }])
   const page = await ctx.newPage()
   for (const screen of SCREENS) {
     const name = screen[0]

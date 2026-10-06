@@ -13,7 +13,7 @@ import type { Part } from "../lib/screens"
 
 const title = "Pulse: recovery and strain for Fitbit Air, self-hosted"
 const description =
-  "Open-source, self-hosted app that turns your Fitbit Air's Google Health data into daily Recovery, Strain, Sleep, Pulse Age, Stress and Energy Bank scores."
+  "Open-source, self-hosted app that turns your Fitbit Air’s Google Health data into daily Recovery, Strain, Sleep, Pulse Age, Stress and Energy Bank scores, with an optional AI coach."
 
 const keywords = [
   "fitbit air recovery score",
@@ -32,17 +32,41 @@ const href = (appSlug: string) => {
 
 // The home screen's three dials: the app's own large dials from the demo, each with a line and its metric page.
 const dials: { part: Part; name: string; line: string; href: string }[] = [
-  { part: "dial-sleep", name: "Sleep", line: "How well last night's sleep met your need.", href: href("sleep") },
+  { part: "dial-sleep", name: "Sleep", line: "How well last night’s sleep met your need.", href: href("sleep") },
   { part: "dial-recovery", name: "Recovery", line: "How ready your body is to take on strain today.", href: href("recovery") },
-  { part: "dial-strain", name: "Strain", line: "The day's cardiovascular load, from 0 to 21.", href: href("strain") },
+  { part: "dial-strain", name: "Strain", line: "The day’s cardiovascular load, from 0 to 21.", href: href("strain") },
 ]
 
-const strip: { shot: Shot; name: string; line: string }[] = [
-  { shot: "phone-strain", name: "Strain", line: "The day so far, and today's Strain Target." },
-  { shot: "phone-sleep", name: "Sleep", line: "Sleep Performance against your own need." },
-  { shot: "phone-health", name: "Health", line: "Pulse Age and Pace of Aging." },
-  { shot: "phone-health-monitor", name: "Health Monitor", line: "Heart rhythm and body measurements." },
-  { shot: "phone-journal", name: "Journal", line: "Log water, food, weight and mood." },
+// The feature bento: each tile shows one real card of the app (a band of a captured phone screen, in capture pixels).
+type Tile = { name: string; line: string; shot: Shot; crop: [number, number]; tone: string; area: string }
+const tiles: Tile[] = [
+  { area: "age", name: "Pulse Age", line: "How old your body is behaving, and whether that is speeding up or slowing down.", shot: "phone-healthspan", crop: [126, 560], tone: "255 167 34" },
+  { area: "rec", name: "Recovery, explained", line: "HRV, resting heart rate, breathing and sleep, each against your own baseline.", shot: "phone-recovery", crop: [358, 436], tone: "22 236 6" },
+  { area: "str", name: "Strain Target", line: "A range for today, set by how recovered you are.", shot: "phone-strain", crop: [360, 434], tone: "0 147 231" },
+  { area: "sts", name: "Stress Monitor", line: "Your stress through the day, on a 0 to 3 scale.", shot: "phone-stress", crop: [84, 440], tone: "103 174 230" },
+  { area: "jrn", name: "Journal", line: "Log water, food, weight and mood, and see what moves tomorrow’s Recovery.", shot: "phone-journal", crop: [44, 560], tone: "0 241 159" },
+  { area: "hrt", name: "Health Monitor", line: "Last night’s vitals against your normal range, with ECG readings and irregular rhythm notifications below.", shot: "phone-health-monitor", crop: [40, 440], tone: "255 90 106" },
+  { area: "trd", name: "Trends", line: "Any metric by week, month, six months or year.", shot: "phone-trends", crop: [192, 420], tone: "0 147 231" },
+  { area: "rep", name: "Reports", line: "A weekly and monthly read of how it went.", shot: "phone-reports", crop: [132, 560], tone: "123 161 187" },
+]
+
+// The rest, in one line each. Every item is a shipped feature (src/core/algorithms, src/app).
+const extras: { icon: string; label: string }[] = [
+  { icon: "battery-medium", label: "Energy Bank" },
+  { icon: "bed-double", label: "Sleep planner" },
+  { icon: "activity", label: "Training load" },
+  { icon: "thermometer", label: "Illness watch" },
+  { icon: "heart-pulse", label: "Live heart rate" },
+  { icon: "trending-up", label: "Fitness level" },
+  { icon: "bell", label: "Push notifications" },
+  { icon: "wifi-off", label: "Works offline" },
+  { icon: "download", label: "Export everything" },
+]
+
+const coach = [
+  { icon: "lock-keyhole", t: "Your key, your provider", d: "Anthropic, OpenAI, Gemini, Vercel AI Gateway, OpenRouter, or a model on your own server. The key is encrypted and never reaches the browser." },
+  { icon: "eye", t: "Reads, never writes", d: "Its tools only read your scores, so every answer points back to a number you can open." },
+  { icon: "toggle-left", t: "Off until you turn it on", d: "Admins choose who gets the coach. Without it, the same button opens the evening check-in." },
 ]
 
 const story: { shot: Shot; name: string; icon: string; text: string }[] = [
@@ -52,29 +76,23 @@ const story: { shot: Shot; name: string; icon: string; text: string }[] = [
     icon: "layout-dashboard",
     text: "Choose which metrics sit on Home and in what order: heart rate variability first and steps last, or the other way round.",
   },
-  { shot: "laptop-trends", name: "Trends", icon: "chart-column", text: "Recovery, sleep, activity and body metrics by week, month, six months or year, each with averages to compare against." },
-  {
-    shot: "laptop-health-monitor",
-    name: "Health Monitor",
-    icon: "heart-pulse",
-    text: "Last night's vitals against your normal range, ECG readings and irregular rhythm notifications, weight and body fat.",
-  },
-  { shot: "laptop-journal", name: "Journal", icon: "notebook-pen", text: "Log your day, check in each evening, and see which habits move the next morning's Recovery." },
+  { shot: "laptop-health", name: "Health", icon: "heart-pulse", text: "Pulse Age, the Health Monitor, stress, fitness and heart rate on one screen, so a change in one is easy to check against the rest." },
+  { shot: "laptop-health-monitor", name: "Health Monitor", icon: "activity", text: "Last night’s five vitals against your normal range, with ECG readings and body measurements beside them." },
+  { shot: "laptop-trends", name: "Trends", icon: "chart-column", text: "Any metric by week, month, six months or year, with the averages to compare against." },
 ]
 
 const flow = [
-  { name: "Fitbit Air", icon: "watch", detail: "Records heart rate, sleep and nightly vitals, and syncs to your phone." },
-  { name: "Google Health app", icon: "smartphone", detail: "Holds the band's data in your Google account, as it always has." },
-  { name: "Google Health API", icon: "key-round", detail: "Pulse reads it with an OAuth client from your own Google Cloud project." },
-  { name: "Your server", icon: "server", detail: "The app scores every day and keeps the history in Postgres, both in Docker on your machine." },
-  { name: "Your browser", icon: "app-window", detail: "Open it on your phone or laptop, and install it like an app." },
+  { name: "Fitbit Air", icon: "watch", detail: "Records heart rate, sleep and nightly vitals." },
+  { name: "Google Health", icon: "smartphone", detail: "Holds the band’s data in your Google account." },
+  { name: "Health API", icon: "key-round", detail: "Read with an OAuth client from your own Google Cloud project." },
+  { name: "Your server", icon: "server", detail: "Scores every day and keeps the history in Postgres, in Docker." },
+  { name: "Your phone", icon: "app-window", detail: "Install it from the browser, like an app." },
 ]
 
 const facts = [
-  { t: "No Pulse account", icon: "user-round-x", d: "You sign in with your own Google account, to your own instance. There is no Pulse service to sign up for." },
-  { t: "No analytics in the app", icon: "eye-off", d: "The app talks to Google's sign-in and Health API, and nothing else." },
-  { t: "One owner per instance", icon: "lock-keyhole", d: "Only the Google account you name can sign in. Nobody else's data is on your server, and yours is on nobody else's." },
-  { t: "Leave whenever you like", icon: "log-out", d: "Disconnecting removes Pulse's access in your Google account. Export your data any time, or delete your account and everything in it." },
+  { t: "Invite only", icon: "user-round-check", d: "Admins invite people. Each person connects their own Google account and sees only their own data." },
+  { t: "No tracking in the app", icon: "eye-off", d: "It talks to Google’s Health API, and to an AI provider only if you turn the coach on." },
+  { t: "Leave whenever you like", icon: "log-out", d: "Export your data any time, or delete your account and everything in it." },
 ]
 
 const faq = [
@@ -92,7 +110,15 @@ const faq = [
   },
   {
     q: "Where does my data go?",
-    a: "From Google Health to your own server, and nowhere else. The app talks only to Google's sign-in and Health API. There is no Pulse account, no Pulse cloud and no analytics in the app.",
+    a: "From Google Health to your own server. The app talks to Google’s sign-in and Health API, and to an AI provider only if you turn the coach on with your own key. There is no Pulse cloud and no analytics in the app.",
+  },
+  {
+    q: "Can several people share one Pulse?",
+    a: "Yes. Sign-up is invite-only by default: the server’s admins invite people, each person connects their own Google account, and nobody can see anyone else’s data.",
+  },
+  {
+    q: "Does the AI coach cost anything?",
+    a: "Pulse charges nothing. The coach uses your own API key with Anthropic, OpenAI, Google Gemini, Vercel AI Gateway or OpenRouter, so that provider bills you for what you use. A server owner can also point it at a local model.",
   },
   {
     q: "Does it work with other Fitbit devices?",
@@ -103,16 +129,8 @@ const faq = [
     a: "No. Pulse uses the newer Google Health API from the start, with your own Google OAuth client.",
   },
   {
-    q: "Can several people share one Pulse?",
-    a: "No. Each instance belongs to one owner, set by the Google account allowed to sign in. Everyone runs their own, so nobody's health data sits on someone else's server.",
-  },
-  {
     q: "Are the scores medical advice?",
     a: "No. Pulse is a wellness tool, not a medical device. Every score is an estimate from a wrist sensor, and each metric page lists its limits.",
-  },
-  {
-    q: "Is Pulse affiliated with a wearable company?",
-    a: `No. Pulse is a free project by one independent developer, with no intention of competing with WHOOP or any other company. It uses no WHOOP device, data, code or assets, and every score comes from your own Google Health data. The interface takes design inspiration from apps the developer admires. If you represent WHOOP or any other company and have a concern, please email <a href="mailto:${CONTACT_EMAIL}">${CONTACT_EMAIL}</a> and it will be changed or taken down.`,
   },
 ]
 
@@ -120,85 +138,126 @@ const schema = [softwareApp(Astro.site!, description), faqPage(faq)]
 ---
 
 <Base title={title} description={description} schema={schema} keywords={keywords}>
-  <section class="hero" aria-labelledby="hero-h" data-observe>
-    <svg class="beat" width="2560" height="160" viewBox="0 0 2560 160" aria-hidden="true">
-      <path class="beat-base" d="M0 110H1018L1038 92L1054 110H1258L1280 26L1304 148L1322 110H1558L1578 92L1594 110H2560"></path>
-      <path class="beat-pulse" d="M0 110H1018L1038 92L1054 110H1258L1280 26L1304 148L1322 110H1558L1578 92L1594 110H2560"></path>
-    </svg>
-    <div class="wrap hero-grid">
-      <div class="hero-copy">
-        <h1 id="hero-h">Recovery, strain and sleep scores for your Fitbit Air</h1>
-        <p class="sub">Open source and self-hosted. Pulse turns your Google Health data into daily scores, on a server you own.</p>
-        <div class="actions">
-          <a class="button button-primary" href={SETUP_GUIDE}>Self-host Pulse</a>
-          <a class="button button-quiet" href={REPO}><GitHubMark class="b-icon" />View source</a>
-        </div>
+  <!-- Hero: one message, two actions, then the product rising out of the page. -->
+  <section class="hero" aria-labelledby="hero-h">
+    <div class="wrap hero-copy">
+      <h1 id="hero-h">Recovery, strain and sleep for your Fitbit&nbsp;Air.</h1>
+      <p class="sub">Pulse turns your Google Health data into daily scores, on a server you own. Free and self-hosted.</p>
+      <div class="actions">
+        <a class="button button-primary" href={SETUP_GUIDE}>Self-host Pulse</a>
+        <a class="button button-quiet" href="#features">See the features</a>
       </div>
-      <div class="stage">
-        <div class="layer layer-laptop">
-          <Device shot="laptop-home" class="dev dev-laptop" />
-        </div>
-        <div class="layer layer-phone">
-          <Device shot="phone-recovery" class="dev dev-phone" />
-        </div>
-      </div>
+    </div>
+    <div class="stage">
+      <div class="glow" aria-hidden="true"></div>
+      <Device shot="laptop-home" class="dev dev-laptop" />
+      <Device shot="phone-home" class="dev dev-phone" />
     </div>
   </section>
 
-  <section class="wrap sec dials" aria-labelledby="dials-h" data-observe>
-    <h2 id="dials-h">Three numbers each morning</h2>
-    <p class="lede">Sleep, Recovery and Strain open the home screen, each scored against your own baselines.</p>
-    <ul class="dial-list">
+  <!-- The three dials, on one panel. -->
+  <section class="wrap sec" aria-labelledby="dials-h" data-reveal>
+    <div class="dials panel" data-observe>
+      <div class="dials-head">
+        <h2 id="dials-h">Three numbers each morning.</h2>
+        <p class="lede">Sleep, Recovery and Strain open the app, each scored against your own baselines.</p>
+      </div>
+      <ul class="dial-list">
+        {
+          dials.map((d) => (
+            <li>
+              <a class="dial" href={d.href}>
+                <Device shot={d.part} class="ring" />
+                <span class="d-name">
+                  {d.name}
+                  <Icon name="arrow-up-right" class="d-arrow" stroke={2} />
+                </span>
+                <span class="d-line">{d.line}</span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- Features: a bento of real app cards. -->
+  <section id="features" class="wrap sec features" aria-labelledby="features-h">
+    <div class="sec-head" data-reveal>
+      <h2 id="features-h">Everything your band records, made useful.</h2>
+      <p class="lede">Every card below is the app itself, running on generated demo data.</p>
+    </div>
+    <ul class="bento">
       {
-        dials.map((d) => (
-          <li>
-            <a class="dial" href={d.href}>
-              <Device shot={d.part} class="ring" />
-              <span class="d-name">{d.name}</span>
-              <span class="d-line">{d.line}</span>
-            </a>
+        tiles.map((t, i) => (
+          <li class={`tile tile-${t.area}`} style={`--tone:${t.tone};--i:${i % 4}`} data-reveal>
+            <div class="tile-text">
+              <h3>{t.name}</h3>
+              <p>{t.line}</p>
+            </div>
+            <div class="tile-ui">
+              <Device shot={t.shot} crop={t.crop} class="crop" />
+            </div>
           </li>
         ))
       }
     </ul>
-    <p class="note">The app's own dials, with demo values. Each score has its own page with its inputs, weights and limits.</p>
+    <div class="extras" data-reveal>
+      <h3>Also in Pulse</h3>
+      <ul>
+        {
+          extras.map((e) => (
+            <li>
+              <Icon name={e.icon} class="x-icon" />
+              {e.label}
+            </li>
+          ))
+        }
+      </ul>
+    </div>
   </section>
 
-  <section class="sec screens" aria-labelledby="screens-h">
-    <div class="wrap">
-      <h2 id="screens-h">Made for the phone in your pocket</h2>
-      <p class="lede">Pulse is a web app you add to your home screen from the browser. Screens from demo mode, with generated data.</p>
-    </div>
-    <ul class="strip">
-      {
-        strip.map((s) => (
-          <li>
-            <figure>
-              <div class="drift">
-                <Device shot={s.shot} />
+  <!-- Coach: its own band, in the app’s coach indigo. -->
+  <section class="wrap sec" aria-labelledby="coach-h">
+    <div class="coach panel" data-reveal>
+      <div class="coach-copy">
+        <span class="monogram" aria-hidden="true">P</span>
+        <h2 id="coach-h">Ask about your own numbers.</h2>
+        <p class="lede">The P button on every screen opens Coach: a chat that reads your Recovery, sleep, strain and journal before it answers.</p>
+        <dl class="coach-facts">
+          {
+            coach.map((c) => (
+              <div>
+                <dt>
+                  <Icon name={c.icon} class="c-icon" stroke={2} />
+                  {c.t}
+                </dt>
+                <dd>{c.d}</dd>
               </div>
-              <figcaption>
-                <strong>{s.name}</strong>
-                {s.line}
-              </figcaption>
-            </figure>
-          </li>
-        ))
-      }
-    </ul>
+            ))
+          }
+        </dl>
+      </div>
+      <div class="coach-ui" aria-hidden="true">
+        <Device shot="phone-coach" class="coach-phone" />
+      </div>
+    </div>
   </section>
 
+  <!-- Laptop: steps scroll on the left, the laptop stays and changes screen on the right. -->
   <section class="wrap sec story" aria-labelledby="story-h">
-    <h2 id="story-h">On a laptop, the whole picture at once</h2>
+    <div class="sec-head" data-reveal>
+      <h2 id="story-h">On a laptop, the whole picture at once.</h2>
+    </div>
     <div class="story-grid">
       <ol class="steps-list">
         {
           story.map((s, i) => (
             <li class="step" data-step={i} style={`--i:${i}`}>
-              <h3>
+              <span class="s-badge">
                 <Icon name={s.icon} class="s-icon" stroke={2} />
-                {s.name}
-              </h3>
+              </span>
+              <h3>{s.name}</h3>
               <p>{s.text}</p>
             </li>
           ))
@@ -210,40 +269,16 @@ const schema = [softwareApp(Astro.site!, description), faqPage(faq)]
     </div>
   </section>
 
-  <section class="wrap sec metrics" aria-labelledby="metrics-h">
-    <h2 id="metrics-h">{METRICS.length} scores, each explained in full</h2>
-    <p class="lede">Inputs, weights, bands, limits and sources for every number Pulse shows. <a href="/metrics/">Browse the metrics</a></p>
-    <ul class="metric-grid">
-      {
-        METRICS.map((m) => (
-          <li>
-            <a href={metricPath(m)}>
-              <span class="m-name">{m.name}</span>
-              <span class="m-sum">{m.summary}</span>
-              {m.scale && (
-                <span class="m-strip" aria-hidden="true">
-                  {m.scale.bands.map((b, i) => (
-                    <i style={`flex-grow:${(m.scale!.bands[i + 1]?.from ?? m.scale!.max) - b.from};background:${b.color}`} />
-                  ))}
-                </span>
-              )}
-            </a>
-          </li>
-        ))
-      }
-    </ul>
-  </section>
-
-  <section class="wrap sec flow" aria-labelledby="flow-h">
-    <h2 id="flow-h">How your data gets to Pulse</h2>
-    <div class="flow-body">
-      <span class="flow-track" aria-hidden="true"></span>
-      <ol class="flow-list">
+  <!-- Privacy and the data path, on one panel. -->
+  <section class="wrap sec" aria-labelledby="privacy-h">
+    <div class="privacy panel" data-reveal>
+      <h2 id="privacy-h">Scored and stored on a machine you control.</h2>
+      <ol class="flow">
         {
-          flow.map((f) => (
-            <li>
+          flow.map((f, i) => (
+            <li class:list={{ home: i === 3 }}>
               <span class="f-node">
-                <Icon name={f.icon} class="f-icon" />
+                <Icon name={f.icon} class="f-icon" stroke={2} />
               </span>
               <span class="f-name">{f.name}</span>
               <span class="f-detail">{f.detail}</span>
@@ -251,12 +286,6 @@ const schema = [softwareApp(Astro.site!, description), faqPage(faq)]
           ))
         }
       </ol>
-    </div>
-  </section>
-
-  <section class="wrap sec privacy" aria-labelledby="privacy-h">
-    <div class="panel">
-      <h2 id="privacy-h">Your health data stays on a machine you control.</h2>
       <dl class="facts">
         {
           facts.map((f) => (
@@ -273,74 +302,127 @@ const schema = [softwareApp(Astro.site!, description), faqPage(faq)]
     </div>
   </section>
 
+  <!-- Metric index. -->
+  <section class="wrap sec" aria-labelledby="metrics-h">
+    <div class="sec-head" data-reveal>
+      <h2 id="metrics-h">{METRICS.length} scores, each explained in full.</h2>
+      <p class="lede">Inputs, weights, bands, limits and sources for every number Pulse shows.</p>
+    </div>
+    <ul class="metric-grid" data-reveal>
+      {
+        METRICS.map((m) => (
+          <li>
+            <a href={metricPath(m)}>
+              <span class="m-name">
+                {m.name}
+                <Icon name="arrow-up-right" class="m-arrow" stroke={2} />
+              </span>
+              <span class="m-sum">{m.summary}</span>
+              {m.scale && (
+                <span class="m-strip" aria-hidden="true">
+                  {m.scale.bands.map((b, i) => (
+                    <i style={`flex-grow:${(m.scale!.bands[i + 1]?.from ?? m.scale!.max) - b.from};background:${b.color}`} />
+                  ))}
+                </span>
+              )}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+    <a class="more-link" href="/metrics/">Browse every metric<Icon name="arrow-right" class="ml-icon" stroke={2} /></a>
+  </section>
+
+  <!-- Get started. -->
   <section class="wrap sec start" aria-labelledby="start-h">
-    <h2 id="start-h">Get started</h2>
-    <p class="lede">Try the demo on your laptop in a few commands, then point it at your own data. You need Node 24 and pnpm for the demo, Docker for a server.</p>
-    <div class="steps">
-      <div class="step-card">
-        <h3><Icon name="laptop" class="c-icon" stroke={2} />Try the demo</h3>
-        <pre><code>git clone https://github.com/adityaongit/pulse.git
-cd pulse
-pnpm install
-cp .env.example .env
-pnpm dev</code></pre>
+    <div class="sec-head" data-reveal>
+      <h2 id="start-h">Try the demo in five commands.</h2>
+      <p class="lede">No Google account needed for the demo. Connecting your own data takes a Google Cloud OAuth client and an HTTPS address; the setup guide walks through both.</p>
+    </div>
+    <div class="terms" data-reveal>
+      <div class="term">
+        <div class="term-bar">
+          <span class="term-title"><Icon name="laptop" class="t-icon" stroke={2} />Try the demo</span>
+          <button class="copy" type="button" data-copy aria-label="Copy the demo commands"><Icon name="copy" class="i-copy" /><Icon name="check" class="i-done" stroke={2} /></button>
+        </div>
+        <pre translate="no"><code><span class="p">$</span> git clone https://github.com/adityaongit/pulse.git
+<span class="p">$</span> cd pulse && pnpm install
+<span class="p">$</span> cp .env.example .env
+<span class="p">$</span> docker compose -f compose.dev.yaml up -d
+<span class="p">$</span> pnpm dev</code></pre>
         <p>Open localhost:3000 and choose Continue with demo data.</p>
       </div>
-      <div class="step-card">
-        <h3><Icon name="server" class="c-icon" stroke={2} />Run it on a server</h3>
-        <pre><code># in .env: Google OAuth client, OWNER_EMAIL, TZ
-docker compose up -d --build
-docker compose logs -f pulse</code></pre>
-        <p>Put a tunnel or HTTPS reverse proxy in front, then open it on your phone.</p>
+      <div class="term">
+        <div class="term-bar">
+          <span class="term-title"><Icon name="server" class="t-icon" stroke={2} />Run it on a server</span>
+          <button class="copy" type="button" data-copy aria-label="Copy the server commands"><Icon name="copy" class="i-copy" /><Icon name="check" class="i-done" stroke={2} /></button>
+        </div>
+        <pre translate="no"><code><span class="c"># .env: Google OAuth client, BETTER_AUTH_SECRET, ADMIN_EMAILS</span>
+<span class="p">$</span> docker compose up -d --build
+<span class="p">$</span> docker compose logs -f pulse</code></pre>
+        <p>Put a tunnel or HTTPS reverse proxy in front, create your account, then invite people from /admin.</p>
       </div>
     </div>
-    <a class="button button-primary guide" href={SETUP_GUIDE}><Icon name="book-open" class="b-icon" stroke={2} />Read the setup guide</a>
+    <a class="more-link" href={SETUP_GUIDE}>Read the setup guide<Icon name="arrow-right" class="ml-icon" stroke={2} /></a>
   </section>
 
-  <section class="wrap sec about" aria-labelledby="about-h">
-    <div class="about-text">
-      <h2 id="about-h">About this project</h2>
-      <p>
-        Pulse is made by one independent developer, for the community, and it is free. There is no company behind it, and no intention of competing with WHOOP or anyone
-        else.
-      </p>
-      <p>
-        It uses no WHOOP device, data, code or assets. Every score is computed from your own Google Health data, with methods published in full. The interface takes design
-        inspiration from apps the developer admires.
-      </p>
-      <p>
-        WHOOP and the other names on this site are trademarks of their owners, and Pulse is not affiliated with or endorsed by them. If you represent WHOOP or any other
-        company and have a concern, please email <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a> and it will be changed or taken down.
-      </p>
-    </div>
-    <aside class="credits" aria-labelledby="credits-h">
-      <h3 id="credits-h">Open source, noncommercial</h3>
-      <p>
-        Free to use, change and share for any noncommercial purpose under <a href={LICENSE_URL}>PolyForm Noncommercial 1.0.0</a>. The recovery, strain and sleep scoring
-        is ported from <a href="https://github.com/ryanbr/noop">noop</a>, and <a href="https://github.com/bardesss/haelan">Hælan</a>'s notes on the Google Health API saved
-        a lot of trial and error.
-      </p>
-      <h3>Weighing it up?</h3>
-      <ul>
-        {
-          COMPARISONS.map((c) => (
-            <li>
-              <a href={`/compare/${c.slug}/`}>{c.h1}</a>
-            </li>
-          ))
-        }
-      </ul>
-    </aside>
-  </section>
-
+  <!-- Questions, then the project. -->
   <div class="wrap sec faq-wrap">
     <Faq items={faq} aside={`Something else? <a href="${REPO}/issues">Ask on GitHub</a>.`} />
   </div>
+
+  <section class="wrap sec" aria-labelledby="about-h">
+    <div class="about">
+      <div class="about-text">
+        <h2 id="about-h">Made by one developer, for the community.</h2>
+        <p>
+          There is no company behind Pulse, and no intention of competing with WHOOP or anyone else. It uses no WHOOP device, data, code or assets: every score is
+          computed from your own Google Health data, with methods published in full. The interface takes design inspiration from apps the developer admires.
+        </p>
+        <p>
+          WHOOP and the other names on this site are trademarks of their owners, and Pulse is not affiliated with or endorsed by them. If you represent a company and have
+          a concern, please email <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a> and it will be changed or taken down.
+        </p>
+      </div>
+      <div class="credits">
+        <h3>Credits</h3>
+        <p>
+          Recovery, strain and sleep scoring is ported from <a href="https://github.com/ryanbr/noop">noop</a>. <a href="https://github.com/bardesss/haelan">Hælan</a>’s
+          notes on the Google Health API saved a lot of trial and error.
+        </p>
+        <h3>Weighing it up?</h3>
+        <ul>
+          {
+            COMPARISONS.map((c) => (
+              <li>
+                <a href={`/compare/${c.slug}/`}>
+                  {c.h1}
+                  <Icon name="arrow-up-right" class="cr-icon" stroke={2} />
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Closing call to action. -->
+  <section class="wrap sec" aria-labelledby="cta-h">
+    <div class="cta panel" data-reveal>
+      <h2 id="cta-h">See what your Fitbit Air already knows.</h2>
+      <p class="lede">Free for personal use. Your server, your data.</p>
+      <div class="actions">
+        <a class="button button-primary" href={SETUP_GUIDE}>Self-host Pulse</a>
+        <a class="button button-quiet" href={REPO}><GitHubMark class="b-icon" />View source</a>
+      </div>
+    </div>
+  </section>
 </Base>
 
 <script>
-  // Small, progressive: the page reads complete without it. Adds `in` once a [data-observe] block is seen (dials draw,
-  // numbers count up), `live` while it is on screen (the heartbeat runs only then), and the active laptop screen.
+  // Small, progressive: the page reads complete without it. `[data-reveal]` blocks fade up once seen, the dials draw
+  // and count up, and the step crossing the middle of the viewport picks the laptop screen.
   const still = matchMedia("(prefers-reduced-motion: reduce)").matches
   const ease = (t: number) => (t === 1 ? 1 : 1 - Math.pow(2, -10 * t))
 
@@ -360,19 +442,17 @@ docker compose logs -f pulse</code></pre>
   const seen = new IntersectionObserver(
     (entries) => {
       for (const e of entries) {
+        if (!e.isIntersecting) continue
         const el = e.target as HTMLElement
-        el.classList.toggle("live", e.isIntersecting)
-        if (e.isIntersecting && !el.classList.contains("in")) {
-          el.classList.add("in")
-          el.querySelectorAll<HTMLElement>("[data-count]").forEach(countUp)
-        }
+        el.classList.add("in")
+        el.querySelectorAll<HTMLElement>("[data-count]").forEach(countUp)
+        seen.unobserve(el)
       }
     },
-    { threshold: 0.3 },
+    { threshold: 0.2, rootMargin: "0px 0px -8% 0px" },
   )
-  document.querySelectorAll("[data-observe]").forEach((el) => seen.observe(el))
+  document.querySelectorAll("[data-reveal], [data-observe]").forEach((el) => seen.observe(el))
 
-  // The step crossing the middle of the viewport picks the laptop screen.
   const stack = document.querySelector<HTMLElement>(".screen-stack")
   const steps = new IntersectionObserver(
     (entries) => {
@@ -381,64 +461,79 @@ docker compose logs -f pulse</code></pre>
     { rootMargin: "-50% 0px -50% 0px" },
   )
   document.querySelectorAll(".step").forEach((el) => steps.observe(el))
+
+  // Copy a terminal card's commands, without the prompts and comments.
+  for (const b of document.querySelectorAll<HTMLButtonElement>("[data-copy]")) {
+    b.addEventListener("click", async () => {
+      const code = b.closest(".term")?.querySelector("code")?.textContent ?? ""
+      const text = code
+        .split("\n")
+        .filter((l) => l.startsWith("$ "))
+        .map((l) => l.slice(2))
+        .join("\n")
+      try {
+        await navigator.clipboard.writeText(text)
+        b.dataset.done = ""
+        setTimeout(() => delete b.dataset.done, 1600)
+      } catch {}
+    })
+  }
 </script>
 
 <style>
-  /* One vertical rhythm for every section; the hero sets its own. */
+  /* One vertical rhythm for every section. */
   .sec {
-    margin-top: clamp(104px, 12vw, 168px);
+    margin-top: clamp(72px, 8vw, 112px);
   }
   .sec h2 {
-    font-size: clamp(1.875rem, 3.6vw, 2.75rem);
-    letter-spacing: -0.03em;
-    max-width: 22ch;
+    font-size: clamp(2rem, 4vw, 3.25rem);
+    line-height: 1.04;
+    letter-spacing: -0.035em;
+    max-width: 20ch;
+  }
+  .sec-head {
+    max-width: 760px;
   }
   .lede {
     margin-top: 16px;
-    max-width: 58ch;
+    max-width: 52ch;
     color: var(--foreground-secondary);
+    font-size: 1.125rem;
   }
-  .lede a {
-    color: var(--foreground);
-    font-weight: 600;
-    white-space: nowrap;
+  /* A rounded, faintly lit surface for the sections that stand alone; concentric with the 24 px tiles inside. */
+  .panel {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    padding: clamp(28px, 5vw, 64px);
+    border-radius: var(--radius-panel);
+    background: linear-gradient(180deg, rgb(255 255 255 / 0.035), rgb(255 255 255 / 0.012));
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.07),
+      0 0 0 1px rgb(255 255 255 / 0.05);
   }
 
   /* Hero */
-  /* The bottom padding is the heartbeat's band, so the line runs below the devices, never under them. */
   .hero {
     position: relative;
     overflow-x: clip;
-    padding: clamp(32px, 5vw, 72px) 0 150px;
+    padding-top: clamp(32px, 5vw, 64px);
+    text-align: center;
   }
-  /* The devices stand in a pool of strain blue, with a thin teal rim light from the left. */
-  .stage::before {
-    content: "";
-    position: absolute;
-    inset: -18% -20% -12% -10%;
-    z-index: -1;
-    pointer-events: none;
-    background:
-      radial-gradient(48% 46% at 58% 46%, rgb(0 147 231 / 0.16), transparent 72%),
-      radial-gradient(30% 34% at 20% 70%, rgb(0 241 159 / 0.08), transparent 70%);
-  }
-
-  .hero-grid {
-    position: relative;
+  .hero-copy {
     display: grid;
-    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
-    gap: 40px;
-    align-items: center;
+    justify-items: center;
   }
   h1 {
-    font-size: clamp(2.5rem, 4.2vw, 3.75rem);
-    line-height: 1.02;
-    letter-spacing: -0.04em;
-    max-width: 15ch;
+    max-width: 14ch;
+    font-size: clamp(2.75rem, 7vw, 5.5rem);
+    font-weight: 680;
+    line-height: 0.98;
+    letter-spacing: -0.045em;
   }
   .sub {
     margin-top: 24px;
-    max-width: 36ch;
+    max-width: 40ch;
     color: var(--foreground-secondary);
     font-size: clamp(1.125rem, 1.6vw, 1.3125rem);
     line-height: 1.5;
@@ -446,106 +541,92 @@ docker compose logs -f pulse</code></pre>
   .actions {
     display: flex;
     flex-wrap: wrap;
+    justify-content: center;
     gap: 12px;
     margin-top: 36px;
   }
-  /* The device pair: a laptop that runs past the column edge, a phone over its lower left corner. Sized in
-     percentages of the column, so the composition holds from phone to desktop. */
+  .actions :global(.b-icon) {
+    width: 18px;
+    height: 18px;
+  }
+  /* The laptop, with the phone standing in front of its right edge. */
   .stage {
     position: relative;
-    aspect-ratio: 1 / 0.92;
+    width: min(100% - 2 * var(--gutter), 1080px);
+    margin: clamp(40px, 5vw, 64px) auto 0;
+    padding-right: 6%;
   }
-  .layer {
+  .glow {
     position: absolute;
-  }
-  .layer-laptop {
-    left: 16%;
-    top: 0;
-    width: 100%;
-  }
-  .layer-phone {
-    left: 0;
-    top: 18%;
-    width: 34%;
-  }
-  .stage :global(.dev) {
-    width: 100%;
-  }
-  /* The heartbeat: drawn at 1:1 (2560 wide, no stretching, so the dash maths below is in screen pixels), centred
-     on the viewport with its spike in the middle, and clipped by the hero. It spans any width up to 2560. */
-  .beat {
-    position: absolute;
-    left: calc(50% - 1280px);
-    bottom: 0;
-    max-width: none;
+    inset: -10% -14% 0;
+    z-index: -1;
     pointer-events: none;
+    background:
+      radial-gradient(46% 42% at 50% 46%, rgb(0 147 231 / 0.2), transparent 70%),
+      radial-gradient(30% 30% at 22% 70%, rgb(0 241 159 / 0.1), transparent 70%),
+      radial-gradient(26% 30% at 86% 64%, rgb(112 149 254 / 0.12), transparent 70%);
   }
-  .beat path {
-    fill: none;
-    stroke: var(--optimal);
-    stroke-width: 2;
-    stroke-linejoin: round;
+  .stage :global(.dev-laptop) {
+    width: 100%;
   }
-  .beat-base {
-    stroke-opacity: 0.22;
-  }
-  .beat-pulse {
-    stroke-opacity: 0;
-    stroke-dasharray: 200 4000;
-  }
-  .dials {
-    margin-top: clamp(40px, 6vw, 88px);
-  }
-  /* Side by side, the stage box runs a little below the phone, so the spike can rise into that space. */
-  @media (min-width: 961px) {
-    .hero {
-      padding-bottom: 120px;
-    }
+  .stage :global(.dev-phone) {
+    position: absolute;
+    right: 0;
+    bottom: -6%;
+    width: 25%;
+    filter: drop-shadow(0 30px 40px rgb(0 0 0 / 0.5));
   }
 
   /* Dials */
+  .dials {
+    display: grid;
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 2fr);
+    gap: 40px;
+    align-items: center;
+  }
+  .dials::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background:
+      radial-gradient(22% 70% at 48% 50%, rgb(123 161 187 / 0.1), transparent 70%),
+      radial-gradient(22% 70% at 70% 50%, rgb(22 236 6 / 0.07), transparent 70%),
+      radial-gradient(22% 70% at 92% 50%, rgb(0 147 231 / 0.12), transparent 70%);
+  }
+  .dials h2 {
+    font-size: clamp(1.875rem, 3vw, 2.5rem);
+  }
+  .dials .lede {
+    font-size: 1rem;
+  }
   .dial-list {
-    position: relative;
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 24px;
-    margin: 56px 0 0;
+    margin: 0;
     padding: 0;
     list-style: none;
+  }
+  .dial-list li + li {
+    box-shadow: inset 1px 0 0 rgb(255 255 255 / 0.07);
   }
   .dial {
     display: grid;
     justify-items: center;
     gap: 6px;
-    padding: 36px 24px 32px;
-    border-radius: 28px;
-    background: radial-gradient(120% 80% at 50% 0%, rgb(255 255 255 / 0.045), transparent 70%);
-    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.06);
+    padding: 8px 20px;
     text-align: center;
     text-decoration: none;
-    transition: background-color 200ms var(--ease-standard);
   }
-  .dial:hover {
-    background-color: rgb(255 255 255 / 0.03);
-  }
-  /* Each dial sits on a faint wash of its own colour. */
-  .dial-list::before {
-    content: "";
-    position: absolute;
-    inset: -8% 0;
-    z-index: -1;
-    pointer-events: none;
-    background:
-      radial-gradient(26% 60% at 17% 40%, rgb(123 161 187 / 0.09), transparent 70%),
-      radial-gradient(26% 60% at 50% 40%, rgb(255 222 0 / 0.06), transparent 70%),
-      radial-gradient(26% 60% at 83% 40%, rgb(0 147 231 / 0.1), transparent 70%);
-  }
-  /* The app's large dial, scaled down from its 256 px. */
   .dial :global(.ring) {
-    width: min(100%, 220px);
-    margin-bottom: 14px;
+    width: min(100%, 168px);
+    margin-bottom: 12px;
+    transition: scale 200ms var(--ease-out-expo);
   }
-  /* The fill draws round from the top: a conic mask over the app's arc, opened by `.in` (script). */
+  .dial:hover :global(.ring) {
+    scale: 1.03;
+  }
   @property --sweep {
     syntax: "<angle>";
     inherits: false;
@@ -559,69 +640,246 @@ docker compose logs -f pulse</code></pre>
     --sweep: 0deg;
   }
   .d-name {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
     font-weight: 650;
-    font-size: 1.25rem;
-    letter-spacing: -0.01em;
-    transition: color 150ms var(--ease-standard);
+    font-size: 1.125rem;
   }
-  .dial:hover .d-name {
-    color: var(--optimal);
+  .d-name :global(.d-arrow),
+  .m-name :global(.m-arrow),
+  .credits :global(.cr-icon) {
+    width: 16px;
+    height: 16px;
+    flex: none;
+    color: var(--muted-foreground);
+    opacity: 0;
+    translate: -4px 4px;
+    transition-property: opacity, translate;
+    transition-duration: 200ms;
+    transition-timing-function: var(--ease-standard);
+  }
+  .dial:hover :global(.d-arrow),
+  .metric-grid a:hover :global(.m-arrow),
+  .credits a:hover :global(.cr-icon) {
+    opacity: 1;
+    translate: 0 0;
   }
   .d-line {
-    max-width: 28ch;
+    max-width: 24ch;
     color: var(--foreground-secondary);
     font-size: 0.9375rem;
     line-height: 1.45;
   }
-  .note {
-    margin-top: 24px;
-    color: var(--muted-foreground);
-    font-size: 0.875rem;
-  }
 
-  /* Phone strip */
-  .screens {
-    padding: clamp(72px, 9vw, 120px) 0;
-    /* A darker band, see-through so the grain carries on, lit teal from the top right and blue from the bottom left. */
-    background:
-      radial-gradient(60% 50% at 80% 0%, rgb(0 241 159 / 0.09), transparent 70%),
-      radial-gradient(50% 45% at 10% 100%, rgb(0 147 231 / 0.08), transparent 70%),
-      rgb(10 12 14 / 0.55);
-    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.06), inset 0 -1px 0 rgb(255 255 255 / 0.06);
-  }
-  .strip {
+  /* Bento: 4 columns, Pulse Age large, Health Monitor wide. Exactly one cell per tile. */
+  .bento {
     display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-    gap: 20px;
-    width: min(100% - 2 * var(--gutter), var(--page));
-    margin: 56px auto 0;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-areas:
+      "age age rec str"
+      "age age sts jrn"
+      "hrt hrt trd rep";
+    grid-auto-rows: 340px;
+    gap: 16px;
+    margin: 56px 0 0;
     padding: 0;
     list-style: none;
   }
-  .strip figure {
-    margin: 0;
+  .tile-age { grid-area: age; }
+  .tile-rec { grid-area: rec; }
+  .tile-str { grid-area: str; }
+  .tile-sts { grid-area: sts; }
+  .tile-jrn { grid-area: jrn; }
+  .tile-hrt { grid-area: hrt; }
+  .tile-trd { grid-area: trd; }
+  .tile-rep { grid-area: rep; }
+  .tile {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border-radius: var(--radius-tile);
+    background:
+      radial-gradient(90% 60% at 50% 100%, rgb(var(--tone) / 0.16), transparent 70%),
+      linear-gradient(180deg, var(--card-top), var(--card));
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.07),
+      0 0 0 1px rgb(255 255 255 / 0.04);
   }
-  .strip li:nth-child(even) {
-    padding-top: 48px;
+  .tile-text {
+    padding: 24px 24px 0;
   }
-  .strip figcaption {
-    margin-top: 10px;
-    padding-inline: 8%;
+  .tile h3 {
+    font-size: 1.1875rem;
+    letter-spacing: -0.015em;
+  }
+  .tile p {
+    margin-top: 6px;
+    max-width: 34ch;
     color: var(--foreground-secondary);
     font-size: 0.9375rem;
     line-height: 1.45;
   }
-  .strip figcaption strong {
-    display: block;
-    color: var(--foreground);
+  /* The app's card, rising out of the bottom of the tile and fading into it. */
+  /* The card starts just under the text and runs off the bottom of the tile, so there is no gap to fill. */
+  .tile-ui {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    overflow: hidden;
+    padding: 20px 20px 0;
+    mask-image: linear-gradient(180deg, #000 72%, transparent);
+  }
+  .tile-ui :global(.crop) {
+    width: min(100%, 340px);
+    overflow: hidden;
+    border-radius: 16px 16px 0 0;
+    box-shadow: 0 0 0 1px rgb(255 255 255 / 0.1), 0 -12px 40px -12px rgb(0 0 0 / 0.5);
+    transition: translate 300ms var(--ease-out-expo);
+  }
+  .tile:hover .tile-ui :global(.crop) {
+    translate: 0 -6px;
+  }
+  .tile-age .tile-text {
+    padding: 32px 32px 0;
+  }
+  .tile-age h3 {
+    font-size: 1.75rem;
+    letter-spacing: -0.03em;
+  }
+  .tile-age p {
+    font-size: 1.0625rem;
+  }
+  .tile-age .tile-ui :global(.crop) {
+    width: min(100%, 440px);
+  }
+  /* The wide Health Monitor tile: text beside the card. */
+  .tile-hrt {
+    flex-direction: row;
+  }
+  .tile-hrt .tile-text {
+    flex: 1;
+    align-self: center;
+    padding: 32px;
+  }
+  .tile-hrt .tile-ui {
+    flex: 1.2;
+    padding-top: 32px;
+  }
+
+  .extras {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 16px 24px;
+    margin-top: 32px;
+  }
+  .extras h3 {
+    color: var(--muted-foreground);
+    font-size: 0.9375rem;
     font-weight: 600;
+    letter-spacing: 0;
+  }
+  .extras ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .extras li {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 36px;
+    padding: 0 14px 0 12px;
+    border-radius: 999px;
+    background: rgb(255 255 255 / 0.04);
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.08);
+    color: var(--foreground-secondary);
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+  .extras :global(.x-icon) {
+    width: 15px;
+    height: 15px;
+    color: var(--optimal);
+  }
+
+  /* Coach */
+  .coach {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+    gap: 48px;
+    align-items: center;
+    background:
+      radial-gradient(60% 80% at 100% 100%, rgb(52 110 140 / 0.35), transparent 70%),
+      radial-gradient(50% 70% at 70% 0%, rgb(75 65 140 / 0.4), transparent 70%),
+      linear-gradient(180deg, #1a1e2c, #151a22);
+  }
+  /* The app's ringed monogram (src/components/shells/AppNav.tsx), the coach's button. */
+  .monogram {
+    display: grid;
+    place-items: center;
+    width: 56px;
+    height: 56px;
+    border: 2px solid transparent;
+    border-radius: 50%;
+    background:
+      linear-gradient(#232a3d, #232a3d) padding-box,
+      linear-gradient(135deg, #7c6cf0, #5aa8ff) border-box;
+    box-shadow: 0 0 0 8px rgb(112 149 254 / 0.08), 0 12px 32px -8px rgb(112 149 254 / 0.5);
+    font-family: var(--font-numeric);
+    font-size: 1.625rem;
+    font-weight: 700;
+    line-height: 1;
+  }
+  .coach h2 {
+    margin-top: 28px;
+  }
+  .coach-facts {
+    display: grid;
+    gap: 20px;
+    margin: 36px 0 0;
+  }
+  .coach-facts dt {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+  }
+  .coach-facts :global(.c-icon) {
+    width: 18px;
+    height: 18px;
+    flex: none;
+    color: var(--coach);
+  }
+  .coach-facts dd {
+    margin: 4px 0 0 28px;
+    max-width: 46ch;
+    color: var(--foreground-secondary);
+    font-size: 0.9375rem;
+    line-height: 1.5;
+  }
+  /* A phone standing in the bottom of the panel, its P button ringed. */
+  .coach-ui {
+    position: relative;
+    justify-self: center;
+    width: min(100%, 320px);
+  }
+  .coach-ui :global(.coach-phone) {
+    width: 100%;
   }
 
   /* Story: steps scroll on the left, the laptop stays and changes screen on the right */
   .story-grid {
     display: grid;
-    grid-template-columns: minmax(0, 0.62fr) minmax(0, 1.38fr);
-    gap: 48px;
+    grid-template-columns: minmax(0, 0.6fr) minmax(0, 1.4fr);
+    gap: 56px;
     margin-top: 24px;
   }
   .steps-list {
@@ -632,29 +890,36 @@ docker compose logs -f pulse</code></pre>
   .step {
     display: grid;
     align-content: center;
+    justify-items: start;
     gap: 10px;
-    min-height: 46vh;
+    min-height: 52vh;
     padding: 24px 0;
     transition: opacity 300ms var(--ease-standard);
   }
   :global(html.js) .step {
-    opacity: 0.4;
+    opacity: 0.35;
   }
-  .step h3 {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    font-size: 1.5rem;
-    letter-spacing: -0.02em;
-  }
-  .step :global(.s-icon) {
-    width: 22px;
-    height: 22px;
-    flex: none;
+  .s-badge {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+    background: rgb(0 241 159 / 0.1);
+    box-shadow: inset 0 0 0 1px rgb(0 241 159 / 0.2);
     color: var(--optimal);
   }
+  .step :global(.s-icon) {
+    width: 20px;
+    height: 20px;
+  }
+  .step h3 {
+    margin-top: 8px;
+    font-size: 1.625rem;
+    letter-spacing: -0.025em;
+  }
   .step p {
-    max-width: 36ch;
+    max-width: 34ch;
     color: var(--foreground-secondary);
   }
   .story-grid:has(.screen-stack[data-active="0"]) .step[data-step="0"],
@@ -663,21 +928,19 @@ docker compose logs -f pulse</code></pre>
   .story-grid:has(.screen-stack[data-active="3"]) .step[data-step="3"] {
     opacity: 1;
   }
-  /* Centred in the viewport below the header: the laptop is 0.618 of its width tall, its column 0.69 of the row. */
   .screen-stack {
     position: sticky;
-    top: max(80px, calc(50vh + 32px - 0.213 * (min(100vw - 2 * var(--gutter), 1180px) - 48px)));
+    top: max(96px, calc(50vh + 36px - 0.213 * (min(100vw - 2 * var(--gutter), 1180px) - 56px)));
     display: grid;
     align-self: start;
   }
-  /* A blue pool under the laptop. */
   .screen-stack::before {
     content: "";
     grid-area: 1 / 1;
     margin: -12% 0;
     z-index: -1;
     pointer-events: none;
-    background: radial-gradient(50% 50% at 50% 50%, rgb(0 147 231 / 0.12), transparent 70%);
+    background: radial-gradient(50% 50% at 50% 50%, rgb(0 147 231 / 0.14), transparent 70%);
   }
   .screen-stack > :global(.device) {
     grid-area: 1 / 1;
@@ -699,98 +962,55 @@ docker compose logs -f pulse</code></pre>
     filter: none;
   }
 
-  /* Metric index */
-  .metric-grid {
+  /* Privacy */
+  .privacy {
+    background:
+      radial-gradient(50% 60% at 62% 0%, rgb(0 241 159 / 0.08), transparent 70%),
+      linear-gradient(180deg, rgb(255 255 255 / 0.035), rgb(255 255 255 / 0.012));
+  }
+  .privacy h2 {
+    max-width: 18ch;
+  }
+  .flow {
+    position: relative;
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 0 40px;
-    margin: 48px 0 0;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 16px;
+    margin: 56px 0 0;
     padding: 0;
     list-style: none;
   }
-  .metric-grid a {
+  /* The path the data takes, behind the nodes. */
+  .flow::before {
+    content: "";
+    position: absolute;
+    top: 23px;
+    left: 24px;
+    right: calc((100% - 64px) / 5 - 24px);
+    height: 2px;
+    background: linear-gradient(90deg, rgb(0 241 159 / 0.6), rgb(31 160 240 / 0.6));
+  }
+  .flow li {
+    position: relative;
     display: grid;
     align-content: start;
     gap: 6px;
-    height: 100%;
-    padding: 22px 0 24px;
-    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.08);
-    text-decoration: none;
   }
-  .m-name {
-    font-weight: 600;
-    font-size: 1.125rem;
-    letter-spacing: -0.01em;
-    transition: color 150ms var(--ease-standard);
-  }
-  .metric-grid a:hover .m-name {
-    color: var(--optimal);
-  }
-  .m-sum {
-    color: var(--foreground-secondary);
-    font-size: 0.9375rem;
-    line-height: 1.45;
-  }
-  .m-strip {
-    display: flex;
-    gap: 2px;
-    width: min(100%, 200px);
-    height: 4px;
-    margin-top: 8px;
-  }
-  .m-strip i {
-    border-radius: 2px;
-  }
-
-  /* Flow */
-  .flow-body {
-    position: relative;
-    margin-top: 68px;
-  }
-  .flow-track {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background: linear-gradient(90deg, var(--optimal), var(--strain-text));
-    opacity: 0.6;
-    transform-origin: left;
-  }
-  .flow-list {
-    display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-  .flow-list li {
-    position: relative;
-    display: grid;
-    align-content: start;
-    gap: 8px;
-    padding: 40px 24px 0 0;
-  }
-  /* Each step is a node on the track: an icon in a ring, the server (where Pulse runs) filled. */
   .f-node {
-    position: absolute;
-    top: -20px;
-    left: 0;
     display: grid;
     place-items: center;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: var(--background);
-    box-shadow:
-      inset 0 0 0 1.5px rgb(0 241 159 / 0.55),
-      0 0 0 6px var(--background);
+    width: 48px;
+    height: 48px;
+    margin-bottom: 12px;
+    border-radius: 16px;
+    background: #182024;
+    box-shadow: inset 0 0 0 1px rgb(0 241 159 / 0.35), 0 0 0 6px #161c1f;
     color: var(--optimal);
   }
-  .flow-list li:nth-child(4) .f-node {
-    background: var(--optimal);
-    box-shadow: 0 0 0 6px var(--background), 0 0 24px rgb(0 241 159 / 0.35);
-    color: var(--background);
+  .flow li.home .f-node {
+    background: var(--primary);
+    box-shadow: 0 0 0 6px #161c1f, 0 0 28px rgb(0 241 159 / 0.4);
+    color: var(--primary-foreground);
   }
   .f-node :global(.f-icon) {
     width: 20px;
@@ -798,36 +1018,20 @@ docker compose logs -f pulse</code></pre>
   }
   .f-name {
     font-weight: 600;
-    font-size: 1.125rem;
   }
   .f-detail {
+    max-width: 24ch;
     color: var(--foreground-secondary);
-    font-size: 0.9375rem;
+    font-size: 0.875rem;
     line-height: 1.45;
-  }
-
-  /* Privacy */
-  .panel {
-    padding: clamp(28px, 5vw, 64px);
-    border-radius: 28px;
-    background: linear-gradient(160deg, #1b2a2b 0%, #161d22 55%, #141a20 100%);
-    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.08), 0 30px 80px rgb(0 0 0 / 0.35);
-  }
-  .privacy h2 {
-    max-width: 18ch;
-    font-size: clamp(2rem, 4.2vw, 3.25rem);
-    letter-spacing: -0.035em;
-    line-height: 1.05;
   }
   .facts {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 28px 32px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 24px 32px;
     margin: 48px 0 0;
-  }
-  .facts div {
-    padding-top: 20px;
-    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.1);
+    padding-top: 32px;
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.08);
   }
   .facts dt {
     display: flex;
@@ -836,8 +1040,8 @@ docker compose logs -f pulse</code></pre>
     font-weight: 600;
   }
   .facts :global(.fact-icon) {
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
     flex: none;
     color: var(--optimal);
   }
@@ -848,86 +1052,223 @@ docker compose logs -f pulse</code></pre>
     line-height: 1.5;
   }
 
-  /* Get started */
-  .steps {
+  /* Metric index */
+  /* Compact rows: the name, its band scale, an arrow. The summaries live on each metric's page. */
+  .metric-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    margin: 48px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .metric-grid a {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 4px 12px;
+    min-height: 64px;
+    height: 100%;
+    padding: 12px 18px;
+    border-radius: 16px;
+    background: rgb(255 255 255 / 0.025);
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.06);
+    text-decoration: none;
+    transition-property: background-color, box-shadow;
+    transition-duration: 200ms;
+    transition-timing-function: var(--ease-standard);
+  }
+  .metric-grid a:hover {
+    background: rgb(255 255 255 / 0.05);
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.12);
+  }
+  .m-name {
+    display: contents;
+    font-weight: 600;
+    font-size: 1rem;
+  }
+  .m-name :global(.m-arrow) {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+  }
+  .m-sum {
+    display: none;
+  }
+  .m-strip {
+    grid-column: 1;
+    display: flex;
+    gap: 2px;
+    width: min(100%, 140px);
+    height: 3px;
+  }
+  .m-strip i {
+    border-radius: 2px;
+  }
+  .more-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    margin-top: 20px;
+    color: var(--foreground);
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .more-link :global(.ml-icon) {
+    width: 16px;
+    height: 16px;
+    transition: translate 150ms var(--ease-standard);
+  }
+  .more-link:hover :global(.ml-icon) {
+    translate: 3px 0;
+  }
+
+  /* Get started: two terminal cards */
+  .terms {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 20px;
-    margin-top: 40px;
+    gap: 16px;
+    margin-top: 48px;
   }
-  .step-card {
-    padding: 28px;
-    border-radius: 20px;
-    background: linear-gradient(180deg, rgb(255 255 255 / 0.025), transparent 40%), rgb(17 22 25 / 0.82);
-    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.07);
+  .term {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border-radius: var(--radius-tile);
+    background: #0c1013;
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.06),
+      0 0 0 1px rgb(255 255 255 / 0.06),
+      0 24px 48px -24px rgb(0 0 0 / 0.6);
   }
-  .step-card h3 {
+  .term-bar {
     display: flex;
     align-items: center;
-    gap: 10px;
-    font-size: 1.125rem;
-    letter-spacing: -0.01em;
+    height: 48px;
+    padding: 0 20px;
+    background: rgb(255 255 255 / 0.025);
+    box-shadow: inset 0 -1px 0 rgb(255 255 255 / 0.06);
   }
-  .step-card :global(.c-icon) {
-    width: 20px;
-    height: 20px;
-    flex: none;
+  .term-title {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
     color: var(--foreground-secondary);
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+  .term-bar {
+    justify-content: space-between;
+  }
+  /* Icon-only copy button, 40 px hit area; the copy and check glyphs cross-fade (better-ui icon recipe). */
+  .copy {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    margin-right: -10px;
+    border: 0;
+    border-radius: 12px;
+    background: none;
+    color: var(--muted-foreground);
+    cursor: pointer;
+    transition-property: color, background-color, scale;
+    transition-duration: 150ms;
+    transition-timing-function: var(--ease-standard);
+  }
+  .copy:hover {
+    background: rgb(255 255 255 / 0.06);
+    color: var(--foreground);
+  }
+  .copy:active {
+    scale: 0.96;
+  }
+  .copy :global(.icon) {
+    grid-area: 1 / 1;
+    width: 16px;
+    height: 16px;
+    transition-property: opacity, scale, filter;
+    transition-duration: 200ms;
+    transition-timing-function: cubic-bezier(0.2, 0, 0, 1);
+  }
+  .copy :global(.i-done),
+  .copy[data-done] :global(.i-copy) {
+    opacity: 0;
+    scale: 0.25;
+    filter: blur(4px);
+  }
+  .copy[data-done] :global(.i-done) {
+    opacity: 1;
+    scale: 1;
+    filter: none;
+    color: var(--optimal);
+  }
+  .term :global(.t-icon) {
+    width: 16px;
+    height: 16px;
   }
   pre {
-    margin: 16px 0 0;
-    padding: 18px 20px;
+    flex: 1;
+    margin: 0;
+    padding: 20px;
     overflow-x: auto;
-    border-radius: 8px;
-    background: #0b0d0f;
-    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.06);
     color: #d7e3ea;
-    line-height: 1.7;
+    line-height: 1.8;
     tab-size: 2;
   }
-  .step-card p {
-    margin-top: 14px;
-    color: var(--foreground-secondary);
-    font-size: 0.9375rem;
+  pre .p {
+    color: var(--optimal);
+    user-select: none;
   }
-  .guide {
-    margin-top: 28px;
+  pre .c {
+    color: var(--muted-foreground);
+  }
+  .term p {
+    padding: 16px 20px 20px;
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.06);
+    color: var(--foreground-secondary);
+    font-size: 0.875rem;
   }
 
   /* About */
   .about {
     display: grid;
-    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
     gap: 48px 64px;
     align-items: start;
+  }
+  .about h2 {
+    font-size: clamp(1.625rem, 3vw, 2.125rem);
   }
   .about-text p {
     max-width: 62ch;
     margin-top: 18px;
     color: var(--foreground-secondary);
-  }
-  .about-text h2 + p {
-    margin-top: 24px;
+    font-size: 0.9375rem;
   }
   .about-text a {
     color: var(--foreground);
   }
   .credits {
     padding: 28px;
-    border-radius: 20px;
+    border-radius: var(--radius-tile);
     background: linear-gradient(180deg, var(--card-top), var(--card));
     box-shadow: inset 0 1px 0 var(--card-edge);
   }
   .credits h3 {
-    font-size: 1.0625rem;
+    font-size: 1rem;
   }
   .credits h3 + p,
   .credits h3 + ul {
-    margin-top: 10px;
+    margin-top: 8px;
   }
   .credits p {
     color: var(--foreground-secondary);
     font-size: 0.9375rem;
+  }
+  .credits p a {
+    color: var(--foreground);
   }
   .credits p + h3 {
     margin-top: 24px;
@@ -939,152 +1280,118 @@ docker compose logs -f pulse</code></pre>
     font-size: 0.9375rem;
   }
   .credits li a {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
     padding: 5px 0;
     color: var(--foreground-secondary);
-    text-decoration-color: rgb(255 255 255 / 0.2);
+    text-decoration: none;
   }
   .credits li a:hover {
     color: var(--foreground);
   }
 
+  /* Closing call to action */
+  .cta {
+    display: grid;
+    justify-items: center;
+    padding-block: clamp(56px, 8vw, 104px);
+    text-align: center;
+    background:
+      radial-gradient(50% 90% at 50% 120%, rgb(0 241 159 / 0.18), transparent 70%),
+      radial-gradient(40% 60% at 85% 0%, rgb(0 147 231 / 0.14), transparent 70%),
+      linear-gradient(180deg, rgb(255 255 255 / 0.035), rgb(255 255 255 / 0.012));
+  }
+  .cta h2 {
+    max-width: 18ch;
+  }
+
   /* Motion. Everything above is the finished state; these only add the way in. */
   @media (prefers-reduced-motion: no-preference) {
-    .stage :global(.dev) {
-      transition: translate 1100ms var(--ease-out-expo);
+    .hero-copy > *,
+    .stage {
+      transition-property: opacity, translate;
+      transition-duration: 900ms;
+      transition-timing-function: var(--ease-out-expo);
     }
-    .stage :global(.dev-laptop) {
+    .hero-copy > :nth-child(2) {
+      transition-delay: 60ms;
+    }
+    .hero-copy > :nth-child(3) {
       transition-delay: 120ms;
     }
+    .hero-copy > :nth-child(4) {
+      transition-delay: 180ms;
+    }
+    .stage {
+      transition-duration: 1300ms;
+      transition-delay: 240ms;
+    }
     @starting-style {
-      .stage :global(.dev-phone) {
-        translate: 0 56px;
+      .hero-copy > * {
+        opacity: 0;
+        translate: 0 16px;
       }
-      .stage :global(.dev-laptop) {
-        translate: 0 32px;
-      }
-    }
-    /* Only the visible stretch, x = 1280 ± 50vw, is timed: the line draws from the left edge of the screen to
-       the right, and the pulse enters at the left edge and leaves at the right (+300 for the spike's extra length). */
-    .beat-base {
-      stroke-dasharray: 3000;
-      animation: draw 1.6s var(--ease-out-expo) 0.15s both;
-    }
-    .hero.live .beat-pulse {
-      stroke-opacity: 0.9;
-      animation: travel 3.6s linear 1.2s infinite;
-    }
-    @keyframes draw {
-      from {
-        stroke-dashoffset: calc(1720px + 50vw);
-      }
-      to {
-        stroke-dashoffset: max(0px, calc(1420px - 50vw));
+      .stage {
+        opacity: 0;
+        translate: 0 64px;
       }
     }
-    @keyframes travel {
-      from {
-        stroke-dashoffset: calc(50vw - 1080px);
-      }
-      to {
-        stroke-dashoffset: calc(-1580px - 50vw);
-      }
+    :global(html.js) [data-reveal] {
+      opacity: 0;
+      translate: 0 24px;
+      transition-property: opacity, translate;
+      transition-duration: 800ms;
+      transition-timing-function: var(--ease-out-expo);
     }
-
+    :global(html.js) .tile[data-reveal] {
+      transition-delay: calc(var(--i) * 80ms);
+    }
+    :global(html.js) [data-reveal].in {
+      opacity: 1;
+      translate: 0 0;
+    }
     @supports (animation-timeline: scroll()) {
-      /* Depth: the phone leaves faster than the laptop as the hero scrolls away. */
-      .layer {
-        animation: rise-out linear both;
+      /* Depth: the phone leaves a little faster than the laptop as the hero scrolls away. */
+      .stage :global(.dev-phone) {
+        animation: rise linear both;
         animation-timeline: scroll(root);
-        animation-range: 0 90vh;
+        animation-range: 0 100vh;
       }
-      .layer-phone {
-        --out: -96px;
-      }
-      .layer-laptop {
-        --out: -28px;
-      }
-      @keyframes rise-out {
+      @keyframes rise {
         to {
-          translate: 0 var(--out);
-        }
-      }
-      /* The phones drift in at two speeds and settle by the time the strip is half way up the screen. At rest
-         they sit at exactly 0: a fractional translate on a moving layer is drawn with cheaper image filtering,
-         which blurs the small UI text in the screens. */
-      .drift {
-        animation: drift linear both;
-        animation-timeline: view();
-        animation-range: entry 0% cover 45%;
-      }
-      .strip li:nth-child(even) .drift {
-        --d: 72px;
-      }
-      .strip li:nth-child(odd) .drift {
-        --d: 32px;
-      }
-      @keyframes drift {
-        from {
-          translate: 0 var(--d);
-        }
-      }
-      /* The data path draws from the band to the browser as it comes into view. */
-      .flow-track {
-        animation: grow linear both;
-        animation-timeline: view();
-        animation-range: entry 40% cover 45%;
-      }
-      @keyframes grow {
-        from {
-          scale: 0 1;
+          translate: 0 -64px;
         }
       }
     }
   }
 
+  @media (max-width: 1024px) {
+    .bento {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-areas:
+        "age age"
+        "rec str"
+        "sts jrn"
+        "hrt hrt"
+        "trd rep";
+    }
+    .dials {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .coach {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 8px;
+    }
+    .coach-ui {
+      width: min(80%, 320px);
+    }
+  }
   @media (max-width: 960px) {
-    .hero-grid {
-      grid-template-columns: minmax(0, 1fr);
-      gap: 32px;
-    }
-    .stage {
-      aspect-ratio: 1 / 1.05;
-    }
-    .layer-laptop {
-      left: 20%;
-    }
-    .layer-phone {
-      top: 14%;
-      width: 44%;
-    }
-    .strip {
-      grid-template-columns: none;
-      grid-auto-flow: column;
-      grid-auto-columns: min(62vw, 260px);
-      gap: 16px;
-      width: 100%;
-      padding-inline: var(--gutter);
-      overflow-x: auto;
-      overscroll-behavior-x: contain;
-      scroll-snap-type: x mandatory;
-      scroll-padding-inline: var(--gutter);
-      scrollbar-width: none;
-    }
-    .strip li {
-      scroll-snap-align: start;
-    }
-    .strip li:nth-child(even) {
-      padding-top: 0;
-    }
-    .story-grid {
-      grid-template-columns: minmax(0, 1fr);
-      gap: 0;
-    }
-    /* One column: each step, then its laptop. The list and the stack open up (display: contents) so their
-       items interleave by order, and the laptops are not drawn twice. */
     .story-grid {
       display: flex;
       flex-direction: column;
+      gap: 0;
     }
     .steps-list,
     .screen-stack {
@@ -1097,81 +1404,78 @@ docker compose logs -f pulse</code></pre>
     :global(html.js) .step {
       order: calc(var(--i) * 2);
       min-height: 0;
-      padding: 40px 0 0;
+      padding: 48px 0 0;
       opacity: 1;
     }
     .screen-stack :global(.stack-shot) {
-      margin-top: 20px;
+      margin-top: 24px;
       opacity: 1;
       scale: 1;
       filter: none;
     }
-    .screen-stack :global(.s0) {
-      order: 1;
+    .screen-stack :global(.s0) { order: 1; }
+    .screen-stack :global(.s1) { order: 3; }
+    .screen-stack :global(.s2) { order: 5; }
+    .screen-stack :global(.s3) { order: 7; }
+    .flow {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 24px;
     }
-    .screen-stack :global(.s1) {
-      order: 3;
+    .flow::before {
+      top: 24px;
+      bottom: 24px;
+      left: 23px;
+      right: auto;
+      width: 2px;
+      height: auto;
+      background: linear-gradient(180deg, rgb(0 241 159 / 0.6), rgb(31 160 240 / 0.6));
     }
-    .screen-stack :global(.s2) {
-      order: 5;
+    .flow li {
+      grid-template-columns: 48px minmax(0, 1fr);
+      column-gap: 16px;
+      row-gap: 2px;
     }
-    .screen-stack :global(.s3) {
-      order: 7;
+    .f-node {
+      grid-row: span 2;
+      margin: 0;
+    }
+    .f-detail {
+      max-width: none;
+    }
+    .facts,
+    .terms,
+    .about {
+      grid-template-columns: minmax(0, 1fr);
     }
     .metric-grid {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
-    .flow-track {
-      top: 6px;
-      bottom: 0;
-      left: 19px;
-      right: auto;
-      width: 2px;
-      height: auto;
-      background: linear-gradient(180deg, var(--optimal), var(--strain-text));
-      transform-origin: top;
-    }
-    @keyframes grow {
-      from {
-        scale: 1 0;
-      }
-    }
-    .flow-list {
-      grid-template-columns: 1fr;
-      gap: 36px;
-      padding-left: 54px;
-    }
-    .flow-list li {
-      padding: 0;
-    }
-    .f-node {
-      top: -9px;
-      left: -54px;
-    }
-    .facts {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-    .steps,
-    .about {
-      grid-template-columns: minmax(0, 1fr);
-    }
   }
   @media (max-width: 640px) {
+    .stage {
+      padding-right: 0;
+    }
+    .stage :global(.dev-phone) {
+      width: 34%;
+      right: -2%;
+    }
     .dial-list {
       grid-template-columns: minmax(0, 1fr);
-      gap: 12px;
+    }
+    .dial-list li + li {
+      box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.07);
     }
     .dial {
-      grid-template-columns: 112px minmax(0, 1fr);
+      grid-template-columns: 96px minmax(0, 1fr);
       justify-items: start;
       align-items: center;
       gap: 2px 20px;
-      padding: 20px;
+      padding: 16px 0;
       text-align: left;
     }
     .dial :global(.ring) {
       grid-row: span 2;
-      width: 112px;
+      width: 96px;
       margin: 0;
     }
     .d-name {
@@ -1180,21 +1484,30 @@ docker compose logs -f pulse</code></pre>
     .d-line {
       align-self: start;
     }
-    .metric-grid a {
-      padding: 16px 0 18px;
+    .bento {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-areas: "age" "rec" "str" "sts" "jrn" "hrt" "trd" "rep";
     }
-    .m-sum {
-      display: none;
+    .bento {
+      grid-auto-rows: 380px;
     }
-    .m-strip {
-      width: 100%;
+    .tile-hrt {
+      flex-direction: column;
     }
-    .facts {
+    .tile-hrt .tile-text {
+      align-self: auto;
+      padding: 24px 24px 0;
+    }
+    .metric-grid {
       grid-template-columns: minmax(0, 1fr);
     }
-    .step-card,
     .credits {
       padding: 20px;
+    }
+    /* Commands wrap rather than hide behind a sideways scroll. */
+    pre {
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
     }
   }
 </style>

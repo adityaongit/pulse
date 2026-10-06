@@ -12,7 +12,8 @@
 // lays them out exactly as the app does.
 import { mkdirSync, writeFileSync } from "node:fs"
 import { fileURLToPath } from "node:url"
-import { chromium, DEVICES, SCREENS, demoSession, openScreen, APP } from "./app.mjs"
+import sharp from "sharp"
+import { chromium, DEVICES, SCREENS, demoSession, openScreen, undemo, APP, COACH_APP, coachSession } from "./app.mjs"
 
 const out = (p) => fileURLToPath(new URL(`../src/kit/${p}`, import.meta.url))
 mkdirSync(out("screens"), { recursive: true })
@@ -38,9 +39,8 @@ function snapshot({ id, height, phone, part }) {
     }
   }
   const H = box ? box.height : height
-  // Not drawn, or drawn by the frame: scripts, styles, portals, announcers, screen-reader text, the floating check-in.
+  // Not drawn, or drawn by the frame: scripts, styles, portals, announcers, screen-reader text.
   document.querySelectorAll("script, noscript, template, nextjs-portal, next-route-announcer, body link, body style, .sr-only").forEach((e) => e.remove())
-  if (phone) document.querySelectorAll('a[aria-label^="Check in for"]').forEach((e) => e.remove())
 
   // A scrolled screen: in-flow content moves up by the scroll; stuck headers stay where they show.
   const scroll = Math.round(scrollY)
@@ -89,7 +89,7 @@ function snapshot({ id, height, phone, part }) {
 
   // Classes for states a picture never enters (hover, focus, press, disabled, invalid) or for motion and pointer
   // behaviour: dropped, which also drops their CSS. About half of the markup.
-  const INERT = /(^|:)(hover|focus|focus-visible|focus-within|active|disabled|aria-invalid|invalid|visited|placeholder):|^(group-hover|peer-focus|peer-focus-visible|group-focus-visible)[:/]|^(transition|duration|ease|delay|cursor|select|touch|pointer-events|will-change|outline-hidden|outline-none)(-|$)/
+  const INERT = /(^|:)(hover|focus|focus-visible|focus-within|active|disabled|aria-invalid|invalid|visited):|^(group-hover|peer-focus|peer-focus-visible|group-focus-visible)[:/]|^(transition|duration|ease|delay|cursor|select|touch|pointer-events|will-change|outline-hidden|outline-none)(-|$)/
   for (const e of document.body.querySelectorAll("[class]")) {
     const svg = e instanceof SVGElement
     const kept = [...e.classList].filter((c) => !INERT.test(c))
@@ -193,7 +193,7 @@ function snapshot({ id, height, phone, part }) {
 
   // Attributes: keep what draws (class, style, data-* for state selectors, SVG geometry); drop links, handlers, focus
   // and accessibility hooks, since the whole screen is one decorative picture.
-  const DROP = /^(on|aria-|role$|tabindex$|href$|for$|title$|name$|autocomplete$|action$|method$|target$|rel$|draggable$|spellcheck$|translate$|popover|inert$|lang$|dir$|type$|placeholder$|xmlns$|focusable$|nonce$)/
+  const DROP = /^(on|aria-|role$|tabindex$|href$|for$|title$|name$|autocomplete$|action$|method$|target$|rel$|draggable$|spellcheck$|translate$|popover|inert$|lang$|dir$|type$|xmlns$|focusable$|nonce$)/
   for (const e of [document.body, ...document.body.querySelectorAll("*")]) {
     const svg = e instanceof SVGElement
     for (const a of [...e.attributes]) {
@@ -290,8 +290,17 @@ const PARTS = [
   ["dial-strain", "/strain"],
 ]
 
+// The colour at the top centre of the screen, which the frame's status bar takes so it runs on into the app's header
+// (a screen's ground differs: Health is flat, Home has the slate top light).
+const topColor = async (page) => {
+  const png = await page.screenshot({ clip: { x: 195, y: 1, width: 1, height: 1 }, scale: "css" })
+  const [r, g, b] = await sharp(png).removeAlpha().raw().toBuffer()
+  return `#${[r, g, b].map((v) => v.toString(16).padStart(2, "0")).join("")}`
+}
+
 const all = new Map() // every kept CSS rule, by its place in the app's stylesheets
-const save = async (page, name, shot) => {
+const save = async (page, name, shot, top) => {
+  if (top) shot.html = shot.html.replace('style="--kit-w:', `style="--kit-top:${top};--kit-w:`)
   for (const r of await page.evaluate(rules)) {
     const key = r.raw ?? r.pos.join("/")
     const prev = all.get(key)
@@ -306,12 +315,13 @@ const token = await demoSession()
 const browser = await chromium.launch()
 for (const [kind, opts] of Object.entries(DEVICES)) {
   const ctx = await browser.newContext({ ...opts, timezoneId: "Asia/Kolkata", reducedMotion: "reduce", colorScheme: "dark" })
-  await ctx.addCookies([{ name: "pulse_session", value: token, url: APP }])
+  await ctx.addCookies([{ name: "better-auth.session_token", value: token, url: APP }])
   const page = await ctx.newPage()
   for (const screen of SCREENS) {
     const name = `${kind}-${screen[0]}`
     const height = await openScreen(page, kind, screen)
-    await save(page, name, await page.evaluate(snapshot, { id: name, height, phone: kind === "phone" }))
+    const top = kind === "phone" ? await topColor(page) : null
+    await save(page, name, await page.evaluate(snapshot, { id: name, height, phone: kind === "phone" }), top)
   }
   if (kind === "phone")
     for (const [name, path] of PARTS) {
@@ -319,9 +329,42 @@ for (const [kind, opts] of Object.entries(DEVICES)) {
       await page.goto(APP + path, { waitUntil: "networkidle" })
       await page.evaluate(() => document.fonts.ready)
       await page.waitForTimeout(600)
+      await page.evaluate(undemo)
       await save(page, name, await page.evaluate(snapshot, { id: name, phone: true, part: "[data-dial]" }))
     }
   await ctx.close()
+}
+// The coach, which a demo instance never offers: captured from a Google-mode app with the scripted test model and the
+// seeded demo account (see app.mjs). One question, its tool card and the answer. Skipped without COACH_APP_URL.
+if (COACH_APP) {
+  const coach = await coachSession()
+  for (const [kind, opts] of Object.entries(DEVICES)) {
+    const ctx = await browser.newContext({ ...opts, timezoneId: "Asia/Kolkata", reducedMotion: "reduce", colorScheme: "dark" })
+    await ctx.addCookies([{ name: "better-auth.session_token", value: coach, url: COACH_APP }])
+    const page = await ctx.newPage()
+    await page.goto(`${COACH_APP}/coach`, { waitUntil: "networkidle" })
+    await page.addStyleTag({ content: "nextjs-portal { display: none !important; }" })
+    await page.evaluate(() => document.fonts.ready)
+    await page.waitForTimeout(1500) // hydrated, so the chip sends
+    // The answer streams in (and is mirrored to a live region for screen readers, so wait on the text, not a node).
+    // A freshly started dev server can drop the first answer, so ask again from a new chat, up to three times.
+    for (let i = 0; ; i++) {
+      await page.getByRole("button", { name: /^Why is my recovery/ }).click() // the chip, not a chat in the list
+      const ok = await page.waitForFunction(() => document.body.innerText.includes("usual bedtime"), null, { timeout: 15000 }).then(() => true, () => false)
+      if (ok) break
+      if (i === 2) throw new Error("The coach never answered")
+      await page.goto(`${COACH_APP}/coach`, { waitUntil: "networkidle" })
+      await page.waitForTimeout(1500)
+    }
+    await page.waitForTimeout(1500)
+    await page.evaluate(() => document.fonts.ready)
+    await page.waitForTimeout(800)
+    await page.mouse.move(0, 0)
+    const name = `${kind}-coach`
+    const top = kind === "phone" ? await topColor(page) : null
+    await save(page, name, await page.evaluate(snapshot, { id: name, height: opts.viewport.height, phone: kind === "phone" }), top)
+    await ctx.close()
+  }
 }
 await browser.close()
 

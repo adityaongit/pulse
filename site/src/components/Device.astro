@@ -2,7 +2,8 @@
 // An app screen in a device frame drawn in CSS: the app's own markup (src/kit/screens, `pnpm screens`), laid out at
 // the size it was captured at (390 or 1440 wide) and scaled to the frame, so text and charts stay sharp at any size
 // and pixel density. The screen is a picture: inert, out of the accessibility tree, described by its label.
-// `part` draws a captured piece (a dial) with no frame.
+// `part` draws a captured piece (a dial) with no frame. `crop` draws a band of a screen (from y, that tall, in the
+// capture's own pixels) with no frame either: one real card of the app, for the feature tiles.
 import "../kit/kit.css"
 import { screen } from "../lib/screens"
 import type { Part } from "../lib/screens"
@@ -13,23 +14,29 @@ interface Props {
   class?: string
   /** Overrides the screen's description. */
   label?: string
+  /** [top, height] of the band to show, in the capture's pixels. */
+  crop?: [number, number]
 }
-const { shot, class: className, label } = Astro.props
-const { html, width, height, alt } = screen(shot)
-const kind = shot.startsWith("phone") ? "phone" : shot.startsWith("laptop") ? "laptop" : "part"
+const { shot, class: className, label, crop } = Astro.props
+const { html, width, height, alt, top } = screen(shot)
+const kind = crop ? "crop" : shot.startsWith("phone") ? "phone" : shot.startsWith("laptop") ? "laptop" : "part"
 // The phone's status bar is part of the frame (the capture starts below it), 50 of its 844 points.
 const status = kind === "phone" ? 50 : 0
+const box = crop
+  ? `aspect-ratio:${width} / ${crop[1]};--w:${width}px;--top:${crop[0]}px`
+  : `aspect-ratio:${width} / ${height + status};--w:${width}px${top ? `;background:${top}` : ""}`
+const decorative = kind === "part" || kind === "crop"
 ---
 
 <div
   class:list={["device", `device-${kind}`, className]}
-  role={kind === "part" ? undefined : "img"}
-  aria-label={kind === "part" ? undefined : (label ?? alt)}
-  aria-hidden={kind === "part" ? "true" : undefined}
+  role={decorative ? undefined : "img"}
+  aria-label={decorative ? undefined : (label ?? alt)}
+  aria-hidden={decorative ? "true" : undefined}
   data-nosnippet
 >
   <div class="shell">
-    <div class="screen" style={`aspect-ratio:${width} / ${height + status};--w:${width}px`}>
+    <div class="screen" style={box}>
       <div class="canvas" inert>
         {
           kind === "phone" && (
@@ -175,5 +182,11 @@ const status = kind === "phone" ? 50 : 0
   .device-part .screen {
     background: none;
     content-visibility: visible;
+  }
+  .device-crop .screen {
+    background: none;
+  }
+  .device-crop .canvas {
+    top: calc(var(--top) * -1 * tan(atan2(100cqw, var(--w))));
   }
 </style>

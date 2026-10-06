@@ -30,12 +30,14 @@ const effectiveLabel = new Date(`${effective}T00:00:00Z`).toLocaleDateString("en
       <p class="date">Effective <time datetime={effective}>{effectiveLabel}</time></p>
       <slot name="lede" />
     </header>
-    <nav class="toc" aria-label="On this page">
-      <h2>On this page</h2>
-      <ol>{toc.map((s) => <li><a href={`#${s.id}`}>{s.title}</a></li>)}</ol>
-    </nav>
-    <div class="body prose">
-      <slot />
+    <div class="cols">
+      <nav class="toc" aria-label="On this page">
+        <h2>On this page</h2>
+        <ol>{toc.map((s) => <li><a href={`#${s.id}`}>{s.title}</a></li>)}</ol>
+      </nav>
+      <div class="body prose">
+        <slot />
+      </div>
     </div>
   </article>
 </Base>
@@ -59,40 +61,65 @@ const effectiveLabel = new Date(`${effective}T00:00:00Z`).toLocaleDateString("en
     color: var(--foreground-secondary);
     font-size: 1.1875rem;
   }
+  /* Wide screens: the contents stay beside the text as you read, so the page uses its width. */
+  .cols {
+    display: grid;
+    grid-template-columns: 260px minmax(0, 68ch);
+    gap: 64px;
+    align-items: start;
+    margin-top: 56px;
+  }
   .toc {
-    margin-top: 40px;
-    max-width: 68ch;
-    padding: 20px 24px;
-    border-radius: var(--radius-card);
-    background: linear-gradient(180deg, var(--card-top), var(--card));
-    box-shadow: inset 0 0 0 1px var(--card-edge);
+    position: sticky;
+    top: 96px;
+    max-height: calc(100vh - 120px);
+    overflow-y: auto;
+    padding: 20px;
+    border-radius: 20px;
+    background: rgb(255 255 255 / 0.025);
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.06);
   }
   .toc h2 {
-    font-size: 0.9375rem;
+    color: var(--muted-foreground);
+    font-size: 0.8125rem;
     font-weight: 600;
     letter-spacing: 0;
   }
   .toc ol {
     margin: 10px 0 0;
-    padding-left: 1.4em;
-    columns: 2;
-    column-gap: 32px;
-    color: var(--muted-foreground);
-    font-size: 0.9375rem;
+    padding: 0;
+    list-style: none;
+    counter-reset: toc;
+    font-size: 0.875rem;
   }
   .toc li {
-    break-inside: avoid;
-    padding: 3px 0;
+    counter-increment: toc;
   }
   .toc a {
+    display: flex;
+    gap: 10px;
+    padding: 6px 8px;
+    margin-inline: -8px;
+    border-radius: 8px;
     color: var(--foreground-secondary);
+    line-height: 1.4;
     text-decoration: none;
+    transition-property: color, background-color;
+    transition-duration: 150ms;
+    transition-timing-function: var(--ease-standard);
+  }
+  .toc a::before {
+    content: counter(toc);
+    min-width: 1.4em;
+    color: var(--muted-foreground);
+    font-variant-numeric: tabular-nums;
   }
   .toc a:hover {
+    background: rgb(255 255 255 / 0.05);
     color: var(--foreground);
   }
   .body {
-    margin-top: 56px;
+    max-width: 68ch;
   }
   .body :global(section) {
     scroll-margin-top: 96px;
@@ -124,6 +151,24 @@ const effectiveLabel = new Date(`${effective}T00:00:00Z`).toLocaleDateString("en
   .body :global(a) {
     color: var(--foreground);
     overflow-wrap: anywhere;
+  }
+  @media (max-width: 960px) {
+    .cols {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 40px;
+      margin-top: 40px;
+    }
+    .toc {
+      position: static;
+      max-height: none;
+    }
+    .toc ol {
+      columns: 2;
+      column-gap: 24px;
+    }
+    .toc li {
+      break-inside: avoid;
+    }
   }
   @media (max-width: 600px) {
     .toc ol {

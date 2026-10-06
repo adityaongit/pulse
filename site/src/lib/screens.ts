@@ -14,6 +14,10 @@ const ALT: Record<string, string> = {
   journal: "Journal: the week strip, the Log for water, food, weight and mood, and the evening check-in",
   trends: "Trends: Recovery by day over the past month, with weekly and monthly averages",
   "dashboard-editor": "My Dashboard: choose the metrics on Home and their order",
+  stress: "Stress Monitor: today's stress on a 0-3 dial, with a line on how the day went",
+  healthspan: "Healthspan: Pulse Age against your real age, and your Pace of Aging",
+  reports: "Reports: a weekly and monthly summary of Recovery, sleep and strain",
+  coach: "Coach: a question about today's Recovery, answered with the day's scores and what moved them",
 }
 
 export type Part = `dial-${"sleep" | "recovery" | "strain"}`
@@ -23,9 +27,11 @@ export function screen(s: Shot | Part) {
   const html = files[`../kit/screens/${s}.html`]
   if (!html) throw new Error(`Missing src/kit/screens/${s}.html: run \`pnpm screens\``)
   const [, w, h] = /--kit-w:(\d+)px;--kit-h:(\d+)px/.exec(html)!.map(Number)
+  // The colour at the top of a phone screen, for the frame's status bar above it.
+  const top = /--kit-top:(#[0-9a-f]{6})/.exec(html)?.[1]
   const [device, ...rest] = s.split("-")
   const alt = device === "dial" ? "" : `Pulse on a ${device}. ${ALT[rest.join("-")]}`
-  return { html, width: w, height: h, alt }
+  return { html, width: w, height: h, alt, top }
 }
 
 export function isPhone(s: Shot) {

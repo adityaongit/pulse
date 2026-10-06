@@ -166,8 +166,21 @@ const schema = [
     padding-top: clamp(40px, 7vw, 88px);
   }
   .head.with-phone {
-    grid-template-columns: minmax(0, 1fr) 280px;
+    position: relative;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
     align-items: center;
+  }
+  /* The phone stands in a soft pool of the brand's blue, centred in its half, so the header has no dead middle. */
+  .head.with-phone::after {
+    content: "";
+    position: absolute;
+    right: 0;
+    top: 10%;
+    width: 50%;
+    height: 90%;
+    z-index: -1;
+    pointer-events: none;
+    background: radial-gradient(50% 50% at 50% 45%, rgb(0 147 231 / 0.16), transparent 70%);
   }
   .crumbs a {
     display: inline-flex;
@@ -206,7 +219,8 @@ const schema = [
   }
   /* The top of the phone is enough to place the screen; the rest fades out so the header stays compact. */
   .head :global(.phone-shot) {
-    width: 280px;
+    justify-self: center;
+    width: 320px;
     aspect-ratio: 466 / 700;
     overflow: hidden;
     mask-image: linear-gradient(180deg, #000 72%, transparent);

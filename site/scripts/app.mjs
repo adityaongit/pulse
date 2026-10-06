@@ -1,6 +1,8 @@
 // Shared by `pnpm shots` and `pnpm screens`: the demo app's screens, the two device sizes, a demo session, and the
 // in-page helpers that end a phone screen on a clean row. Both scripts drive a running demo-mode app:
 //   DATA_SOURCE=demo TZ=Asia/Kolkata pnpm dev -p 3317   (repo root, in another terminal)
+// Demo mode scores the day so far, so capture in the evening (a morning capture shows 0.0 strain), and in one run,
+// so the laptop and phone show the same numbers.
 import { createRequire } from "node:module"
 
 const require = createRequire(new URL("../../package.json", import.meta.url))
@@ -14,15 +16,11 @@ export const SCREENS = [
   ["strain", "/strain"],
   ["sleep", "/sleep"],
   ["health", "/health"],
-  // On the phone, scroll to Heart rhythm and Measurements, the newer half of the screen. What scrolled up under the
-  // header is hidden, so no half-row shows through it.
-  ["health-monitor", "/health/monitor", (page, kind) => kind === "phone" &&
-    page.getByRole("heading", { name: "Heart rhythm" }).evaluate((h) => {
-      scrollBy(0, h.getBoundingClientRect().top - 96) // just under the header, so the Measurements card fits below
-      const top = h.getBoundingClientRect().top
-      hideWhere((r) => r.bottom <= top)
-    })],
+  ["health-monitor", "/health/monitor"],
   ["journal", "/journal"],
+  ["stress", "/health/stress"],
+  ["healthspan", "/health/healthspan"],
+  ["reports", "/reports"],
   ["trends", "/trends"],
   ["dashboard-editor", "/", (page) => page.getByRole("button", { name: "Edit My Dashboard" }).click()],
 ]
@@ -34,10 +32,27 @@ export const DEVICES = {
   laptop: { viewport: { width: 1440, height: 900 }, deviceScaleFactor: 2 },
 }
 
+// The coach is never on in demo mode, so it is captured from a second app in Google mode with the scripted model:
+//   pnpm seed:demo against its database, server_settings coach = everyone, and coach_settings provider/model "mock"
+//   with consent for the demo account; then run it with DATA_SOURCE=google COACH_MOCK=true on COACH_APP_URL.
+export const COACH_APP = process.env.COACH_APP_URL
+
+/** A session cookie for the seeded demo account on the coach app (email sign-in; a Google instance has no demo route). */
+export async function coachSession() {
+  const res = await fetch(`${COACH_APP}/api/auth/sign-in/email`, {
+    method: "POST",
+    headers: { "content-type": "application/json", origin: COACH_APP },
+    body: JSON.stringify({ email: "demo@pulse.local", password: "pulse-demo-generated-data" }),
+  })
+  const token = /better-auth\.session_token=([^;]+)/.exec(res.headers.get("set-cookie") ?? "")?.[1]
+  if (!token) throw new Error(`No session from ${COACH_APP}: is the demo account seeded there?`)
+  return token
+}
+
 /** A demo session cookie from the running app. */
 export async function demoSession() {
   const res = await fetch(`${APP}/login/demo`, { method: "POST", redirect: "manual" })
-  const token = /pulse_session=([^;]+)/.exec(res.headers.get("set-cookie") ?? "")?.[1]
+  const token = /better-auth\.session_token=([^;]+)/.exec(res.headers.get("set-cookie") ?? "")?.[1]
   if (!token) throw new Error(`No demo session from ${APP}/login/demo: is the app running in demo mode?`)
   return token
 }
@@ -50,9 +65,6 @@ export const HIDE = `window.hideWhere = (test) => {
     if (r.height && test(r) && !pinned(e)) e.style.visibility = "hidden"
   }
 }`
-
-// The phone's round check-in button floats over the bottom right of every screen (src/components/shells/AppNav.tsx).
-export const FLOAT = `a[aria-label^="Check in for"]`
 
 // Runs in the page. Every phone screen keeps the full screen height (so the site's phones are one size), and its
 // content ends on a row or card boundary rather than mid-row: the lowest y above the floating tab bar that no row,
@@ -99,15 +111,30 @@ export function cleanCut({ maxH, minH }) {
   return maxH
 }
 
+// Runs in the page. The landing page shows the app as a person sees it, so demo mode's own labels come off: the
+// "Demo data" chip, "Demo" in the sync slot (the band icon and its dot stay) and the Journal's demo caption.
+export function undemo() {
+  for (const e of document.querySelectorAll("body *")) {
+    const t = e.textContent.trim()
+    if (e.children.length <= 1 && t === "Demo data") e.remove()
+    else if (e.tagName === "P" && t.startsWith("Demo: ")) e.remove()
+  }
+  for (const e of document.querySelectorAll('[aria-label^="Demo data."]'))
+    for (const n of [...e.querySelectorAll("*"), e].flatMap((x) => [...x.childNodes])) if (n.nodeType === 3 && n.textContent.trim() === "Demo") n.remove()
+}
+
 /** Opens one screen at one device size, ready to capture; returns its height (a phone's content ends on a clean row). */
 export async function openScreen(page, kind, [, path, act]) {
   const opts = DEVICES[kind]
   await page.setViewportSize(opts.viewport)
   await page.goto(APP + path, { waitUntil: "networkidle" })
   await page.evaluate(HIDE)
-  // Not part of the screen: the dev-mode indicator, and on the phone the floating check-in button over the content.
-  await page.addStyleTag({ content: `nextjs-portal { display: none !important; }${kind === "phone" ? `${FLOAT} { display: none !important; }` : ""}` })
+  // Not part of the screen: the dev-mode indicator. The phone's round P action (check-in, or the coach) stays: it is
+  // on every screen of the real app.
+  await page.addStyleTag({ content: `nextjs-portal { display: none !important; }` })
+  await page.evaluate(undemo)
   if (act) await act(page, kind)
+  await page.evaluate(undemo) // the dashboard editor's sheet renders after the act
   await page.evaluate(() => document.fonts.ready)
   await page.waitForTimeout(600)
   let height = opts.viewport.height

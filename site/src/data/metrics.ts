@@ -7,7 +7,7 @@ import { SCORE_DOCS, type ScoreDoc } from "../../../src/app/(app)/more/how-it-wo
 export type Source = { label: string; url?: string }
 export type Band = { from: number; to: number; label: string; color: string }
 export type Scale = { min: number; max: number; unit?: string; bands: Band[] }
-export type Shot = `${"phone" | "laptop"}-${"home" | "recovery" | "strain" | "sleep" | "health" | "health-monitor" | "journal" | "trends" | "dashboard-editor"}`
+export type Shot = `${"phone" | "laptop"}-${"home" | "recovery" | "strain" | "sleep" | "health" | "health-monitor" | "journal" | "trends" | "dashboard-editor" | "stress" | "healthspan" | "reports" | "coach"}`
 export type Faq = { q: string; a: string }
 
 type Meta = {

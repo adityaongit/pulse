@@ -32,8 +32,9 @@ const fullTitle = Astro.url.pathname === "/" || suffixed.length > 60 ? title : s
 const ld = JSON.stringify({ "@context": "https://schema.org", "@graph": [...siteGraph(Astro.site!), ...schema] })
 const path = Astro.url.pathname
 const nav = [
+  { href: "/#features", label: "Features" },
   { href: "/metrics/", label: "Metrics" },
-  { href: "/compare/", label: "Compare" },
+  { href: "/compare/", label: "Compare", narrow: true },
   { href: "/glossary/", label: "Glossary", wide: true },
 ]
 ---
@@ -55,7 +56,7 @@ const nav = [
     <link rel="canonical" href={canonical} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="sitemap" href="/sitemap.xml" />
-    <meta name="theme-color" content="#262e33" />
+    <meta name="theme-color" content="#1d2529" />
 
     <meta property="og:type" content={ogType} />
     <meta property="og:site_name" content={SITE_NAME} />
@@ -86,15 +87,15 @@ const nav = [
           <ul>
             {
               nav.map((n) => (
-                <li class:list={[{ wide: n.wide }]}>
-                  <a href={n.href} aria-current={path.startsWith(n.href) ? "page" : undefined}>
+                <li class:list={[{ wide: n.wide, narrow: n.narrow }]}>
+                  <a href={n.href} aria-current={n.href.startsWith("/#") ? undefined : path.startsWith(n.href) ? "page" : undefined}>
                     {n.label}
                   </a>
                 </li>
               ))
             }
             <li>
-              <a class="gh" href={REPO} aria-label="GitHub"><GitHubMark class="gh-mark" /><span class="gh-text">GitHub</span></a>
+              <a class="gh" href={REPO} aria-label="Source on GitHub"><GitHubMark class="gh-mark" /><span class="gh-text">GitHub</span></a>
             </li>
           </ul>
         </nav>
@@ -169,25 +170,41 @@ const nav = [
     top: 12px;
   }
 
+  /* A floating glass pill (the app's tab-bar material), stuck 12 px under the top of the window. */
   .site-header {
     position: sticky;
-    top: 0;
+    top: 12px;
     z-index: 10;
-    background: rgb(38 46 51 / 0.72);
-    backdrop-filter: blur(16px) saturate(140%);
-    -webkit-backdrop-filter: blur(16px) saturate(140%);
-    box-shadow: inset 0 -1px 0 rgb(255 255 255 / 0.06);
-  }
-  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-    .site-header {
-      background: #232a2f;
-    }
+    margin-top: 12px;
+    pointer-events: none;
   }
   .bar {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    height: 64px;
+    gap: 16px;
+    width: min(100% - 2 * var(--gutter), 860px);
+    height: 60px;
+    padding: 0 8px 0 20px;
+    border-radius: 999px;
+    background: linear-gradient(180deg, rgb(34 39 45 / 0.78), rgb(22 27 31 / 0.86));
+    backdrop-filter: blur(16px) saturate(150%);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.1),
+      0 0 0 1px rgb(255 255 255 / 0.06),
+      0 12px 32px -8px rgb(0 0 0 / 0.55);
+    pointer-events: auto;
+  }
+  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .bar {
+      background: #1c2226;
+    }
+  }
+  @media (prefers-reduced-transparency: reduce) {
+    .bar {
+      background: #1c2226;
+      backdrop-filter: none;
+    }
   }
   .home {
     display: inline-flex;
@@ -215,34 +232,51 @@ const nav = [
     display: inline-flex;
     align-items: center;
     min-height: 44px;
-    padding: 0 12px;
-    border-radius: 10px;
+    padding: 0 14px;
+    border-radius: 999px;
     color: var(--foreground-secondary);
     font-size: 0.9375rem;
     font-weight: 500;
     text-decoration: none;
-    transition: color 150ms var(--ease-standard), background-color 150ms var(--ease-standard);
+    transition-property: color, background-color, scale;
+    transition-duration: 150ms;
+    transition-timing-function: var(--ease-standard);
+  }
+  .bar nav a:active {
+    scale: 0.96;
   }
   .bar nav a:hover,
   .bar nav a[aria-current="page"] {
     color: var(--foreground);
   }
+  .bar nav a[aria-current="page"] {
+    background: rgb(255 255 255 / 0.06);
+  }
   .bar nav a.gh {
     gap: 8px;
     margin-left: 6px;
-    color: var(--foreground);
-    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.18);
+    background: #fff;
+    color: var(--ink);
+    font-weight: 600;
   }
   .bar nav a.gh:hover {
-    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.4);
+    background: #e6edf2;
   }
   .bar :global(.gh-mark) {
     width: 16px;
     height: 16px;
   }
-  @media (max-width: 520px) {
+  @media (max-width: 640px) {
     .wide {
       display: none;
+    }
+  }
+  @media (max-width: 520px) {
+    .narrow {
+      display: none;
+    }
+    .bar {
+      padding-left: 14px;
     }
     .bar nav a {
       padding: 0 9px;
@@ -276,7 +310,7 @@ const nav = [
   }
 
   .site-footer {
-    margin-top: 120px;
+    margin-top: clamp(64px, 7vw, 96px);
     padding: 64px 0 48px;
     /* A darker floor, see-through so the grain runs on, with the brand's teal low on the left. */
     background:
@@ -341,9 +375,6 @@ const nav = [
     padding-top: 24px;
     box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.06);
     font-size: 0.8125rem;
-  }
-  .legal p {
-    max-width: 110ch;
   }
   .legal p + p {
     margin-top: 8px;

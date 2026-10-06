@@ -44,6 +44,11 @@ Run `pnpm typecheck && pnpm lint && pnpm test` before every commit. Run `pnpm e2
 - **UI.** Build only from shells and kit components, using Tailwind utilities and the tokens in `globals.css`. No new CSS files, and no breakpoint logic inside feature components. Every metric renders its five states through `MetricState`. Spec decisions and deviations live in `docs/design/spec.md` §11.
 - **Auth.** better-auth (`src/server/auth.ts`, Drizzle adapter on Postgres): sign-up with name, username and email, gated by the sign-up mode (invite / open / closed, admin panel, else `SIGNUP`) in the `user.create.before` hook; an `ADMIN_EMAILS` address may sign up only while the server has no accounts; sign-in by username or email. Admins (`src/server/admin.ts`: owners plus `user.role = 'admin'`) use `/admin`; its actions check `isAdmin` themselves. `src/proxy.ts` only checks that a session cookie exists; the `(app)` layout looks the session up and sends users without a profile to `/onboarding`. Every Server Action calls `currentUser()` and every route handler `requestUser(req)` itself; never rely on the proxy alone. The profile, including the user's time zone, lives in the database (`src/server/profile.ts`), never in `.env`.
 - **Copy.** User-facing text says Pulse and Pulse Age.
+- **Landing site.** `site/` (Astro) is the public landing page and must always show the app as it is today. Any change to a feature, screen, component UI or theme token in the app updates the site in the same pull request:
+  - recapture the app's screens with `pnpm screens` in `site/` against a demo app (`DATA_SOURCE=demo pnpm dev -p 3317`), so every device frame and feature card shows the current UI;
+  - add, rename or remove the feature in `site/src/pages/index.astro` (hero, feature bento, "Also in Pulse", coach, FAQ) and in `site/src/data/metrics.ts` when it is a score;
+  - keep `site/src/styles/global.css` tokens equal to `src/app/globals.css`;
+  - check the landing page on a phone (390 px) and a laptop (1440 px) before pushing.
 - **Tests.** Algorithms get golden-value or property tests beside the file. Queries get tests on a temp DB built with `src/server/testing.ts`.
 - **Design references.** `docs/design/reference/` is gitignored and holds third-party screenshots. Never commit or publish it.
 - **Git.**
