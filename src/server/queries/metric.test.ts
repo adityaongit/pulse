@@ -1,7 +1,7 @@
 import { beforeAll, describe, expect, it } from "vitest";
 import { and, eq } from "drizzle-orm";
 import { type Db, row, sql } from "../db";
-import { dailyMetrics, dailyValues, loggedEntries } from "../db/schema";
+import { dailyMetrics, dailyValues, dashboardMetrics, loggedEntries } from "../db/schema";
 import { readSamples } from "../samples";
 import { localMidnight } from "../time";
 import { copyDb, ctxFor, dayAt, seeded, TZ, USER } from "../testing";
@@ -41,8 +41,10 @@ describe("getMetricDetail", () => {
   });
 
   it("nightly vital pages match dashboard values and open the selected metric", async () => {
-    const home = await getHome(PAST, ctxFor(db));
-    for (const key of ["hrv", "rhr", "resp", "spo2", "skin"] as const) {
+    const vitals = ["hrv", "rhr", "resp", "spo2", "skin"] as const;
+    await db.insert(dashboardMetrics).values(vitals.map((key, position) => ({ userId: USER, key, position })));
+    const home = await getHome(PAST, ctxFor(db)).finally(() => db.delete(dashboardMetrics).where(eq(dashboardMetrics.userId, USER)));
+    for (const key of vitals) {
       const detail = await getMetricDetail(key, PAST, ctxFor(db));
       const dashboard = home.keyStats.find((s) => s.key === key)!;
       expect(dashboard.href).toBe(`/metric/${key}`);

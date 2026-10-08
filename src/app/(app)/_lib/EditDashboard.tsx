@@ -1,9 +1,9 @@
 "use client"
 
 import * as React from "react"
-import { ArrowDown, ArrowUp, Minus, Pencil, Plus, Search } from "lucide-react"
+import { ChartNoAxesColumn, Equal, Minus, Pencil, Plus, Search } from "lucide-react"
 import { toast } from "sonner"
-import { cn, moved } from "@/lib/utils"
+import { cn } from "@/lib/utils"
 import { DASHBOARD_GROUPS, DASHBOARD_LABEL, DASHBOARD_METRICS, type DashboardKey } from "@/lib/dashboard"
 import { saveDashboard } from "@/server/actions/dashboard"
 import { ResponsiveSheet, SHEET_SECTION } from "@/components/shells/ResponsiveSheet"
@@ -14,32 +14,39 @@ import { STAT_ICON } from "./view"
 export type EditDashboardProps = {
   /** The metrics on Home now, in order. */
   keys: DashboardKey[]
-  /** What Reset to default restores (the v1 rows, or phone metrics without a band). */
-  defaults: DashboardKey[]
   /** Metrics with no value in the last 30 days: still addable, marked "No data yet". */
   empty?: DashboardKey[]
 }
 
-const ROW = "flex min-h-14 items-center gap-3 border-b border-border"
+/** dashboard-03: each metric a card with its icon and caps name. */
+const CARD = "flex min-h-14 items-center gap-3 rounded-xl bg-foreground/[0.07] pl-4"
+const NAME = "min-w-0 flex-1 text-[13px] leading-4 font-bold tracking-[0.1em] text-balance uppercase"
 const ICON = "grid size-5 shrink-0 place-items-center text-muted-foreground [&_svg]:size-5 [&_svg]:stroke-[1.75]"
 const GROUP_LABEL = Object.fromEntries(DASHBOARD_GROUPS.map((g) => [g.key, g.label])) as Record<string, string>
-const same = (a: DashboardKey[], b: DashboardKey[]) => a.length === b.length && a.every((k, i) => k === b[i])
+const moveTo = <T,>(items: T[], from: number, to: number) => {
+  const next = [...items]
+  next.splice(to, 0, ...next.splice(from, 1))
+  return next
+}
 
 /**
- * Home › My Dashboard's pencil (spec §11 CD1, CD2): the reference app's two lists. "On Home" holds the shown metrics in order, each
- * with Move up / Move down and Remove; "Add to My Dashboard" holds the rest by group (Recovery & sleep, Activity, Body,
- * Nutrition, Vitals) with a search field, and a tap adds a metric to the end. Save stores the list; Reset to default
- * restores `defaults`.
+ * Home › My Dashboard's CUSTOMIZE (dashboard-03..06, spec §11 CD1, CD2, R41): the reference app's full-screen editor.
+ * "My Dashboard" holds the shown metrics in order, each dragged by its handle (or moved with the arrow keys on it) and
+ * removed with its minus; "Add to My Dashboard" holds the rest by group with a search field, and a tap adds one at the
+ * end. SAVE stores the list and shows Success.
  */
-export function EditDashboard({ keys, defaults, empty = [] }: EditDashboardProps) {
+export function EditDashboard({ keys, empty = [] }: EditDashboardProps) {
   const [open, setOpen] = React.useState(false)
   const [shown, setShown] = React.useState(keys)
   const [query, setQuery] = React.useState("")
   const [saving, setSaving] = React.useState(false)
+  const [done, setDone] = React.useState(false)
+  const [dragging, setDragging] = React.useState<DashboardKey | null>(null)
   const [status, setStatus] = React.useState("")
-  // The control that takes focus after a row leaves its list (its own button is gone).
+  // The control that takes focus after a row leaves its list (its own button is gone), or a handle after a move.
   const focusNext = React.useRef<string | null>(null)
   const search = React.useRef<HTMLInputElement>(null)
+  const list = React.useRef<HTMLUListElement>(null)
 
   React.useEffect(() => {
     if (focusNext.current === null) return
@@ -57,11 +64,25 @@ export function EditDashboard({ keys, defaults, empty = [] }: EditDashboardProps
     setShown(keys)
     setQuery("")
     setStatus("")
+    setDone(false)
     setOpen(true)
   }
-  const move = (i: number, by: -1 | 1) => {
-    setShown(moved(shown, i, by))
-    setStatus(`${DASHBOARD_LABEL[shown[i]]} moved to position ${i + by + 1} of ${shown.length}`)
+  const move = (from: number, to: number) => {
+    if (to < 0 || to >= shown.length || to === from) return
+    setShown(moveTo(shown, from, to))
+    setStatus(`${DASHBOARD_LABEL[shown[from]]} moved to position ${to + 1} of ${shown.length}`)
+  }
+  // Pointer drag: the row follows the pointer over the other rows' midpoints.
+  const drag = (key: DashboardKey) => (e: React.PointerEvent<HTMLButtonElement>) => {
+    if (e.button !== 0) return
+    e.currentTarget.setPointerCapture(e.pointerId)
+    setDragging(key)
+  }
+  const dragMove = (e: React.PointerEvent<HTMLButtonElement>) => {
+    if (!dragging || !list.current) return
+    const rows = [...list.current.children] as HTMLElement[]
+    const to = rows.findIndex((r) => e.clientY < r.getBoundingClientRect().top + r.offsetHeight / 2)
+    move(shown.indexOf(dragging), to === -1 ? shown.length - 1 : to)
   }
   const remove = (i: number) => {
     const next = shown.filter((_, j) => j !== i)
@@ -82,8 +103,7 @@ export function EditDashboard({ keys, defaults, empty = [] }: EditDashboardProps
     const r = await saveDashboard({ keys: shown }).catch(() => ({ ok: false as const, error: "network" }))
     setSaving(false)
     if (!r.ok) return void toast.error("Couldn’t save your dashboard. Try again.")
-    setOpen(false)
-    toast.success("Dashboard saved")
+    setDone(true)
   }
 
   return (
@@ -101,55 +121,63 @@ export function EditDashboard({ keys, defaults, empty = [] }: EditDashboardProps
       <ResponsiveSheet
         open={open}
         onOpenChange={setOpen}
-        title="My Dashboard"
-        description="Choose the metrics on Home and their order."
-        size="tall"
+        title="Customize dashboard"
+        size="screen"
+        done={done ? { title: "Success", body: "Your preferences have been saved.", onDone: () => setOpen(false) } : null}
         footer={
-          <>
-            <Button size="sheet" onClick={save} disabled={saving || shown.length === 0} aria-describedby={shown.length === 0 ? "dashboard-none" : undefined}>
-              {saving ? "Saving…" : "Save dashboard"}
-            </Button>
-            <Button size="sheet" variant="outline-pill" onClick={() => setShown(defaults)} disabled={saving || same(shown, defaults)}>
-              Reset to default
-            </Button>
-          </>
+          <Button size="sheet" variant="outline-pill" onClick={save} disabled={saving || shown.length === 0} aria-describedby={shown.length === 0 ? "dashboard-none" : undefined}>
+            {saving ? "Saving…" : "Save"}
+          </Button>
         }
       >
-        <h3 id="dashboard-shown" className={cn(SHEET_SECTION, "mt-2")}>
-          On Home <span className="font-numeric tabular-nums">{shown.length}</span>
+        <h3 id="dashboard-shown" className="mt-4 text-[22px] leading-7 font-semibold">
+          My Dashboard
         </h3>
+        <p id="dashboard-reorder-help" className="sr-only">
+          Drag the handle, or press the up and down arrows on it, to move a metric.
+        </p>
         {shown.length === 0 ? (
           <p id="dashboard-none" role="alert" className="py-4 text-[15px] leading-[22px] text-pretty text-foreground-secondary">
             Add at least one metric to save.
           </p>
         ) : (
-          <ul aria-labelledby="dashboard-shown">
+          <ul ref={list} aria-labelledby="dashboard-shown" className="mt-4 space-y-3">
             {shown.map((key, i) => {
               const label = DASHBOARD_LABEL[key]
               return (
-                <li key={key} className={cn(ROW, "gap-1")}>
-                  <span aria-hidden className={cn(ICON, "mr-2")}>
+                <li key={key} className={cn(CARD, "transition-[scale,box-shadow] duration-150 ease-standard", dragging === key && "z-10 scale-[1.02] shadow-overlay")}>
+                  <span aria-hidden className={ICON}>
                     {STAT_ICON[key]}
                   </span>
-                  <span className="min-w-0 flex-1 text-[15px] leading-[22px] text-balance">{label}</span>
-                  <Button variant="ghost" size="icon-touch" aria-label={`Move ${label} up`} disabled={i === 0} onClick={() => move(i, -1)}>
-                    <ArrowUp strokeWidth={1.75} />
-                  </Button>
-                  <Button variant="ghost" size="icon-touch" aria-label={`Move ${label} down`} disabled={i === shown.length - 1} onClick={() => move(i, 1)}>
-                    <ArrowDown strokeWidth={1.75} />
-                  </Button>
+                  <span className={NAME}>{label}</span>
+                  {/* dashboard-03: the chart tile carries a small bar-chart glyph. */}
+                  {key === "stress" && <ChartNoAxesColumn aria-hidden strokeWidth={1.5} className="size-5 shrink-0 text-muted-foreground" />}
                   {/* the reference app hides removal behind a swipe that members could not find; Pulse shows it (spec §11 CD2). */}
-                  <Button
-                    id={`dashboard-remove-${key}`}
-                    variant="ghost"
-                    size="icon-touch"
-                    aria-label={`Remove ${label}`}
-                    onClick={() => remove(i)}
-                    className="text-foreground-secondary hover:text-foreground"
-                  >
+                  <Button id={`dashboard-remove-${key}`} variant="ghost" size="icon-touch" aria-label={`Remove ${label}`} onClick={() => remove(i)} className="text-foreground-secondary hover:text-foreground">
                     <span className="grid size-6 place-items-center rounded-full ring-1 ring-current">
                       <Minus className="size-3.5" strokeWidth={2.25} />
                     </span>
+                  </Button>
+                  <Button
+                    id={`dashboard-move-${key}`}
+                    variant="ghost"
+                    size="icon-touch"
+                    aria-label={`Reorder ${label}, position ${i + 1} of ${shown.length}`}
+                    aria-describedby="dashboard-reorder-help"
+                    onPointerDown={drag(key)}
+                    onPointerMove={dragMove}
+                    onPointerUp={() => setDragging(null)}
+                    onPointerCancel={() => setDragging(null)}
+                    onKeyDown={(e) => {
+                      const by = e.key === "ArrowUp" ? -1 : e.key === "ArrowDown" ? 1 : 0
+                      if (!by) return
+                      e.preventDefault()
+                      move(i, i + by)
+                      focusNext.current = `dashboard-move-${key}`
+                    }}
+                    className="cursor-grab touch-none text-foreground active:cursor-grabbing"
+                  >
+                    <Equal aria-hidden strokeWidth={2} className="size-6" />
                   </Button>
                 </li>
               )
@@ -174,7 +202,7 @@ export function EditDashboard({ keys, defaults, empty = [] }: EditDashboardProps
             aria-label="Search metrics"
             autoComplete="off"
             enterKeyHint="search"
-            className="h-11 rounded-full bg-secondary pl-10 text-base dark:bg-secondary"
+            className="h-12 rounded-xl bg-foreground/[0.06] pl-10 text-base"
           />
         </div>
         {groups.map((g) => (
@@ -182,26 +210,24 @@ export function EditDashboard({ keys, defaults, empty = [] }: EditDashboardProps
             <h4 id={`dashboard-group-${g.key}`} className="text-[13px] leading-4 font-semibold text-foreground-secondary">
               {g.label}
             </h4>
-            <ul>
+            <ul className="mt-2 space-y-3">
               {g.items.map((m) => (
-                <li key={m.key} className="border-b border-border">
+                <li key={m.key}>
                   <button
                     id={`dashboard-add-${m.key}`}
                     type="button"
                     onClick={() => add(m.key)}
                     aria-label={`Add ${m.label}${noData.has(m.key) ? ", no data yet" : ""}`}
-                    className="-mx-2 flex min-h-14 w-[calc(100%+16px)] items-center gap-3 rounded-lg px-2 text-left transition-[background-color] duration-150 ease-standard outline-none hover:bg-accent focus-visible:ring-3 focus-visible:ring-ring/50 active:bg-accent"
+                    className={cn(CARD, "w-full pr-3 text-left transition-[background-color,scale] duration-150 ease-standard outline-none hover:bg-foreground/10 focus-visible:ring-3 focus-visible:ring-ring/50 active:scale-[0.98]")}
                   >
                     <span aria-hidden className={ICON}>
                       {STAT_ICON[m.key]}
                     </span>
                     <span className="min-w-0 flex-1">
-                      <span className="block text-[15px] leading-[22px] text-balance">{m.label}</span>
-                      {noData.has(m.key) && <span className="block text-xs leading-4 font-medium text-muted-foreground">No data yet</span>}
+                      <span className={cn(NAME, "block")}>{m.label}</span>
+                      {noData.has(m.key) && <span className="mt-0.5 block text-xs leading-4 font-medium text-muted-foreground">No data yet</span>}
                     </span>
-                    <span aria-hidden className="grid size-6 shrink-0 place-items-center rounded-full bg-foreground text-background">
-                      <Plus className="size-3.5" strokeWidth={2.5} />
-                    </span>
+                    <Plus aria-hidden className="size-6 shrink-0" strokeWidth={2} />
                   </button>
                 </li>
               ))}

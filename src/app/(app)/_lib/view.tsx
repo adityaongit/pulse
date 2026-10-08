@@ -32,6 +32,7 @@ import {
   Weight,
   Wheat,
   Wind,
+  PersonStanding,
   Zap,
 } from "lucide-react"
 import type { EnergySeries } from "@/components/charts/EnergyBankChart"
@@ -117,6 +118,12 @@ export const STAT_ICON: Record<string, React.ReactNode> = {
   swim_strokes: <Waves />,
   weight: <Weight />,
   body_fat: <Percent />,
+  // The reference app's My Dashboard rows (spec §11 R41).
+  restorative_pct: <BatteryCharging />,
+  debt: <BedDouble />,
+  zones_all: <HeartPulse />,
+  vo2max: <Gauge />,
+  lean_mass: <PersonStanding />,
 }
 
 /**

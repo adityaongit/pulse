@@ -49,17 +49,17 @@ it("saves the chosen metrics in order for that user only, and revalidates Home",
 
 it("rejects unknown, repeated or no metrics, writing nothing", async () => {
   await saveDashboard({ keys: ["hrv"] });
-  for (const keys of [["hrv", "vo2max"], ["hrv", "hrv"], [], ["__proto__"]]) expect(await saveDashboard({ keys })).toMatchObject({ ok: false });
+  for (const keys of [["hrv", "not_a_metric"], ["hrv", "hrv"], [], ["__proto__"]]) expect(await saveDashboard({ keys })).toMatchObject({ ok: false });
   expect(await rows()).toEqual([{ key: "hrv", position: 0 }]);
 });
 
-it("the default list (Reset to default) is stored as no rows: phone metrics until heart rate syncs, then the v1 rows", async () => {
+it("the default list is stored as no rows: phone metrics until heart rate syncs, then the reference app's rows", async () => {
   await saveDashboard({ keys: ["steps"] });
   await saveDashboard({ keys: ["steps", "distance", "calories", "active_minutes", "active_calories", "floors"] });
   expect(await rows()).toEqual([]);
   await db.insert(hrDays).values({ userId: USER, bucket: 0, offsets: [1], values: [60] });
   try {
-    await saveDashboard({ keys: ["hrv", "rhr", "resp", "sleep", "stress", "calories", "steps", "spo2", "skin"] });
+    await saveDashboard({ keys: ["hrv", "sleep", "consistency", "hours", "stress", "rhr", "vo2max", "steps"] });
     expect(await rows()).toEqual([]);
   } finally {
     await db.delete(hrDays);

@@ -47,7 +47,6 @@ function Chart({ s, variant }: { s: StressSeries; variant: "full" | "spark" }) {
   const summary = latest?.value != null
     ? `Stress through the day, latest ${formatValue("decimal1", latest.value)}, ${STRESS_WORD[stressLevel(latest.value)].toLowerCase()}, at ${clock(latest.t, tz)}.`
     : "Stress through the day."
-  const latestColor = latest?.value != null ? DATA_COLORS[STRESS_COLOR[stressLevel(latest.value)]].css : undefined
 
   return (
     <ChartFigure summary={summary} config={{ all: { label: "Stress", color: "var(--stress-medium)" } }} className={full ? "h-[200px]" : "h-11"}>
@@ -57,20 +56,22 @@ function Chart({ s, variant }: { s: StressSeries; variant: "full" | "spark" }) {
           <FadeGradient id={`stress-fill-${id}`} color={bandColor(top, BANDS)} from={0.22} />
         </defs>
         {full && <CartesianGrid {...GRID} horizontalValues={[1, 2, 3]} />}
-        {full && spanAreas(s.spans)}
+        {full && spanAreas(s.spans, true)}
         <XAxis
           dataKey="x"
           type="number"
           scale="time"
           domain={[first, last]}
           hide={!full}
-          ticks={full ? hourTicks(first, last, 4, tz) : undefined}
+          // The hours, then the time now in bold at the end of the line (dashboard-08), clear of the last hour.
+          ticks={full ? (s.now ? [...hourTicks(first, last, 4, tz).filter((t) => last - t > 5_400_000), s.now] : hourTicks(first, last, 4, tz)) : undefined}
           tickFormatter={(v: number) => clock(v, tz)}
-          interval="equidistantPreserveStart"
+          tick={full && s.now ? (p: { x?: number | string; y?: number | string; payload?: { value: number } }) => <NowTick {...p} now={s.now!} tz={tz} /> : undefined}
+          interval={s.now ? 0 : "equidistantPreserveStart"}
           minTickGap={24}
           {...AXIS}
         />
-        <YAxis domain={[0, 3]} ticks={[0, 1, 2, 3]} width={24} hide={!full} {...AXIS} tickMargin={4} />
+        <YAxis domain={[0, 3]} ticks={[0, 1, 2, 3]} tickFormatter={(v: number) => formatValue("decimal1", v)} width={28} hide={!full} {...AXIS} tickMargin={4} />
         {full && (
           <ChartTooltip
             isAnimationActive={false}
@@ -105,9 +106,21 @@ function Chart({ s, variant }: { s: StressSeries; variant: "full" | "spark" }) {
           {...anim}
         />
         {full && s.now && <ReferenceLine x={s.now} stroke="var(--chart-cursor)" strokeDasharray="4 4" ifOverflow="hidden" />}
-        {latest?.value != null && <ReferenceDot x={latest.t} y={latest.value} r={full ? 4 : 3} fill={latestColor} stroke="none" />}
+        {/* The latest reading: a white dot, as the reference app ends its line (health-01, dashboard-08). */}
+        {latest?.value != null && <ReferenceDot x={latest.t} y={latest.value} r={full ? 4 : 3} fill="var(--foreground)" stroke="none" />}
       </ComposedChart>
     </ChartFigure>
+  )
+}
+
+/** An hour tick, or the time now in bold. */
+function NowTick({ x, y, payload, now, tz }: { x?: number | string; y?: number | string; payload?: { value: number }; now: number; tz?: string }) {
+  if (!payload) return null
+  const isNow = payload.value === now
+  return (
+    <text x={x} y={y} dy="0.9em" textAnchor={isNow ? "end" : "middle"} fontSize={12} fontWeight={isNow ? 700 : 400} fill={isNow ? "var(--foreground)" : "var(--muted-foreground)"} className="font-numeric tabular-nums">
+      {clock(payload.value, tz)}
+    </text>
   )
 }
 

@@ -136,8 +136,8 @@ export type HomeVM = {
   energyBank: Metric<EnergyBankVM>;
   tonight: Metric<SleepPlanVM>;
   keyStats: KeyStat[];
-  /** My Dashboard's editor: the default list (v1 rows, or phone metrics without a band) and the metrics with no data in 30 days. */
-  dashboard: { defaults: DashboardKey[]; empty: DashboardKey[] };
+  /** My Dashboard's editor: the metrics with no data in 30 days. */
+  dashboard: { empty: DashboardKey[] };
   /** No heart rate on the day but the phone counted steps (spec §11 CD2): those stats lead Home. Null otherwise. */
   phone: KeyStat[] | null;
   weeklyTeaser: { period: string; start: string; end: string } | null;

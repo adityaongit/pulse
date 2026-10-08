@@ -78,12 +78,12 @@ const zoneParts = (from: number, to: number) => (r: DayRow) => {
   if (!r.s1 || r.s1.hrCount === 0) return null;
   return Object.fromEntries(Array.from({ length: to - from }, (_, k) => [`z${from + k + 1}`, r.s1!.zoneSeconds[from + k] / 60]));
 };
-const zoneSum = (from: number, to: number) => (r: DayRow) => {
+export const zoneSum = (from: number, to: number) => (r: DayRow) => {
   const xs = Array.from({ length: to - from }, (_, k) => zoneMin(r, from + k));
   return xs.every(finite) ? xs.reduce((a, b) => a + b, 0) : null;
 };
 const zoneSeries = (from: number, to: number) => Array.from({ length: to - from }, (_, k) => ({ key: `z${from + k + 1}`, label: `Zone ${from + k + 1}` }));
-const worn = (r: DayRow) => (r.s1?.hrCount ?? 0) > 0;
+export const worn = (r: DayRow) => (r.s1?.hrCount ?? 0) > 0;
 /** The night's need: the plan made the evening before, else the baseline need (as the Sleep page reads it). */
 const needMin = (r: DayRow, x: Ctx) => {
   if (!r.sleep) return null;

@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Activity, Moon } from "lucide-react"
+import { Activity, Moon, PersonStanding } from "lucide-react"
 import { Area, AreaChart, CartesianGrid, ReferenceArea, ReferenceLine, XAxis, YAxis } from "recharts"
 import { DATA_COLORS, ZONE_COLOR } from "@/lib/bands"
 import { bandColor } from "@/lib/charts"
@@ -37,10 +37,20 @@ export type IntradayHrChartProps = {
 
 const SPAN_COLOR = { workout: "var(--strain)", sleep: "var(--sleep)" } as const
 
-/** A marked stretch's header: a 2 px accent along its top edge, and an icon with its name centred above it (WHOOP's day chart). */
-function SpanMark({ viewBox, kind, text }: { viewBox?: { x?: number; y?: number; width?: number }; kind: ChartSpan["kind"]; text: string }) {
+/**
+ * A marked stretch's header: a 2 px accent along its top edge, and an icon with its name centred above it (WHOOP's day
+ * chart). `iconOnly`: the Stress Monitor's moon and walker, drawn over even a narrow stretch (dashboard-08).
+ */
+function SpanMark({ viewBox, kind, text, iconOnly }: { viewBox?: { x?: number; y?: number; width?: number }; kind: ChartSpan["kind"]; text: string; iconOnly?: boolean }) {
   const { x = 0, y = 0, width = 0 } = viewBox ?? {}
-  const Icon = kind === "sleep" ? Moon : Activity
+  const Icon = kind === "sleep" ? Moon : iconOnly ? PersonStanding : Activity
+  if (iconOnly)
+    return (
+      <g pointerEvents="none">
+        <rect x={x} y={y} width={width} height={2} fill={SPAN_COLOR[kind]} />
+        <Icon x={x + width / 2 - 7} y={y - 18} width={14} height={14} color="var(--foreground)" strokeWidth={2} />
+      </g>
+    )
   const w = 14 + Math.ceil(text.length * 6.2)
   // A header stays inside its own stretch, so back-to-back spans never overprint: the name when it fits, else the icon alone.
   const named = width >= w
@@ -59,7 +69,7 @@ function SpanMark({ viewBox, kind, text }: { viewBox?: { x?: number; y?: number;
 }
 
 /** Each marked stretch shaded, with its header along the top. */
-export function spanAreas(spans: ChartSpan[] | undefined) {
+export function spanAreas(spans: ChartSpan[] | undefined, iconOnly = false) {
   return (spans ?? []).map((s) => (
     <ReferenceArea
       key={`${s.kind}-${s.start}`}
@@ -68,7 +78,7 @@ export function spanAreas(spans: ChartSpan[] | undefined) {
       fill={s.kind === "workout" ? "var(--strain-deep)" : "var(--sleep)"}
       fillOpacity={s.kind === "workout" ? 0.12 : 0.08}
       ifOverflow="hidden"
-      label={({ viewBox }: { viewBox?: { x?: number; y?: number; width?: number } }) => <SpanMark viewBox={viewBox} kind={s.kind} text={s.label} />}
+      label={({ viewBox }: { viewBox?: { x?: number; y?: number; width?: number } }) => <SpanMark viewBox={viewBox} kind={s.kind} text={s.label} iconOnly={iconOnly} />}
     />
   ))
 }

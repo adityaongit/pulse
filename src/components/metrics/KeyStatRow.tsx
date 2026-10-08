@@ -124,7 +124,9 @@ function Row({ p, c }: { p: KeyStatRowProps; c: Computed }) {
           {c.loading ? (
             <SkeletonText className="w-[4ch] font-numeric text-xl leading-6 font-bold" />
           ) : (
-            <ValueUnit value={c.valueText} unit={p.unit} className={cn("font-numeric text-xl leading-6 font-bold", c.reason && "text-muted-foreground")} />
+            // A My Dashboard card prints the number alone ("43", "5,185"), percent kept, as the reference app does
+            // (dashboard-01); the spoken sentence keeps the unit.
+            <ValueUnit value={c.valueText} unit={p.variant === "card" && p.unit !== "%" ? undefined : p.unit} className={cn("font-numeric text-xl leading-6 font-bold", c.reason && "text-muted-foreground")} />
           )}
           {p.direction !== "none" && (c.dir ? <DeltaMark dir={c.dir} tone={c.tone!} /> : <span />)}
           {c.avgText && !c.reason && (

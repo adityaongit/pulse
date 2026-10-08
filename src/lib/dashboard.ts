@@ -26,6 +26,27 @@ const CORE = [
   { key: "skin", label: "Skin temperature", group: "vitals" },
 ] as const
 
+/**
+ * The reference app's other rows (dashboard-03..09). Keys match the Trend View each opens where there is one;
+ * "(weekly)" rows total the 7 days ending on the day and compare with the same 7-day total over the prior 30 days.
+ */
+const SCORED = [
+  { key: "recovery", label: "Recovery", group: "recovery" },
+  { key: "consistency", label: "Sleep consistency", group: "recovery" },
+  { key: "hours", label: "Hours of sleep", group: "recovery" },
+  { key: "restorative_pct", label: "Restorative sleep (%)", group: "recovery" },
+  { key: "restorative", label: "Restorative sleep (hours)", group: "recovery" },
+  { key: "debt", label: "Sleep debt", group: "recovery" },
+  { key: "strain", label: "Day strain", group: "activity" },
+  { key: "zones13", label: "HR zones 1-3 (weekly)", group: "activity" },
+  { key: "zones45", label: "HR zones 4-5 (weekly)", group: "activity" },
+  { key: "zones_all", label: "HR zones all (weekly)", group: "activity" },
+  { key: "strength", label: "Strength activity time (weekly)", group: "activity" },
+  { key: "vo2max", label: "VO2 max", group: "body" },
+  { key: "lean_mass", label: "Lean body mass", group: "body" },
+] as const
+export type ScoredKey = (typeof SCORED)[number]["key"]
+
 /** Stress Monitor: a chart tile rather than a row (the day's stress line), placed and reordered like any metric. */
 const STRESS = { key: "stress", label: "Stress Monitor", group: "recovery" } as const
 
@@ -36,10 +57,11 @@ export const BODY_METRICS = [
 ] as const satisfies readonly { key: string; label: string; unit: string; format: FormatKey; direction: GoodDirection; href: string }[]
 export type BodyKey = (typeof BODY_METRICS)[number]["key"]
 
-export type DashboardKey = (typeof CORE)[number]["key"] | typeof STRESS.key | BodyKey | ExtraKey
+export type DashboardKey = (typeof CORE)[number]["key"] | ScoredKey | typeof STRESS.key | BodyKey | ExtraKey
 
 const ALL: { key: DashboardKey; label: string; group: DashboardGroup }[] = [
   ...CORE,
+  ...SCORED,
   STRESS,
   ...BODY_METRICS.map((m) => ({ key: m.key, label: m.label, group: "body" as const })),
   ...EXTRA_METRICS.map((m) => ({ key: m.key, label: m.label, group: m.group })),
@@ -52,8 +74,8 @@ export const DASHBOARD_LABEL = Object.fromEntries(ALL.map((m) => [m.key, m.label
 
 export const isDashboardKey = (k: string): k is DashboardKey => Object.hasOwn(DASHBOARD_LABEL, k)
 
-/** The default list: the v1 rows, with Stress Monitor after Sleep performance as in the reference app. */
-export const DASHBOARD_DEFAULT: DashboardKey[] = CORE.flatMap((m) => (m.key === "sleep" ? [m.key, STRESS.key] : [m.key]))
+/** The default list, the reference app's (dashboard-03); installs that never saved a list follow it. */
+export const DASHBOARD_DEFAULT: DashboardKey[] = ["hrv", "sleep", "consistency", "hours", "stress", "rhr", "vo2max", "steps"]
 
 /** The default for an account that has never synced heart rate (phone only, no Fitbit band): what its phone counts. */
 export const PHONE_DEFAULT: DashboardKey[] = ["steps", "distance", "calories", "active_minutes", "active_calories", "floors"]

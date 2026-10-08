@@ -1,7 +1,8 @@
-import { BODY_METRICS, DASHBOARD_DEFAULT, DASHBOARD_LABEL, DASHBOARD_METRICS, type DashboardKey, isDashboardKey, PHONE_DEFAULT, PHONE_STATS } from "@/lib/dashboard";
+import { BODY_METRICS, DASHBOARD_DEFAULT, DASHBOARD_LABEL, DASHBOARD_METRICS, type DashboardKey, isDashboardKey, PHONE_DEFAULT, PHONE_STATS, type ScoredKey } from "@/lib/dashboard";
 import { EXTRA_METRICS, type ExtraKey, type ExtraMetric } from "@/lib/extraMetrics";
 import { hmm } from "@/lib/format";
-import { metricHref } from "@/lib/url";
+import type { ReasonCode } from "@/lib/reasons";
+import { metricHref, trendHref } from "@/lib/url";
 import { and, desc, eq, gte, like, lte } from "drizzle-orm";
 import type { Db } from "../db";
 import { dashboardMetrics, hrDays, journalEntries, reports } from "../db/schema";
@@ -9,6 +10,7 @@ import { addDays, localMinutes } from "../time";
 import { insightOf as recoveryInsight } from "./recovery";
 import { insightOf as sleepInsight } from "./sleep";
 import { coach } from "./strain";
+import { worn, zoneSum } from "./trendView";
 import {
   activityKind,
   type DayRow,
@@ -52,17 +54,20 @@ export async function getHome(day: string, ctx: QueryCtx): Promise<HomeVM> {
   const today = todayOf(ctx);
   const isToday = day === today;
   const stripStart = day < addDays(today, -29) ? day : addDays(today, -29);
-  const [rows, exs, keys, defaults, weeklyTeaser, journal, ebSeries] = await Promise.all([
-    loadDays(ctx, addDays(stripStart, -30), today),
+  const [rows, exs, keys, weeklyTeaser, journal, ebSeries] = await Promise.all([
+    // 30 days before the strip, and 6 more so a weekly row's prior 30 seven-day totals are whole.
+    loadDays(ctx, addDays(stripStart, -36), today),
     exercisesBetween(ctx, day, day),
     dashboardKeys(ctx.db, ctx.userId),
-    dashboardDefault(ctx.db, ctx.userId),
     latestReport(ctx, "week"),
     journalWeek(ctx, day),
     loadSeries(ctx, day, "energy_bank"),
   ]);
-  // The tile's line is a minute series: read it only when the tile is on the dashboard.
-  const stressSeries = keys.includes("stress") ? await loadSeries(ctx, day, "stress") : null;
+  // The tile's line is a minute series, and strength time needs the workouts: read each only when it's on the dashboard.
+  const [stressSeries, strength] = await Promise.all([
+    keys.includes("stress") ? loadSeries(ctx, day, "stress") : null,
+    keys.includes("strength") ? strengthMinutes(ctx, addDays(stripStart, -36), today) : new Map<string, number>(),
+  ]);
   const row = rows.get(day);
 
   const recovery = recoveryMetric(row, isToday);
@@ -95,8 +100,8 @@ export async function getHome(day: string, ctx: QueryCtx): Promise<HomeVM> {
     activities: { title: isToday ? "Today’s activities" : "Activities", items: timelineOf(row, day, exs) },
     energyBank: energyBankVM(ctx, row, day, isToday, ebSeries),
     tonight: planVM(ctx, row, isToday),
-    keyStats: keyStats(rows, day, isToday, keys),
-    dashboard: { defaults, empty: emptyKeys(rows, day, isToday) },
+    keyStats: keyStats(rows, day, isToday, keys, strength),
+    dashboard: { empty: emptyKeys(rows, day, isToday) },
     phone: phoneDay(rows, day, isToday),
     weeklyTeaser,
     outlook: outlookOf(ctx, row, { recovery, strain, target }, isToday),
@@ -244,7 +249,20 @@ const spec = (
   format?: KeyStat["format"],
 ): StatSpec => ({ pick, metric, ...(unit && { unit }), direction, ...(href && { href }), ...(format && { format }) });
 
-function statSpecs(row: DayRow | undefined, isToday: boolean): Record<DashboardKey, StatSpec> {
+/** Strength-workout minutes per day over [from, to]. */
+async function strengthMinutes(ctx: QueryCtx, from: string, to: string): Promise<Map<string, number>> {
+  const out = new Map<string, number>();
+  for (const e of await exercisesBetween(ctx, from, to)) if (activityKind(e.type) === "strength") out.set(e.day, (out.get(e.day) ?? 0) + (e.endTs - e.startTs) / 60);
+  return out;
+}
+
+/** A daily pick summed over the 7 days ending on the row's day; null when none of them has a value. */
+const weekly = (rows: Map<string, DayRow>, pick: (r: DayRow) => number | null | undefined) => (r: DayRow) => {
+  const xs = Array.from({ length: 7 }, (_, k) => rows.get(addDays(r.day, -k))).flatMap((d) => (d ? [pick(d)] : [])).filter(finite);
+  return xs.length ? xs.reduce((a, b) => a + b, 0) : null;
+};
+
+function statSpecs(row: DayRow | undefined, isToday: boolean, rows: Map<string, DayRow> = new Map(), strength: Map<string, number> = new Map()): Record<DashboardKey, StatSpec> {
   const m = row?.metrics;
   const rhr = (r: DayRow) => r.metrics?.rhrBpm ?? r.sessionRhr ?? null;
   const skin = (r: DayRow) => r.recovery?.inputs.skinTempDev ?? null;
@@ -261,6 +279,32 @@ function statSpecs(row: DayRow | undefined, isToday: boolean): Record<DashboardK
     skin: spec(skin, maybe(row && skin(row), skinReason), "°C", "toward_zero", metricHref("skin")),
     stress: spec((r) => r.stress?.average, maybe(row?.stress?.average, dailyReason), undefined, "down", "/health/stress", "decimal1"),
   } as Record<DashboardKey, StatSpec>;
+  // The reference app's rows (dashboard-03..09); each opens its Trend View, or its screen where it has none.
+  const sleepMain = (r: DayRow) => r.sleep?.main;
+  const restorative = (r: DayRow) => {
+    const s = sleepMain(r);
+    return s?.deepMin != null && s.remMin != null ? s.deepMin + s.remMin : null;
+  };
+  const night: ReasonCode = sleepMetric(row, isToday).reason ?? "no_data";
+  const scored = (pick: StatSpec["pick"], reason: ReasonCode, unit: string | undefined, direction: KeyStat["direction"], href: string, format?: KeyStat["format"]) =>
+    spec(pick, maybe(row && pick(row), reason), unit, direction, href, format);
+  const strengthDay = (r: DayRow) => (worn(r) || strength.has(r.day) ? (strength.get(r.day) ?? 0) : null);
+  const lean = (r: DayRow) => (r.metrics?.weightKg != null && r.metrics.bodyFatPct != null ? r.metrics.weightKg * (1 - r.metrics.bodyFatPct / 100) : null);
+  Object.assign(out, {
+    recovery: scored((r) => r.recovery?.value, recoveryMetric(row, isToday).reason ?? "no_data", "%", "up", trendHref("recovery"), "int"),
+    consistency: scored((r) => r.sleep?.consistency, night, "%", "up", trendHref("consistency"), "int"),
+    hours: scored((r) => sleepMain(r)?.asleepMin, night, "min", "up", trendHref("hours")),
+    restorative_pct: scored((r) => { const x = restorative(r); const s = sleepMain(r); return x != null && s?.asleepMin ? (x / s.asleepMin) * 100 : null }, night, "%", "up", trendHref("restorative"), "int"),
+    restorative: scored(restorative, night, "min", "up", trendHref("restorative")),
+    debt: scored((r) => (sleepMain(r) ? r.sleep!.debtMin : null), night, "min", "down", "/sleep"),
+    strain: scored((r) => (finite(r.s1?.effort) ? toStrain(r.s1.effort) : null), dailyReason, undefined, "neutral", trendHref("strain"), "decimal1"),
+    zones13: scored(weekly(rows, zoneSum(0, 3)), dailyReason, "min", "up", trendHref("zones13")),
+    zones45: scored(weekly(rows, zoneSum(3, 5)), dailyReason, "min", "up", trendHref("zones45")),
+    zones_all: scored(weekly(rows, zoneSum(0, 5)), dailyReason, "min", "up", "/strain"),
+    strength: scored(weekly(rows, strengthDay), dailyReason, "min", "up", trendHref("strength")),
+    vo2max: scored((r) => (r.fitness?.reason === null ? r.fitness.vo2max : null), "no_data", "ml/kg/min", "up", "/health/fitness", "decimal1"),
+    lean_mass: scored(lean, "no_data", "kg", "neutral", metricHref("weight"), "decimal1"),
+  } satisfies Record<ScoredKey, StatSpec>);
   for (const b of BODY_METRICS) {
     const pick = (r: DayRow) => (b.key === "weight" ? r.metrics?.weightKg : r.metrics?.bodyFatPct);
     out[b.key] = spec(pick, maybe(row && pick(row), "no_data"), b.unit, b.direction, b.href, b.format);
@@ -270,8 +314,8 @@ function statSpecs(row: DayRow | undefined, isToday: boolean): Record<DashboardK
   return out;
 }
 
-export function keyStats(rows: Map<string, DayRow>, day: string, isToday: boolean, keys: DashboardKey[]): KeyStat[] {
-  const specs = statSpecs(rows.get(day), isToday);
+export function keyStats(rows: Map<string, DayRow>, day: string, isToday: boolean, keys: DashboardKey[], strength?: Map<string, number>): KeyStat[] {
+  const specs = statSpecs(rows.get(day), isToday, rows, strength);
   return keys.map((key) => {
     const { pick, ...s } = specs[key];
     const { mean, sd } = priorStats(rows, day, pick);
@@ -281,7 +325,7 @@ export function keyStats(rows: Map<string, DayRow>, day: string, isToday: boolea
 
 /** Catalogue metrics with no value on `day` or in the 30 days before it: the editor marks them "No data yet". */
 function emptyKeys(rows: Map<string, DayRow>, day: string, isToday: boolean): DashboardKey[] {
-  const specs = statSpecs(rows.get(day), isToday);
+  const specs = statSpecs(rows.get(day), isToday, rows);
   const days = Array.from({ length: 31 }, (_, k) => rows.get(addDays(day, -k))).filter((r): r is DayRow => !!r);
   return DASHBOARD_METRICS.map((m) => m.key).filter((key) => !days.some((r) => finite(specs[key].pick(r))));
 }

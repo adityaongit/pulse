@@ -254,7 +254,7 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
             variant="section"
             title="My Dashboard"
             // the reference app's pencil on the right of the section header opens the metric picker (spec §11 CD1).
-            action={<EditDashboard keys={vm.keyStats.map((s) => s.key).filter(isDashboardKey)} defaults={vm.dashboard.defaults} empty={vm.dashboard.empty} />}
+            action={<EditDashboard keys={vm.keyStats.map((s) => s.key).filter(isDashboardKey)} empty={vm.dashboard.empty} />}
             className="xl:flex xl:h-full xl:flex-col"
           >
             {/* One card per metric (V9, [latest-home-dashboard-1]). */}

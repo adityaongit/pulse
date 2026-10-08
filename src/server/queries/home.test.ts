@@ -7,6 +7,7 @@ import { recompute } from "../pipeline";
 import { copyDb, ctxFor, dayAt, OPTS, seeded, USER } from "../testing";
 import { getActivity } from "./activity";
 import { getFitness, getHealthHub, getHealthspan, getMonitor, getStress } from "./health";
+import { loadDays } from "./common";
 import { activityLogContext, getHome } from "./home";
 import { getJournal, getJournalInsights } from "./journal";
 import { getRecovery } from "./recovery";
@@ -83,14 +84,13 @@ describe("getHome", () => {
     expect(vm.dials.soFar).toBe(true);
     expect(vm.keyStats.map((s) => s.label)).toEqual([
       "Heart rate variability",
-      "Resting heart rate",
-      "Respiratory rate",
       "Sleep performance",
+      "Sleep consistency",
+      "Hours of sleep",
       "Stress Monitor",
-      "Calories",
+      "Resting heart rate",
+      "VO2 max",
       "Steps",
-      "Blood oxygen",
-      "Skin temperature",
     ]);
     expect(vm.keyStats.every((s) => s.average != null)).toBe(true);
     // Newest first: the night's sleep, which started the day, comes last.
@@ -151,7 +151,6 @@ describe("getHome", () => {
     expect(vm.dashboard.empty).toContain("glucose");
     expect(vm.dashboard.empty).not.toContain("distance");
     expect(vm.dashboard.empty).not.toContain("hrv");
-    expect(vm.dashboard.defaults).toEqual(DASHBOARD_DEFAULT);
     expect(vm.phone).toBeNull();
   });
 
@@ -165,7 +164,6 @@ describe("getHome", () => {
     // The demo seed writes the phone extras (distance, active minutes) beside steps and calories.
     expect(vm.phone?.map((s) => s.key)).toEqual(["steps", "distance", "calories", "active_minutes"]);
     expect(vm.phone?.[0]).toMatchObject({ label: "Steps", metric: { value: expect.any(Number) }, average: expect.any(Number) });
-    expect(vm.dashboard.defaults).toEqual(PHONE_DEFAULT);
     expect(vm.keyStats.map((s) => s.key)).toEqual(PHONE_DEFAULT);
     // A band-off day with no phone data either keeps the plain empty state.
     expect((await getHome(dayAt(156), ctxFor(c))).phone).toBeNull();
@@ -177,16 +175,42 @@ describe("getHome", () => {
       if (keys.length) await db.insert(dashboardMetrics).values(keys.map((key, position) => ({ userId: USER, key, position })));
     };
     const keys = async () => (await getHome(dayAt(179), ctxFor(db))).keyStats.map((s) => s.key);
-    const all = ["hrv", "rhr", "resp", "sleep", "stress", "calories", "steps", "spo2", "skin"];
     try {
-      expect(await keys()).toEqual(all);
-      await set(["steps", "vo2max", "hrv"]);
+      expect(await keys()).toEqual(DASHBOARD_DEFAULT);
+      await set(["steps", "not_a_metric", "hrv"]);
       expect(await keys()).toEqual(["steps", "hrv"]);
       expect((await getHome(dayAt(179), ctxFor(db))).keyStats[0]).toMatchObject({ label: "Steps", href: "/metric/steps", direction: "up" });
-      await set(["vo2max"]);
-      expect(await keys()).toEqual(all);
+      await set(["not_a_metric"]);
+      expect(await keys()).toEqual(DASHBOARD_DEFAULT);
     } finally {
       await set([]);
+    }
+  });
+
+  it("the reference app's rows: weekly totals over seven days, restorative share, lean mass, links to their Trend Views", async () => {
+    const keys = ["zones13", "zones_all", "strength", "restorative_pct", "restorative", "debt", "recovery", "strain", "lean_mass"];
+    await db.delete(dashboardMetrics).where(eq(dashboardMetrics.userId, USER));
+    await db.insert(dashboardMetrics).values(keys.map((key, position) => ({ userId: USER, key, position })));
+    try {
+      const day = dayAt(170);
+      const vm = await getHome(day, ctxFor(db));
+      const by = Object.fromEntries(vm.keyStats.map((s) => [s.key, s]));
+      expect(vm.keyStats.map((s) => s.key)).toEqual(keys);
+      // The 7-day total covers each of the 7 days' zone minutes.
+      const week = await loadDays(ctxFor(db), dayAt(164), day);
+      const zone13 = [...week.values()].reduce((a, r) => a + (r.s1 && r.s1.hrCount > 0 ? (r.s1.zoneSeconds[0] + r.s1.zoneSeconds[1] + r.s1.zoneSeconds[2]) / 60 : 0), 0);
+      expect(by.zones13.metric.value).toBeCloseTo(zone13, 3);
+      expect(by.zones_all.metric.value!).toBeGreaterThanOrEqual(by.zones13.metric.value!);
+      expect(by.zones13).toMatchObject({ href: "/trend/zones13", unit: "min" });
+      expect(by.strength.metric.value).toBeGreaterThanOrEqual(0);
+      expect(by.restorative_pct.metric.value!).toBeGreaterThan(0);
+      expect(by.restorative_pct.metric.value!).toBeLessThan(100);
+      expect(by.debt).toMatchObject({ direction: "down", href: "/sleep" });
+      expect(by.recovery).toMatchObject({ unit: "%", href: "/trend/recovery" });
+      expect(by.strain).toMatchObject({ format: "decimal1", href: "/trend/strain" });
+      for (const k of keys.filter((k) => k !== "lean_mass")) expect(by[k].average, k).not.toBeNull();
+    } finally {
+      await db.delete(dashboardMetrics).where(eq(dashboardMetrics.userId, USER));
     }
   });
 

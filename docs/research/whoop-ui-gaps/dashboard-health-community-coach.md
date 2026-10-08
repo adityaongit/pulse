@@ -106,23 +106,23 @@ Build steps are listed in [activity-and-journal.md §3a](activity-and-journal.md
 | # | Plan | Status |
 |---|---|---|
 | 1 | Stress Monitor as a dashboard tile | Done (R24, Home phase) |
-| 2 | Step 7: tile body: moon and walking icons, ticks to now, line toned by level | Open |
-| 3 | Step 7: Sleep Consistency and Hours of Sleep rows | Open |
-| 4 | Step 7: VO2 Max, Recovery and Day Strain rows | Open |
-| 5 | Step 7: HR Zones 1-3, 4-5 and All (weekly) and Strength Activity Time rows | Open |
-| 6 | Step 7: Restorative Sleep (%), Restorative Sleep (hours) and Sleep Debt rows | Open |
-| 7 | Step 7: Lean Body Mass row (weight × (1 − body fat)) | Open |
-| 8 | Step 7: the reference default set and order (phone default unchanged) | Open |
+| 2 | Step 7: tile body: moon and walking icons, ticks to now, line toned by level | Done (R41) |
+| 3 | Step 7: Sleep Consistency and Hours of Sleep rows | Done (R41) |
+| 4 | Step 7: VO2 Max, Recovery and Day Strain rows | Done (R41) |
+| 5 | Step 7: HR Zones 1-3, 4-5 and All (weekly) and Strength Activity Time rows | Done (R41) |
+| 6 | Step 7: Restorative Sleep (%), Restorative Sleep (hours) and Sleep Debt rows | Done (R41) |
+| 7 | Step 7: Lean Body Mass row (weight × (1 − body fat)) | Done (R41) |
+| 8 | Step 7: the reference default set and order (phone default unchanged) | Done (R41) |
 | 9 | "CUSTOMIZE" with a pencil, no aside | Done (R23, Home phase) |
-| 10 | Step 7: values without units (the accessible name keeps them) | Open |
-| 11 | Steps 1 and 7: full-screen editor with drag handles that also move by keyboard | Open |
-| 12 | Step 7: one outline SAVE; Reset to default goes | Open |
-| 13 | Steps 1 and 7: SUCCESS screen (`DoneScreen`) | Open |
+| 10 | Step 7: values without units (the accessible name keeps them) | Done (R41) |
+| 11 | Steps 1 and 7: full-screen editor with drag handles that also move by keyboard | Done (R41) |
+| 12 | Step 7: one outline SAVE; Reset to default goes | Done (R41) |
+| 13 | Steps 1 and 7: SUCCESS screen (`DoneScreen`) | Done (R41) |
 | 14 | Discover More promo cards | Out of scope (promotions) |
 | 15 | Step 8: Stress Monitor first, then the orb, Pace of Aging and Health Monitor | Open |
 | 16 | Step 8: orb without a card | Open |
 | 17 | Step 8: Pace of Aging card with GO TO HEALTHSPAN | Open |
-| 18 | Step 8: sparkline toned by level, white end dot | Open |
+| 18 | Step 8: sparkline toned by level, white end dot | Done (R41) |
 | 19 | "Upgrade to Access" promo | Out of scope (nothing to sell) |
 | 20 | Step 8: Blood Pressure Insights, behind a flag (no source) | Open |
 | 21 | Step 9: factor rows expand in place | Open |
