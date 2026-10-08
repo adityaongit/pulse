@@ -10,6 +10,8 @@ import { TAG_COPY, type MetricTag } from "@/lib/reasons"
 /** Shared type styles: the uppercase small label and the muted caption. */
 export const LABEL = "text-xs leading-4 font-bold tracking-[0.1em] uppercase"
 export const CAPTION = "text-xs leading-4 font-medium text-muted-foreground"
+/** Trims a text box to cap height and baseline, so a number centres optically beside an icon or between gaps. */
+export const CAP_TRIM = "leading-none [text-box:trim-both_cap_alphabetic]"
 /** A caps text link with an arrow ("Explore your sleep insights →", "View trend →"), the coach blue. */
 export const TEXT_LINK =
   "relative inline-flex items-center gap-1.5 self-start rounded-md text-xs leading-4 font-bold tracking-[0.1em] text-coach uppercase underline-offset-4 outline-none after:absolute after:-inset-x-1 after:-inset-y-3.5 hover:underline focus-visible:ring-3 focus-visible:ring-ring/50"

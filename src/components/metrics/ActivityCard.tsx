@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils"
 import { clock, formatValue, spoken } from "@/lib/format"
 import type { Metric } from "@/lib/reasons"
 import { Skeleton, SkeletonText } from "@/components/ui/skeleton"
+import { CAP_TRIM } from "./primitives"
 
 export type ActivityKind = "run" | "ride" | "walk" | "strength" | "workout"
 export const ACTIVITY_ICON: Record<ActivityKind, LucideIcon> = {
@@ -103,7 +104,7 @@ export function ActivityCard({ name, kind, strain, start, end, href, timeZone, d
       chip={
         <>
           <Icon aria-hidden className="size-4" strokeWidth={1.75} />
-          <span className={cn("font-numeric text-xl leading-6 font-bold tabular-nums", strain.value === null && "text-foreground-secondary")}>{value}</span>
+          <span className={cn("font-numeric text-xl font-bold tabular-nums", CAP_TRIM, strain.value === null && "text-foreground-secondary")}>{value}</span>
         </>
       }
       name={name}

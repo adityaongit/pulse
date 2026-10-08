@@ -13,7 +13,7 @@ import { useReducedMotion } from "@/hooks/use-reduced-motion"
 import { ChartContainer } from "@/components/ui/chart"
 import { SkeletonText } from "@/components/ui/skeleton"
 import { Wordmark } from "@/components/brand/Wordmark"
-import { MetricTags, type TagKind } from "./primitives"
+import { MetricTags, type TagKind, CAP_TRIM } from "./primitives"
 
 export type DialSize = "sm" | "md" | "lg"
 export type DialVariant = "recovery" | "strain" | "sleep" | "stat" | "gauge"
@@ -63,8 +63,8 @@ const SIZE = {
   lg: { box: "size-64 md:size-70", d: 256, ring: 17, value: "text-[31cqi] tracking-[-0.01em]" },
 } as const
 const COMPACT = { box: "size-16", d: 64, ring: 5, value: "text-[40cqi]" } as const
-// Trims each text box to cap height and baseline, so the cqi gaps between rows are the visible gaps.
-const TRIM = "leading-none [text-box:trim-both_cap_alphabetic]"
+// Each text box is trimmed to cap height and baseline, so the cqi gaps between rows are the visible gaps.
+const TRIM = CAP_TRIM
 
 const DIAL_LABEL = "text-xs leading-4 font-bold tracking-[0.1em] uppercase"
 const STATUS_LIT = { poor: "bg-warning", sufficient: "bg-foreground-secondary", optimal: "bg-optimal" } as const
