@@ -1,7 +1,8 @@
 // The Journal's default behaviours, shared by both data sources.
-import { and, eq, inArray } from "drizzle-orm";
+import { and, eq, inArray, notInArray } from "drizzle-orm";
 import { type Db, rows, sql } from "./db";
 import { journalTags } from "./db/schema";
+import { behavior } from "@/lib/behaviors";
 
 export const DEFAULT_JOURNAL_TAGS = [
   { tag: "alcohol", label: "Alcohol" },
@@ -78,4 +79,24 @@ export async function reorderTags(db: Db, userId: number, tags: string[]): Promi
     }
   });
   return true;
+}
+
+/**
+ * Makes `tags` the behaviours the journal asks: adds catalogue behaviours the user has no row for (at the end), shows
+ * the chosen ones and hides the rest. "unknown" for a key neither in the catalogue nor the user's; "full" past MAX_TAGS.
+ */
+export async function selectTags(db: Db, userId: number, tags: string[]): Promise<"saved" | "unknown" | "full"> {
+  const mine = new Set((await db.select({ tag: journalTags.tag }).from(journalTags).where(eq(journalTags.userId, userId))).map((r) => r.tag));
+  const added = [...new Set(tags)].filter((t) => !mine.has(t));
+  if (added.some((t) => !behavior(t))) return "unknown";
+  if (mine.size + added.length > MAX_TAGS) return "full";
+  const [{ max }] = await rows<{ max: number }>(db, sql`select coalesce(max(position), 0)::int as max from journal_tags where user_id = ${userId}`);
+  await db.transaction(async (tx) => {
+    if (added.length) {
+      await tx.insert(journalTags).values(added.map((t, i) => ({ userId, tag: t, label: behavior(t)!.label, position: max + 1 + i }))).onConflictDoNothing();
+    }
+    await tx.update(journalTags).set({ hidden: true }).where(and(eq(journalTags.userId, userId), notInArray(journalTags.tag, tags.length ? tags : [""])));
+    if (tags.length) await tx.update(journalTags).set({ hidden: false }).where(and(eq(journalTags.userId, userId), inArray(journalTags.tag, tags)));
+  });
+  return "saved";
 }

@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { beforeAll, describe, expect, it, vi } from "vitest";
 import type { Db } from "@/server/db";
-import { journalEntries, oauthTokens } from "@/server/db/schema";
+import { journalEntries, journalNotes, oauthTokens } from "@/server/db/schema";
 import { toCsv } from "@/server/export";
 import { addTag } from "@/server/journalTags";
 import { saveProfile } from "@/server/profile";
@@ -35,6 +35,7 @@ beforeAll(async () => {
   const other = await addUser(db);
   await addTag(db, other, "other_tag", OTHER_LABEL);
   await db.insert(journalEntries).values({ userId: other, day: "2026-10-01", tag: "other_tag", value: 1 });
+  await db.insert(journalNotes).values([{ userId: USER, day: "2026-10-01", text: "Mine" }, { userId: other, day: "2026-10-01", text: "Theirs" }]);
 });
 
 describe("/export/daily and /export/journal", () => {
@@ -75,10 +76,11 @@ describe("/export/daily and /export/journal", () => {
 
   it("journal CSV defuses formulas in user labels; the JSON lists behaviours; no secrets", async () => {
     const csv = await (await journal(req("/export/journal?format=csv"))).text();
-    expect(csv.split("\r\n")[0]).toBe("day,behaviour,label,answer");
-    expect(csv).toContain(`2026-10-01,'=cmd,"'=HYPERLINK(""x"")",1`);
+    expect(csv.split("\r\n")[0]).toBe("day,behaviour,label,answer,follow_up");
+    expect(csv).toContain(`2026-10-01,'=cmd,"'=HYPERLINK(""x"")",1,`);
     noSecrets(csv);
-    const json = (await (await journal(req("/export/journal?format=json"))).json()) as { behaviours: { tag: string; custom: boolean }[]; entries: unknown[] };
+    const json = (await (await journal(req("/export/journal?format=json"))).json()) as { behaviours: { tag: string; custom: boolean }[]; entries: unknown[]; notes: unknown[] };
+    expect(json.notes).toEqual([{ day: "2026-10-01", text: "Mine" }]);
     expect(json.behaviours.find((b) => b.tag === "alcohol")).toMatchObject({ custom: false });
     expect(json.entries.length).toBeGreaterThan(100);
     noSecrets(JSON.stringify(json));

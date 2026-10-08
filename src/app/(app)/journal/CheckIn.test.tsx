@@ -4,8 +4,8 @@ import type { JournalTag } from "@/server/queries/types"
 import { ShellStatusProvider } from "@/components/shells/ShellStatus"
 import { CheckIn, CheckInSheet, changedEntries } from "./CheckIn"
 
-const tags: JournalTag[] = [{ tag: "alcohol", label: "Alcohol", group: "evening", isDefault: true, hidden: false }]
-const checkIn = { done: true, entries: { alcohol: 1 }, yes: [{ tag: "alcohol", label: "Alcohol" }] }
+const tags: JournalTag[] = [{ tag: "alcohol", label: "Alcohol", question: "Had any alcohol?", section: "nighttime", isDefault: true, hidden: false }]
+const checkIn = { done: true, entries: { alcohol: 1 }, details: {}, note: "", yes: [{ tag: "alcohol", label: "Alcohol" }] }
 const h = vi.hoisted(() => ({
   save: vi.fn<(input: unknown) => Promise<{ ok: true; data: undefined }>>(async () => ({ ok: true, data: undefined })),
   load: vi.fn(),

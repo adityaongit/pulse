@@ -13,6 +13,7 @@ import {
   healthRecords,
   intradaySeries,
   journalEntries,
+  journalNotes,
   journalTags,
   loggedEntries,
   oauthTokens,
@@ -148,8 +149,9 @@ beforeAll(async () => {
   ]);
   await db.insert(journalEntries).values([
     { ...user, day: TODAY, tag: "intruder_tag", value: 1 },
-    { ...user, day: PAST, tag: "alcohol", value: 1 },
+    { ...user, day: PAST, tag: "alcohol", value: 1, detail: 777 },
   ]);
+  await db.insert(journalNotes).values({ ...user, day: TODAY, text: "INTRUDER note" });
   await db.insert(reports).values({ ...user, period: "1999-W01", data: { ...(r1.data as object), start: "1999-01-04", end: "1999-01-10" } });
   await db.insert(healthRecords).values([
     { ...user, id: "INTRUDER-ecg", kind: "ecg", ts: NOW - 86400, day: dayAt(178), data: { result: "ATRIAL_FIBRILLATION", avgBpm: 177.7 } },

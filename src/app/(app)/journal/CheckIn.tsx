@@ -5,7 +5,8 @@ import { useSearchParams } from "next/navigation"
 import { LoaderCircle } from "lucide-react"
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"
-import { TAG_GROUPS, tagIcon } from "@/lib/journal"
+import { JOURNAL_SECTIONS } from "@/lib/behaviors"
+import { tagIcon } from "@/lib/journal"
 import { DAY, formatDay } from "@/lib/format"
 import { haptic } from "@/lib/haptics"
 import { enqueue } from "@/lib/offline-queue"
@@ -277,8 +278,8 @@ export function CheckInSheet() {
               <LoaderCircle aria-hidden className="size-5 animate-spin text-muted-foreground motion-reduce:animate-none" strokeWidth={2} />
             </div>
           ))}
-        {data && TAG_GROUPS.map((g) => {
-          const items = tags.filter((t) => t.group === g.key)
+        {data && JOURNAL_SECTIONS.map((g) => {
+          const items = tags.filter((t) => t.section === g.key)
           if (!items.length && g.key !== "custom") return null
           return (
             <section key={g.key} aria-labelledby={`checkin-${g.key}`} className="mt-6 first:mt-2">

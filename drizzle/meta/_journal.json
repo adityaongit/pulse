@@ -43,6 +43,13 @@
       "when": 1791296734680,
       "tag": "0005_lively_the_enforcers",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1791470352596,
+      "tag": "0006_mixed_talisman",
+      "breakpoints": true
     }
   ]
 }

@@ -338,8 +338,21 @@ export const journalEntries = pgTable(
     day: day("day").notNull(),
     tag: text("tag").notNull(),
     value: integer("value").notNull(),
+    /** The follow-up answer for a "yes" (src/lib/behaviors.ts): minutes after midnight or a count. Null when not asked or skipped. */
+    detail: integer("detail"),
   },
   (t) => [primaryKey({ columns: [t.userId, t.day, t.tag] })],
+);
+
+/** The journal's free-text note for a day (journal-02). No row means no note. */
+export const journalNotes = pgTable(
+  "journal_notes",
+  {
+    userId: userId(),
+    day: day("day").notNull(),
+    text: text("text").notNull(),
+  },
+  (t) => [primaryKey({ columns: [t.userId, t.day] })],
 );
 
 /** Days whose HR or steps changed; stage 1 of the pipeline recomputes them, then clears the row. */

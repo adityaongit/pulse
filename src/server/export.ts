@@ -2,7 +2,7 @@
 // oauth_tokens or anything account-level: the files only read the user's own rows of the tables below.
 import { asc, eq } from "drizzle-orm";
 import { rows as query, sql } from "./db";
-import { journalTags } from "./db/schema";
+import { journalNotes, journalTags } from "./db/schema";
 import { firstDay, loadDays, type QueryCtx, todayOf } from "./queries/common";
 import { TREND_METRICS } from "./queries/trends";
 
@@ -27,15 +27,23 @@ export async function dailyTable(ctx: QueryCtx): Promise<Table> {
   return { columns, rows };
 }
 
-/** Journal answers, one row per (day, behaviour): answer 1 for yes (or a count), 0 for no. Hidden behaviours included. */
+/**
+ * Journal answers, one row per (day, behaviour): answer 1 for yes (or a count), 0 for no, and the follow-up answer
+ * (minutes after midnight or a count) when there is one. Hidden behaviours included.
+ */
 export async function journalTable(ctx: QueryCtx): Promise<Table> {
-  const rows = await query<{ day: string; tag: string; label: string; value: number }>(
+  const rows = await query<{ day: string; tag: string; label: string; value: number; detail: number | null }>(
     ctx.db,
-    sql`select e.day, e.tag, coalesce(t.label, e.tag) label, e.value from journal_entries e
+    sql`select e.day, e.tag, coalesce(t.label, e.tag) label, e.value, e.detail from journal_entries e
       left join journal_tags t on t.user_id = e.user_id and t.tag = e.tag
       where e.user_id = ${ctx.userId} order by e.day, e.tag`,
   );
-  return { columns: ["day", "behaviour", "label", "answer"], rows: rows.map((r) => [r.day, r.tag, r.label, r.value]) };
+  return { columns: ["day", "behaviour", "label", "answer", "follow_up"], rows: rows.map((r) => [r.day, r.tag, r.label, r.value, r.detail]) };
+}
+
+/** The journal's notes, one per day, for the journal JSON. */
+export async function journalNoteList(ctx: QueryCtx) {
+  return ctx.db.select({ day: journalNotes.day, text: journalNotes.text }).from(journalNotes).where(eq(journalNotes.userId, ctx.userId)).orderBy(asc(journalNotes.day));
 }
 
 /** The behaviour list itself, for the journal JSON. */

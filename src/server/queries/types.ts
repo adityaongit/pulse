@@ -1,3 +1,4 @@
+import type { JournalSection } from "@/lib/behaviors";
 import type { BehaviorChip } from "@/core/algorithms/behaviorChips";
 // View models returned by server/queries, one per screen (spec §7). Shapes mirror the U12 kit props
 // (src/lib/reasons.ts Metric, ZoneBars' ZoneRow, DriverList's DriverItem…), importing only types from the kit.
@@ -432,7 +433,8 @@ export type FitnessVM = {
 
 // ── Journal ──────────────────────────────────────────────────────────────────
 
-export type JournalTag = { tag: string; label: string; group: "evening" | "recovery" | "context" | "custom"; isDefault: boolean; hidden: boolean };
+/** A behaviour: its journal question and section come from the catalogue (src/lib/behaviors.ts); a custom one sits under "custom". */
+export type JournalTag = { tag: string; label: string; question: string; section: JournalSection; isDefault: boolean; hidden: boolean };
 
 /** More › Behaviours: every tag in check-in order, hidden ones included, with its answered-day count. */
 export type BehavioursVM = { tags: (JournalTag & { answers: number })[] };
@@ -442,7 +444,7 @@ export type JournalVM = {
   today: string;
   strip: { day: string; done: boolean }[];
   tags: JournalTag[];
-  checkIn: { done: boolean; entries: Record<string, number>; yes: { tag: string; label: string }[] };
+  checkIn: { done: boolean; entries: Record<string, number>; details: Record<string, number>; note: string; yes: { tag: string; label: string }[] };
   teaser: { text: string; ready: boolean };
   history: { day: string; yes: string[] }[];
 };

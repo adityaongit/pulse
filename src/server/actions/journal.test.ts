@@ -1,12 +1,12 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { and, asc, eq, inArray } from "drizzle-orm";
 import type { Db } from "../db";
-import { intradayDirty, journalEntries, journalTags } from "../db/schema";
+import { intradayDirty, journalEntries, journalNotes, journalTags } from "../db/schema";
 import { DEFAULT_JOURNAL_TAGS, ensureDefaultTags, MAX_TAGS } from "../journalTags";
 import { needsRecompute } from "../pipeline";
 import { saveProfile } from "../profile";
 import { addUser, freshDb, USER } from "../testing";
-import { addCustomTag, loadCheckIn, reorderBehaviours, saveJournalEntry, setBehaviourHidden } from "./journal";
+import { addCustomTag, loadCheckIn, reorderBehaviours, saveBehaviors, saveJournalEntry, saveJournalNote, setBehaviourHidden } from "./journal";
 
 const h = vi.hoisted(() => ({ db: undefined as unknown, revalidate: vi.fn(), requestSync: vi.fn(), user: null as unknown }));
 vi.mock("../worker", () => ({ requestSync: h.requestSync }));
@@ -202,5 +202,42 @@ describe("per user", () => {
     await setBehaviourHidden({ tag: "alcohol", hidden: false });
     // Same key, two users: both can have it.
     expect(await addCustomTag({ label: "Their tag" })).toEqual({ ok: true, data: { tag: "their_tag" } });
+  });
+});
+
+describe("follow-ups, notes and Select Behaviors", () => {
+  it("keeps a follow-up answer only with a yes", async () => {
+    await saveJournalEntry({ day: "2026-10-01", tag: "alcohol", value: true, detail: 3 });
+    await saveJournalEntry({ day: "2026-10-02", tag: "alcohol", value: false, detail: 3 });
+    const rows = await db.select({ day: journalEntries.day, detail: journalEntries.detail }).from(journalEntries).where(eq(journalEntries.userId, USER)).orderBy(journalEntries.day);
+    expect(rows).toEqual([{ day: "2026-10-01", detail: 3 }, { day: "2026-10-02", detail: null }]);
+    expect(await saveJournalEntry({ day: "2026-10-01", tag: "alcohol", value: true, detail: 2000 })).toMatchObject({ ok: false });
+    const r = await loadCheckIn("2026-10-01");
+    expect(r.ok && r.data.checkIn.details).toEqual({ alcohol: 3 });
+  });
+
+  it("saves, replaces and clears a day's note, for this user only, never for a future day", async () => {
+    const notes = () => db.select({ userId: journalNotes.userId, day: journalNotes.day, text: journalNotes.text }).from(journalNotes);
+    expect(await saveJournalNote({ day: "2026-10-03", text: "  Slept at a friend's  " })).toEqual({ ok: true, data: undefined });
+    await saveJournalNote({ day: "2026-10-03", text: "Slept badly" });
+    expect(await notes()).toEqual([{ userId: USER, day: "2026-10-03", text: "Slept badly" }]);
+    const r = await loadCheckIn("2026-10-03");
+    expect(r.ok && r.data.checkIn.note).toBe("Slept badly");
+    expect(await saveJournalNote({ day: "2026-10-04", text: "Later" })).toMatchObject({ ok: false });
+    await saveJournalNote({ day: "2026-10-03", text: "   " });
+    expect(await notes()).toEqual([]);
+  });
+
+  it("asks exactly the chosen behaviours: adds catalogue ones, hides the rest, refuses unknown keys whole", async () => {
+    expect(await saveBehaviors({ tags: ["mouth_tape", "illness", "electrolytes"] })).toEqual({ ok: true, data: undefined });
+    const shown = async () => (await allTags()).filter((t) => !t.hidden).map((t) => t.tag).sort();
+    expect(await shown()).toEqual(["electrolytes", "illness", "mouth_tape"]);
+    expect((await allTags()).find((t) => t.tag === "mouth_tape")).toMatchObject({ label: "Mouth tape", isDefault: false });
+    expect(await saveBehaviors({ tags: ["illness", "not_a_behaviour"] })).toMatchObject({ ok: false });
+    expect(await shown()).toEqual(["electrolytes", "illness", "mouth_tape"]);
+    // The other user's list is untouched.
+    const theirs = await db.select().from(journalTags).where(eq(journalTags.userId, other));
+    expect(theirs.every((t) => !t.hidden) && theirs.some((t) => t.tag === "mouth_tape")).toBe(false);
+    await saveBehaviors({ tags: DEFAULT_JOURNAL_TAGS.map((d) => d.tag) });
   });
 });

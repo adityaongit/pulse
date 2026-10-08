@@ -5,7 +5,8 @@ import { useRouter } from "next/navigation"
 import { ArrowDown, ArrowUp } from "lucide-react"
 import { toast } from "sonner"
 import { cn, moved } from "@/lib/utils"
-import { TAG_GROUPS, tagIcon } from "@/lib/journal"
+import { JOURNAL_SECTIONS } from "@/lib/behaviors"
+import { tagIcon } from "@/lib/journal"
 import { addCustomTag, reorderBehaviours, setBehaviourHidden } from "@/server/actions/journal"
 import type { BehavioursVM } from "@/server/queries/types"
 import { SectionShell } from "@/components/shells/SectionShell"
@@ -86,8 +87,8 @@ export function Behaviours({ vm }: { vm: BehavioursVM }) {
       <p className="max-w-[65ch] text-[15px] leading-[22px] text-pretty text-foreground-secondary">
         Choose what the check-in asks. A hidden behaviour leaves the check-in, but its past answers stay and still count in your insights.
       </p>
-      {TAG_GROUPS.map((g) => {
-        const group = tags.filter((t) => t.group === g.key)
+      {JOURNAL_SECTIONS.map((g) => {
+        const group = tags.filter((t) => t.section === g.key)
         if (!group.length && g.key !== "custom") return null
         return (
           <SectionShell key={g.key} variant="card" level={2} title={g.title} id={`group-${g.key}`}>

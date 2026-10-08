@@ -133,9 +133,9 @@ describe("Behaviours", () => {
     expect(await reorderTags(db, USER, ["sauna", "meditation", "stretching"])).toBe(true);
     await addTag(db, USER, "cold_plunge", "Cold plunge");
     const tags = (await getJournal(todayOf(ctx), ctx)).tags;
-    expect(tags.filter((t) => t.group === "recovery").map((t) => t.tag)).toEqual(["sauna", "meditation", "stretching"]);
-    expect(tags.filter((t) => t.group === "evening").map((t) => t.tag)).toEqual(["alcohol", "late_caffeine", "late_meal", "screen_in_bed"]);
-    expect(tags.at(-1)).toMatchObject({ tag: "cold_plunge", group: "custom", hidden: false });
+    expect(tags.filter((t) => t.section === "daytime").map((t) => t.tag)).toEqual(["late_caffeine", "sauna", "meditation", "stretching"]);
+    expect(tags.filter((t) => t.section === "nighttime").map((t) => t.tag)).toEqual(["alcohol", "late_meal", "screen_in_bed"]);
+    expect(tags.at(-1)).toMatchObject({ tag: "cold_plunge", section: "custom", question: "Cold plunge?", hidden: false });
     expect(await reorderTags(db, USER, ["sauna", "unknown"])).toBe(false);
   });
 });
