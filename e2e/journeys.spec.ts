@@ -83,7 +83,7 @@ test("4. bedtime plan: Home's Tonight's sleep → the Sleep planner", async ({ p
   for (const goal of ["Peak", "Perform", "Get by"]) await expect(planner.getByText(goal, { exact: true })).toBeVisible();
 });
 
-test("5. healthspan: Health → Healthspan → header collapses → contributor sheet", async ({ page }) => {
+test("5. healthspan: Health → Healthspan → header collapses → a factor opens in place → its Trend View", async ({ page }) => {
   await page.goto("/health");
   await page.getByRole("link", { name: "Go to Healthspan" }).click();
   await expect(page).toHaveURL(url("/health/healthspan"));
@@ -99,12 +99,11 @@ test("5. healthspan: Health → Healthspan → header collapses → contributor 
 
   const vo2 = page.getByRole("button", { name: /^VO2 max/ });
   await vo2.click();
-  const sheet = page.getByRole("dialog");
-  await expect(sheet).toBeVisible();
-  await expect(sheet.getByRole("heading", { name: /VO2 max/ })).toBeVisible();
-  await page.keyboard.press("Escape");
-  await expect(sheet).toBeHidden();
-  await expect(vo2).toBeFocused();
+  await expect(vo2).toHaveAttribute("aria-expanded", "true");
+  const panel = page.getByRole("region", { name: /^VO2 max/ });
+  await expect(panel.getByText(/^(Outperforming|On track|Room to improve)$/)).toBeVisible();
+  await panel.getByRole("link", { name: "View trend" }).click();
+  await expect(page).toHaveURL(/\/trend\/vo2max$/);
 });
 
 test("6. illness week: Home alert → Health Monitor flags", async ({ page }) => {

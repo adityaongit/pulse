@@ -345,12 +345,19 @@ export type HealthspanContributor = {
   group: "sleep" | "strain" | "fitness";
   label: string;
   unit: string;
+  /** The 6-month mean the score uses. */
   metric: Metric<number>;
+  /** The 30-day mean (the Pace of Aging window); null when unknown. */
+  recent: number | null;
   target: number;
   years: number | null;
   domain: [number, number];
   higherIsBetter: boolean;
   caption?: string;
+  /** "Outperforming" and its sentence (src/core/algorithms/healthspanFactor.ts); null without a value. */
+  state: { title: string; body: string } | null;
+  /** The factor's Trend View. */
+  trendHref: string;
   explanation: string;
   source: string;
 };

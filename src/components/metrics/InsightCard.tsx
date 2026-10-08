@@ -1,6 +1,8 @@
 import Link from "next/link"
+import { cn } from "@/lib/utils"
 import { ArrowRight } from "lucide-react"
 import { SkeletonText } from "@/components/ui/skeleton"
+import { TEXT_LINK } from "./primitives"
 
 export type InsightCardProps = {
   title?: string
@@ -27,7 +29,7 @@ export function InsightCard({ title, body, action }: InsightCardProps) {
             href={action.href}
             // An in-page anchor replaces the entry, so Back still leaves the screen in one press (spec §8, journey 1).
             replace={action.href.startsWith("#")}
-            className="relative mt-auto inline-flex items-center gap-1.5 self-start rounded-md text-xs leading-4 font-bold tracking-[0.1em] text-coach uppercase underline-offset-4 outline-none after:absolute after:-inset-x-1 after:-inset-y-3.5 hover:underline focus-visible:ring-3 focus-visible:ring-ring/50"
+            className={cn(TEXT_LINK, "mt-auto")}
           >
             {action.label}
             <ArrowRight aria-hidden className="size-3.5" strokeWidth={2} />

@@ -107,19 +107,12 @@ export function SelectableImpact() {
 const HS_ICON: Record<string, React.ReactNode> = { vo2: <CircleGauge />, rhr: <Heart />, lean: <CircleGauge /> }
 
 export function HealthspanList() {
-  const [open, setOpen] = React.useState<string | null>(null)
-  const item = healthspan.find((h) => h.key === open)
   return (
-    <>
-      <div className="divide-y divide-border">
-        {healthspan.map(({ key, ...h }) => (
-          <ContributorRow key={key} variant="healthspan" icon={HS_ICON[key]} {...h} onSelect={() => setOpen(key)} />
-        ))}
-      </div>
-      <ResponsiveSheet open={!!open} onOpenChange={(o) => !o && setOpen(null)} title={item?.label ?? ""}>
-        <p className="text-[15px] leading-[22px] text-foreground-secondary">Contributor detail sheet (journey 5).</p>
-      </ResponsiveSheet>
-    </>
+    <div className="divide-y divide-border">
+      {healthspan.map(({ key, ...h }) => (
+        <ContributorRow key={key} variant="healthspan" icon={HS_ICON[key]} {...h} />
+      ))}
+    </div>
   )
 }
 

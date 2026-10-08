@@ -20,6 +20,13 @@ describe("getTrendView", () => {
     }
   });
 
+  it("VO2 max and lean body mass are a Health pair of line charts with a typical range", async () => {
+    const vo2 = await getTrendView("vo2max", dayAt(150), "m", 0, ctxFor(db));
+    expect(vo2.options.map((o) => o.key)).toEqual(["vo2max", "lean_mass"]);
+    expect(vo2.value).toBeGreaterThan(20);
+    expect(vo2.typical![0]).toBeLessThan(vo2.typical![1]);
+  });
+
   it("steps back whole periods and compares with the one before", async () => {
     const now = await getTrendView("hrv", dayAt(150), "m", 0, ctxFor(db));
     const back = await getTrendView("hrv", dayAt(150), "m", 1, ctxFor(db));

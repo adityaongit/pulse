@@ -22,8 +22,9 @@ import type { StrainTarget } from "@/core/algorithms/strainTarget";
  * zones, resting HR, time in zones, skin-temperature baseline and personal ranges), four named zones. 7: five
  * display zones on heart-rate reserve (Strain's and WHOOP's 50/60/70/80/90%) in place of Google's four. 8: max HR
  * no longer from Google's PEAK zone (a flat 220), so zones and Strain use the person's own or Tanaka's.
+ * 10: each Healthspan factor keeps its 30-day mean beside the 6-month one (health-03's two markers).
  */
-export const SCORING_VERSION = 9;
+export const SCORING_VERSION = 10;
 
 export type PipelineOptions = {
   /** Whose data: every read and write is scoped to this user. */

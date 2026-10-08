@@ -132,6 +132,8 @@ export interface HealthspanContribution {
   key: HealthspanInput;
   /** The window's value, in the curve's units (weekly minutes for zones and strength, FFMI for lean mass). */
   value: number;
+  /** The same input over the last 30 days (the Pace of Aging window); absent in results stored before it existed. */
+  recent?: number;
   reference: number;
   /** Signed years added to Pulse Age (renormalized and shrunk; they sum to the unclamped Δage). */
   years: number;
@@ -237,7 +239,7 @@ export function healthspan(days: HealthspanDay[], profile: HealthspanProfile, as
     deltaYears,
     // Unclamped deltas, so a change still shows while Pulse Age sits at the clamp.
     paceOfAging: clamp(1 + (b.years - a.years) / cfg.paceScaleYears, cfg.paceMin, cfg.paceMax),
-    contributions: a.contributions,
+    contributions: a.contributions.map((c) => ({ ...c, recent: short[c.key] ?? c.value })),
     vo2maxSource: long.vo2max == null ? null : run ? "run" : "daily",
     dataDays: withData.length,
     provisional: withData.length < cfg.minDays,

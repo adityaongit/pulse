@@ -125,11 +125,11 @@ Build steps are listed in [activity-and-journal.md §3a](activity-and-journal.md
 | 18 | Step 8: sparkline toned by level, white end dot | Done (R41) |
 | 19 | "Upgrade to Access" promo | Out of scope (nothing to sell) |
 | 20 | Step 8: Blood Pressure Insights, behind a flag (no source) | Hidden (R42, `FEATURES.bloodPressure`) |
-| 21 | Step 9: factor rows expand in place | Open |
-| 22 | Step 9: 6-month and 30-day markers; the age target moves into the row's text | Open |
-| 23 | Step 9: segmented bar with end labels, years on the right | Open |
-| 24 | Step 9: per-state copy ("Outperforming") | Open |
-| 25 | Step 9: VIEW TREND to the factor's Trend View | Open |
+| 21 | Step 9: factor rows expand in place | Done (R43) |
+| 22 | Step 9: 6-month and 30-day markers; the age target moves into the row's text | Done (R43) |
+| 23 | Step 9: segmented bar with end labels, years on the right | Done (R43) |
+| 24 | Step 9: per-state copy ("Outperforming") | Done (R43) |
+| 25 | Step 9: VIEW TREND to the factor's Trend View | Done (R43) |
 | 26 | Community tab | Out of scope (no community) |
 | 27 | Teams list | Out of scope (no community) |
 | 28 | Recommended Teams | Out of scope (no community) |

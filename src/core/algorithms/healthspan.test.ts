@@ -152,6 +152,8 @@ describe("Pace of Aging", () => {
     // 6-month mean 58.33 bpm vs 30-day 50 bpm.
     expect(better.paceOfAging).toBeCloseTo(1 + (years(-Math.log(1.09)) - years((-10 / 60) * Math.log(1.09))) / 5, 10);
     expect(better.paceOfAging).toBeLessThan(1);
+    // Each factor carries its 30-day value beside the 6-month one.
+    expect(better.contributions.find((c) => c.key === "restingHr")).toMatchObject({ value: expect.closeTo(58.33, 2), recent: 50 });
     expect(run(series(180, (ago) => ({ restingHr: ago < 30 ? 75 : 60 }))).paceOfAging).toBeGreaterThan(1);
   });
 

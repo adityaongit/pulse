@@ -1,4 +1,7 @@
 // Health hub and its four detail screens (spec §7.6–7.10).
+import { factorCopy } from "@/core/algorithms/healthspanFactor";
+import { trendHref } from "@/lib/url";
+import type { TrendViewKey } from "./trendView";
 import type { HealthspanContribution } from "@/core/algorithms/healthspan";
 import { minChronic } from "@/core/scoring/readiness";
 import { standardConfig } from "@/core/scoring/trainingLoad";
@@ -113,7 +116,7 @@ async function latestHr(ctx: QueryCtx) {
 
 // ── Healthspan ──────────────────────────────────────────────────────────────
 
-const HS_META: Record<string, Omit<HealthspanContributor, "metric" | "target" | "years" | "caption" | "key">> = {
+const HS_META: Record<string, Omit<HealthspanContributor, "metric" | "recent" | "target" | "years" | "caption" | "key" | "state" | "trendHref">> = {
   sleepHours: {
     group: "sleep",
     label: "Hours of sleep",
@@ -198,6 +201,18 @@ const HS_META: Record<string, Omit<HealthspanContributor, "metric" | "target" | 
   },
 };
 const HS_ORDER = ["sleepHours", "sri", "zone13", "zone45", "strength", "steps", "vo2max", "restingHr", "leanMass"];
+/** Each factor's Trend View (health-03's VIEW TREND). */
+const HS_TREND: Record<string, TrendViewKey> = {
+  sleepHours: "hours",
+  sri: "consistency",
+  zone13: "zones13",
+  zone45: "zones45",
+  strength: "strength",
+  steps: "steps",
+  vo2max: "vo2max",
+  restingHr: "rhr",
+  leanMass: "lean_mass",
+};
 
 /** Healthspan `/health/healthspan` for the ISO week containing `day` (spec §7.7). Updated weekly. */
 export async function getHealthspan(day: string, ctx: QueryCtx): Promise<HealthspanVM> {
@@ -235,8 +250,11 @@ export async function getHealthspan(day: string, ctx: QueryCtx): Promise<Healths
       ...meta,
       domain,
       metric: c ? ok(display(c.value), result.provisional) : none("no_data"),
+      recent: c?.recent != null ? display(c.recent) : null,
       target,
       years: c ? c.years : null,
+      state: c ? factorCopy(meta.label, c.years) : null,
+      trendHref: trendHref(HS_TREND[key]),
       ...(caption && { caption }),
     };
   });

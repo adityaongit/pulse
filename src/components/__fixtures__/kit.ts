@@ -126,9 +126,9 @@ export const contributors = [
 ] satisfies RecoveryContributor[]
 
 export const healthspan = [
-  { key: "vo2", label: "VO2 max", metric: ok(58), unit: "ml/kg/min", format: "int", domain: [15, 70], target: 52, years: -5.3, higherIsBetter: true },
-  { key: "rhr", label: "Resting heart rate", metric: ok(47.3), unit: "bpm", format: "decimal1", domain: [35, 100], target: 55, years: -0.7, higherIsBetter: false },
-  { key: "lean", label: "Lean body mass", metric: why<number>("no_data"), unit: "%", format: "int", domain: [50, 90], target: 75, years: null, higherIsBetter: true },
+  { key: "vo2", label: "VO2 max", metric: ok(58), unit: "ml/kg/min", format: "int", domain: [15, 70], recent: 55, years: -5.3, higherIsBetter: true },
+  { key: "rhr", label: "Resting heart rate", metric: ok(47.3), unit: "bpm", format: "decimal1", domain: [35, 100], recent: 49, years: -0.7, higherIsBetter: false },
+  { key: "lean", label: "Lean body mass", metric: why<number>("no_data"), unit: "%", format: "int", domain: [50, 90], recent: null, years: null, higherIsBetter: true },
 ] satisfies HealthspanContributor[]
 
 // --- Drivers ---

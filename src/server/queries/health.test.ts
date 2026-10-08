@@ -4,7 +4,7 @@ import type { Db } from "../db";
 import { dailyMetrics, dailyValues, healthRecords } from "../db/schema";
 import { SEED_DAYS } from "../sources/seed/scenario";
 import { copyDb, ctxFor, dayAt, seeded, USER } from "../testing";
-import { getMonitor } from "./health";
+import { getHealthspan, getMonitor } from "./health";
 
 let db: Db;
 beforeAll(async () => {
@@ -62,5 +62,25 @@ describe("getMonitor measurements", () => {
     expect(m[3].average).toBeNull();
     const before = (await getMonitor(dayAt(160), ctxFor(db2))).measurements[2];
     expect(before.metric).toMatchObject({ value: null, reason: "no_data" });
+  });
+});
+
+describe("getHealthspan factors", () => {
+  it("each factor carries its 6-month and 30-day means, how it stands and its Trend View", async () => {
+    const vm = await getHealthspan(dayAt(170), ctxFor(db));
+    const shown = vm.contributors.filter((c) => c.metric.value !== null);
+    expect(shown.length).toBeGreaterThan(5);
+    for (const c of shown) {
+      expect(c.recent, c.key).not.toBeNull();
+      expect(c.state?.title, c.key).toMatch(/^(Outperforming|On track|Room to improve)$/);
+    }
+    expect(Object.fromEntries(vm.contributors.map((c) => [c.key, c.trendHref]))).toMatchObject({
+      sleepHours: "/trend/hours",
+      sri: "/trend/consistency",
+      zone13: "/trend/zones13",
+      restingHr: "/trend/rhr",
+      vo2max: "/trend/vo2max",
+      leanMass: "/trend/lean_mass",
+    });
   });
 });

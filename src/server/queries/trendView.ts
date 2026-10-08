@@ -22,7 +22,7 @@ import { activityKind, exercisesBetween, finite, firstDay, loadDays, meanSd, tod
 // The Trend View `/trend/[key]` (spec §11 R29): one metric over a W / M / 6M window that steps back through time,
 // against the window before it, with a verdict, a breakdown and an explainer.
 
-export type TrendViewGroup = "recovery" | "sleep" | "strain";
+export type TrendViewGroup = "recovery" | "sleep" | "strain" | "health";
 export type TrendViewChart = "bars" | "line" | "stack" | "range" | "pair";
 
 type Ctx = { strength: Map<string, { min: number; byType: Record<string, number> }>; tz: string; rows: Map<string, DayRow> };
@@ -270,6 +270,22 @@ export const TREND_VIEW = {
     pick: (r) => r.metrics?.calories, partialToday: true,
     about: { title: "What are Calories?", body: [
       "Calories are everything you burned in the day: your resting burn plus movement and workouts.",
+    ] },
+  },
+  vo2max: {
+    group: "health", label: "VO2 Max", short: "VO2 max", unit: "ml/kg/min", format: "decimal1", direction: "up", colorBy: "single", chart: "line", agg: "daily",
+    pick: (r) => (r.fitness?.reason === null ? r.fitness.vo2max : null), typical: true,
+    about: { title: "What is VO2 Max?", body: [
+      "VO2 max is the most oxygen your body can use during hard exercise, in millilitres per kilogram of body weight per minute. Fitbit estimates it from your runs, or from your resting heart rate when you don't run.",
+      "It is one of the strongest signs of long-term health: higher fitness goes with a longer life. Steady aerobic training raises it over weeks and months.",
+    ] },
+  },
+  lean_mass: {
+    group: "health", label: "Lean Body Mass", short: "lean body mass", unit: "kg", format: "decimal1", direction: "up", colorBy: "single", chart: "line", agg: "daily",
+    pick: (r) => (r.metrics?.weightKg != null && r.metrics.bodyFatPct != null ? r.metrics.weightKg * (1 - r.metrics.bodyFatPct / 100) : null),
+    about: { title: "What is Lean Body Mass?", body: [
+      "Lean body mass is your weight minus your body fat: muscle, bone, organs and water. Pulse works it out from the weight and body fat your scale or the Fitbit app records.",
+      "More lean mass for your height is linked to a longer life, whatever your body fat. Strength training and enough protein build it.",
     ] },
   },
 } as const satisfies Record<string, Def>;

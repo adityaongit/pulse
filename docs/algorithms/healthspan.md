@@ -176,3 +176,17 @@ Without a height, the eight remaining terms renormalize by 9/8 and give Δage +5
 - Finch CE, Pike MC, Witten M. Slow mortality rate accelerations during aging in some animals approximate that of humans. *Science* 1990;249(4971):902–905. doi:10.1126/science.2392680
 - Bull FC, et al. World Health Organization 2020 guidelines on physical activity and sedentary behaviour. *Br J Sports Med* 2020;54(24):1451–1462. doi:10.1136/bjsports-2020-102955
 - noop `android/app/src/main/java/com/noop/analytics/VitalityEngine.kt` (ryanbr/noop, PolyForm Noncommercial 1.0.0): the overlap shrink and the ln 2 / 8 conversion.
+
+## Factor copy
+
+Code: `src/core/algorithms/healthspanFactor.ts`. Tests: `healthspanFactor.test.ts`. UI: each factor row on Healthspan, opened in place (spec §11 R43).
+
+Each factor also carries its 30-day mean (`recent`, the Pace of Aging window) beside the 6-month mean the score uses, so the row marks both, as the reference app does. When the factor opens, a heading and one sentence say where it stands, from the years it adds to or takes off Pulse Age:
+
+| Years | Heading | Sentence |
+|---|---|---|
+| −0.3 or fewer | Outperforming | You're boosting your long-term health with your *factor*. Keep it up to hold on to the benefit. |
+| between −0.3 and 0.3 | On track | Your *factor* is close to the target for your age. Small gains here add up over the years. |
+| 0.3 or more | Room to improve | Your *factor* is adding years to your Pulse Age. Moving it toward the target for your age would take them off. |
+
+The ±0.3-year band (`ON_TRACK_YEARS`, *tunable*) keeps a factor that barely moves Pulse Age from being praised or blamed.
