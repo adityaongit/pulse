@@ -85,7 +85,7 @@ test("4. bedtime plan: Home's Tonight's sleep → the Sleep planner", async ({ p
 
 test("5. healthspan: Health → Healthspan → header collapses → contributor sheet", async ({ page }) => {
   await page.goto("/health");
-  await page.getByRole("link", { name: "Healthspan" }).click();
+  await page.getByRole("link", { name: "Go to Healthspan" }).click();
   await expect(page).toHaveURL(url("/health/healthspan"));
   await expect(page.getByRole("img", { name: /^Pulse Age/ }).first()).toBeVisible();
 

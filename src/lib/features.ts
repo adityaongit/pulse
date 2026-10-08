@@ -19,6 +19,8 @@ export const FEATURES = {
   sleepStress: false,
   /** Weekly zone, strength and step goals. Pulse has no goals or weekly plan. */
   goals: false,
+  /** Health's Blood Pressure Insights (Beta). Pulse reads no blood pressure. */
+  bloodPressure: false,
   /** An activity's strain split into cardio and muscular load. Pulse measures heart rate only. */
   muscularLoad: false,
 } as const

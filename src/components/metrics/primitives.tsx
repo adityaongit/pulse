@@ -19,12 +19,13 @@ export const SEGMENT_TRACK = "flex shrink-0 gap-0.5 rounded-lg bg-muted p-0.5"
 export const SEGMENT_ITEM =
   "grid h-10 min-w-11 place-items-center rounded-md px-3 font-numeric text-[13px] font-bold text-muted-foreground transition-[background-color,color] duration-150 ease-standard outline-none hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50 data-[state=on]:bg-secondary data-[state=on]:text-foreground aria-[current=page]:bg-secondary aria-[current=page]:text-foreground"
 
-export type TagKind = keyof typeof TAG_COPY | "so_far" | "partial_week" | "partial_month" | "estimate"
+export type TagKind = keyof typeof TAG_COPY | "so_far" | "partial_week" | "partial_month" | "estimate" | "beta"
 const EXTRA_TAGS: Record<Exclude<TagKind, keyof typeof TAG_COPY>, string> = {
   so_far: "So far",
   partial_week: "Partial week",
   partial_month: "Partial month",
   estimate: "Estimate",
+  beta: "Beta",
 }
 export const tagLabel = (kind: TagKind) =>
   kind in TAG_COPY ? TAG_COPY[kind as keyof typeof TAG_COPY].label : EXTRA_TAGS[kind as keyof typeof EXTRA_TAGS]

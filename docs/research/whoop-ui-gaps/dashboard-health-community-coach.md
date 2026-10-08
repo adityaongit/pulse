@@ -119,12 +119,12 @@ Build steps are listed in [activity-and-journal.md §3a](activity-and-journal.md
 | 12 | Step 7: one outline SAVE; Reset to default goes | Done (R41) |
 | 13 | Steps 1 and 7: SUCCESS screen (`DoneScreen`) | Done (R41) |
 | 14 | Discover More promo cards | Out of scope (promotions) |
-| 15 | Step 8: Stress Monitor first, then the orb, Pace of Aging and Health Monitor | Open |
-| 16 | Step 8: orb without a card | Open |
-| 17 | Step 8: Pace of Aging card with GO TO HEALTHSPAN | Open |
+| 15 | Step 8: Stress Monitor first, then the orb, Pace of Aging and Health Monitor | Done (R42) |
+| 16 | Step 8: orb without a card | Done (R42) |
+| 17 | Step 8: Pace of Aging card with GO TO HEALTHSPAN | Done (R42) |
 | 18 | Step 8: sparkline toned by level, white end dot | Done (R41) |
 | 19 | "Upgrade to Access" promo | Out of scope (nothing to sell) |
-| 20 | Step 8: Blood Pressure Insights, behind a flag (no source) | Open |
+| 20 | Step 8: Blood Pressure Insights, behind a flag (no source) | Hidden (R42, `FEATURES.bloodPressure`) |
 | 21 | Step 9: factor rows expand in place | Open |
 | 22 | Step 9: 6-month and 30-day markers; the age target moves into the row's text | Open |
 | 23 | Step 9: segmented bar with end labels, years on the right | Open |

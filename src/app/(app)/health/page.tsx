@@ -1,5 +1,7 @@
+import Link from "next/link"
 import { connection } from "next/server"
 import { Activity, Check, Droplet, Heart, Rabbit, Thermometer, TriangleAlert, Turtle, Wind } from "lucide-react"
+import { FEATURES } from "@/lib/features"
 import { cn } from "@/lib/utils"
 import { formatValue, hmm } from "@/lib/format"
 import type { ChipTone } from "@/lib/bands"
@@ -7,7 +9,7 @@ import { userCtx } from "@/server/queries/common"
 import { getHealthHub } from "@/server/queries/health"
 import type { HealthHubVM, VitalKey } from "@/server/queries/types"
 import { StressChart } from "@/components/charts/StressChart"
-import { CAPTION, LABEL, StatusChip, ValueUnit } from "@/components/metrics/primitives"
+import { CAPTION, CARD_BUTTON, LABEL, StatusChip, Tag, ValueUnit } from "@/components/metrics/primitives"
 import { TickScale } from "@/components/metrics/TickScale"
 import { AgeOrb } from "@/components/metrics/AgeOrb"
 import { MetricState } from "@/components/shells/MetricState"
@@ -42,55 +44,82 @@ function paceChip(delta: number | null) {
 }
 
 /**
- * The hub's hero [latest-health-tab-1]: the 200 px orb on the Healthspan card, then the reference app's Pace of Aging
- * ruler with the week-on-week chip. On laptop the orb and the ruler sit side by side.
+ * The hub's age block (health-02, health-04): the orb on the page with no card around it, then the Pace of Aging card
+ * (the ruler and its week-on-week chip) ending in GO TO HEALTHSPAN. On laptop the orb sits beside the card.
  */
-function Healthspan({ m }: { m: HealthHubVM["healthspan"] }) {
+function AgeBlock({ m }: { m: HealthHubVM["healthspan"] }) {
   return (
-    <MetricState metric={m} skeleton={skeleton} renderReason={() => <p className={EMPTY}>Healthspan needs 20 days of data.</p>}>
+    <MetricState
+      metric={m}
+      skeleton={skeleton}
+      renderReason={() => (
+        <SectionShell variant="card" level={2} title="Healthspan" href="/health/healthspan">
+          <p className={EMPTY}>Healthspan needs 20 days of data.</p>
+        </SectionShell>
+      )}
+    >
       {(v, meta) => {
         const chip = paceChip(v.paceDelta)
         return (
-          <div className="flex flex-col gap-6 xl:grid xl:grid-cols-2 xl:items-center xl:gap-8">
-            <div className="flex justify-center">
-              <AgeOrb age={v.pulseAge} deltaYears={v.deltaYears} provisional={meta.provisional} size={200} />
+          <div className="flex flex-col gap-6 xl:grid xl:grid-cols-2 xl:items-center xl:gap-4">
+            <div className="flex justify-center py-2">
+              <AgeOrb age={v.pulseAge} deltaYears={v.deltaYears} provisional={meta.provisional} size={260} />
             </div>
-            <div className="space-y-3">
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <p className={LABEL}>Pace of Aging</p>
-                {chip && (
+            <SectionShell
+              variant="card"
+              level={2}
+              title="Pace of Aging"
+              action={
+                chip && (
                   <StatusChip tone={chip.tone} delta={chip.dir}>
                     {chip.text}
                   </StatusChip>
-                )}
+                )
+              }
+            >
+              <div className="space-y-5">
+                <TickScale
+                  variant="marker"
+                  label="Pace of Aging"
+                  metric={{ value: v.pace, reason: null, provisional: meta.provisional }}
+                  min={-1}
+                  max={3}
+                  format="decimal1"
+                  unit="x"
+                  describe={v.pace < 1 ? "aging slower than your 6-month average" : v.pace > 1 ? "aging faster than your 6-month average" : "aging at the normal rate"}
+                  ends={["−1.0x", "1.0x", "3.0x"]}
+                  leading={
+                    <>
+                      <Turtle aria-hidden strokeWidth={1.75} /> Slow
+                    </>
+                  }
+                  trailing={
+                    <>
+                      Fast <Rabbit aria-hidden strokeWidth={1.75} />
+                    </>
+                  }
+                />
+                <Link href="/health/healthspan" className={CARD_BUTTON}>
+                  Go to Healthspan
+                </Link>
               </div>
-              <TickScale
-                variant="marker"
-                label="Pace of Aging"
-                metric={{ value: v.pace, reason: null, provisional: meta.provisional }}
-                min={-1}
-                max={3}
-                format="decimal1"
-                unit="x"
-                describe={v.pace < 1 ? "aging slower than your 6-month average" : v.pace > 1 ? "aging faster than your 6-month average" : "aging at the normal rate"}
-                ends={["−1.0x", "1.0x", "3.0x"]}
-                leading={
-                  <>
-                    <Turtle aria-hidden strokeWidth={1.75} /> Slow
-                  </>
-                }
-                trailing={
-                  <>
-                    Fast <Rabbit aria-hidden strokeWidth={1.75} />
-                  </>
-                }
-              />
-              <p className={CAPTION}>Updated weekly</p>
-            </div>
+            </SectionShell>
           </div>
         )
       }}
     </MetricState>
+  )
+}
+
+/**
+ * health-01's Blood Pressure Insights (Beta), built and off (FEATURES.bloodPressure): Pulse reads no blood pressure.
+ * The card says what it would show; the page renders it only when the flag is on.
+ */
+function BloodPressure() {
+  return (
+    <SectionShell variant="card" level={2} title="Blood Pressure Insights" info={false} action={<Tag kind="beta" />}>
+      <p className={EMPTY}>How your blood pressure trends against your sleep, strain and recovery, from the readings your cuff shares with Google Health.</p>
+    </SectionShell>
   )
 }
 
@@ -230,15 +259,18 @@ export default async function HealthPage() {
   const vm = await getHealthHub(await userCtx())
   return (
     <PageShell title="Health">
+      {/* The reference app's order (health-01, 02, 04): Stress Monitor, the age block, then Health Monitor; Pulse's
+          Fitness and Heart rate follow. */}
       <HealthCards>
-        <SectionShell variant="card" level={2} title="Healthspan" href="/health/healthspan" className="xl:col-span-2">
-          <Healthspan m={vm.healthspan} />
+        <SectionShell variant="card" level={2} title="Stress Monitor" info={false} href="/health/stress" className="xl:col-span-2">
+          <Stress m={vm.stress} />
         </SectionShell>
+        <div className="xl:col-span-2">
+          <AgeBlock m={vm.healthspan} />
+        </div>
+        {FEATURES.bloodPressure && <BloodPressure />}
         <SectionShell variant="card" level={2} title="Health Monitor" info={false} href="/health/monitor">
           <Monitor m={vm.monitor} />
-        </SectionShell>
-        <SectionShell variant="card" level={2} title="Stress Monitor" info={false} href="/health/stress">
-          <Stress m={vm.stress} />
         </SectionShell>
         <SectionShell variant="card" level={2} title="Fitness" href="/health/fitness">
           <Fitness m={vm.fitness} />
