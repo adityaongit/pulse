@@ -142,7 +142,7 @@ function Monitor({ m }: { m: HealthHubVM["monitor"] }) {
               aria-hidden
               className={cn(
                 "grid size-5 place-items-center rounded-sm",
-                status === "no_data" ? "bg-secondary text-muted-foreground" : ok ? "bg-optimal/15 text-optimal" : "bg-warning/15 text-warning"
+                status === "no_data" ? "bg-secondary text-muted-foreground" : ok ? "bg-optimal/15 text-optimal-text" : "bg-warning/15 text-warning-text"
               )}
             >
               {status === "no_data" ? (

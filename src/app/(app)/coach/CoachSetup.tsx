@@ -100,7 +100,7 @@ export function ProviderForm({ providers, current, onSaved }: { providers: Provi
             <>
               Encrypted on this server and never shown again.{" "}
               {p.keyUrl && (
-                <a href={p.keyUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-0.5 font-semibold text-coach underline-offset-4 hover:underline">
+                <a href={p.keyUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-0.5 font-semibold text-coach-text underline-offset-4 hover:underline">
                   Get a {p.label} key
                   <ArrowUpRight aria-hidden className="size-3.5" />
                 </a>

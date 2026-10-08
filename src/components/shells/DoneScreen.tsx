@@ -22,7 +22,7 @@ export function DoneScreen({ title, body, onDone }: { title: string; body: strin
   return (
     <div role="status" className="flex flex-1 flex-col items-center justify-center gap-6 px-6 pb-16 text-center">
       <span className="grid size-30 place-items-center rounded-full ring-[5px] ring-optimal ring-inset animate-in fade-in-0 zoom-in-75 duration-300 ease-out-expo motion-reduce:zoom-in-100">
-        <Check aria-hidden strokeWidth={2.5} className="size-12 text-optimal" />
+        <Check aria-hidden strokeWidth={2.5} className="size-12 text-optimal-text" />
       </span>
       <div className="space-y-2 animate-in fade-in-0 slide-in-from-bottom-1 fill-mode-both delay-100 duration-300 ease-out-expo motion-reduce:slide-in-from-bottom-0">
         <p className="text-xl leading-7 font-bold tracking-[0.1em] uppercase">{title}</p>

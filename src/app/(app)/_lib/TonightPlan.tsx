@@ -47,7 +47,7 @@ export function TonightPlan({ plan, timeZone, alarm }: { plan: SleepPlanVM; time
         <span />
         {wake ? (
           <span className={cn(LABEL, "text-right")}>
-            <span className="inline-flex items-center gap-1.5 text-optimal">
+            <span className="inline-flex items-center gap-1.5 text-optimal-text">
               <span aria-hidden className="size-1.5 rounded-full bg-optimal" />
               Alarm on
             </span>

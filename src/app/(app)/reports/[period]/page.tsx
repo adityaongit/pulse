@@ -41,7 +41,7 @@ const FORMAT: Record<string, { format: FormatKey; unit?: string; scale?: number 
   rhr: { format: "int", unit: "bpm" },
 }
 const DIAL_FORMAT = { sleep: "int", recovery: "int", strain: "decimal1" } as const
-const BALANCE_TONE = { balanced: "text-optimal", overreaching: "text-warning", undertrained: "text-muted-foreground" }
+const BALANCE_TONE = { balanced: "text-optimal-text", overreaching: "text-warning-text", undertrained: "text-muted-foreground" }
 
 function periodLabel(kind: "week" | "month", start: string, end: string) {
   return kind === "week" ? rangeLabel(start, end) : formatDay(start, DAY.monthYear)
@@ -101,7 +101,7 @@ function Dials({ vm }: { vm: ReportVM }) {
     <div className="flex w-full items-start justify-center gap-5 sm:gap-8">
       {vm.dials.map((dl) => {
         const f = DIAL_FORMAT[dl.key]
-        const tone = dl.delta === null || dl.key === "strain" || Math.round(dl.delta * 10) === 0 ? "text-muted-foreground" : dl.delta > 0 ? "text-optimal" : "text-warning"
+        const tone = dl.delta === null || dl.key === "strain" || Math.round(dl.delta * 10) === 0 ? "text-muted-foreground" : dl.delta > 0 ? "text-optimal-text" : "text-warning-text"
         return (
           <div key={dl.key} className="flex min-w-0 flex-1 basis-0 flex-col items-center gap-1.5 text-center">
             <ScoreDial variant={dl.key} size="md" value={dl.metric.value} reason={dl.metric.reason} label={dl.label} />

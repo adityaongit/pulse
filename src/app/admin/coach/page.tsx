@@ -103,7 +103,7 @@ export default async function CoachConfigPage({ searchParams }: { searchParams: 
             <Panel>
               <div className="flex items-start gap-3">
                 <span aria-hidden className="grid size-10 shrink-0 place-items-center rounded-lg bg-coach/12">
-                  <Bot className="size-5 text-coach" strokeWidth={1.75} />
+                  <Bot className="size-5 text-coach-text" strokeWidth={1.75} />
                 </span>
                 <div className="min-w-0">
                   <h2 className="font-mono text-[16px] leading-6 font-semibold">{selected}</h2>

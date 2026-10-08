@@ -31,7 +31,7 @@ function Stat({ stat }: { stat?: HeaderStat }) {
   if (!stat) return <span />
   return (
     <p className={cn("flex min-w-0 flex-col items-center gap-0.5 text-center", STAT_MOTION)}>
-      <span className={cn("font-numeric text-xl leading-6 font-bold tabular-nums", stat.tone === "optimal" ? "text-optimal" : stat.tone === "warning" ? "text-warning" : "text-foreground")}>
+      <span className={cn("font-numeric text-xl leading-6 font-bold tabular-nums", stat.tone === "optimal" ? "text-optimal-text" : stat.tone === "warning" ? "text-warning-text" : "text-foreground")}>
         {stat.value}
       </span>
       <span className="text-xs leading-4 font-bold tracking-[0.1em] text-balance text-muted-foreground uppercase">{stat.label}</span>

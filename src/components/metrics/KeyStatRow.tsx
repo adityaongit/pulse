@@ -240,7 +240,7 @@ function Tile({ p, c }: { p: KeyStatRowProps; c: Computed }) {
               <>
                 <ValueUnit value={c.avgText!} unit={p.unit} className="font-numeric text-lg leading-6 font-bold" unitClassName="text-xs leading-4 font-medium text-muted-foreground" />
                 {c.diffText && (
-                  <span className={cn("font-numeric text-xs leading-4 font-bold tabular-nums", c.tone === "good" ? "text-optimal" : c.tone === "bad" ? "text-warning" : "text-foreground-secondary")}>
+                  <span className={cn("font-numeric text-xs leading-4 font-bold tabular-nums", c.tone === "good" ? "text-optimal-text" : c.tone === "bad" ? "text-warning-text" : "text-foreground-secondary")}>
                     {c.diffText}
                     {p.unit && (p.unit === "%" ? "%" : `\u00a0${p.unit}`)} vs avg
                   </span>

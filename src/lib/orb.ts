@@ -30,7 +30,7 @@ export const ORB = {
   ] satisfies Stop[],
   /** No result: a dim grey orb. */
   empty: "--orb-empty" as Token,
-  /** Delta line inside the orb: pale cyan (amber-1, cyan-1, mixed-1), mint (`text-optimal`) once the orb is green. */
+  /** Delta line inside the orb: pale cyan (amber-1, cyan-1, mixed-1), mint (`text-optimal-text`) once the orb is green. */
   deltaText: "--orb-delta-text" as Token,
   greenText: -2,
   /** Rim fill = edge colour × this; particles and the edge line are brighter tints. */

@@ -79,7 +79,7 @@ function RecoveryRow({ p, value, meta }: { p: Extract<ContributorRowProps, { var
           right={
             pts !== null && (
               <span className="inline-flex items-baseline">
-                <span className={cn("font-numeric text-base font-bold tabular-nums", pts > 0 ? "text-optimal" : pts < 0 ? "text-warning" : "text-muted-foreground")}>
+                <span className={cn("font-numeric text-base font-bold tabular-nums", pts > 0 ? "text-optimal-text" : pts < 0 ? "text-warning-text" : "text-muted-foreground")}>
                   {formatValue("signedInt", pts)}
                 </span>
                 <span className="ml-1 text-[13px] leading-4 font-semibold text-foreground-secondary">pts</span>
@@ -175,8 +175,8 @@ function HealthspanRow({ p, value, meta }: { p: Extract<ContributorRowProps, { v
                   />
                 )
               })}
-              <span className={cn("absolute top-1/2 left-1.5 -translate-y-1/2 font-numeric text-[11px] font-bold tabular-nums", lit === 0 ? "text-foreground" : p.higherIsBetter ? "text-warning" : "text-optimal")}>{loText}</span>
-              <span className={cn("absolute top-1/2 right-1.5 -translate-y-1/2 font-numeric text-[11px] font-bold tabular-nums", lit === SEGMENTS - 1 ? "text-foreground" : p.higherIsBetter ? "text-optimal" : "text-warning")}>{hiText}</span>
+              <span className={cn("absolute top-1/2 left-1.5 -translate-y-1/2 font-numeric text-[11px] font-bold tabular-nums", lit === 0 ? "text-foreground" : p.higherIsBetter ? "text-warning-text" : "text-optimal-text")}>{loText}</span>
+              <span className={cn("absolute top-1/2 right-1.5 -translate-y-1/2 font-numeric text-[11px] font-bold tabular-nums", lit === SEGMENTS - 1 ? "text-foreground" : p.higherIsBetter ? "text-optimal-text" : "text-warning-text")}>{hiText}</span>
             </div>
             {recent !== null && (
               <MarkerLabel at={at(recent)} className="bottom-0">
@@ -187,7 +187,7 @@ function HealthspanRow({ p, value, meta }: { p: Extract<ContributorRowProps, { v
             )}
           </div>
           <span className="flex w-12 shrink-0 flex-col items-end">
-            <span className={cn("font-numeric text-xl leading-6 font-bold tabular-nums", years === null ? "text-muted-foreground" : years < 0 ? "text-optimal" : years > 0 ? "text-warning" : "text-foreground-secondary")}>
+            <span className={cn("font-numeric text-xl leading-6 font-bold tabular-nums", years === null ? "text-muted-foreground" : years < 0 ? "text-optimal-text" : years > 0 ? "text-warning-text" : "text-foreground-secondary")}>
               {years === null ? MISSING : formatValue("decimal1", years)}
             </span>
             <span className="text-[13px] leading-4 font-semibold text-foreground-secondary">years</span>

@@ -117,10 +117,11 @@ function Rows({ night, selected, onSelect, restorative }: { night: SleepStagesNi
           </button>
         ))}
       </div>
-      <div className="flex items-center justify-between gap-2">
+      {/* One baseline for the label and "Duration 6:59" (the 17 px value sets it). */}
+      <div className="flex items-baseline justify-between gap-2">
         {tab === "breakdown" ? (
-          <span className={cn(LABEL, "flex items-center gap-2 text-foreground-secondary")}>
-            <span aria-hidden className={cn("h-4 w-3.5", RANGE_BOX)} />
+          <span className={cn(LABEL, "flex items-baseline gap-2 text-foreground-secondary")}>
+            <span aria-hidden className={cn("h-4 w-3.5 self-center", RANGE_BOX)} />
             Typical range
           </span>
         ) : (

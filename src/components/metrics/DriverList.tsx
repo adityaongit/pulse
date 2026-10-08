@@ -52,7 +52,7 @@ function Header({ variant, unit, provisional }: { variant: DriverListProps["vari
   const [left, mid, right] = variant === "recovery" ? ["Lowered", "Points", "Raised"] : ["Hurts", unit === "SD" ? "Impact (SD)" : "% Impact", "Helps"]
   return (
     <div aria-hidden className="mb-2 grid grid-cols-[1fr_auto_1fr] items-center gap-2 text-xs leading-4 font-bold tracking-[0.1em] uppercase">
-      <span className="flex items-center gap-2 text-warning">
+      <span className="flex items-center gap-2 text-warning-text">
         <span className="grid size-4 place-items-center rounded-sm bg-warning/20">
           <ChevronDown className="size-3" strokeWidth={2.5} />
         </span>
@@ -62,7 +62,7 @@ function Header({ variant, unit, provisional }: { variant: DriverListProps["vari
         {mid}
         {provisional && <MetricTags provisional />}
       </span>
-      <span className="flex items-center justify-end gap-2 text-optimal">
+      <span className="flex items-center justify-end gap-2 text-optimal-text">
         {right}
         <span className="grid size-4 place-items-center rounded-sm bg-optimal/20">
           <ChevronUp className="size-3" strokeWidth={2.5} />
@@ -80,7 +80,7 @@ function Item({ i, max, p }: { i: DriverItem; max: number; p: DriverListProps })
   const width = `${(Math.abs(i.delta) / (max || 1)) * 50}%`
   const impact = p.variant === "impact"
   const value = (
-    <span className={cn("shrink-0 font-numeric text-base font-bold tabular-nums", e === "positive" ? "text-optimal" : e === "negative" ? "text-warning" : "text-foreground-secondary")}>
+    <span className={cn("shrink-0 font-numeric text-base font-bold tabular-nums", e === "positive" ? "text-optimal-text" : e === "negative" ? "text-warning-text" : "text-foreground-secondary")}>
       {fmt(i.delta, p.unit)}
     </span>
   )

@@ -82,12 +82,12 @@ const SOURCE: Record<SettingsVM["source"]["status"], { line?: string; tone?: str
   not_connected: { line: "Not connected", body: "Connect the Google account your Fitbit Air syncs to. Pulse reads your data and writes only what you log in Pulse." },
   not_linked: {
     line: "No Google Health profile",
-    tone: "text-warning",
+    tone: "text-warning-text",
     body: "This Google account has no Google Health profile, so there is no Fitbit data to read. Set up Google Health with this account (or move your Fitbit account to it), or switch to the account your Fitbit Air uses.",
   },
   no_device: {
     line: "No Fitbit device",
-    tone: "text-warning",
+    tone: "text-warning-text",
     body: "This Google account has Google Health but no Fitbit device, so there is nothing to import. Pair your Fitbit Air in the Google Health app and sync again, or switch to the account it uses.",
   },
   connected: {},
@@ -105,8 +105,8 @@ function OAuthLink({ label }: { label: string }) {
 }
 
 function SyncIcon({ status }: { status: SettingsVM["sync"][number]["status"] }) {
-  if (status === "ok") return <Check aria-hidden className="size-4 text-optimal" strokeWidth={2.5} />
-  if (status === "stale") return <TriangleAlert aria-hidden className="size-4 text-warning" strokeWidth={2} />
+  if (status === "ok") return <Check aria-hidden className="size-4 text-optimal-text" strokeWidth={2.5} />
+  if (status === "stale") return <TriangleAlert aria-hidden className="size-4 text-warning-text" strokeWidth={2} />
   if (status === "error") return <CircleAlert aria-hidden className="size-4 text-recovery-red-text" strokeWidth={2} />
   return <Minus aria-hidden className="size-4 text-muted-foreground" strokeWidth={2} />
 }
@@ -123,7 +123,7 @@ function DataTypes({ rows, now }: { rows: SettingsVM["sync"]; now: number }) {
       <summary className="flex min-h-13 cursor-pointer list-none items-center justify-between gap-3 rounded-md py-2 outline-none select-none focus-visible:ring-3 focus-visible:ring-ring/50 [&::-webkit-details-marker]:hidden">
         <span className={ROW_LABEL}>Data types</span>
         <span className="flex items-center gap-2">
-          <span className={cn("text-[13px] leading-[18px]", failing ? "text-recovery-red-text" : behind ? "text-warning" : "text-muted-foreground")}>{summary}</span>
+          <span className={cn("text-[13px] leading-[18px]", failing ? "text-recovery-red-text" : behind ? "text-warning-text" : "text-muted-foreground")}>{summary}</span>
           <ChevronDown aria-hidden className="size-4 text-muted-foreground transition-transform duration-200 ease-standard group-open:rotate-180 motion-reduce:transition-none" strokeWidth={2} />
         </span>
       </summary>
@@ -198,7 +198,7 @@ export function DataSource({ vm, now, googleEmail = null }: { vm: Pick<SettingsV
       {source.needsPermissions && (
         <div role="note" aria-labelledby="permissions-title" className="mt-4 rounded-xl bg-foreground/[0.04] p-4">
           <p id="permissions-title" className="flex items-center gap-2 text-[15px] leading-[22px] font-semibold">
-            <TriangleAlert aria-hidden className="size-4 shrink-0 text-warning" strokeWidth={2} />
+            <TriangleAlert aria-hidden className="size-4 shrink-0 text-warning-text" strokeWidth={2} />
             Pulse needs new permissions
           </p>
           <p className={cn(BODY, "mt-1")}>

@@ -3,7 +3,6 @@ import type { InfoContent } from "./InfoButton"
 const COPY: Record<string, string> = {
   "Stress": "Body activation during still minutes, from 0 to 3. Movement, workouts and sleep are excluded.",
   "Hours of sleep": "Time asleep during your main sleep session, excluding awake periods.",
-  "Skin temp (from baseline)": "Nightly temperature difference from your personal baseline, not your absolute body temperature.",
   "Stress Monitor": "Body activation from 0 to 3, based on heart rate during still minutes. Movement, workouts and sleep are excluded.",
   "Health Monitor": "Your nightly vital signs compared with your personal baseline. Unusual readings are signals to watch, not diagnoses.",
   "Healthspan": "Pulse Age combines fitness, sleep and strain patterns to estimate how your habits relate to long-term health.",

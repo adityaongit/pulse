@@ -336,7 +336,7 @@ export async function getMonitor(day: string, ctx: QueryCtx, preloaded?: Map<str
     const tags = hm && hm.reason === null && hm.stale.includes(v.key === "restingHr" ? "rhr" : v.key === "skinTempDev" ? "skinTemp" : v.key) ? (["stale_baseline"] as const) : [];
     return {
       key: v.key,
-      label: v.key === "skinTempDev" ? "Skin temp (from baseline)" : VITAL_LABEL[v.key],
+      label: VITAL_LABEL[v.key],
       short: v.short,
       unit: v.unit,
       metric: finite(value) ? ok(value, false, [...tags]) : none(reason),

@@ -384,7 +384,7 @@ export function AgeOrb({ age, deltaYears, provisional = false, size: sizeProp, r
         </span>
         {!small && d && (
           <span
-            className={cn("mt-2.5 text-[calc(8px+var(--s)*0.024)] leading-tight font-semibold tabular-nums motion-safe:delay-400", delta! <= ORB.greenText ? "text-optimal" : same && "text-(--orb-text-muted)", ENTER)}
+            className={cn("mt-2.5 text-[calc(8px+var(--s)*0.024)] leading-tight font-semibold tabular-nums motion-safe:delay-400", delta! <= ORB.greenText ? "text-optimal-text" : same && "text-(--orb-text-muted)", ENTER)}
             style={delta! > ORB.greenText && !same ? { color: `var(${ORB.deltaText})` } : undefined}
           >
             {d.text}

@@ -66,9 +66,9 @@ function Rows({ zones, note, noteLink }: { zones: ZoneRow[]; note?: string; note
     // In a stretched card (Strain's Time in zones beside two stacked cards) the rows share the spare height
     // evenly instead of leaving it under the last row (SYM5). In a natural-height parent nothing grows.
     <div className="flex flex-1 flex-col">
-      <div aria-hidden className="mb-2 flex items-center justify-between px-1">
-        <span className={cn(LABEL, "flex items-center gap-1.5 text-muted-foreground", !typical && "invisible")}>
-          <span className="size-2.5 rounded-[2px] bg-(image:--pattern-hatch) ring-1 ring-border" />
+      <div aria-hidden className="mb-2 flex items-baseline justify-between px-1">
+        <span className={cn(LABEL, "flex items-baseline gap-1.5 text-muted-foreground", !typical && "invisible")}>
+          <span className="size-2.5 self-center rounded-[2px] bg-(image:--pattern-hatch) ring-1 ring-border" />
           Typical range
         </span>
         <span className={cn(LABEL, "flex items-baseline gap-2 text-muted-foreground")}>
@@ -98,7 +98,7 @@ function Rows({ zones, note, noteLink }: { zones: ZoneRow[]; note?: string; note
                 <span className={cn(LABEL, "font-bold uppercase")}>{z.label}</span>
                 <span className={cn(LABEL, "font-numeric text-muted-foreground uppercase")}>{range}</span>
                 {/* The share in the zone's colour, 0% included; Zones 0 and 1 stay white (activity-02, activity-05). */}
-                <span className={cn(LABEL, "font-numeric", color && z.zone > 1 ? color.text : "text-foreground")}>{sh}</span>
+                <span className={cn(LABEL, "font-numeric tabular-nums", color && z.zone > 1 ? color.text : "text-foreground")}>{sh}</span>
                 <span className="ml-auto font-numeric text-lg leading-6 font-bold tabular-nums">
                   {hmm(minutes)}
                   <span className="text-xs text-muted-foreground">:{String(t % 60).padStart(2, "0")}</span>
@@ -131,7 +131,7 @@ function Note({ note, link }: { note?: string; link?: { label: string; href: str
       {link && (
         <>
           {" "}
-          <Link href={link.href} className="text-foreground-secondary underline underline-offset-2 hover:text-foreground">
+          <Link href={link.href} className="relative text-foreground-secondary underline underline-offset-2 after:absolute after:-inset-x-1 after:-inset-y-3.5 hover:text-foreground">
             {link.label}
           </Link>
         </>

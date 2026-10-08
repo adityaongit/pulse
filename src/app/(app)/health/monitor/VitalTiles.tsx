@@ -49,7 +49,7 @@ const SKELETON_LABEL: [VitalKey, string][] = [
   ["spo2", "Blood oxygen"],
   ["restingHr", "RHR"],
   ["hrv", "HRV"],
-  ["skinTempDev", "Skin temp (from baseline)"],
+  ["skinTempDev", "Skin temperature"],
 ]
 
 export function VitalTilesSkeleton() {

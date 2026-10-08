@@ -56,7 +56,7 @@ export function ImpactList({ vm }: { vm: JournalInsightsVM }) {
   const sd = vm.unit === "SD"
   const fx = (v: number, signed = true) => (sd ? `${formatValue(signed ? "signed1" : "decimal1", v)} SD` : `${formatValue(signed ? "signedInt" : "int", v)}%`)
   const avg = (v: number | null) => (v === null ? "--" : sd ? `${formatValue("signed1", v)} SD` : `${formatValue("int", v)}%`)
-  const tone = item?.effect === "positive" ? "text-optimal" : item?.effect === "negative" ? "text-warning" : "text-foreground-secondary"
+  const tone = item?.effect === "positive" ? "text-optimal-text" : item?.effect === "negative" ? "text-warning-text" : "text-foreground-secondary"
 
   return (
     <>

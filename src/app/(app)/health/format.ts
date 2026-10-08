@@ -13,7 +13,7 @@ export const ordinal = (n: number) => {
 export function ageDelta(delta: number) {
   const v = formatValue("decimal1", Math.abs(delta))
   if (v === "0.0") return { text: "Same as your age", tone: "text-foreground-secondary" }
-  return delta < 0 ? { text: `${v}\u00a0years younger`, tone: "text-optimal" } : { text: `${v}\u00a0years older`, tone: "text-warning" }
+  return delta < 0 ? { text: `${v}\u00a0years younger`, tone: "text-optimal-text" } : { text: `${v}\u00a0years older`, tone: "text-warning-text" }
 }
 
 /** "excellent" (the core's key) → "Excellent". */
@@ -22,5 +22,5 @@ export const categoryWord = (c: string) => c.charAt(0).toUpperCase() + c.slice(1
 /** VO2 max category word colour (spec §7.6). */
 export function categoryTone(c: string) {
   const k = c.toLowerCase()
-  return k === "excellent" || k === "superior" ? "text-optimal" : k === "good" ? "text-foreground" : "text-warning"
+  return k === "excellent" || k === "superior" ? "text-optimal-text" : k === "good" ? "text-foreground" : "text-warning-text"
 }

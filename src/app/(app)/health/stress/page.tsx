@@ -42,9 +42,9 @@ const INFO = {
 }
 
 const LEVEL_KEYS = [
-  { key: "lowMin", word: "Low", bar: "bg-stress-low", text: "text-stress-low" },
-  { key: "mediumMin", word: "Medium", bar: "bg-stress-medium", text: "text-stress-medium" },
-  { key: "highMin", word: "High", bar: "bg-stress-high", text: "text-stress-high" },
+  { key: "lowMin", word: "Low", bar: "bg-stress-low", text: "text-stress-low-text" },
+  { key: "mediumMin", word: "Medium", bar: "bg-stress-medium", text: "text-stress-medium-text" },
+  { key: "highMin", word: "High", bar: "bg-stress-high", text: "text-stress-high-text" },
 ] as const
 
 function LevelBar({ m, className }: { m: { lowMin: number; mediumMin: number; highMin: number }; className: string }) {

@@ -41,9 +41,9 @@ import { CAPTION, energySeries, LABEL, statProps, stressSeries } from "../_lib/v
 export const metadata = { title: "Today", description: "Today’s Sleep, Recovery and Strain at a glance." }
 
 const STRESS_TONE: Record<StressLevel, { chip: string; text: string; word: string }> = {
-  low: { chip: "bg-stress-low/15 text-stress-low", text: "text-stress-low", word: "Low" },
-  medium: { chip: "bg-stress-medium/15 text-stress-medium", text: "text-stress-medium", word: "Medium" },
-  high: { chip: "bg-stress-high/15 text-stress-high", text: "text-stress-high", word: "High" },
+  low: { chip: "bg-stress-low/15 text-stress-low-text", text: "text-stress-low-text", word: "Low" },
+  medium: { chip: "bg-stress-medium/15 text-stress-medium-text", text: "text-stress-medium-text", word: "Medium" },
+  high: { chip: "bg-stress-high/15 text-stress-high-text", text: "text-stress-high-text", word: "High" },
 }
 const CHIP_BOX = "grid h-7 min-w-7 shrink-0 place-items-center rounded-md px-1"
 /** The 56 px gradient banner rows: day outlook / review and week in review (spec §7.1 7a, 10). */
@@ -304,7 +304,7 @@ function DayBanner({ outlook }: { outlook: NonNullable<HomeVM["outlook"]> }) {
     >
       <Icon aria-hidden className="size-[22px] shrink-0 text-foreground-secondary" strokeWidth={1.5} />
       <span className="min-w-0 flex-1 truncate text-base leading-[22px] font-semibold">{outlook.title}</span>
-      <ChevronRight aria-hidden className={cn("size-5 shrink-0", review ? "text-coach" : "text-outlook-accent")} strokeWidth={1.75} />
+      <ChevronRight aria-hidden className={cn("size-5 shrink-0", review ? "text-coach-text" : "text-outlook-accent")} strokeWidth={1.75} />
     </InfoCardTrigger>
   )
 }
@@ -362,11 +362,11 @@ function MonitorAlert({ alert, href }: { alert: NonNullable<HomeVM["monitorAlert
     <Alert
       className={cn(
         CARD_MATERIAL,
-        "grid-cols-[auto_minmax(0,1fr)] gap-x-3 gap-y-0.5 border-0 px-4 py-3 *:[svg]:size-5 *:[svg]:translate-y-px",
+        "grid-cols-[auto_minmax(0,1fr)] gap-x-3 gap-y-0.5 border-0 px-4 py-3 *:[svg]:size-5! *:[svg]:translate-y-px",
         illness ? "ring-1 ring-recovery-red/60" : "ring-1 ring-warning/50",
       )}
     >
-      {illness ? <CircleAlert className="text-recovery-red-text" strokeWidth={1.75} /> : <TriangleAlert className="text-warning" strokeWidth={1.75} />}
+      {illness ? <CircleAlert className="text-recovery-red-text" strokeWidth={1.75} /> : <TriangleAlert className="text-warning-text" strokeWidth={1.75} />}
       <AlertTitle className="text-base leading-[22px] font-semibold text-balance">
         {illness ? "Your body may be fighting something" : `${alert.count} ${alert.count === 1 ? "vital" : "vitals"} outside your normal range`}
       </AlertTitle>
@@ -437,17 +437,17 @@ function MonitorCard({ vm, href }: { vm: HomeVM; href: string }) {
       ) : m.value.flagged === 0 ? (
         <MonitorLine
           chip={<Check aria-hidden className="size-4" strokeWidth={2.5} />}
-          chipClass="bg-optimal/15 text-optimal"
+          chipClass="bg-optimal/15 text-optimal-text"
           top="Within range"
-          topClass="text-optimal"
+          topClass="text-optimal-text"
           bottom={`${m.value.inRange}/${m.value.total} Metrics`}
         />
       ) : (
         <MonitorLine
           chip={<TriangleAlert aria-hidden className="size-4" strokeWidth={2} />}
-          chipClass="bg-warning/15 text-warning"
+          chipClass="bg-warning/15 text-warning-text"
           top="Out of range"
-          topClass="text-warning"
+          topClass="text-warning-text"
           bottom={`${m.value.inRange}/${m.value.total} Metrics`}
         />
       )}
@@ -536,8 +536,8 @@ function EnergyCard({ vm, timeZone, className }: { vm: HomeVM; timeZone: string;
             </div>
             <EnergyBankChart data={{ value: energySeries(eb), reason: null, provisional: false }} />
             <div className="mt-auto grid grid-cols-2 gap-3">
-              <MiniStat label="Charged" value={formatValue("signedInt", eb.charged)} className="text-optimal" />
-              <MiniStat label="Drained" value={formatValue("signedInt", eb.drained)} className="text-warning" />
+              <MiniStat label="Charged" value={formatValue("signedInt", eb.charged)} className="text-optimal-text" />
+              <MiniStat label="Drained" value={formatValue("signedInt", eb.drained)} className="text-warning-text" />
             </div>
             {eb.drains.length > 0 && (
               <ul className="space-y-1">

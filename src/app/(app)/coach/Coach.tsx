@@ -410,7 +410,7 @@ export function Coach({ id, initial, groups, next, prefill, auto, suggestions }:
                   return (
                   <li key={text} className="min-w-0">
                     <button type="button" onClick={() => send(text)} className={SUGGESTION}>
-                      <Icon aria-hidden className="size-5 shrink-0 text-coach" strokeWidth={1.75} />
+                      <Icon aria-hidden className="size-5 shrink-0 text-coach-text" strokeWidth={1.75} />
                       <span className="min-w-0 flex-1 text-pretty">{text}</span>
                       <ChevronRight aria-hidden className="size-4 shrink-0 text-muted-foreground transition-[translate] duration-150 ease-standard group-hover/suggestion:translate-x-0.5" strokeWidth={1.75} />
                     </button>

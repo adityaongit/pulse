@@ -122,12 +122,12 @@ test("6. illness week: Home alert → Health Monitor flags", async ({ page }) =>
   await expect(page).toHaveURL(url(withDay("/", d)));
 });
 
-test("dashboard vital metrics open their own details and return to the selected Home day", async ({ page }) => {
+test("dashboard metrics open their own details and return to the selected Home day", async ({ page }) => {
   const d = days().past!;
   await page.goto(withDay("/", d));
+  // The default dashboard's rows with a metric screen of their own (spec §11 R41); the rest open Trend Views.
   for (const [label, key] of [
-    ["Heart rate variability", "hrv"], ["Resting heart rate", "rhr"], ["Respiratory rate", "resp"],
-    ["Blood oxygen", "spo2"], ["Skin temperature", "skin"],
+    ["Heart rate variability", "hrv"], ["Resting heart rate", "rhr"], ["Steps", "steps"],
   ]) {
     await page.getByRole("link", { name: new RegExp(`^${label}:? `) }).click();
     await expect(page).toHaveURL(url(withDay(`/metric/${key}`, d)));

@@ -65,6 +65,12 @@
   --color-sleep: var(--sleep);
   --color-sleep-deep: var(--sleep-deep);
   --color-optimal: var(--optimal);
+  --color-optimal-text: var(--optimal-text);
+  --color-warning-text: var(--warning-text);
+  --color-stress-low-text: var(--stress-low-text);
+  --color-stress-medium-text: var(--stress-medium-text);
+  --color-stress-high-text: var(--stress-high-text);
+  --color-coach-text: var(--coach-text);
   --color-warning: var(--warning);
   --color-stress-low: var(--stress-low);
   --color-stress-medium: var(--stress-medium);
@@ -187,7 +193,7 @@
   --secondary: #3b4244;
   --secondary-foreground: #ffffff;
   --muted: #22282c;
-  --muted-foreground: #999ea3;
+  --muted-foreground: #a9aeb3;
   --accent: #41484b;
   --accent-foreground: #ffffff;
   --inset: #111619;
@@ -223,6 +229,13 @@
   --stress-low: var(--recovery-blue);
   --stress-medium: #00f19f;
   --stress-high: #ffa722;
+  /* Status colours as text: the data colours themselves in dark; darker in light so 12 px text passes 4.5:1. */
+  --optimal-text: var(--optimal);
+  --warning-text: var(--warning);
+  --stress-low-text: var(--stress-low);
+  --stress-medium-text: var(--stress-medium);
+  --stress-high-text: var(--stress-high);
+  --coach-text: var(--coach);
 
   /* Coach / insight language */
   --coach: #7095fe;
@@ -370,7 +383,7 @@
   --secondary: #e4e8eb;
   --secondary-foreground: #101518;
   --muted: #eef1f3;
-  --muted-foreground: #646e75;
+  --muted-foreground: #5a646b;
   --accent: #dde2e6;
   --accent-foreground: #101518;
   --inset: #eef1f3;
@@ -396,6 +409,12 @@
   --stress-low: var(--recovery-blue);
   --stress-medium: #00b377;
   --stress-high: #d97900;
+  --optimal-text: #007a52;
+  --warning-text: #a85a00;
+  --stress-low-text: #2a6fa8;
+  --stress-medium-text: #007a52;
+  --stress-high-text: #a85a00;
+  --coach-text: #3d5bd9;
   --coach: #4f6fe0;
   --insight-from: #e6e2fb;
   --insight-to: #dceef7;

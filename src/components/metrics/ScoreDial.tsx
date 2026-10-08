@@ -137,7 +137,9 @@ export function ScoreDial(props: ScoreDialProps) {
     const ring = compact ? 4 : lg ? 7 : 4
     const pct = (px: number) => `${Math.round((px / r) * 1000) / 10}%`
     const inner = r - 4 - ring
-    return { ring, outer: pct(r - 4), inner: pct(inner), needleInner: pct(inner - 22), tailStart: (inner - 22) / r, headStart: (inner - 2) / r }
+    // Where the arc's ends (215° and −35°, on the stroke's centre line) fall across the dial, for the 0.0 and 3.0 labels.
+    const end = 50 * (1 - Math.cos((35 * Math.PI) / 180) * ((inner + ring / 2) / r))
+    return { ring, outer: pct(r - 4), inner: pct(inner), needleInner: pct(inner - 22), tailStart: (inner - 22) / r, headStart: (inner - 2) / r, end }
   })()
   const target = variant === "strain" ? props.target : null
   const tagNode = (
@@ -301,9 +303,14 @@ export function ScoreDial(props: ScoreDialProps) {
         )}
       </div>
       {gauge && lg && (
-        <div aria-hidden className="absolute inset-x-[3%] top-[79%] flex justify-between font-numeric text-xs font-medium text-muted-foreground tabular-nums">
-          <span>0.0</span>
-          <span>3.0</span>
+        <div aria-hidden className="absolute inset-x-0 top-[79%] font-numeric text-xs font-medium text-muted-foreground tabular-nums">
+          {/* Each label centred under its end of the arc. */}
+          <span className="absolute -translate-x-1/2" style={{ left: `${gauge_.end}%` }}>
+            0.0
+          </span>
+          <span className="absolute translate-x-1/2" style={{ right: `${gauge_.end}%` }}>
+            3.0
+          </span>
         </div>
       )}
     </div>

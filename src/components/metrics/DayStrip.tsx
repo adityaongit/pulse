@@ -116,7 +116,7 @@ function Strip({ indicator, days, variant = "tile", value: controlled, onSelect 
                   className={cn(
                     "grid place-items-center rounded-full",
                     variant === "pill" ? "size-5" : "size-4",
-                    day.done ? (variant === "pill" ? "bg-optimal text-on-color" : "bg-optimal/20 text-optimal") : "ring-1 ring-border"
+                    day.done ? (variant === "pill" ? "bg-optimal text-on-color" : "bg-optimal/20 text-optimal-text") : "ring-1 ring-border"
                   )}
                 >
                   {day.done && <Check className={variant === "pill" ? "size-3" : "size-2.5"} strokeWidth={3} />}

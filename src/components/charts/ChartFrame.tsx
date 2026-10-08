@@ -25,7 +25,8 @@ export function ChartFigure({
   children: React.ComponentProps<typeof ChartContainer>["children"]
 }) {
   return (
-    <figure className={cn("min-w-0", grow && "flex flex-1 flex-col")}>
+    // Axis and value labels in tabular figures, so ticks of equal width line up ("0:00", "06:36").
+    <figure className={cn("min-w-0 tabular-nums", grow && "flex flex-1 flex-col")}>
       <figcaption className="sr-only">{summary}</figcaption>
       {/* Recharts' keyboard layer makes the plot (its <svg>) a tab stop; arrows scrub the tooltip. The default outline
           box is off: it showed on click (user report, 2026-10-03). The focus ring is the app's, on :focus-visible only,

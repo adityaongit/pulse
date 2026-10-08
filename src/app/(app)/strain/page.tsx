@@ -110,6 +110,8 @@ function TargetRow({ vm }: { vm: StrainVM }) {
       <span aria-hidden className="grid shrink-0 grid-cols-[auto_8px] gap-x-2">
         <span className={cn("font-numeric text-xl leading-6 font-bold tabular-nums", reason && "text-muted-foreground")}>{text}</span>
       </span>
+      {/* The rows below end on a chevron: keep its column so the values still line up. */}
+      <span aria-hidden className="size-4 shrink-0" />
     </div>
   )
 }

@@ -263,7 +263,7 @@ export function EditProfileButton({ defaults }: { defaults: ProfileDefaults }) {
         variant="ghost"
         aria-label="Edit profile"
         onClick={() => setOpen(true)}
-        className="-my-2 h-9 gap-1.5 rounded-full px-3 text-[13px] font-semibold text-foreground-secondary hover:bg-foreground/[0.06] hover:text-foreground"
+        className="relative -my-2 h-9 gap-1.5 rounded-full px-3 after:absolute after:-inset-y-1 text-[13px] font-semibold text-foreground-secondary hover:bg-foreground/[0.06] hover:text-foreground"
       >
         <Pencil aria-hidden strokeWidth={2} className="size-3.5" />
         Edit

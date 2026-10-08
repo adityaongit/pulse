@@ -16,7 +16,7 @@ function metric(m: { value: number | null; reason?: string | null; provisional?:
 }
 
 function BasedOn({ href, children }: { href: string; children: ReactNode }) {
-  return <Link href={href} className="inline-flex items-center gap-1.5 text-[12px] leading-4 text-coach hover:underline underline-offset-4">Based on {children}<ArrowUpRight aria-hidden className="size-3.5" /></Link>
+  return <Link href={href} className="inline-flex items-center gap-1.5 text-[12px] leading-4 text-coach-text hover:underline underline-offset-4">Based on {children}<ArrowUpRight aria-hidden className="size-3.5" /></Link>
 }
 
 function Card({ title, children }: { title: string; children: ReactNode }) {

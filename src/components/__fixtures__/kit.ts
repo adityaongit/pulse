@@ -107,7 +107,7 @@ export const vitals = [
   { key: "spo2", label: "Blood oxygen", metric: ok(92), unit: "%", format: "int", chip: { tone: "warning", text: "below 95 - 100" } },
   { key: "rhr", label: "Resting heart rate", metric: ok(58, { provisional: true }), unit: "bpm", format: "int", chip: { tone: "alert", text: "above 50 - 54" } },
   { key: "hrv", label: "Heart rate variability", metric: why<number>("no_hrv_last_night"), unit: "ms", format: "int" },
-  { key: "temp", label: "Skin temp (from baseline)", metric: ok(-0.6), unit: "°C", format: "signed1", chip: { tone: "neutral", text: "low < −0.4" } },
+  { key: "temp", label: "Skin temperature", metric: ok(-0.6), unit: "°C", format: "signed1", chip: { tone: "neutral", text: "low < −0.4" } },
 ] satisfies Keyed<Omit<KeyStatRowProps, "variant" | "direction">>[]
 
 export const activityTiles = [

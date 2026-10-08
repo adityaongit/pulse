@@ -41,7 +41,8 @@ export function distanceText(km: number | null | undefined, paceS?: number | nul
 
 // Rows are 10 px inside a 16 px card with a 6 px inset; the chip is 8 px inside the row (concentric, spec §2.4).
 const ROW = "flex h-14 items-center gap-3 rounded-lg bg-secondary pr-3 pl-1.5"
-const CHIP = "flex h-11 min-w-18 shrink-0 items-center justify-center gap-1.5 rounded-md px-2.5 text-foreground"
+// One fixed width, so every row's title starts on the same line whatever the number ("6.3", "11.4", "7:13").
+const CHIP = "flex h-11 w-21 shrink-0 items-center justify-center gap-1.5 rounded-md text-foreground"
 
 /** One row on the day's timeline (spec §5.12). Shared by ActivityCard and SleepCard. */
 export function TimelineRow({
