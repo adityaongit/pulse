@@ -53,12 +53,25 @@ describe("activity distance", () => {
     const ctx = ctxFor(db);
     const first = (type: string) => one<string>(sql`select id from exercises where user_id = ${USER} and type = ${type} order by start_ts desc limit 1`);
     const keys = async (type: string) => (await getActivity(await first(type), ctx))!.stats.map((k) => k.key);
-    expect(await keys("RUNNING")).toEqual(["duration", "distance", "pace", "avgHr", "maxHr", "calories"]);
-    expect(await keys("BIKING")).toEqual(["duration", "distance", "avgHr", "maxHr", "calories"]);
-    expect(await keys("STRENGTH_TRAINING")).toEqual(["duration", "avgHr", "maxHr", "calories"]);
+    expect(await keys("RUNNING")).toEqual(["calories", "avgHr", "maxHr", "duration", "distance", "pace"]);
+    expect(await keys("BIKING")).toEqual(["calories", "avgHr", "maxHr", "duration", "distance"]);
+    expect(await keys("STRENGTH_TRAINING")).toEqual(["calories", "avgHr", "maxHr", "duration"]);
     const run = (await getActivity(await first("RUNNING"), ctx))!.stats;
     expect(run.find((k) => k.key === "pace")).toMatchObject({ unit: "/km", format: "pace" });
     expect(run.find((k) => k.key === "pace")!.metric.value).toBeGreaterThan(180);
     expect(run.find((k) => k.key === "pace")!.average).not.toBeNull();
+  });
+
+  it("the activity hero: this kind's strain average, steps inside a run only, no split, and typical zone ranges", async () => {
+    const ctx = ctxFor(db);
+    const first = (type: string) => one<string>(sql`select id from exercises where user_id = ${USER} and type = ${type} order by start_ts desc limit 1`);
+    const run = (await getActivity(await first("RUNNING"), ctx))!;
+    expect(run.strainAverage).toBeGreaterThan(0);
+    expect(run.steps!.value).toBeGreaterThan(0);
+    expect(run.steps!.average).toBeGreaterThan(0);
+    expect(run.split).toBeNull();
+    for (const z of run.zones.value!) expect(z.typical!.low).toBeLessThanOrEqual(z.typical!.high);
+    const lift = (await getActivity(await first("STRENGTH_TRAINING"), ctx))!;
+    expect(lift.steps).toBeNull();
   });
 });

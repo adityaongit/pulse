@@ -1,5 +1,7 @@
 import { and, eq } from "drizzle-orm";
+import { zoneShareRanges } from "@/core/algorithms/zoneTypical";
 import { exercises } from "../db/schema";
+import { readSamples } from "../samples";
 import { addDays } from "../time";
 import {
   ACTIVITY_NAME,
@@ -31,6 +33,9 @@ export async function getActivity(id: string, ctx: QueryCtx): Promise<ActivityVM
     .from(x)
     .where(and(eq(x.userId, ctx.userId), eq(x.id, id)));
   if (!e) return null;
+  const kind = activityKind(e.type);
+  // Steps inside the workout for the kinds that walk or run (activity-05), and the same for earlier ones of that kind.
+  const stepping = kind === "run" || kind === "walk";
   const [rows, recent, series] = await Promise.all([
     loadDays(ctx, addDays(e.day, -30), e.day),
     exercisesBetween(ctx, addDays(e.day, -30), e.day),
@@ -38,12 +43,17 @@ export async function getActivity(id: string, ctx: QueryCtx): Promise<ActivityVM
   ]);
   const row = rows.get(e.day);
   const a = row?.activities.find((x) => x.id === id);
-  const kind = activityKind(e.type);
   const reason = a && a.hrCount > 0 ? "insufficient_hr_data" : hrReason(row?.s1 ?? null);
 
   // 30-day averages over the same activity kind, before this one.
   const same = recent.filter((x) => x.id !== id && x.startTs < e.startTs && activityKind(x.type) === kind);
   const statOf = (x: ExerciseRow) => rows.get(x.day)?.activities.find((y) => y.id === x.id);
+  const steps = stepping ? await readSamples(ctx.db, "steps", ctx.userId, Math.min(e.startTs, ...same.map((x) => x.startTs)), e.endTs) : [];
+  const stepsIn = (x: { startTs: number; endTs: number }) => steps.reduce((s, m) => (m.ts >= x.startTs && m.ts < x.endTs ? s + m.v : s), 0);
+  const strainOf = (x: ExerciseRow) => {
+    const effort = statOf(x)?.effort;
+    return effort == null ? null : toStrain(effort);
+  };
   const tile = (key: string, label: string, v: number | null | undefined, unit: string | undefined, prior: (number | null | undefined)[], r = reason): KeyStat => {
     const { mean, sd } = meanSd(prior);
     return { key, label, metric: maybe(v, r), ...(unit && { unit }), average: mean, ...(sd !== undefined && { sd }), direction: "neutral" };
@@ -58,13 +68,15 @@ export async function getActivity(id: string, ctx: QueryCtx): Promise<ActivityVM
         ...(kind === "ride" ? [] : [{ ...tile("pace", "Pace", here.paceS, "/km", same.map((x) => distanceOf(x).paceS), "no_data"), format: "pace" as const }]),
       ]
     : [];
+  // The reference app's order (activity-03): calories, heart rate, then duration; distance and pace after.
   const stats = [
-    tile("duration", "Duration", durationMin(e), "min", same.map(durationMin), "no_data"),
-    ...distance,
+    tile("calories", "Calories", e.calories, "kcal", same.map((x) => x.calories), "no_data"),
     tile("avgHr", "Average heart rate", a?.avgHr, "bpm", same.map((x) => statOf(x)?.avgHr)),
     tile("maxHr", "Max heart rate", a?.maxHr, "bpm", same.map((x) => statOf(x)?.maxHr)),
-    tile("calories", "Calories", e.calories, "kcal", same.map((x) => x.calories), "no_data"),
+    tile("duration", "Duration", durationMin(e), "min", same.map(durationMin), "no_data"),
+    ...distance,
   ];
+  const ownSteps = stepping ? stepsIn(e) : 0;
 
   const hrr60 = a?.hrr?.after1Minute;
   const hrr: ActivityVM["hrr"] =
@@ -80,7 +92,10 @@ export async function getActivity(id: string, ctx: QueryCtx): Promise<ActivityVM
     start: ms(e.startTs),
     end: ms(e.endTs),
     strain: a?.effort != null ? ok(toStrain(a.effort)) : none(reason),
-    dayStrain: row?.s1?.effort != null ? toStrain(row.s1.effort) : null,
+    strainAverage: meanSd(same.map(strainOf)).mean,
+    steps: ownSteps > 0 ? { value: ownSteps, average: meanSd(same.map(stepsIn).filter((n) => n > 0)).mean } : null,
+    // No source estimates muscular load yet: the split stays empty and its bar hidden (FEATURES.muscularLoad).
+    split: null,
     stats,
     insight: a && a.hrCount > 0 ? zoneInsight(a.zoneSeconds) : null,
     hr: hrChartOf(ctx, row, e.day, e.day === todayOf(ctx), series, recent.filter((y) => y.id === id), e.startTs - 600, e.endTs + 600),
@@ -92,21 +107,14 @@ export async function getActivity(id: string, ctx: QueryCtx): Promise<ActivityVM
 }
 
 /**
- * Adds each zone's typical seconds and share over earlier activities of the same kind (`prior`: seconds per zone, one
- * array per activity). Activities with no time in any zone are left out of the share; none at all leaves the rows as they are.
+ * Adds each zone's typical range (docs/algorithms/zone-typical-range.md) over earlier activities of the same kind
+ * (`prior`: seconds per zone in the rows' order, one array per activity). Too few activities leave the rows as they are.
  */
 export function withTypical(m: Metric<ZoneRow[]>, prior: number[][]): Metric<ZoneRow[]> {
   const rows = m.value;
-  if (!rows || !prior.length) return m;
-  const shares = prior.filter((p) => p.some((x) => x > 0)).map((p) => p.map((x) => x / p.reduce((a, b) => a + b, 0)));
-  const mean = (xs: number[]) => xs.reduce((a, b) => a + b, 0) / xs.length;
-  return {
-    ...m,
-    value: rows.map((z, i) => ({
-      ...z,
-      typical: { seconds: mean(prior.map((p) => p[i] ?? 0)), share: shares.length ? mean(shares.map((s) => s[i] ?? 0)) : 0 },
-    })),
-  };
+  const ranges = rows && zoneShareRanges(prior, rows.length);
+  if (!rows || !ranges) return m;
+  return { ...m, value: rows.map((z, i) => ({ ...z, typical: ranges[i] })) };
 }
 
 /** Seconds per zone, Zone 1 to Zone 5 (Zone 0 is not counted). */

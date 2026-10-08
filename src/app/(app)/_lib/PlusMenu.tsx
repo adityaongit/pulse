@@ -7,7 +7,7 @@ import { FEATURES } from "@/lib/features"
 import { cn } from "@/lib/utils"
 import { InfoDialogContent } from "@/components/shells/InfoDialog"
 import { openSheet } from "@/components/shells/SheetTrigger"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, MENU_ITEM, MENU_PANEL } from "@/components/ui/dropdown-menu"
 import { ADD_ACTIVITY_INFO } from "./info"
 
 type Entry = { key: string; label: string; icon: LucideIcon; shown: boolean; onSelect: () => void }
@@ -44,7 +44,7 @@ export function PlusMenu({ label }: { label: string }) {
         <DropdownMenuContent
           align="end"
           sideOffset={8}
-          className="w-auto min-w-64 rounded-2xl bg-linear-to-b from-menu-from to-menu-to p-1.5 text-foreground shadow-overlay ring-1 ring-foreground/10"
+          className={cn(MENU_PANEL, "w-auto min-w-64")}
         >
           {entries
             .filter((e) => e.shown)
@@ -52,7 +52,7 @@ export function PlusMenu({ label }: { label: string }) {
               <DropdownMenuItem
                 key={key}
                 onSelect={onSelect}
-                className="h-12 gap-3 rounded-xl px-3 text-[13px] leading-4 font-bold tracking-[0.1em] uppercase focus:bg-foreground/10 focus:text-foreground [&_svg:not([class*='size-'])]:size-5"
+                className={cn(MENU_ITEM, "[&_svg:not([class*='size-'])]:size-5")}
               >
                 <Icon aria-hidden strokeWidth={1.75} className="text-foreground-secondary" />
                 {text}

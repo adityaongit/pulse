@@ -54,8 +54,8 @@ export type ZoneRow = {
   min: number;
   max: number | null;
   seconds: number;
-  /** Activity only: the mean seconds and share (0-1) in this zone over the person's last 30 days of the same kind. */
-  typical?: { seconds: number; share: number };
+  /** Activity only: the middle half (25th to 75th percentile) of this zone's share (0-1) over the last 30 days of the same kind. */
+  typical?: { low: number; high: number };
 };
 export type StackedSegment = { key: string; label: string; count: number; color: string };
 
@@ -222,7 +222,12 @@ export type ActivityVM = {
   start: number;
   end: number;
   strain: Metric<number>;
-  dayStrain: number | null;
+  /** The mean strain of earlier activities of the same kind in the last 30 days (the hero's chip). */
+  strainAverage: number | null;
+  /** Runs and walks: steps inside the workout and the 30-day mean for the kind; null when none were counted. */
+  steps: { value: number; average: number | null } | null;
+  /** Cardio and muscular shares of the strain (0-1). Always null until a source estimates muscular load. */
+  split: { cardio: number; muscular: number } | null;
   stats: KeyStat[];
   insight: string | null;
   hr: Metric<HrChart>;

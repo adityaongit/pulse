@@ -1,3 +1,4 @@
+import Link from "next/link"
 import { cn } from "@/lib/utils"
 import { DATA_COLORS, ZONE_COLOR, type DataColor } from "@/lib/bands"
 import { durationWords, hmm } from "@/lib/format"
@@ -14,8 +15,8 @@ export type ZoneRow = {
   min: number
   max: number | null
   seconds: number
-  /** Activity only: the mean seconds and share (0-1) in this zone over the last 30 days of the same kind. */
-  typical?: { seconds: number; share: number }
+  /** Activity only: the middle half of this zone's share (0-1) over the last 30 days of the same kind. */
+  typical?: { low: number; high: number }
 }
 export type StackedSegment = { key: string; label: string; count: number; color: DataColor }
 
@@ -26,6 +27,8 @@ export type ZoneBarsProps =
       data: Metric<ZoneRow[]> | null | undefined
       /** Where the zones came from, under the rows. */
       note?: string
+      /** A link after the note (activity-02's "View HR Settings"). */
+      noteLink?: { label: string; href: string }
       emptyCopy?: string
     }
   | {
@@ -43,7 +46,7 @@ function share(part: number, total: number) {
   return p < 1 ? "<1%" : `${Math.round(p)}%`
 }
 
-function Rows({ zones, note }: { zones: ZoneRow[]; note?: string }) {
+function Rows({ zones, note, noteLink }: { zones: ZoneRow[]; note?: string; noteLink?: { label: string; href: string } }) {
   const total = zones.reduce((a, z) => a + z.seconds, 0)
   const sorted = [...zones].sort((a, b) => b.zone - a.zone)
   const typical = sorted.some((z) => z.typical)
@@ -55,7 +58,7 @@ function Rows({ zones, note }: { zones: ZoneRow[]; note?: string }) {
         <p className="rounded-lg bg-secondary px-3 py-3 text-[15px] leading-[22px] text-pretty text-foreground-secondary">
           Heart rate stayed under the {lowest.label} zone ({lowest.min}{"\u00a0"}bpm) the whole time.
         </p>
-        {note && <p className="mt-3 text-xs leading-4 font-medium text-muted-foreground">{note}</p>}
+        <Note note={note} link={noteLink} />
       </div>
     )
   const T = Math.round(total)
@@ -94,30 +97,46 @@ function Rows({ zones, note }: { zones: ZoneRow[]; note?: string }) {
               <div aria-hidden className="flex items-baseline gap-2">
                 <span className={cn(LABEL, "font-bold uppercase")}>{z.label}</span>
                 <span className={cn(LABEL, "font-numeric text-muted-foreground uppercase")}>{range}</span>
-                <span className={cn(LABEL, "font-numeric", color && z.zone > 1 && z.seconds > 0 ? color.text : "text-muted-foreground")}>{sh}</span>
-                {z.typical && Math.round((z.seconds - z.typical.seconds) / 60) !== 0 && (
-                  <span className={cn(LABEL, "font-numeric", z.seconds > z.typical.seconds ? "text-foreground" : "text-muted-foreground")}>
-                    {z.seconds > z.typical.seconds ? "+" : "\u2212"}
-                    {Math.abs(Math.round((z.seconds - z.typical.seconds) / 60))}
-                    {"\u00a0"}min
-                  </span>
-                )}
+                {/* The share in the zone's colour, 0% included; Zones 0 and 1 stay white (activity-02, activity-05). */}
+                <span className={cn(LABEL, "font-numeric", color && z.zone > 1 ? color.text : "text-foreground")}>{sh}</span>
                 <span className="ml-auto font-numeric text-lg leading-6 font-bold tabular-nums">
                   {hmm(minutes)}
                   <span className="text-xs text-muted-foreground">:{String(t % 60).padStart(2, "0")}</span>
                 </span>
               </div>
               <div aria-hidden className="relative h-3 rounded-[2px] bg-(image:--pattern-hatch)">
-                <div className={cn("absolute inset-y-0 left-0 rounded-[2px]", color ? color.bg : "bg-foreground/30")} style={{ width: total ? `${(z.seconds / total) * 100}%` : 0 }} />
-                {/* Your typical share for this kind of activity: a thin tick at the end of the hatched area. */}
-                {z.typical && <div className="absolute -inset-y-0.5 w-0.5 -translate-x-1/2 bg-foreground" style={{ left: `${Math.min(100, z.typical.share * 100)}%` }} />}
+                <div className={cn("absolute inset-y-0 left-0 rounded-[2px]", color ? color.bg : "bg-foreground")} style={{ width: total ? `${(z.seconds / total) * 100}%` : 0 }} />
+                {/* Your typical range for this kind of activity: a lit band between two dashed ticks, over the bar. */}
+                {z.typical && (
+                  <div
+                    className="absolute -inset-y-0.5 border-x border-dashed border-foreground/80 bg-foreground/10"
+                    style={{ left: `${Math.min(100, z.typical.low * 100)}%`, width: `${Math.max(0, Math.min(100, z.typical.high * 100) - Math.min(100, z.typical.low * 100))}%` }}
+                  />
+                )}
               </div>
             </li>
           )
         })}
       </ul>
-      {note && <p className="mt-3 text-xs leading-4 font-medium text-muted-foreground">{note}</p>}
+      <Note note={note} link={noteLink} />
     </div>
+  )
+}
+
+function Note({ note, link }: { note?: string; link?: { label: string; href: string } }) {
+  if (!note) return null
+  return (
+    <p className="mt-3 text-xs leading-4 font-medium text-muted-foreground">
+      {note}
+      {link && (
+        <>
+          {" "}
+          <Link href={link.href} className="text-foreground-secondary underline underline-offset-2 hover:text-foreground">
+            {link.label}
+          </Link>
+        </>
+      )}
+    </p>
   )
 }
 
@@ -158,7 +177,7 @@ export function ZoneBars(p: ZoneBarsProps) {
   if (p.variant === "rows")
     return (
       <MetricState metric={p.data} skeleton={<ZoneBarsSkeleton variant="rows" />} empty={empty}>
-        {(zones) => <Rows zones={zones} note={p.note} />}
+        {(zones) => <Rows zones={zones} note={p.note} noteLink={p.noteLink} />}
       </MetricState>
     )
   return (

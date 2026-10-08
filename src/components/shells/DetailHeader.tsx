@@ -83,11 +83,7 @@ export function DetailHeaderRow({
           <h1 className={cn(HEADER_TITLE, "truncate")}>{title}</h1>
           {subtitle && <p className="truncate text-[13px] leading-[18px] text-foreground-secondary tabular-nums">{subtitle}</p>}
         </div>
-        {info && (
-          <span className={sideLine}>
-            <InfoButton info={info} label={title} variant="header" />
-          </span>
-        )}
+        {(action || info) && <span className={sideLine}>{action ?? <InfoButton info={info!} label={title} variant="header" />}</span>}
       </div>
     )
 

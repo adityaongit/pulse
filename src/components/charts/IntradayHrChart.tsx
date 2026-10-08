@@ -58,15 +58,15 @@ function SpanMark({ viewBox, kind, text }: { viewBox?: { x?: number; y?: number;
   )
 }
 
-/** `shade: false` keeps the header but drops the fill (an activity chart is all workout, so shading it says nothing). */
-export function spanAreas(spans: ChartSpan[] | undefined, shade = true) {
+/** Each marked stretch shaded, with its header along the top. */
+export function spanAreas(spans: ChartSpan[] | undefined) {
   return (spans ?? []).map((s) => (
     <ReferenceArea
       key={`${s.kind}-${s.start}`}
       x1={s.start}
       x2={s.end}
       fill={s.kind === "workout" ? "var(--strain-deep)" : "var(--sleep)"}
-      fillOpacity={!shade ? 0 : s.kind === "workout" ? 0.12 : 0.08}
+      fillOpacity={s.kind === "workout" ? 0.12 : 0.08}
       ifOverflow="hidden"
       label={({ viewBox }: { viewBox?: { x?: number; y?: number; width?: number } }) => <SpanMark viewBox={viewBox} kind={s.kind} text={s.label} />}
     />
@@ -138,11 +138,13 @@ function Chart({ hr, variant }: { hr: HrSeries; variant: "day" | "activity" }) {
   const hotTop = hot.length ? Math.max(...hot) : 0
   const hotBottom = hot.length ? Math.min(...hot) : 0
   const bands = zoneBands(hr.zones ?? [])
+  // An activity marks its start and end with dashed lines and bold times under them (activity-01, activity-05).
+  const workout = variant === "activity" ? workouts[0] : undefined
 
   return (
     <div>
       <ChartFigure summary={summary} config={{ bpm: { label: "Heart rate", color: "var(--strain)" } }} className={variant === "day" ? "h-[200px]" : "h-[180px]"}>
-        <AreaChart data={rows} accessibilityLayer margin={{ top: 18, right: 28, bottom: 0, left: 0 }}>
+        <AreaChart data={rows} accessibilityLayer margin={{ top: workout ? 8 : 18, right: workout ? 8 : 28, bottom: 0, left: 0 }}>
           <defs>
             <BandGradient id={`hr-line-${id}`} top={hotTop} bottom={hotBottom} bands={bands} />
             {/* The fill is one soft fade in the peak's colour: band stops in a fill read as stacked blocks. */}
@@ -150,18 +152,30 @@ function Chart({ hr, variant }: { hr: HrSeries; variant: "day" | "activity" }) {
             <FadeGradient id={`hr-cool-${id}`} color="var(--foreground)" from={0.1} />
           </defs>
           <CartesianGrid {...GRID} />
-          {spanAreas(hr.spans, variant === "day")}
-          {zoneStrips(hr.zones, domain)}
+          {variant === "day" && spanAreas(hr.spans)}
+          {variant === "day" && zoneStrips(hr.zones, domain)}
+          {workout &&
+            [workout.start, workout.end].map((x) => (
+              <ReferenceLine
+                key={x}
+                x={x}
+                stroke="var(--foreground-secondary)"
+                strokeDasharray="3 3"
+                ifOverflow="hidden"
+                label={({ viewBox }: { viewBox?: { x?: number; y?: number; height?: number } }) => <circle cx={viewBox?.x ?? 0} cy={(viewBox?.y ?? 0) + (viewBox?.height ?? 0)} r={2.5} fill="var(--foreground)" />}
+              />
+            ))}
           <XAxis
             dataKey="t"
             type="number"
             scale="time"
             domain={[first, last]}
-            ticks={variant === "day" ? hourTicks(first, last, 6, tz) : clockTicks(first, last, last - first <= 3_600_000 ? 15 : last - first <= 3 * 3_600_000 ? 30 : 60, tz)}
+            ticks={workout ? [workout.start, workout.end] : variant === "day" ? hourTicks(first, last, 6, tz) : clockTicks(first, last, last - first <= 3_600_000 ? 15 : last - first <= 3 * 3_600_000 ? 30 : 60, tz)}
             tickFormatter={(v: number) => clock(v, tz)}
-            interval="preserveStartEnd"
+            interval={workout ? 0 : "preserveStartEnd"}
             minTickGap={24}
             {...AXIS}
+            {...(workout && { tick: { fill: "var(--foreground)", fontSize: 12, fontWeight: 700 } })}
           />
           <YAxis domain={domain} width={32} tickCount={4} {...AXIS} />
           {hr.now && <ReferenceLine x={hr.now} stroke="var(--chart-cursor)" strokeDasharray="4 4" ifOverflow="hidden" />}

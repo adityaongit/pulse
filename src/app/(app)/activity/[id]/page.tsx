@@ -1,6 +1,8 @@
 import { notFound } from "next/navigation"
 import { cn } from "@/lib/utils"
-import { clock, dayLabel, formatValue, hmm } from "@/lib/format"
+import { deltaTone } from "@/lib/bands"
+import { FEATURES } from "@/lib/features"
+import { clock, dayLabel, formatValue } from "@/lib/format"
 import { dayHref } from "@/lib/url"
 import { IntradayHrChart } from "@/components/charts/IntradayHrChart"
 import { ZoneBars } from "@/components/charts/ZoneBars"
@@ -16,6 +18,8 @@ import { getActivity } from "@/server/queries/activity"
 import { todayOf, userCtx } from "@/server/queries/common"
 import type { ActivityVM } from "@/server/queries/types"
 import { CAPTION, hrSeries, statProps } from "../../_lib/view"
+import { ActivityMenu } from "./ActivityMenu"
+import { WorkoutBanner } from "./WorkoutBanner"
 
 export const metadata = { title: "Activity", description: "Activity strain, heart rate, zones and recovery after the workout." }
 
@@ -32,7 +36,8 @@ export default async function ActivityPage({ params }: PageProps<"/activity/[id]
   // No heart rate at all (band off): one notice replaces the empty chart, the empty zones and the dashed heart-rate
   // tiles, instead of the same "band not worn" line three times over an empty page.
   const noHr = vm.hr.value === null && vm.zones.value === null
-  const tiles = vm.stats.filter((k) => k.key !== "duration" && !(noHr && k.metric.value === null))
+  const tiles = vm.stats.filter((k) => !(noHr && k.metric.value === null))
+  const strainHref = dayHref("/strain", vm.day, today)
 
   return (
     <DetailShell
@@ -40,8 +45,14 @@ export default async function ActivityPage({ params }: PageProps<"/activity/[id]
       subtitle={`${dayLabel(vm.day, today)} ${clock(vm.start, timeZone)} to ${clock(vm.end, timeZone)}`}
       align="start"
       titleIcon={<Icon />}
-      backHref={dayHref("/strain", vm.day, today)}
-      hero={<Hero vm={vm} />}
+      backHref={strainHref}
+      action={<ActivityMenu strainHref={strainHref} settingsHref={HR_SETTINGS} />}
+      hero={
+        <div className="w-full space-y-6">
+          {FEATURES.strengthTrainer && vm.kind === "strength" && <WorkoutBanner />}
+          <Hero vm={vm} />
+        </div>
+      }
       // the reference app draws the heart rate and the zone rows on the ground, not in cards [latest-activity-1].
       primary={
         noHr ? (
@@ -60,7 +71,7 @@ export default async function ActivityPage({ params }: PageProps<"/activity/[id]
               <h2 id="zones-title" className="sr-only">
                 Time in zones
               </h2>
-              <ZoneBars variant="rows" data={vm.zones} note={vm.zoneNote} emptyCopy="No heart-rate zones for this activity." />
+              <ZoneBars variant="rows" data={vm.zones} note={vm.zoneNote} noteLink={{ label: "View heart-rate settings", href: HR_SETTINGS }} emptyCopy="No heart-rate zones for this activity." />
             </section>
           </div>
         )
@@ -68,13 +79,14 @@ export default async function ActivityPage({ params }: PageProps<"/activity/[id]
       secondary={[
         tiles.length > 0 && (
           <SectionShell key="stats" variant="section" title="Key statistics" aside="vs. 30-day average" level={2} className={cn("flex flex-col", noHr && "xl:col-span-2")}>
-            <div className={cn("grid flex-1 grid-cols-2 gap-3 xl:gap-4", tiles.length > 2 && "md:grid-cols-3")}>
-              {tiles.map((k, i) => {
-                // An odd last tile spans the phone's two columns as a wide strip that spells out its comparison.
-                const wide = tiles.length % 2 === 1 && i === tiles.length - 1
-                return <KeyStatRow key={k.key} variant="tile" {...statProps(k)} wide={wide && "md"} className={cn(wide && "max-md:col-span-2")} />
-              })}
-            </div>
+            {/* One scrolling row, the next tile peeking at the edge (activity-03); bleeds to the phone's edges. */}
+            <ul className="-mx-4 flex flex-1 snap-x snap-mandatory scroll-px-4 gap-3 overflow-x-auto overscroll-x-contain px-4 pb-1 [scrollbar-width:none] md:mx-0 md:scroll-px-0 md:px-0">
+              {tiles.map((k) => (
+                <li key={k.key} className="relative flex w-[calc((100%-12px)/2.15)] shrink-0 snap-start md:w-44">
+                  <KeyStatRow variant="tile" {...statProps(k)} className="w-full" />
+                </li>
+              ))}
+            </ul>
           </SectionShell>
         ),
         // A titled section like Key statistics beside it, so both columns carry a heading and their cards start and end
@@ -93,35 +105,66 @@ export default async function ActivityPage({ params }: PageProps<"/activity/[id]
 }
 
 const STAT_LABEL = "text-xs leading-4 font-bold tracking-[0.1em] text-foreground-secondary uppercase"
+/** The profile, where max heart rate (and so the zones) is set. */
+const HR_SETTINGS = "/settings?s=account"
 
-/** the reference app's activity hero [latest-activity-1]: a left-aligned stat pair at 34 px (spec §11 F14), activity strain in blue and the duration. */
+/**
+ * The activity hero (activity-01, activity-05): strain in blue with a chip of this kind's 30-day average, then the steps
+ * in the workout for runs and walks, or the cardio / muscular split once a source estimates it (FEATURES.muscularLoad).
+ */
 function Hero({ vm }: { vm: ActivityVM }) {
   const s = vm.strain.value
-  const duration = vm.stats.find((k) => k.key === "duration")?.metric.value ?? (vm.end - vm.start) / 60_000
   return (
     <div className="w-full space-y-2">
-      <div className="flex flex-wrap items-end gap-x-10 gap-y-3">
-        <div>
-          <p className="font-numeric text-[34px] leading-none font-bold tabular-nums">
-            <span className={s === null ? "text-muted-foreground" : "text-strain-text"}>{formatValue("decimal1", s)}</span>
-          </p>
-          <p className={cn(STAT_LABEL, "mt-2")}>Activity strain</p>
-        </div>
-        <div>
-          <p className="font-numeric text-[34px] leading-none font-bold tabular-nums">{hmm(duration)}</p>
-          <p className={cn(STAT_LABEL, "mt-2")}>Duration</p>
-        </div>
+      <div className="flex flex-wrap items-end gap-x-10 gap-y-4">
+        <HeroStat label="Activity strain" value={formatValue("decimal1", s)} average={vm.strainAverage} format="decimal1" valueClass={s === null ? "text-muted-foreground" : "text-strain-text"} raw={s} />
+        {vm.steps ? (
+          <HeroStat label="Activity steps" value={formatValue("grouped", vm.steps.value)} average={vm.steps.average} format="grouped" raw={vm.steps.value} />
+        ) : (
+          FEATURES.muscularLoad && vm.split && <CardioMuscular split={vm.split} />
+        )}
       </div>
-      {s === null ? (
-        // The band-off notice under the hero already says why; repeating it here was the first of three copies.
-        vm.hr.value !== null && <ReasonPlaceholder reason={vm.strain.reason} size="sm" />
-      ) : (
-        vm.dayStrain !== null && (
-          <p className={CAPTION}>
-            Day strain <span className="font-numeric tabular-nums">{formatValue("decimal1", vm.dayStrain)}</span>
-          </p>
-        )
-      )}
+      {/* The band-off notice under the hero already says why; repeating it here was the first of three copies. */}
+      {s === null && vm.hr.value !== null && <ReasonPlaceholder reason={vm.strain.reason} size="sm" />}
+    </div>
+  )
+}
+
+function HeroStat({ label, value, raw, average, format, valueClass }: { label: string; value: string; raw: number | null; average: number | null; format: "decimal1" | "grouped"; valueClass?: string }) {
+  const dir = raw !== null && average !== null ? deltaTone("neutral", raw, average).dir : null
+  return (
+    <div>
+      <p className="flex items-center gap-2">
+        <span className={cn("font-numeric text-[34px] leading-none font-bold tabular-nums", valueClass)}>{value}</span>
+        {dir && average !== null && (
+          <StatusChip tone="neutral" delta={dir}>
+            <span className="sr-only">30-day average for this kind of activity </span>
+            {formatValue(format, average)}
+          </StatusChip>
+        )}
+      </p>
+      <p className={cn(STAT_LABEL, "mt-2")}>{label}</p>
+    </div>
+  )
+}
+
+/** activity-01's split: Cardio and Muscular over one bar with a white divider at the split, the shares under it. */
+function CardioMuscular({ split }: { split: NonNullable<ActivityVM["split"]> }) {
+  const cardio = Math.round(split.cardio * 100)
+  return (
+    <div className="min-w-48 flex-1" role="img" aria-label={`Cardio ${cardio} percent, muscular ${100 - cardio} percent`}>
+      <p aria-hidden className={cn(STAT_LABEL, "flex justify-between")}>
+        <span>Cardio</span>
+        <span>Muscular</span>
+      </p>
+      <div aria-hidden className="relative mt-1.5 h-4 overflow-hidden rounded-[3px] bg-strain">
+        <div className="absolute inset-y-0 left-0 bg-strain-deep" style={{ width: `${cardio}%` }} />
+        <div className="absolute inset-y-0 w-0.5 -translate-x-1/2 bg-foreground" style={{ left: `${cardio}%` }} />
+      </div>
+      <p aria-hidden className="mt-1.5 flex justify-between font-numeric text-[15px] leading-5 font-bold tabular-nums">
+        <span>{cardio}%</span>
+        <span>{100 - cardio}%</span>
+      </p>
     </div>
   )
 }

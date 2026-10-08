@@ -4,7 +4,7 @@ import Link from "next/link"
 import { Check, ChevronDown } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { CARD_LINK } from "@/components/shells/SectionShell"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, MENU_ITEM, MENU_PANEL } from "@/components/ui/dropdown-menu"
 
 export type TrendMetricOption = { key: string; label: string; href: string; icon?: React.ReactNode }
 
@@ -29,10 +29,10 @@ export function TrendMetricMenu({ current, options }: { current: string; options
       <DropdownMenuContent
         align="start"
         sideOffset={8}
-        className="w-(--radix-dropdown-menu-trigger-width) rounded-2xl bg-linear-to-b from-menu-from to-menu-to p-1.5 text-foreground shadow-overlay ring-1 ring-foreground/10"
+        className={cn(MENU_PANEL, "w-(--radix-dropdown-menu-trigger-width)")}
       >
         {options.map((o) => (
-          <DropdownMenuItem key={o.key} asChild className="h-12 gap-3 rounded-xl px-3 text-[13px] leading-4 font-bold tracking-[0.1em] uppercase focus:bg-foreground/10 focus:text-foreground">
+          <DropdownMenuItem key={o.key} asChild className={MENU_ITEM}>
             <Link href={o.href} replace scroll={false} aria-current={o.key === on.key ? "page" : undefined}>
               <span aria-hidden className={ICON}>
                 {o.icon}

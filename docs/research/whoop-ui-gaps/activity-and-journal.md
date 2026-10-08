@@ -95,17 +95,17 @@ Build steps for the last phase (shared with [dashboard-health-community-coach.md
 | 2 | Step 6: Select Activity picker (static catalogue), opened by the hidden Add and Start flows | Open |
 | 3 | Step 6: Start Activity live screen, behind `FEATURES.startActivity` | Open |
 | 4 | Steps 1 and 3: SAVED screen (`DoneScreen`) replaces the toast | Done (R37) |
-| 5 | Step 5: Cardio / Muscular split, behind a flag (no muscular load source) | Open |
-| 6 | Step 5: strain chip against the sport's 30-day average | Open |
-| 7 | Step 5: Activity Steps from the step minutes inside the workout | Open |
-| 8 | Step 5: "Get More from Your Workouts" banner, behind `FEATURES.strengthTrainer` | Open |
-| 9 | Step 5: overflow menu (the day's Strain, heart-rate settings) | Open |
-| 10 | Step 5: zone footnote links "View HR Settings" to the profile in `/settings` | Open |
-| 11 | Step 5: Key Statistics carousel with a Duration tile | Open |
+| 5 | Step 5: Cardio / Muscular split, behind a flag (no muscular load source) | Hidden (R39, `FEATURES.muscularLoad`) |
+| 6 | Step 5: strain chip against the sport's 30-day average | Done (R39) |
+| 7 | Step 5: Activity Steps from the step minutes inside the workout | Done (R39) |
+| 8 | Step 5: "Get More from Your Workouts" banner, behind `FEATURES.strengthTrainer` | Hidden (R39, `FEATURES.strengthTrainer`) |
+| 9 | Step 5: overflow menu (the day's Strain, heart-rate settings) | Done (R39) |
+| 10 | Step 5: zone footnote links "View HR Settings" to the profile in `/settings` | Done (R39) |
+| 11 | Step 5: Key Statistics carousel with a Duration tile | Done (R39) |
 | 12 | Step 10: coach pill ("Analyzing…") replaces the insight card when the coach is on | Open |
-| 13 | Step 5: dashed start and end markers with times; the span bar and zone strips go | Open |
-| 14 | Step 5: typical band on zone rows | Open |
-| 15 | Step 5: zone colours at 0%, Zone 0 white; the "+N min" deltas go | Open |
+| 13 | Step 5: dashed start and end markers with times; the span bar and zone strips go | Done (R39) |
+| 14 | Step 5: typical band on zone rows | Done (R39) |
+| 15 | Step 5: zone colours at 0%, Zone 0 white; the "+N min" deltas go | Done (R39) |
 | 16 | Steps 1 and 3: Journal as a full-screen modal with the sand glow and the pencil | Done (R37, R38) |
 | 17 | Step 3: day strip and "‹ TODAY ›" inside the journal | Done (R37) |
 | 18 | Step 3: "What's happening today, April 15?" heading | Done (R37) |
