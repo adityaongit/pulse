@@ -62,10 +62,10 @@ export async function saveJournalEntry(input: z.input<typeof Entry>): Promise<Ac
 }
 
 /**
- * Read-only: the check-in sheet's behaviours and a day's answers. The sheet opens over any screen (`?checkin=1`,
+ * Read-only: the journal's behaviours, a day's answers and note, and the day strip. The sheet opens over any screen (`?checkin=1`,
  * spec §11 UX2), so it fetches what the Journal page would have passed it.
  */
-export async function loadCheckIn(day: string): Promise<ActionResult<Pick<JournalVM, "tags" | "checkIn">>> {
+export async function loadCheckIn(day: string): Promise<ActionResult<Pick<JournalVM, "tags" | "checkIn" | "strip">>> {
   const user = await currentUser();
   if (!user) return SIGNED_OUT;
   const r = z.iso.date().safeParse(day);
@@ -73,8 +73,8 @@ export async function loadCheckIn(day: string): Promise<ActionResult<Pick<Journa
   const ctx = await userCtx(user.userId);
   if (!inDayRange(r.data, localDay(ctx.now, ctx.timeZone))) return { ok: false, error: "Invalid day" };
   // ponytail: getJournal also builds the strip, history and teaser the sheet drops; a lean query if it ever shows.
-  const { tags, checkIn } = await getJournal(r.data, ctx);
-  return { ok: true, data: { tags, checkIn } };
+  const { tags, checkIn, strip } = await getJournal(r.data, ctx);
+  return { ok: true, data: { tags, checkIn, strip } };
 }
 
 const Note = z.object({ day: z.iso.date(), text: z.string().max(2000) });

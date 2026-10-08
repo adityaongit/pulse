@@ -142,13 +142,13 @@ test("7. journal: check in with the round button or + → save → Insights show
   await page.goto("/");
   await page.getByRole("button", { name: "Check in for Today" }).filter({ visible: true }).click();
   await expect(page).toHaveURL(url("/?checkin=1"));
-  const sheet = page.getByRole("dialog", { name: "Check in" });
+  const sheet = page.getByRole("dialog", { name: "Journal" });
   await expect(sheet).toBeVisible();
-  await sheet.getByRole("radiogroup", { name: "Alcohol" }).getByRole("radio", { name: "Yes" }).click();
-  await sheet.getByRole("radiogroup", { name: "Stretching" }).getByRole("radio", { name: "No" }).click();
-  await sheet.getByRole("button", { name: "Save check-in" }).click();
-  await expect(page.getByText("Check-in saved")).toBeVisible();
-  await expect(sheet).toBeHidden();
+  await sheet.getByRole("radiogroup", { name: "Had any alcohol?" }).getByRole("radio", { name: "Yes" }).click();
+  await sheet.getByRole("radiogroup", { name: "Stretched?" }).getByRole("radio", { name: "No" }).click();
+  await sheet.getByRole("button", { name: "Save journal" }).click();
+  await expect(page.getByText("Have a great day!")).toBeVisible();
+  await expect(page.getByRole("dialog")).toBeHidden();
   await expect(page).toHaveURL(url("/"));
 
   await page.goto("/journal/insights");
@@ -199,9 +199,10 @@ test("9. More hub: Trends and a metric switch, a custom behaviour in the check-i
   await page.getByRole("button", { name: "Add behaviour", exact: true }).click();
   await expect(page.getByRole("switch", { name: `Show ${name} in the check-in` })).toBeChecked();
   await page.goto("/journal?checkin=1");
-  const sheet = page.getByRole("dialog", { name: "Check in" });
-  await expect(sheet.getByRole("radiogroup", { name })).toBeVisible();
+  const sheet = page.getByRole("dialog", { name: "Journal" });
+  await expect(sheet.getByRole("radiogroup", { name: `${name}?` })).toBeVisible();
   await page.keyboard.press("Escape");
+  await page.getByRole("button", { name: "Yes, dismiss journal" }).click();
 
   await page.goto("/more/data");
   const download = page.waitForEvent("download");
@@ -243,5 +244,5 @@ test("10. My Day's +: the action menu → Add activity explains, Complete your j
   await plus.click();
   await page.getByRole("menu").getByRole("menuitem", { name: /Complete your journal/i }).click();
   await expect(page).toHaveURL(url("/?checkin=1"));
-  await expect(page.getByRole("dialog", { name: "Check in" })).toBeVisible();
+  await expect(page.getByRole("dialog", { name: "Journal" })).toBeVisible();
 });

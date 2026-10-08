@@ -26,15 +26,21 @@ export type DayStripProps = {
   indicator: "recovery" | "journal"
   /** The 30 days ending today, extended back to include `d` (U10). Oldest first; no future days. */
   days: DayStripDay[]
+  /** "pill": the Journal's tall rounded days with a short weekday, the selected one ringed (journal-01). */
+  variant?: "tile" | "pill"
+  /** With `onSelect`, the strip picks a day for its owner instead of changing `?d=`. */
+  value?: string
+  onSelect?: (day: string) => void
 }
 
-function Strip({ indicator, days }: DayStripProps) {
+function Strip({ indicator, days, variant = "tile", value: controlled, onSelect }: DayStripProps) {
   const { today } = useShellCalendar()
   const router = useRouter()
   const pathname = usePathname()
   const params = useSearchParams()
   const reduced = useReducedMotion()
-  const { d } = parseDay(params.get("d") ?? undefined, today)
+  const { d: urlDay } = parseDay(params.get("d") ?? undefined, today)
+  const d = controlled ?? urlDay
   const [value, setValue] = React.useState(d)
   const selected = React.useRef<HTMLButtonElement>(null)
   const first = React.useRef(true)
@@ -66,12 +72,13 @@ function Strip({ indicator, days }: DayStripProps) {
         value={value}
         onValueChange={(v) => {
           if (!v) return // Radix allows deselecting; a day is always selected.
+          if (onSelect) return onSelect(v)
           setValue(v)
           router.replace(`${pathname}${withParam(params.toString(), "d", v === today ? null : v)}`, { scroll: false })
         }}
         aria-label="Choose a day"
         spacing={1}
-        className="w-max gap-1 px-4 py-1 md:px-1"
+        className={cn("w-max gap-1 px-4 py-1", variant === "pill" ? "gap-2 md:px-6" : "md:px-1")}
       >
         {days.map((day) => {
                     const r = day.recovery ?? null
@@ -88,10 +95,15 @@ function Strip({ indicator, days }: DayStripProps) {
               aria-label={label}
               // Sized by its contents with 8 px above and below, so the badge sits fully inside the lit tile (SYM1):
               // 60 px with the recovery bar, 72 px with the journal badge.
-              className="h-auto w-11 flex-col justify-center gap-1 rounded-xl px-0 py-2 transition-[background-color,scale] duration-150 ease-standard hover:bg-foreground/6 active:scale-[0.96] data-[state=on]:bg-foreground/10"
+              className={cn(
+                "h-auto flex-col justify-center gap-1 px-0 transition-[background-color,box-shadow,scale] duration-150 ease-standard active:scale-[0.96]",
+                variant === "pill"
+                  ? "w-12 gap-1.5 rounded-full bg-foreground/[0.07] py-3 hover:bg-foreground/10 data-[state=on]:bg-foreground/[0.07] data-[state=on]:inset-ring-2 data-[state=on]:inset-ring-foreground"
+                  : "w-11 rounded-xl py-2 hover:bg-foreground/6 data-[state=on]:bg-foreground/10"
+              )}
             >
-              <span aria-hidden className="text-[11px] leading-3 font-semibold text-muted-foreground">
-                {formatDay(day.date, { weekday: "narrow" })}
+              <span aria-hidden className={cn("leading-3 font-semibold text-muted-foreground", variant === "pill" ? "text-xs" : "text-[11px]")}>
+                {formatDay(day.date, { weekday: variant === "pill" ? "short" : "narrow" })}
               </span>
               <span aria-hidden className="font-numeric text-[17px] leading-5 font-semibold tabular-nums">
                 {formatDay(day.date, { day: "numeric" })}
@@ -101,9 +113,13 @@ function Strip({ indicator, days }: DayStripProps) {
               ) : (
                 <span
                   aria-hidden
-                  className={cn("grid size-4 place-items-center rounded-full", day.done ? "bg-optimal/20 text-optimal" : "ring-1 ring-border")}
+                  className={cn(
+                    "grid place-items-center rounded-full",
+                    variant === "pill" ? "size-5" : "size-4",
+                    day.done ? (variant === "pill" ? "bg-optimal text-on-color" : "bg-optimal/20 text-optimal") : "ring-1 ring-border"
+                  )}
                 >
-                  {day.done && <Check className="size-2.5" strokeWidth={3} />}
+                  {day.done && <Check className={variant === "pill" ? "size-3" : "size-2.5"} strokeWidth={3} />}
                 </span>
               )}
             </ToggleGroupItem>

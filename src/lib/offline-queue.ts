@@ -7,7 +7,7 @@ import { saveJournalEntry } from "@/server/actions/journal"
 const key = (userId: number) => `pulse:journal-queue:${userId}`
 // Before the queue was per account; its owner is unknown, so it is dropped rather than replayed.
 const LEGACY_KEY = "pulse:journal-queue"
-export type Queued = { day: string; tag: string; value: boolean | null }
+export type Queued = { day: string; tag: string; value: boolean | null; detail?: number | null }
 
 const read = (userId: number): Queued[] => {
   try {

@@ -94,7 +94,7 @@ Build steps for the last phase (shared with [dashboard-health-community-coach.md
 | 1 | Step 6: Add Activity form, behind a flag (Google Health takes no written sessions) | Open |
 | 2 | Step 6: Select Activity picker (static catalogue), opened by the hidden Add and Start flows | Open |
 | 3 | Step 6: Start Activity live screen, behind `FEATURES.startActivity` | Open |
-| 4 | Steps 1 and 3: SAVED screen (`DoneScreen`) replaces the toast | Open |
+| 4 | Steps 1 and 3: SAVED screen (`DoneScreen`) replaces the toast | Done (R37) |
 | 5 | Step 5: Cardio / Muscular split, behind a flag (no muscular load source) | Open |
 | 6 | Step 5: strain chip against the sport's 30-day average | Open |
 | 7 | Step 5: Activity Steps from the step minutes inside the workout | Open |
@@ -106,15 +106,15 @@ Build steps for the last phase (shared with [dashboard-health-community-coach.md
 | 13 | Step 5: dashed start and end markers with times; the span bar and zone strips go | Open |
 | 14 | Step 5: typical band on zone rows | Open |
 | 15 | Step 5: zone colours at 0%, Zone 0 white; the "+N min" deltas go | Open |
-| 16 | Steps 1 and 3: Journal as a full-screen modal with the sand glow and the pencil | Open |
-| 17 | Step 3: day strip and "‹ TODAY ›" inside the journal | Open |
-| 18 | Step 3: "What's happening today, April 15?" heading | Open |
-| 19 | Steps 2 and 3: Daytime / Nighttime / Status groups | Open |
-| 20 | Step 3: one card per full-sentence question, no icon | Open |
-| 21 | Step 3: ✕ / ✓ answer buttons (44 px) | Open |
-| 22 | Steps 2 and 3: follow-up slider | Open |
-| 23 | Steps 2 and 3: Notes | Open |
-| 24 | Step 3: "Dismiss journal?" dialog with "Don't show me this message again" | Open |
+| 16 | Steps 1 and 3: Journal as a full-screen modal with the sand glow and the pencil | Done (R37); the pencil lands with step 4 |
+| 17 | Step 3: day strip and "‹ TODAY ›" inside the journal | Done (R37) |
+| 18 | Step 3: "What's happening today, April 15?" heading | Done (R37) |
+| 19 | Steps 2 and 3: Daytime / Nighttime / Status groups | Done (R37) |
+| 20 | Step 3: one card per full-sentence question, no icon | Done (R37) |
+| 21 | Step 3: ✕ / ✓ answer buttons (44 px) | Done (R37) |
+| 22 | Steps 2 and 3: follow-up slider | Done (R37) |
+| 23 | Steps 2 and 3: Notes | Done (R37) |
+| 24 | Step 3: "Dismiss journal?" dialog with "Don't show me this message again" | Done (R37) |
 | 25 | Step 4: pencil opens Select Behaviors | Open |
 | 26 | Step 4: search field | Open |
 | 27 | Steps 2 and 4: category tabs | Open |

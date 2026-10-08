@@ -78,6 +78,8 @@
   --color-outlook-to: var(--outlook-to);
   --color-outlook-accent: var(--outlook-accent);
   --color-glow-sand: var(--glow-sand);
+  --color-answer-yes: var(--answer-yes);
+  --color-on-color: var(--on-color);
   --color-menu-from: var(--menu-from);
   --color-menu-to: var(--menu-to);
   --color-key-from: var(--key-from);
@@ -233,6 +235,9 @@
   /* The "+" action menu: a blue-violet panel, lighter at its top edge */
   /* The Journal's sand glow at the top of its screen (journal-01). */
   --glow-sand: #8c7a63;
+  /* A journal "yes" (journal-01's blue check), and the ink drawn on any data-coloured fill (that check, a done badge). */
+  --answer-yes: var(--recovery-blue);
+  --on-color: #101518;
   --menu-from: #343f6b;
   --menu-to: #2a3150;
   /* Light key: the white "+" tile with a soft top light */

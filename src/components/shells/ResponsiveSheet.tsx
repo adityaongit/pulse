@@ -74,8 +74,13 @@ export function ResponsiveSheet({ open, onOpenChange, title, description, childr
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent
           showCloseButton={false}
-          onOpenAutoFocus={() => {
+          // The confirmation reads its own line out (role="status"); a description would repeat it.
+          {...(done && { "aria-describedby": undefined })}
+          onOpenAutoFocus={(e) => {
             opener.current = document.activeElement as HTMLElement | null
+            // Focus the screen itself (it reads its title) rather than ringing the X on open, as the reference app shows none.
+            e.preventDefault()
+            ;(e.currentTarget as HTMLElement).focus()
           }}
           onCloseAutoFocus={(e) => {
             const target = opener.current?.isConnected && opener.current !== document.body ? opener.current : fallbackFocus?.current
@@ -89,13 +94,12 @@ export function ResponsiveSheet({ open, onOpenChange, title, description, childr
             // The whole phone (safe areas inside); from 768 px a centred panel, as tall as the window allows.
             "inset-0 top-0 left-0 h-svh max-w-none translate-x-0 translate-y-0 rounded-none pt-[env(safe-area-inset-top)]",
             "md:inset-auto md:top-1/2 md:left-1/2 md:h-[min(880px,calc(100svh-48px))] md:w-[560px] md:max-w-[calc(100%-48px)] md:-translate-x-1/2 md:-translate-y-1/2 md:rounded-[28px] md:pt-2",
-            glow && "bg-linear-to-b from-glow-sand via-sheet via-45% to-sheet-bottom"
+            glow && !done && "bg-linear-to-b from-glow-sand via-sheet via-45% to-sheet-bottom"
           )}
         >
           {done ? (
             <>
               <DialogTitle className="sr-only">{done.title}</DialogTitle>
-              <DialogDescription className="sr-only">{done.body}</DialogDescription>
               <DoneScreen title={done.title} body={done.body} onDone={done.onDone} />
             </>
           ) : (
