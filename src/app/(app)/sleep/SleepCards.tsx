@@ -1,10 +1,11 @@
-// Sleep's measure cards drawn the way WHOOP draws them: hours against need as two bars, and the last five nights' bed
-// and wake times against your usual ones. Plain DOM meters, no chart library. (Restorative sleep and efficiency are
-// TrendCharts on the page.)
+// Sleep's measure cards drawn the way WHOOP draws them: hours against need as two bars, the last five nights' bed and
+// wake times against your usual ones, efficiency as asleep and awake bars marked where you woke, and sleep stress by
+// level. Plain DOM meters, except the stress line.
 import { cn } from "@/lib/utils"
 import { hmm } from "@/lib/format"
+import { DATA_COLORS, STRESS_COLOR, STRESS_WORD, deltaTone, type StressLevel } from "@/lib/bands"
+import { StressChart } from "@/components/charts/StressChart"
 import { ReasonPlaceholder } from "@/components/metrics/ReasonPlaceholder"
-import { deltaTone } from "@/lib/bands"
 import { CAPTION, DeltaMark, LABEL } from "@/components/metrics/primitives"
 import type { KeyStat, SleepVM } from "@/server/queries/types"
 
@@ -12,9 +13,9 @@ const BAR = "h-3.5 rounded-[3px]"
 const signed = (min: number, sign: "+" | "−") => `${sign}${hmm(Math.abs(min))}`
 
 /** WHOOP's card headline: the percentage large with its arrow against the prior 30 nights, and their mean under it. */
-function Headline({ value, stat }: { value: number; stat?: KeyStat }) {
+function Headline({ value, stat, down = false }: { value: number; stat?: Pick<KeyStat, "average" | "sd">; down?: boolean }) {
   const avg = stat?.average ?? null
-  const t = avg === null ? null : deltaTone("up", value, avg, stat?.sd)
+  const t = avg === null ? null : deltaTone(down ? "down" : "up", value, avg, stat?.sd)
   return (
     <div>
       <p className="flex items-center gap-1.5">
@@ -63,38 +64,36 @@ export function HoursVsNeed({ vm }: { vm: SleepVM }) {
             <span className={cn(LABEL, "text-muted-foreground")}>Hours of sleep</span>
             <span className="font-numeric text-lg leading-6 font-bold tabular-nums">{hmm(h.asleepMin)}</span>
           </p>
-          <div aria-hidden className={cn("relative bg-secondary", BAR)}>
-            <div className={cn("absolute inset-y-0 left-0 bg-sleep", BAR)} style={{ width: pct(h.asleepMin) }} />
-            {/* Where the need ends: a hairline through the track, so a short night leaves a visible gap and a long one a visible surplus. */}
-            <div className="absolute -inset-y-1 w-0.5 -translate-x-1/2 rounded-full bg-foreground" style={{ left: pct(h.needMin) }} />
-          </div>
+          {/* The reference app's bar fades in from the track to sleep blue at the night's length. */}
+          <div aria-hidden className={cn("bg-linear-to-r from-sleep/0 to-sleep", BAR)} style={{ width: pct(h.asleepMin) }} />
         </div>
         <div>
-          <p className="mb-1.5 flex items-baseline justify-between gap-3">
-            <span className={cn(LABEL, "text-muted-foreground")}>Sleep needed</span>
-            <span className="font-numeric text-lg leading-6 font-bold tabular-nums">{hmm(h.needMin)}</span>
-          </p>
           {h.calibrating ? (
             <p className={CAPTION}>Your need settles after 7 nights. Using {hmm(h.needMin)} until then.</p>
           ) : (
+            // The need builds left to right: the healthy minimum fading in, then recent strain, then sleep debt.
             <div aria-hidden className="flex gap-0.5" style={{ width: pct(h.needMin) }}>
               {[
-                [baselineMin, "bg-foreground/70"],
+                [baselineMin, "bg-linear-to-r from-foreground/0 to-foreground/35"],
                 [strainMin, "bg-strain"],
-                [debtMin, "bg-foreground/35"],
+                [debtMin, "bg-foreground/80"],
               ].map(([min, color], i) => (
                 <span key={i} className={cn(BAR, "first:rounded-r-none", color as string)} style={{ flexGrow: Math.max(0, min as number), flexBasis: 0 }} />
               ))}
             </div>
           )}
+          <p className="mt-1.5 flex items-baseline justify-between gap-3">
+            <span className={cn(LABEL, "text-muted-foreground")}>Sleep needed</span>
+            <span className="font-numeric text-lg leading-6 font-bold tabular-nums">{hmm(h.needMin)}</span>
+          </p>
         </div>
       </div>
       {!h.calibrating && (
         <Legend
           rows={[
-            { swatch: "bg-foreground/70", label: "Healthy minimum", value: hmm(baselineMin) },
-            { swatch: "bg-strain", label: "Recent strain", value: signed(strainMin, "+") },
-            { swatch: "bg-foreground/35", label: "Sleep debt", value: signed(debtMin, "+") },
+            { swatch: "bg-foreground/35", label: "Healthy Minimum", value: hmm(baselineMin) },
+            { swatch: "bg-strain", label: "Recent Strain", value: signed(strainMin, "+") },
+            { swatch: "bg-foreground/80", label: "Sleep Debt", value: signed(debtMin, "+") },
             ...(napMin > 0 ? [{ swatch: "bg-sleep", label: "Naps", value: signed(napMin, "−") }] : []),
           ]}
         />
@@ -139,10 +138,10 @@ export function SleepConsistency({ vm }: { vm: SleepVM }) {
   const nights = c.nights.flatMap((n) => (n ? [n] : []))
   const beds = nights.flatMap((n) => [n.bed, ...(n.typicalBed != null ? [n.typicalBed] : [])])
   const wakes = nights.flatMap((n) => [n.wake, ...(n.typicalWake != null ? [n.typicalWake] : [])])
-  // Axis in 4-hour steps (19:00, 23:00, 03:00…) with room above the earliest bed and below the latest wake for last
-  // night's labels.
-  const lo = Math.floor((Math.min(...beds) - 60) / 240) * 240
-  const hi = Math.ceil((Math.max(...wakes) + 60) / 240) * 240
+  // The reference app's fixed axis, 21:00 to 13:00 in 4-hour steps, stretched by whole steps only when a night falls
+  // outside it.
+  const lo = Math.min(-180, Math.floor((Math.min(...beds) - 60 + 180) / 240) * 240 - 180)
+  const hi = Math.max(780, Math.ceil((Math.max(...wakes) + 60 - 780) / 240) * 240 + 780)
   const pctOf = (min: number) => ((min - lo) / (hi - lo)) * 100
   const ticks = Array.from({ length: Math.floor((hi - lo) / 240) + 1 }, (_, i) => lo + i * 240)
   const last = c.nights.at(-1)
@@ -210,6 +209,89 @@ export function SleepConsistency({ vm }: { vm: SleepVM }) {
             ))}
           </div>
         </div>
+      </div>
+    </div>
+  )
+}
+
+/** Tick marks where you woke: thin card-coloured cuts through a bar, at least 2 px wide. */
+function Wakes({ wakes, className }: { wakes: { at: number; width: number }[]; className: string }) {
+  return wakes.map((w, i) => (
+    <span key={i} className={cn("absolute inset-y-0 min-w-0.5", className)} style={{ left: `${w.at * 100}%`, width: `${w.width * 100}%` }} />
+  ))
+}
+
+/**
+ * The reference app's Sleep Efficiency card (sleep-24, sleep-25): the share with its arrow and prior mean, an asleep bar
+ * cut where each spell awake fell, an awake bar on the hatched track marked at the same places, then the wake events.
+ */
+export function SleepEfficiency({ vm }: { vm: SleepVM }) {
+  const m = vm.efficiency
+  if (m.value === null) return <ReasonPlaceholder reason={m.reason} nightsLeft={m.nightsLeft} size="md" />
+  const e = m.value
+  return (
+    <div>
+      <Headline value={e.pct} stat={e} />
+      <div className="mt-4 space-y-2">
+        <p className="flex items-baseline justify-between gap-3">
+          <span className={cn(LABEL, "text-muted-foreground")}>Asleep</span>
+          <span className="font-numeric text-lg leading-6 font-bold tabular-nums">{hmm(e.asleepMin)}</span>
+        </p>
+        <div aria-hidden className={cn("relative overflow-hidden bg-sleep", BAR)}>
+          <Wakes wakes={e.wakes} className="bg-card" />
+        </div>
+        <div aria-hidden className={cn("relative overflow-hidden bg-(image:--pattern-hatch)", BAR)}>
+          <Wakes wakes={e.wakes} className="bg-foreground" />
+        </div>
+        <p className="flex items-baseline justify-between gap-3">
+          <span className={cn(LABEL, "text-muted-foreground")}>Awake</span>
+          <span className="font-numeric text-lg leading-6 font-bold tabular-nums">{hmm(e.awakeMin)}</span>
+        </p>
+      </div>
+      <p className="mt-4 flex items-center gap-3 border-t border-border pt-4">
+        <span aria-hidden className="size-3.5 shrink-0 rounded-[3px] bg-foreground/80" />
+        <span className={cn(LABEL, "flex-1")}>Wake events</span>
+        <span className="font-numeric text-xl leading-6 font-bold tabular-nums">{e.wakeEvents ?? "--"}</span>
+      </p>
+    </div>
+  )
+}
+
+const LEVELS: StressLevel[] = ["high", "medium", "low"]
+
+/**
+ * The reference app's Sleep Stress card (sleep-26, sleep-27): the share of the night in high stress against the prior
+ * 30 nights, the night's 0-3 line, then a row per level with its share, time and a filled hatched track. Built and off
+ * (`FEATURES.sleepStress`) until Pulse scores stress during sleep.
+ */
+export function SleepStress({ vm }: { vm: SleepVM }) {
+  const m = vm.sleepStress
+  if (m.value === null) return <ReasonPlaceholder reason={m.reason} nightsLeft={m.nightsLeft} size="md" />
+  const s = m.value
+  const total = Math.max(1, s.minutes.high + s.minutes.medium + s.minutes.low)
+  return (
+    <div>
+      <Headline value={s.pct} stat={s} down />
+      <div className="mt-4">
+        <StressChart variant="full" data={{ value: { points: s.points.map((p) => ({ t: p.t, value: p.v })), spans: [{ kind: "sleep", label: "Sleep", start: s.bed, end: s.wake }] }, reason: null, provisional: false }} />
+      </div>
+      <div className="mt-4 space-y-4">
+        {LEVELS.map((l) => {
+          const share = (s.minutes[l] / total) * 100
+          const color = DATA_COLORS[STRESS_COLOR[l]]
+          return (
+            <div key={l} className="space-y-2">
+              <p className="flex items-baseline gap-2.5">
+                <span className={LABEL}>{STRESS_WORD[l]}</span>
+                <span className={cn("font-numeric text-[13px] font-bold tabular-nums", color.text)}>{Math.round(share)}%</span>
+                <span className="ml-auto font-numeric text-lg leading-6 font-bold tabular-nums">{hmm(s.minutes[l])}</span>
+              </p>
+              <div aria-hidden className={cn("relative bg-(image:--pattern-hatch)", BAR)}>
+                <div className={cn("absolute inset-y-0 left-0", BAR, color.bg)} style={{ width: `${share}%` }} />
+              </div>
+            </div>
+          )
+        })}
       </div>
     </div>
   )

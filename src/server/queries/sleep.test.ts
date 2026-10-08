@@ -22,7 +22,8 @@ describe("getSleep", () => {
     const need = vm.hoursVsNeed.value!;
     expect(need.calibrating).toBe(false);
     expect(need.needMin).toBeCloseTo(need.parts.baselineMin + need.parts.strainMin + need.parts.debtMin - need.parts.napMin, 6);
-    expect(vm.summary.map((s) => s.label)).toEqual(["Hours vs. needed", "Sleep consistency", "Sleep efficiency", "Restorative sleep"]);
+    expect(vm.summary.map((s) => s.label)).toEqual(["Hours vs. needed", "Sleep consistency", "Sleep efficiency"]);
+    expect(vm.summary.map((s) => s.href)).toEqual(["/trend/hours_need", "/trend/consistency", "/trend/efficiency"]);
     expect(vm.summary.every((s) => s.status)).toBe(true);
     const consistency = vm.summary[1].metric.value!;
     expect(consistency).toBeGreaterThan(50);
@@ -31,7 +32,18 @@ describe("getSleep", () => {
     expect(plans[0].bedtimeAt).toBeLessThan(plans[1].bedtimeAt);
     expect(plans[1].bedtimeAt).toBeLessThan(plans[2].bedtimeAt);
     expect(vm.insight).toMatch(/^Your sleep was (optimal|sufficient|poor)\./);
-    expect(vm.debtTrend.points).toHaveLength(182);
+    // Restorative is deep + REM; efficiency places each spell awake inside the night.
+    const st = vm.stages!.value!;
+    const deep = st.rows.find((r) => r.stage === "deep")!.minutes;
+    const rem = st.rows.find((r) => r.stage === "rem")!.minutes;
+    expect(vm.restorative.value!.minutes).toBe(deep + rem);
+    const eff = vm.efficiency.value!;
+    expect(eff.pct).toBeCloseTo(vm.summary[2].metric.value!, 6);
+    for (const w of eff.wakes) {
+      expect(w.at).toBeGreaterThan(0);
+      expect(w.at + w.width).toBeLessThanOrEqual(1);
+    }
+    expect(vm.sleepStress.value).toBeNull();
   });
 
   it("consistency draws five nights against the usual times", async () => {

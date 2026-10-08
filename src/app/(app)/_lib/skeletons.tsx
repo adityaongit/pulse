@@ -4,7 +4,6 @@ import { Fragment } from "react"
 import { DASHBOARD_DEFAULT, DASHBOARD_LABEL, type DashboardKey } from "@/lib/dashboard"
 import { IntradayHrChartSkeleton } from "@/components/charts/IntradayHrChart"
 import { EnergyBankChartSkeleton } from "@/components/charts/EnergyBankChart"
-import { TrendChartSkeleton } from "@/components/charts/TrendChart"
 import { ZoneBarsSkeleton } from "@/components/charts/ZoneBars"
 import { TimelineSkeleton } from "@/components/metrics/ActivityCard"
 import { WeeklyTrendsSkeleton } from "@/components/metrics/WeeklyTrends"
@@ -28,7 +27,7 @@ const rows = (n: number, Row: (i: number) => React.ReactNode) => Array.from({ le
 
 const SUMMARY: Record<string, string[]> = {
   Strain: ["Strain Target", "Heart rate zones 1-3", "Heart rate zones 4-5", "Strength activity time", "Steps"],
-  Sleep: ["Hours vs. needed", "Sleep consistency", "Sleep efficiency", "Restorative sleep"],
+  Sleep: ["Hours vs. needed", "Sleep consistency", "Sleep efficiency"],
 }
 
 function CardSkeleton({ title, className, children }: { title: string; className?: string; children: React.ReactNode }) {
@@ -197,7 +196,7 @@ function DialDetail({
     <DetailShell loading
       footer={footer}
       title={title}
-      dateSwitcher={{ mode: "day", placement: "header" }}
+      dateSwitcher={{ mode: "day", placement: "header", steppers: false }}
       notch
       hero={<ScoreDialSkeleton size="lg" variant={dial} />}
       summary={
@@ -332,11 +331,13 @@ export function SleepSkeleton() {
             <Skeleton className="h-52 rounded-lg" />
           </div>
         </CardSkeleton>,
-        <CardSkeleton key="details" title="Details">
-          {statRows(["Time in bed", "Wake events", "Respiratory rate", "Sleep debt"])}
-        </CardSkeleton>,
-        <CardSkeleton key="debt" title="Sleep debt">
-          <TrendChartSkeleton chip />
+        <CardSkeleton key="efficiency" title="Sleep efficiency">
+          <div aria-hidden className="space-y-4">
+            <SkeletonText className="w-24 font-numeric text-4xl leading-10 font-bold" />
+            <Skeleton className="h-3.5 rounded-[3px]" />
+            <Skeleton className="h-3.5 rounded-[3px] bg-muted/60" />
+            <SkeletonText className={`${LABEL} w-32`} />
+          </div>
         </CardSkeleton>,
         <SectionShell key="planner" variant="card" title="Tonight’s sleep" info={TONIGHT_INFO} level={2}>
           <div aria-hidden className="space-y-2">

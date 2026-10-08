@@ -37,7 +37,7 @@ export default async function RecoveryPage({ searchParams }: PageProps<"/recover
     <DetailShell
       title="Recovery"
       info={RECOVERY_INFO}
-      dateSwitcher={{ mode: "day", placement: "header" }}
+      dateSwitcher={{ mode: "day", placement: "header", steppers: false }}
       notch
       hero={<ScoreDial variant="recovery" size="lg" value={r.value} reason={r.reason} nightsLeft={r.nightsLeft} provisional={r.provisional} tags={r.tags} />}
       summary={

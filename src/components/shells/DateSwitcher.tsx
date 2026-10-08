@@ -22,6 +22,11 @@ export type DateSwitcherProps = {
   placement?: "header" | "body"
   /** Home's top row: below 400 px the pill tightens (24 px chevrons, snug label) so the row fits at 320 px. */
   narrow?: boolean
+  /**
+   * false: the label alone, no chevrons (the score screens' "TODAY", spec §11 R33). The label still opens the calendar
+   * and the arrow keys still step days.
+   */
+  steppers?: boolean
 }
 
 const PRESS = "transition-[background-color,color,scale] duration-150 ease-standard outline-none focus-visible:ring-3 focus-visible:ring-ring/50 active:scale-[0.96]"
@@ -52,7 +57,7 @@ function ownsArrows(target: EventTarget | null) {
 const NARROW_STEP = "max-[400px]:size-6"
 const NARROW_LABEL = "max-[400px]:min-w-0 max-[400px]:px-2.5"
 
-function Switcher({ mode, calendar, placement = "body", narrow = false }: DateSwitcherProps) {
+function Switcher({ mode, calendar, placement = "body", narrow = false, steppers = true }: DateSwitcherProps) {
   const { today, firstDay } = useShellCalendar()
   const router = useRouter()
   const pathname = usePathname()
@@ -123,9 +128,11 @@ function Switcher({ mode, calendar, placement = "body", narrow = false }: DateSw
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <div className={cn("inline-flex items-center", bare ? "gap-1" : "h-[30px] rounded-full bg-foreground/[0.04] p-px")}>
-        <button type="button" className={bare ? BARE_STEP : cn(STEP, narrow && NARROW_STEP)} aria-label={`Previous ${unit}`} disabled={atStart} onClick={() => by(-step)}>
-          <ChevronLeft aria-hidden className={bare ? "size-4" : "size-[18px]"} strokeWidth={2.25} />
-        </button>
+        {steppers && (
+          <button type="button" className={bare ? BARE_STEP : cn(STEP, narrow && NARROW_STEP)} aria-label={`Previous ${unit}`} disabled={atStart} onClick={() => by(-step)}>
+            <ChevronLeft aria-hidden className={bare ? "size-4" : "size-[18px]"} strokeWidth={2.25} />
+          </button>
+        )}
         <DialogTrigger asChild>
           <button
             type="button"
@@ -141,9 +148,11 @@ function Switcher({ mode, calendar, placement = "body", narrow = false }: DateSw
             {text}
           </button>
         </DialogTrigger>
-        <button type="button" className={bare ? BARE_STEP : cn(STEP, narrow && NARROW_STEP)} aria-label={`Next ${unit}`} disabled={atEnd} onClick={() => by(step)}>
-          <ChevronRight aria-hidden className={bare ? "size-4" : "size-[18px]"} strokeWidth={2.25} />
-        </button>
+        {steppers && (
+          <button type="button" className={bare ? BARE_STEP : cn(STEP, narrow && NARROW_STEP)} aria-label={`Next ${unit}`} disabled={atEnd} onClick={() => by(step)}>
+            <ChevronRight aria-hidden className={bare ? "size-4" : "size-[18px]"} strokeWidth={2.25} />
+          </button>
+        )}
       </div>
       <CalendarPanel
         selected={d}

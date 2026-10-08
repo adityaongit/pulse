@@ -1,6 +1,7 @@
 import { cn } from "@/lib/utils"
 import { clock, hmm } from "@/lib/format"
-import { TrendChart } from "@/components/charts/TrendChart"
+import { FEATURES } from "@/lib/features"
+import { trendHref } from "@/lib/url"
 import { InsightCard } from "@/components/metrics/InsightCard"
 import { KeyStatRow } from "@/components/metrics/KeyStatRow"
 import { ReasonPlaceholder } from "@/components/metrics/ReasonPlaceholder"
@@ -16,8 +17,8 @@ import type { SleepVM } from "@/server/queries/types"
 import { pageDay, type SearchParams } from "../_lib/day"
 import { HashScroll } from "../_lib/HashScroll"
 import { SLEEP_INFO, TONIGHT_INFO } from "../_lib/info"
-import { CAPTION, LABEL, LEGEND, statProps, trendProps } from "../_lib/view"
-import { HoursVsNeed, SleepConsistency } from "./SleepCards"
+import { CAPTION, LABEL, LEGEND, statProps } from "../_lib/view"
+import { HoursVsNeed, SleepConsistency, SleepEfficiency, SleepStress } from "./SleepCards"
 
 export const metadata = { title: "Sleep", description: "Sleep performance, stages, need and debt, plus tonight’s bedtime plan." }
 
@@ -39,7 +40,7 @@ export default async function SleepPage({ searchParams }: PageProps<"/sleep">) {
     <DetailShell
       title="Sleep"
       info={SLEEP_INFO}
-      dateSwitcher={{ mode: "day", placement: "header" }}
+      dateSwitcher={{ mode: "day", placement: "header", steppers: false }}
       notch
       hero={
         <ScoreDial
@@ -57,7 +58,7 @@ export default async function SleepPage({ searchParams }: PageProps<"/sleep">) {
         <Card className="gap-0 px-4 py-1 ring-0">
           <div className="divide-y divide-border">
             {vm.summary.map((k) => (
-              <KeyStatRow key={k.key} variant="row" {...statProps(k)} average={null} direction="none" />
+              <KeyStatRow key={k.key} variant="row" {...statProps(k, { d, today })} average={null} direction="none" />
             ))}
           </div>
           <p className={cn(LEGEND, "flex flex-wrap items-center gap-x-4 gap-y-1")}>
@@ -70,10 +71,10 @@ export default async function SleepPage({ searchParams }: PageProps<"/sleep">) {
           </p>
         </Card>
       }
-      insight={vm.insight && <InsightCard body={vm.insight} />}
+      insight={vm.insight && <InsightCard body={vm.insight} action={{ label: "Explore your sleep insights", href: trendHref("sleep", { d, today }) }} />}
       primary={
         <SectionShell variant="card" title="Last night’s sleep" aside="vs. prior 30 days" level={2}>
-          <SleepStages hours={vm.hours} hr={vm.nightHr} data={vm.stages} />
+          <SleepStages hours={vm.hours} hr={vm.nightHr} data={vm.stages} restorative={vm.restorative} />
         </SectionShell>
       }
       secondary={[
@@ -83,21 +84,19 @@ export default async function SleepPage({ searchParams }: PageProps<"/sleep">) {
         <SectionShell key="consistency" variant="card" title="Sleep consistency" level={2}>
           <SleepConsistency vm={vm} />
         </SectionShell>,
-        <SectionShell key="details" variant="card" title="Details" info={{ title: "Sleep stages", body: "Time in each sleep stage during the main sleep session, as estimated by your Fitbit." }} level={2}>
-          <div className="divide-y divide-border">
-            {vm.details.map((k) => (
-              <KeyStatRow key={k.key} variant="row" {...statProps(k, { d, today }, false)} />
-            ))}
-          </div>
+        <SectionShell key="efficiency" variant="card" title="Sleep efficiency" level={2}>
+          <SleepEfficiency vm={vm} />
         </SectionShell>,
-        <SectionShell key="debt" variant="card" title="Sleep debt" level={2}>
-          <TrendChart label="Sleep debt" unit="h" format="decimal1" colorBy="sleep" direction="down" {...trendProps(vm.debtTrend)} />
-        </SectionShell>,
+        FEATURES.sleepStress && (
+          <SectionShell key="stress" variant="card" title="Sleep stress" level={2}>
+            <SleepStress vm={vm} />
+          </SectionShell>
+        ),
         <SectionShell key="planner" variant="card" title="Tonight’s sleep" id="planner" info={TONIGHT_INFO} level={2}>
           <Planner vm={vm} timeZone={timeZone} />
           <HashScroll />
         </SectionShell>,
-      ]}
+      ].filter(Boolean)}
       footer={<WeeklyTrends cards={weekly} d={d} today={today} />}
     />
   )

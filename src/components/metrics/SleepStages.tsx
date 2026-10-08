@@ -26,6 +26,8 @@ export type SleepHours = { asleepMin: number; average: number | null; sd?: numbe
 export type SleepStagesProps = {
   /** The hero: no value means no night, and the whole card shows the reason. */
   hours: Metric<SleepHours> | undefined
+  /** Deep + REM against the prior 30 nights: the row that closes the breakdown (spec §11 R33). */
+  restorative?: Metric<{ minutes: number; average: number | null; sd?: number }>
   hr: Metric<SleepHr> | undefined
   /** null: a night Fitbit did not stage. */
   data: Metric<SleepStagesNight> | null | undefined
@@ -70,7 +72,26 @@ type Tab = (typeof TABS)[number][0]
 /** The typical-range mark: a dashed box over the track (the legend's swatch and each row's range). */
 const RANGE_BOX = "border-x-[1.5px] border-dashed border-foreground/75 bg-foreground/12"
 
-function Rows({ night, selected, onSelect }: { night: SleepStagesNight; selected: Stage; onSelect: (s: Stage) => void }) {
+/** The reference app's closing row: a deep-to-REM swatch, "Restorative sleep", the minutes with an arrow and the prior mean. */
+function RestorativeRow({ r }: { r: { minutes: number; average: number | null; sd?: number } }) {
+  const t = r.average === null ? undefined : deltaTone("up", r.minutes, r.average, r.sd)
+  return (
+    <div className="flex items-center gap-3 border-t border-border pt-4">
+      <span aria-hidden className="size-4 shrink-0 rounded-[3px] bg-linear-135 from-stage-deep to-stage-rem" />
+      <span className={cn(LABEL, "min-w-0 flex-1 text-[13px]")}>Restorative sleep</span>
+      <span className="sr-only">
+        {statSentence({ label: "Restorative sleep", valueText: durationWords(r.minutes), averageText: r.average === null ? undefined : durationWords(r.average), dir: t?.dir, tone: t?.tone })}
+      </span>
+      <span aria-hidden className="grid grid-cols-[auto_8px] items-center gap-x-2 text-right">
+        <span className="font-numeric text-[22px] leading-7 font-bold tabular-nums">{hmm(r.minutes)}</span>
+        {t ? <DeltaMark dir={t.dir} tone={t.tone} /> : <span />}
+        {r.average !== null && <span className="font-numeric text-[13px] leading-4 font-medium text-muted-foreground tabular-nums">{hmm(r.average)}</span>}
+      </span>
+    </div>
+  )
+}
+
+function Rows({ night, selected, onSelect, restorative }: { night: SleepStagesNight; selected: Stage; onSelect: (s: Stage) => void; restorative?: SleepStagesProps["restorative"] }) {
   const name = React.useId()
   const [tab, setTab] = React.useState<Tab>("breakdown")
   const span = Math.max(1, night.wake - night.bed)
@@ -158,6 +179,7 @@ function Rows({ night, selected, onSelect }: { night: SleepStagesNight; selected
           })}
         </div>
       )}
+      {tab === "breakdown" && restorative?.value && <RestorativeRow r={restorative.value} />}
     </div>
   )
 }
@@ -166,7 +188,7 @@ function Rows({ night, selected, onSelect }: { night: SleepStagesNight; selected
  * the reference app's "Last night's sleep" card (spec §7.5, §11 V8, R9): the hours hero, the overnight heart rate, then the
  * stages as a breakdown (rows) or a timeline (hypnogram). Choosing a stage row lights its stretches on the heart-rate line.
  */
-export function SleepStages({ hours, hr, data }: SleepStagesProps) {
+export function SleepStages({ hours, hr, data, restorative }: SleepStagesProps) {
   const [selected, setSelected] = React.useState<Stage>("awake")
   const segments = data?.value?.segments
   const highlight = React.useMemo(() => (segments?.length ? segments.filter((g) => g.stage === selected) : undefined), [segments, selected])
@@ -191,7 +213,7 @@ export function SleepStages({ hours, hr, data }: SleepStagesProps) {
               empty={<EmptyState body={EMPTY} />}
               renderReason={(r) => <ReasonPlaceholder reason={r} size="md" />}
             >
-              {(night) => (night.segments.length ? <Rows night={night} selected={selected} onSelect={setSelected} /> : <EmptyState body={EMPTY} />)}
+              {(night) => (night.segments.length ? <Rows night={night} selected={selected} onSelect={setSelected} restorative={restorative} /> : <EmptyState body={EMPTY} />)}
             </MetricState>
           </div>
         </div>

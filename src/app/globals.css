@@ -258,11 +258,12 @@
   --strain-band-3: color-mix(in srgb, var(--strain) 58%, var(--card));
   --strain-band-4: color-mix(in srgb, var(--strain) 40%, var(--card));
 
-  /* Hypnogram lanes, Google Health's hues so each stage reads apart: awake pink, REM pale cyan, light blue, deep violet */
-  --stage-awake: #f48fb1;
-  --stage-rem: #a8dcff;
-  --stage-light: #7fa8f5;
-  --stage-deep: #9370db;
+  /* Sleep stages in the reference app's 2026 hues (sleep-17, sleep-18; spec §11 R33): awake near-white, light lavender,
+     SWS (deep) pink, REM purple. Bars, labels, the hypnogram and the restorative stack share them. */
+  --stage-awake: #dfe3e8;
+  --stage-rem: #a35cf0;
+  --stage-light: #a9a6f4;
+  --stage-deep: #f39ae4;
 
   /* Calories burned, stacked: active (movement and workouts) in strain blue over resting in a quiet light grey */
   --energy-active: #0093e7;
@@ -408,10 +409,10 @@
   --chart-3: #6690ad;
   --chart-4: #d97900;
   --chart-5: var(--recovery-blue);
-  --stage-awake: #d9577f;
-  --stage-rem: #3a9fd8;
-  --stage-light: #4f7fe0;
-  --stage-deep: #6a48b8;
+  --stage-awake: #8a939c;
+  --stage-rem: #8236d4;
+  --stage-light: #5f5ad6;
+  --stage-deep: #c93b9f;
   --energy-active: #0093e7;
   --energy-resting: #c9d1d8;
   --pattern-hatch: repeating-linear-gradient(-45deg, rgb(16 21 24 / 0.08) 0 1.5px, transparent 1.5px 5px);

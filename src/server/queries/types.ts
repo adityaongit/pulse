@@ -264,9 +264,28 @@ export type SleepVM = {
      */
     nights: ({ day: string; label: string; bed: number; wake: number; typicalBed: number | null; typicalWake: number | null } | null)[];
   }>;
+  /** Time in bed, wake events, respiratory rate and sleep debt: the coach reads them; the screen does not show them (R33). */
   details: KeyStat[];
-  debtTrend: Trend;
+  /** Last night's deep + REM minutes against the prior 30 nights (the Restorative Sleep row, spec §11 R33). */
+  restorative: Metric<{ minutes: number; average: number | null; sd?: number }>;
+  /**
+   * The Sleep Efficiency card: the share against the prior 30 nights, asleep and awake time, the wake events and where
+   * each spell awake fell across the night (`at` and `width` as 0-1 of bed to wake).
+   */
+  efficiency: Metric<{ pct: number; average: number | null; sd?: number; asleepMin: number; awakeMin: number; wakeEvents: number | null; wakes: { at: number; width: number }[] }>;
+  /** Sleep Stress (`FEATURES.sleepStress`): no source yet, so always `no_data` (spec §11 R33). */
+  sleepStress: Metric<SleepStressNight>;
   planner: Metric<SleepPlanVM & { weekdayWake: boolean }>;
+};
+
+/** A night's stress: the share in high stress against the prior 30 nights, the 0-3 line, and minutes at each level. */
+export type SleepStressNight = {
+  pct: number;
+  average: number | null;
+  bed: number;
+  wake: number;
+  points: TimePoint[];
+  minutes: { high: number; medium: number; low: number };
 };
 
 // ── Health ───────────────────────────────────────────────────────────────────

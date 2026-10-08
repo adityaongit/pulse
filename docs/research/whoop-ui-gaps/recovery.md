@@ -85,7 +85,7 @@ Build steps for the score-screens phase: 1 trend helpers (`src/lib/trend.ts`), 2
 | 13 | Same link as gap 12 (WHOOP's screen was not captured) | Planned |
 | 14 | Step 6: "What shaped it" and "Tomorrow's forecast" are removed from Recovery | Planned |
 | 15 | Step 6: no band word under the ring | Planned |
-| 16 | Steps 5-7: the Recovery, Sleep and Strain headers read "TODAY" with no date arrows | Planned |
+| 16 | Steps 5-7: the Recovery, Sleep and Strain headers read "TODAY" with no date arrows | Done (R33): the date alone on Recovery, Sleep and Strain |
 | 17 | Step 3: metric dropdown | Done (R29) |
 | 18 | Steps 1 and 3: relative % chip; Resp up is orange | Done on the Trend View (R30); contributor arrows in step 6 |
 | 19 | Step 3: W/M/6M beside the average, no 1Y | Done (R30) |

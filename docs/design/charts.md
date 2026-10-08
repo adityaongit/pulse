@@ -69,7 +69,7 @@ Research from 2026-10-05. Sources are real app screenshots from the past year (G
 
 ### Hypnogram (Sleep)
 
-- Stage blocks as thick rounded bars in stage colours: Awake near-white, REM light cyan, Light mid blue, Deep navy (WHOOP's current view). Thin 1 px connectors between stages.
+- Stage blocks as thick rounded bars in stage colours: Awake near-white, Light lavender, SWS (Deep) pink, REM purple (the reference app's 2026 view, spec §11 R33). Thin 1 px connectors between stages.
 - Bed and wake times as chips at both ends; hour ticks in between.
 - A wake-events tick strip under the plot (WHOOP).
 - Legend: one bar per stage, sized by time, with "REM 1 h 26 min 22%".

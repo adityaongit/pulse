@@ -81,8 +81,8 @@ Build steps for the score-screens phase: 1 trend helpers (`src/lib/trend.ts`), 2
 
 | # | Plan | Status |
 |---|---|---|
-| 1 | Step 5: Sleep Stress contributor row, behind `FEATURES.sleepStress` (the stress algorithm excludes sleep minutes) | Planned (hidden) |
-| 2 | Step 5: Sleep Stress card (line, HIGH / MEDIUM / LOW rows), same flag | Planned (hidden) |
+| 1 | Step 5: Sleep Stress contributor row, behind `FEATURES.sleepStress` (the stress algorithm excludes sleep minutes) | Hidden (R33, `FEATURES.sleepStress`) |
+| 2 | Step 5: Sleep Stress card (line, HIGH / MEDIUM / LOW rows), same flag | Hidden (R33, `FEATURES.sleepStress`) |
 | 3 | Steps 4-5: Weekly Trends with the seven cards in WHOOP order | Done (R32) |
 | 4 | Step 4: each Weekly Trends card links to its Trend View | Done (R32) |
 | 5 | Step 3: `/trend/[key]` Trend View screen | Done (R29) |
@@ -92,16 +92,16 @@ Build steps for the score-screens phase: 1 trend helpers (`src/lib/trend.ts`), 2
 | 9 | Step 3: days breakdown bar | Done (R29) |
 | 10 | Learn More cards | Out of scope |
 | 11 | Step 3: "What is X?" explainer card | Done (R29) |
-| 12 | Step 5: Sleep Stress Trend View (stacked HIGH / MEDIUM / LOW), same flag | Planned (hidden) |
-| 13 | Steps 3 and 5: Time in Bed Trend View with bed-to-wake bars | Done (R29): the Trend View; the Sleep page link comes in step 5 |
+| 12 | Step 5: Sleep Stress Trend View (stacked HIGH / MEDIUM / LOW), same flag | Hidden (R29, `FEATURES.sleepStress`) |
+| 13 | Steps 3 and 5: Time in Bed Trend View with bed-to-wake bars | Done (R29, R32): the Trend View, opened from the Time in Bed card |
 | 14 | Step 2: efficiency, restorative, hours vs. needed %, time in bed and sleep stress registered as trend metrics | Done (R29) |
 | 15 | Step 3: W value labels, AVG pill on the left, fixed 0-100% axis for consistency | Done (R30) |
-| 16 | Step 5: Asleep / Awake bars with wake ticks, drawn from the stored stage segments | Planned |
-| 17 | Step 5: Restorative Sleep row under the stage rows | Planned |
-| 18 | Step 5: stage colours as WHOOP (theme tokens) | Planned |
-| 19 | Step 5: "Explore your sleep insights" link to the Sleep Trend View | Planned |
-| 20 | Step 5: Hours vs. needed fades and legend order | Planned |
-| 21 | Step 5: consistency axis 21:00-13:00 and "Sat." day labels | Planned |
+| 16 | Step 5: Asleep / Awake bars with wake ticks, drawn from the stored stage segments | Done (R33) |
+| 17 | Step 5: Restorative Sleep row under the stage rows | Done (R33) |
+| 18 | Step 5: stage colours as WHOOP (theme tokens) | Done (R33) |
+| 19 | Step 5: "Explore your sleep insights" link to the Sleep Trend View | Done (R33) |
+| 20 | Step 5: Hours vs. needed fades and legend order | Done (R33) |
+| 21 | Step 5: consistency axis 21:00-13:00 and "Sat." day labels | Done (R33) |
 
 ## 4. Already matches (do not redo)
 

@@ -87,7 +87,13 @@ function rowClass(p: KeyStatRowProps) {
   const tappable = !!(p.href || p.onSelect)
   if (p.variant === "card")
     return cn(CARD_MATERIAL, "flex min-h-14 items-center gap-3 px-4 py-2", tappable && "hover:from-card-hover active:scale-[0.96]", p.className)
-  return cn("flex min-h-14 items-center gap-3 py-2", tappable && "-mx-2 rounded-lg px-2 hover:bg-accent active:bg-accent", p.className)
+  // The hover fill sits on a pseudo-element just past the row's edges, so the row itself (and the divider drawn on it)
+  // stays square and full width.
+  return cn(
+    "flex min-h-14 items-center gap-3 py-2",
+    tappable && "relative isolate before:absolute before:-inset-x-2 before:inset-y-0.5 before:-z-1 before:rounded-lg before:transition-[background-color] before:duration-150 hover:before:bg-accent active:before:bg-accent",
+    p.className
+  )
 }
 
 function Row({ p, c }: { p: KeyStatRowProps; c: Computed }) {
