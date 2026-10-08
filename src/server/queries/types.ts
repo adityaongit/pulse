@@ -145,6 +145,10 @@ export type HomeVM = {
   insights: { key: "strain" | "recovery" | "sleep"; title: string; body: string; href: string }[];
   /** The 7 days ending on `day`: was a check-in logged. */
   journalWeek: { day: string; done: boolean }[];
+  /** My Plan (`FEATURES.myPlan`): Pulse has no plan source yet, so always null. */
+  plan: { title: string; daysLeft: number; /** 0-1 */ done: number } | null;
+  /** The Stress Monitor dashboard tile's line; null when the tile is not on the dashboard. */
+  stressChart: Metric<StressDayChart> | null;
   /** The 7 days ending on `day`, oldest first: Strain 0-21 and Recovery %. */
   strainRecovery: { day: string; strain: number | null; recovery: number | null }[];
 };
@@ -383,12 +387,15 @@ export type HeartRhythm = {
 /** The latest reading on or before the selected day, against the mean of readings in the 30 days before it. */
 export type Measurement = KeyStat & { format: FormatKey };
 
+/** A day's stress line: still minutes 0-3, the excluded spans (sleep, workouts) and, today, the latest reading. */
+export type StressDayChart = { points: TimePoint[]; spans: Span[]; now: number | null };
+
 export type StressVM = {
   day: string;
   isToday: boolean;
   gauge: Metric<{ value: number; level: StressLevel; at: number | null; dayAverage: boolean }>;
   insight: string | null;
-  chart: Metric<{ points: TimePoint[]; spans: Span[]; now: number | null }>;
+  chart: Metric<StressDayChart>;
   levels: Metric<{
     lowMin: number;
     mediumMin: number;

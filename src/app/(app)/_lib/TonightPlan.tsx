@@ -1,7 +1,11 @@
 "use client"
 
 import * as React from "react"
-import { AlarmClock, Sunset } from "lucide-react"
+import { AlarmClock, Pencil, Sunset } from "lucide-react"
+import { FEATURES } from "@/lib/features"
+import { cn } from "@/lib/utils"
+import { CARD_BUTTON } from "@/components/metrics/primitives"
+import { openSheet } from "@/components/shells/SheetTrigger"
 import { clock, hmm } from "@/lib/format"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import type { SleepPlanVM } from "@/server/queries/types"
@@ -11,8 +15,15 @@ import type { SleepPlanVM } from "@/server/queries/types"
 const TIME = "font-numeric text-[22px] leading-none font-bold tabular-nums @[15rem]:text-[26px] @[18rem]:text-[32px]"
 const LABEL = "text-xs leading-4 font-bold tracking-[0.1em] uppercase text-foreground-secondary"
 
-/** Home's "Tonight's sleep" body: bedtime for the chosen goal, typical wake, goal toggle (spec §7.1, journey 4). */
-export function TonightPlan({ plan, timeZone }: { plan: SleepPlanVM; timeZone: string }) {
+/** A smart alarm set in Pulse (`FEATURES.sleepAlarm`): its time and how it wakes you. */
+export type SleepAlarmVM = { at: number; mode: "exact" | "window" }
+
+/**
+ * Home's "Tonight's sleep" body: bedtime for the chosen goal, typical wake, goal toggle (spec §7.1, journey 4). With an
+ * alarm (the reference app, home-09) the right block is the alarm and an "Edit alarm" button closes the card.
+ */
+export function TonightPlan({ plan, timeZone, alarm }: { plan: SleepPlanVM; timeZone: string; alarm?: SleepAlarmVM | null }) {
+  const wake = FEATURES.sleepAlarm && alarm ? alarm : null
   const [key, setKey] = React.useState<SleepPlanVM["plans"][number]["key"]>("peak")
   const chosen = plan.plans.find((p) => p.key === key) ?? plan.plans[0]
   const bed = clock(chosen.bedtimeAt, timeZone)
@@ -30,11 +41,21 @@ export function TonightPlan({ plan, timeZone }: { plan: SleepPlanVM; timeZone: s
         <span aria-hidden className="h-0 w-full max-w-28 justify-self-center border-t-2 border-dashed border-foreground/20" />
         <span className="flex items-center gap-2">
           <AlarmClock aria-hidden className="size-6 shrink-0 text-foreground-secondary" strokeWidth={1.5} />
-          <span className={TIME}>{clock(plan.wakeAt, timeZone)}</span>
+          <span className={TIME}>{clock(wake ? wake.at : plan.wakeAt, timeZone)}</span>
         </span>
         <span className={LABEL}>Recommended bedtime</span>
         <span />
-        <span className={`${LABEL} text-right`}>Typical wake</span>
+        {wake ? (
+          <span className={cn(LABEL, "text-right")}>
+            <span className="inline-flex items-center gap-1.5 text-optimal">
+              <span aria-hidden className="size-1.5 rounded-full bg-optimal" />
+              Alarm on
+            </span>
+            <span className="block">{wake.mode === "exact" ? "Exact time" : "Wake window"}</span>
+          </span>
+        ) : (
+          <span className={cn(LABEL, "text-right")}>Typical wake</span>
+        )}
       </div>
       <ToggleGroup
         type="single"
@@ -59,6 +80,12 @@ export function TonightPlan({ plan, timeZone }: { plan: SleepPlanVM; timeZone: s
       <p className="text-xs leading-4 font-medium text-muted-foreground">
         Need tonight: <span className="font-numeric tabular-nums">{hmm(plan.needMin)}</span>
       </p>
+      {wake && (
+        <button type="button" aria-haspopup="dialog" onClick={() => openSheet("alarm")} className={CARD_BUTTON}>
+          <Pencil aria-hidden className="size-4" strokeWidth={2} />
+          Edit alarm
+        </button>
+      )}
     </div>
   )
 }

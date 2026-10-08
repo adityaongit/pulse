@@ -63,8 +63,10 @@ describe("getHome", () => {
         "monitorAlert",
         "outlook",
         "phone",
+        "plan",
         "strainRecovery",
         "stress",
+        "stressChart",
         "strip",
         "today",
         "tonight",
@@ -72,6 +74,9 @@ describe("getHome", () => {
       ].sort(),
     );
     expect(vm.isToday).toBe(true);
+    // Stress Monitor is on the default dashboard, so its tile's line is loaded; no plan source exists yet.
+    expect(vm.stressChart?.value?.points.length).toBeGreaterThan(0);
+    expect(vm.plan).toBeNull();
     expect(vm.strip).toHaveLength(30);
     expect(vm.dials.recovery.value).toBeTypeOf("number");
     expect(vm.dials.strainTarget).toHaveLength(2);
@@ -81,6 +86,7 @@ describe("getHome", () => {
       "Resting heart rate",
       "Respiratory rate",
       "Sleep performance",
+      "Stress Monitor",
       "Calories",
       "Steps",
       "Blood oxygen",
@@ -171,7 +177,7 @@ describe("getHome", () => {
       if (keys.length) await db.insert(dashboardMetrics).values(keys.map((key, position) => ({ userId: USER, key, position })));
     };
     const keys = async () => (await getHome(dayAt(179), ctxFor(db))).keyStats.map((s) => s.key);
-    const all = ["hrv", "rhr", "resp", "sleep", "calories", "steps", "spo2", "skin"];
+    const all = ["hrv", "rhr", "resp", "sleep", "stress", "calories", "steps", "spo2", "skin"];
     try {
       expect(await keys()).toEqual(all);
       await set(["steps", "vo2max", "hrv"]);

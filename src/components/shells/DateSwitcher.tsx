@@ -5,7 +5,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { ChevronLeft, ChevronRight, LoaderCircle } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { calendarContext, type CalendarContext } from "@/lib/calendar"
-import { dayLabel, rangeLabel } from "@/lib/format"
+import { pillLabel, rangeLabel } from "@/lib/format"
 import { dayHref, parseDay, stepDay, weekOf } from "@/lib/url"
 import { Dialog, DialogTrigger } from "@/components/ui/dialog"
 import { CalendarPanel } from "./CalendarPanel"
@@ -109,7 +109,7 @@ function Switcher({ mode, calendar, placement = "body", narrow = false }: DateSw
     return () => window.removeEventListener("keydown", onKey)
   }, [step, atStart, atEnd, by])
 
-  const label = week ? rangeLabel(weekStart, weekEnd) : dayLabel(d, today)
+  const label = week ? rangeLabel(weekStart, weekEnd) : pillLabel(d, today)
   const bare = placement === "header"
   const text = loading ? (
     <LoaderCircle aria-hidden className="mx-auto size-4 animate-spin motion-reduce:animate-none" strokeWidth={2} />

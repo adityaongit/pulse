@@ -1,6 +1,7 @@
 // View-model → kit-prop mappers shared by the half-A screens (Home, Recovery, Strain, Activity, Sleep).
 import {
   Activity,
+  ChartSpline,
   Armchair,
   BatteryCharging,
   Building2,
@@ -33,11 +34,12 @@ import {
 } from "lucide-react"
 import type { EnergySeries } from "@/components/charts/EnergyBankChart"
 import type { HrSeries } from "@/components/charts/IntradayHrChart"
+import type { StressSeries } from "@/components/charts/StressChart"
 import type { TrendPoint } from "@/components/charts/TrendChart"
 import type { KeyStatRowProps } from "@/components/metrics/KeyStatRow"
 import type { FormatKey } from "@/lib/format"
 import { dayHref, RANGE_DAYS, type TrendRange } from "@/lib/url"
-import type { EnergyBankVM, HrChart, KeyStat, Metric, Trend } from "@/server/queries/types"
+import type { EnergyBankVM, HrChart, KeyStat, Metric, StressDayChart, Trend } from "@/server/queries/types"
 
 export { CAPTION, LABEL } from "@/components/metrics/primitives"
 /** The inset legend strip under a summary card (spec §7.2, §7.3, §7.5). */
@@ -60,6 +62,7 @@ export const STAT_ICON: Record<string, React.ReactNode> = {
   steps: <Footprints />,
   spo2: <Droplet />,
   skin: <Thermometer />,
+  stress: <ChartSpline />,
   zones13: <HeartPulse />,
   zones45: <HeartPulse />,
   strength: <Dumbbell />,
@@ -141,6 +144,14 @@ export const hrSeries = (m: Metric<HrChart>, maxHr: number): Metric<HrSeries> =>
 
 /** Drains closer than this to a bigger one are left unlabelled on the chart, so labels never overlap. */
 const DRAIN_GAP_MS = 90 * 60_000
+
+/** A day's stress line as the chart draws it: naps count as sleep spans (Stress Monitor, Home's tile). */
+export const stressSeries = (m: Metric<StressDayChart>): Metric<StressSeries> =>
+  mapMetric(m, (c) => ({
+    points: c.points.map((p) => ({ t: p.t, value: p.v })),
+    spans: c.spans.map((s) => ({ ...s, kind: s.kind === "nap" ? "sleep" : s.kind })),
+    now: c.now ?? undefined,
+  }))
 
 export function energySeries(e: EnergyBankVM): EnergySeries {
   const drains: NonNullable<EnergySeries["drains"]> = []

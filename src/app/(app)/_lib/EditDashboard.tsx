@@ -88,14 +88,15 @@ export function EditDashboard({ keys, defaults, empty = [] }: EditDashboardProps
 
   return (
     <>
+      {/* the reference app's "CUSTOMIZE" with a pencil at the section header's right (home-12). */}
       <Button
         variant="ghost"
-        size="icon"
-        aria-label="Edit My Dashboard"
+        aria-label="Customize My Dashboard"
         onClick={start}
-        className="relative rounded-full text-foreground-secondary after:absolute after:-inset-1.5 hover:bg-foreground/[0.06] hover:text-foreground"
+        className="relative -mr-2 h-8 gap-1.5 rounded-full px-2 text-xs leading-4 font-bold tracking-[0.1em] text-foreground uppercase after:absolute after:-inset-y-1.5 hover:bg-foreground/[0.06]"
       >
-        <Pencil aria-hidden strokeWidth={1.75} className="size-[18px]" />
+        Customize
+        <Pencil aria-hidden strokeWidth={1.75} className="size-4" />
       </Button>
       <ResponsiveSheet
         open={open}

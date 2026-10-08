@@ -12,7 +12,7 @@ const shown = () =>
     .getAllByRole("listitem")
     .map((li) => li.textContent)
 const group = (name: string) => within(screen.getByRole("region", { name }))
-const open = () => fireEvent.click(screen.getByRole("button", { name: "Edit My Dashboard" }))
+const open = () => fireEvent.click(screen.getByRole("button", { name: "Customize My Dashboard" }))
 const saved = (keys: string[]) => {
   fireEvent.click(screen.getByRole("button", { name: "Save dashboard" }))
   return waitFor(() => expect(h.save).toHaveBeenCalledExactlyOnceWith({ keys }))
@@ -27,7 +27,7 @@ describe("EditDashboard", () => {
     await screen.findByRole("list", { name: /On Home/ })
     expect(shown()).toEqual(["Steps", "Heart rate variability"])
     expect(screen.getByRole("button", { name: "Move Steps up" })).toBeDisabled()
-    expect(group("Recovery & sleep").getAllByRole("button").map((b) => b.textContent)).toEqual(["Resting heart rate", "Sleep performance"])
+    expect(group("Recovery & sleep").getAllByRole("button").map((b) => b.textContent)).toEqual(["Resting heart rate", "Sleep performance", "Stress Monitor"])
     expect(group("Body").getByRole("button", { name: "Add Weight" })).toBeInTheDocument()
     expect(group("Nutrition").getByRole("button", { name: "Add Water" })).toBeInTheDocument()
     expect(group("Vitals").getByRole("button", { name: "Add Blood glucose, no data yet" })).toHaveTextContent("No data yet")

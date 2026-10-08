@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { agoShort, DAY, dayLabel, dialAriaLabel, durationWords, formatDay, formatValue, rangeLabel } from "./format";
+import { agoShort, DAY, dayLabel, pillLabel, dialAriaLabel, durationWords, formatDay, formatValue, rangeLabel } from "./format";
 
 describe("format", () => {
   it("shortens sync ages for the header", () => {
@@ -29,6 +29,9 @@ describe("format", () => {
     expect(dayLabel("2026-10-02", "2026-10-02")).toBe("Today");
     expect(dayLabel("2026-10-01", "2026-10-02")).toBe("Yesterday");
     expect(dayLabel("2026-09-28", "2026-10-02")).toBe("Mon, Sep 28");
+    expect(pillLabel("2026-09-28", "2026-10-02")).toBe("Mon., Sep. 28");
+    expect(pillLabel("2026-05-04", "2026-10-02")).toBe("Mon., May 4");
+    expect(pillLabel("2026-10-01", "2026-10-02")).toBe("Yesterday");
     expect(rangeLabel("2026-09-22", "2026-09-28")).toBe("Sep 22 - Sep 28");
     expect(dayLabel("2026-03-01", "2026-03-02")).toBe("Yesterday");
     expect(formatDay("2026-09-28", DAY.long)).toBe("Monday, September 28");

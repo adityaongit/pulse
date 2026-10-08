@@ -22,7 +22,7 @@ export const SCREENS = [
   ["healthspan", "/health/healthspan"],
   ["reports", "/reports"],
   ["trends", "/trends"],
-  ["dashboard-editor", "/", (page) => page.getByRole("button", { name: "Edit My Dashboard" }).click()],
+  ["dashboard-editor", "/", (page) => page.getByRole("button", { name: "Customize My Dashboard" }).click()],
 ]
 
 // The phone's status bar is drawn by the frame, so the page gets the rest of an 844 pt screen.

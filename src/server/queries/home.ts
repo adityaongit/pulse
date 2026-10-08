@@ -27,6 +27,7 @@ import {
   sleepMetric,
   strainMetric,
   stressNow,
+  stressChartOf,
   exercisesBetween,
   timelineOf,
   todayOf,
@@ -59,6 +60,8 @@ export async function getHome(day: string, ctx: QueryCtx): Promise<HomeVM> {
     journalWeek(ctx, day),
     loadSeries(ctx, day, "energy_bank"),
   ]);
+  // The tile's line is a minute series: read it only when the tile is on the dashboard.
+  const stressSeries = keys.includes("stress") ? await loadSeries(ctx, day, "stress") : null;
   const row = rows.get(day);
 
   const recovery = recoveryMetric(row, isToday);
@@ -86,6 +89,8 @@ export async function getHome(day: string, ctx: QueryCtx): Promise<HomeVM> {
     monitorAlert: monitorAlert(row),
     monitor: monitorSummary(row, isToday),
     stress: stressNow(row, isToday),
+    plan: null,
+    stressChart: keys.includes("stress") ? stressChartOf(ctx, row, day, isToday, stressSeries, exs) : null,
     activities: { title: isToday ? "Today’s activities" : "Activities", items: timelineOf(row, day, exs) },
     energyBank: energyBankVM(ctx, row, day, isToday, ebSeries),
     tonight: planVM(ctx, row, isToday),
@@ -253,6 +258,7 @@ function statSpecs(row: DayRow | undefined, isToday: boolean): Record<DashboardK
     steps: spec((r) => r.metrics?.steps, maybe(m?.steps, dailyReason), undefined, "up", metricHref("steps")),
     spo2: spec((r) => r.metrics?.spo2Pct, maybe(m?.spo2Pct, vitalReason(row, isToday)), "%", "up", metricHref("spo2")),
     skin: spec(skin, maybe(row && skin(row), skinReason), "°C", "toward_zero", metricHref("skin")),
+    stress: spec((r) => r.stress?.average, maybe(row?.stress?.average, dailyReason), undefined, "down", "/health/stress", "decimal1"),
   } as Record<DashboardKey, StatSpec>;
   for (const b of BODY_METRICS) {
     const pick = (r: DayRow) => (b.key === "weight" ? r.metrics?.weightKg : r.metrics?.bodyFatPct);

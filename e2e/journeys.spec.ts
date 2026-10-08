@@ -225,3 +225,21 @@ test("Home header: dials, then scroll, then the ring row under a fixed top row",
   await scrollUntil(page, async () => (await panel.getAttribute("data-state")) === "rings");
   await expect(page.getByRole("img", { name: /-day streak$/ })).toBeInViewport();
 });
+
+test("10. My Day's +: the action menu → Add activity explains, Complete your journal opens the check-in", async ({ page }) => {
+  await page.goto("/");
+  const plus = page.getByRole("button", { name: "Add to today" });
+  await plus.click();
+  const menu = page.getByRole("menu");
+  // Only entries Pulse has data for; Start activity, Strength trainer and Share live stay off (src/lib/features.ts).
+  await expect(menu.getByRole("menuitem")).toHaveText([/Add activity/i, /Complete your journal/i]);
+  await menu.getByRole("menuitem", { name: /Add activity/i }).click();
+  const info = page.getByRole("dialog", { name: "Add an activity" });
+  await expect(info).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(info).toBeHidden();
+  await plus.click();
+  await page.getByRole("menu").getByRole("menuitem", { name: /Complete your journal/i }).click();
+  await expect(page).toHaveURL(url("/?checkin=1"));
+  await expect(page.getByRole("dialog", { name: "Check in" })).toBeVisible();
+});

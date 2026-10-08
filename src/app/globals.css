@@ -76,6 +76,12 @@
   --color-banner-to: var(--banner-to);
   --color-outlook-from: var(--outlook-from);
   --color-outlook-to: var(--outlook-to);
+  --color-outlook-accent: var(--outlook-accent);
+  --color-menu-from: var(--menu-from);
+  --color-menu-to: var(--menu-to);
+  --color-key-from: var(--key-from);
+  --color-key-to: var(--key-to);
+  --color-key-foreground: var(--key-foreground);
   --color-dial-track: var(--dial-track);
   --color-dial-target: var(--dial-target);
   --color-chart-grid: var(--chart-grid);
@@ -221,6 +227,14 @@
   --banner-to: #2b3f50;
   --outlook-from: #6a5a45;
   --outlook-to: #2f4a5e;
+  --outlook-accent: #e8d6b4;
+  /* The "+" action menu: a blue-violet panel, lighter at its top edge */
+  --menu-from: #343f6b;
+  --menu-to: #2a3150;
+  /* Light key: the white "+" tile with a soft top light */
+  --key-from: #ffffff;
+  --key-to: #dfe2e6;
+  --key-foreground: #101518;
 
   /* Dials and charts */
   --dial-track: #33383c;
@@ -367,6 +381,12 @@
   --banner-to: #e3ecf3;
   --outlook-from: #f3ebdf;
   --outlook-to: #e2ebf2;
+  --outlook-accent: #8a6a32;
+  --menu-from: #eef0fb;
+  --menu-to: #e2e6f6;
+  --key-from: #101518;
+  --key-to: #2a3034;
+  --key-foreground: #ffffff;
 
   --dial-track: #e2e6e9;
   --dial-target: #b3bbc1;

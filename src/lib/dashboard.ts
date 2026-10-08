@@ -26,6 +26,9 @@ const CORE = [
   { key: "skin", label: "Skin temperature", group: "vitals" },
 ] as const
 
+/** Stress Monitor: a chart tile rather than a row (the day's stress line), placed and reordered like any metric. */
+const STRESS = { key: "stress", label: "Stress Monitor", group: "recovery" } as const
+
 /** Google's weight and body-fat readings (daily_metrics); each opens its detail screen. */
 export const BODY_METRICS = [
   { key: "weight", label: "Weight", unit: "kg", format: "decimal1", direction: "neutral", href: metricHref("weight") },
@@ -33,10 +36,11 @@ export const BODY_METRICS = [
 ] as const satisfies readonly { key: string; label: string; unit: string; format: FormatKey; direction: GoodDirection; href: string }[]
 export type BodyKey = (typeof BODY_METRICS)[number]["key"]
 
-export type DashboardKey = (typeof CORE)[number]["key"] | BodyKey | ExtraKey
+export type DashboardKey = (typeof CORE)[number]["key"] | typeof STRESS.key | BodyKey | ExtraKey
 
 const ALL: { key: DashboardKey; label: string; group: DashboardGroup }[] = [
   ...CORE,
+  STRESS,
   ...BODY_METRICS.map((m) => ({ key: m.key, label: m.label, group: "body" as const })),
   ...EXTRA_METRICS.map((m) => ({ key: m.key, label: m.label, group: m.group })),
 ]
@@ -48,8 +52,8 @@ export const DASHBOARD_LABEL = Object.fromEntries(ALL.map((m) => [m.key, m.label
 
 export const isDashboardKey = (k: string): k is DashboardKey => Object.hasOwn(DASHBOARD_LABEL, k)
 
-/** The default list: the v1 rows in their v1 order. */
-export const DASHBOARD_DEFAULT: DashboardKey[] = CORE.map((m) => m.key)
+/** The default list: the v1 rows, with Stress Monitor after Sleep performance as in the reference app. */
+export const DASHBOARD_DEFAULT: DashboardKey[] = CORE.flatMap((m) => (m.key === "sleep" ? [m.key, STRESS.key] : [m.key]))
 
 /** The default for an account that has never synced heart rate (phone only, no Fitbit band): what its phone counts. */
 export const PHONE_DEFAULT: DashboardKey[] = ["steps", "distance", "calories", "active_minutes", "active_calories", "floors"]

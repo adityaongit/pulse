@@ -152,3 +152,14 @@ export const STRAIN_RECOVERY_INFO: InfoContent = {
     </>
   ),
 }
+
+/** "Add activity" (Home's card button and the "+" menu): Pulse imports workouts, so this explains where they come from (§11 R2). */
+export const ADD_ACTIVITY_INFO: InfoContent = {
+  title: "Add an activity",
+  body: (
+    <>
+      <p>Pulse reads your workouts from Fitbit through Google Health, so it cannot add one here.</p>
+      <p>Start or log the workout in the Fitbit app. It appears in your activities after the next sync, with its Strain.</p>
+    </>
+  ),
+}

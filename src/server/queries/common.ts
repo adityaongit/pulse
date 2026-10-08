@@ -26,7 +26,7 @@ import { STRENGTH_TYPES } from "@/core/algorithms/healthspan";
 import { toStrainScale } from "@/core/scoring/strain";
 import { stressLevel } from "@/lib/bands";
 import { addDays, localDay, localMidnight } from "../time";
-import type { ActivityKind, DayPoint, Metric, MetricTag, ReasonCode, SleepPlanVM, Span, TimelineItem, TimePoint } from "./types";
+import type { ActivityKind, DayPoint, Metric, MetricTag, ReasonCode, SleepPlanVM, Span, StressDayChart, TimelineItem, TimePoint } from "./types";
 
 export type QueryCtx = {
   db: Db;
@@ -401,6 +401,14 @@ export function sleepMetric(row: DayRow | undefined, isToday: boolean): Metric<n
 export function strainMetric(row: DayRow | undefined): Metric<number> {
   const s1 = row?.s1;
   return s1?.effort != null ? ok(toStrain(s1.effort)) : none(hrReason(s1 ?? null));
+}
+
+/** The day's stress line for the Stress Monitor screen and Home's tile: every 2nd still minute, spans, now (spec §7.9). */
+export function stressChartOf(ctx: QueryCtx, row: DayRow | undefined, day: string, isToday: boolean, series: (number | null)[] | null, exs: ExerciseRow[]): Metric<StressDayChart> {
+  const st = row?.stress;
+  if (!st || st.average == null) return none(row?.s1?.hrCount ? "no_data" : "band_not_worn");
+  const start = dayStartOf(ctx, day);
+  return ok({ points: minutePoints(series, start, 2), spans: daySpansOf(row, start, exs), now: isToday && st.latest ? ms(st.latest.ts) : null }, st.provisional);
 }
 
 export function stressNow(row: DayRow | undefined, isToday: boolean): Metric<{ value: number; level: "low" | "medium" | "high"; at: number | null; dayAverage: boolean }> {

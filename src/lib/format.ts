@@ -99,6 +99,16 @@ export function dayLabel(date: string, today: string) {
   return formatDay(date, DAY.short);
 }
 
+/** The date pill's label: "Today", "Yesterday", else "Mon., Sep. 28", abbreviations marked with a period as the
+ * reference app prints them ("TUE., APR. 14", home-03); a month short enough to need none stays bare ("May 4"). */
+export function pillLabel(date: string, today: string) {
+  const label = dayLabel(date, today);
+  if (label === "Today" || label === "Yesterday") return label;
+  const month = formatDay(date, { month: "short" });
+  const dot = month === formatDay(date, { month: "long" }) ? "" : ".";
+  return `${formatDay(date, { weekday: "short" })}., ${month}${dot} ${formatDay(date, { day: "numeric" })}`;
+}
+
 /** "Sep 22 - Sep 28". */
 export const rangeLabel = (from: string, to: string) => `${formatDay(from, DAY.monthDay)} - ${formatDay(to, DAY.monthDay)}`;
 

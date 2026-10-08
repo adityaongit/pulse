@@ -29,7 +29,7 @@ import {
   todayOf,
   vitalReason,
   trendPoints,
-  daySpansOf,
+  stressChartOf,
   exercisesBetween,
 } from "./common";
 import type {
@@ -453,21 +453,19 @@ export async function getStress(day: string, ctx: QueryCtx): Promise<StressVM> {
   const row = rows.get(day);
   const st = row?.stress;
   const gauge = stressNow(row, isToday);
-  const start = dayStartOf(ctx, day);
   const sameStress = [7, 14, 21, 28].map((k) => rows.get(addDays(day, -k))?.stress).filter((x) => !!x && x.average != null);
   const typicalOf = (pick: (x: NonNullable<DayRow["stress"]>) => number) => meanSd(sameStress.map((x) => pick(x!))).mean ?? 0;
   const typical = sameStress.length ? typicalOf((x) => x.highMin) : null;
 
-  const spans = daySpansOf(row, start, exs);
   const scored = st && st.average != null;
-  const empty = row?.s1?.hrCount ? "no_data" : "band_not_worn";
+  const chart = stressChartOf(ctx, row, day, isToday, series, exs);
 
   return {
     day,
     isToday,
     gauge,
     insight: scored ? stressInsight(st, ctx.timeZone) : null,
-    chart: scored ? ok({ points: minutePoints(series, start, 2), spans, now: isToday && st.latest ? ms(st.latest.ts) : null }, st.provisional) : none(empty),
+    chart,
     levels: scored
       ? ok(
           {
@@ -480,7 +478,7 @@ export async function getStress(day: string, ctx: QueryCtx): Promise<StressVM> {
           },
           st.provisional,
         )
-      : none(empty),
+      : none(chart.reason ?? "no_data"),
     trend: {
       points: trendPoints(rows, day, (r) => r.stress?.average, 30),
     },

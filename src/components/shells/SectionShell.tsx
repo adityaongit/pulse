@@ -76,7 +76,8 @@ export function SectionShell({ variant, title, info, action, aside, href, level,
       </H>
       <div className="flex shrink-0 items-center gap-2">
         {aside}
-        {href ? <ChevronRight aria-hidden className="-mr-1.5 size-[18px] text-foreground-secondary" strokeWidth={1.75} /> : actionNode}
+        {/* Pulled into the padding by the glyph's own inset, so the visible arrow sits on the 16 px edge and "Health Monitor" fits one line at 390 px. */}
+        {href ? <ChevronRight aria-hidden className="-mr-2.5 size-[18px] text-foreground-secondary" strokeWidth={1.75} /> : actionNode}
         {explanation && <span className={href ? "relative z-10" : undefined}><InfoButton info={explanation} label={title} variant="card" /></span>}
       </div>
     </div>

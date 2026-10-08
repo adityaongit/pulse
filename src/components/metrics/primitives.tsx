@@ -10,6 +10,9 @@ import { TAG_COPY, type MetricTag } from "@/lib/reasons"
 /** Shared type styles: the uppercase small label and the muted caption. */
 export const LABEL = "text-xs leading-4 font-bold tracking-[0.1em] uppercase"
 export const CAPTION = "text-xs leading-4 font-medium text-muted-foreground"
+/** The 48 px secondary button at a card's foot ("+ Add activity", "Behaviour insights", "Edit alarm"). */
+export const CARD_BUTTON =
+  "flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-secondary text-[13px] leading-4 font-bold tracking-[0.1em] uppercase transition-[background-color,scale] duration-150 ease-standard outline-none hover:bg-accent focus-visible:ring-3 focus-visible:ring-ring/50 active:scale-[0.96]"
 
 export type TagKind = keyof typeof TAG_COPY | "so_far" | "partial_week" | "partial_month" | "estimate"
 const EXTRA_TAGS: Record<Exclude<TagKind, keyof typeof TAG_COPY>, string> = {

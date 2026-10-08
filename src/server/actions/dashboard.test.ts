@@ -59,7 +59,7 @@ it("the default list (Reset to default) is stored as no rows: phone metrics unti
   expect(await rows()).toEqual([]);
   await db.insert(hrDays).values({ userId: USER, bucket: 0, offsets: [1], values: [60] });
   try {
-    await saveDashboard({ keys: ["hrv", "rhr", "resp", "sleep", "calories", "steps", "spo2", "skin"] });
+    await saveDashboard({ keys: ["hrv", "rhr", "resp", "sleep", "stress", "calories", "steps", "spo2", "skin"] });
     expect(await rows()).toEqual([]);
   } finally {
     await db.delete(hrDays);
