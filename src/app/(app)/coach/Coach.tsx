@@ -5,8 +5,7 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useChat } from "@ai-sdk/react"
 import { DefaultChatTransport, type UIMessage } from "ai"
-import { ArrowUp, Check, Clipboard, History, Mic, NotebookPen, PanelLeftClose, PanelLeftOpen, Pencil, RotateCcw, Settings2, Square, ThumbsDown, ThumbsUp } from "lucide-react"
-import { FEATURES } from "@/lib/features"
+import { Activity, ArrowUp, Check, ChevronRight, Copy, Dumbbell, History, Moon, NotebookPen, PanelLeftClose, PanelLeftOpen, Pencil, RotateCcw, Settings2, Square, type LucideIcon } from "lucide-react"
 import { cn } from "@/lib/utils"
 import type { dayDigest } from "@/server/coach/tools"
 import type { ChatCursor, ChatGroup } from "@/server/coach/store"
@@ -26,6 +25,10 @@ import { Evidence } from "./Evidence"
 
 type DayDigest = Awaited<ReturnType<typeof dayDigest>>
 type Num = { value: number | null; reason?: string | null }
+
+const SUGGESTION_ICONS: Record<CoachSuggestion["key"], LucideIcon> = {
+  brief: Activity, recovery: Activity, training: Dumbbell, hrv: Activity, sleep: Moon, strain: Dumbbell, sync: Moon,
+}
 
 const RUNNING: Record<string, string> = {
   get_day: "Looking at your day…",
@@ -138,29 +141,9 @@ function CopyAnswer({ text }: { text: string }) {
   const ICON = "absolute size-4 transition-[opacity,scale,filter] duration-200 ease-standard motion-reduce:transition-none"
   return (
     <Button type="button" variant="ghost" size="icon-lg" aria-label={copied ? "Copied" : "Copy answer"} onClick={() => navigator.clipboard?.writeText(text).then(() => setCopied(true), () => {})} className={ACTION}>
-      <Clipboard aria-hidden strokeWidth={1.75} className={cn(ICON, copied && "scale-25 opacity-0 blur-[4px]")} />
+      <Copy aria-hidden strokeWidth={1.75} className={cn(ICON, copied && "scale-25 opacity-0 blur-[4px]")} />
       <Check aria-hidden strokeWidth={2} className={cn(ICON, !copied && "scale-25 opacity-0 blur-[4px]")} />
     </Button>
-  )
-}
-
-/**
- * coach-02's thumbs up and down, built and off (FEATURES.coachFeedback): Pulse stores no ratings yet, so the choice
- * stays on the screen.
- */
-function RateAnswer() {
-  const [rated, setRated] = React.useState<"up" | "down" | null>(null)
-  return (
-    <>
-      {(["up", "down"] as const).map((r) => {
-        const Icon = r === "up" ? ThumbsUp : ThumbsDown
-        return (
-          <Button key={r} type="button" variant="ghost" size="icon-lg" aria-label={r === "up" ? "Good answer" : "Bad answer"} aria-pressed={rated === r} onClick={() => setRated(rated === r ? null : r)} className={cn(ACTION, rated === r && "text-foreground")}>
-            <Icon aria-hidden strokeWidth={1.75} className={cn("size-4", rated === r && "fill-current")} />
-          </Button>
-        )
-      })}
-    </>
   )
 }
 
@@ -235,7 +218,6 @@ function AssistantMessage({ m, done, onRegenerate }: { m: UIMessage; done: boole
       {done && (text || onRegenerate) && (
         <div className="-ml-2 flex items-center">
           {text && <CopyAnswer text={text} />}
-          {text && FEATURES.coachFeedback && <RateAnswer />}
           {onRegenerate && (
             <Button type="button" variant="ghost" size="icon-lg" aria-label="Regenerate answer" onClick={onRegenerate} className={ACTION}>
               <RotateCcw aria-hidden strokeWidth={1.75} className="size-4" />
@@ -257,20 +239,10 @@ const chatsPanel = panelStore("pulse:coach-chats-open")
 const usePanelOpen = chatsPanel.use
 const setPanelOpen = chatsPanel.set
 
-/** coach-02's reply chips: white pills in one scrolling row over the composer. */
-const CHIP =
-  "h-10 shrink-0 snap-start rounded-full bg-primary px-4 text-[14px] leading-5 font-medium whitespace-nowrap text-primary-foreground outline-none transition-[scale,opacity] duration-150 ease-standard hover:opacity-90 focus-visible:ring-3 focus-visible:ring-ring/50 active:scale-[0.96]"
-
-/** coach-01's glyph: Pulse's mark in an indigo ring, the header's title icon. */
-export function CoachGlyph() {
-  return (
-    <span className="grid size-7 place-items-center rounded-full bg-linear-to-br from-insight-from to-insight-to p-px">
-      <span className="grid size-full place-items-center rounded-full bg-background">
-        <Mark className="size-3.5" />
-      </span>
-    </span>
-  )
-}
+const SUGGESTION = cn(
+  CARD_MATERIAL,
+  "group/suggestion flex min-h-14 w-full items-center gap-3 px-4 py-3 text-left text-[14px] leading-5 font-medium text-foreground outline-none transition-[scale,--tw-gradient-from] duration-150 ease-standard hover:from-card-hover focus-visible:ring-3 focus-visible:ring-ring/50 active:scale-[0.96]",
+)
 
 export function CoachBarActions({ chatCount, chatOpen }: { chatCount: number; chatOpen: boolean }) {
   const btn = "text-foreground-secondary hover:text-foreground"
@@ -291,26 +263,7 @@ export function CoachBarActions({ chatCount, chatOpen }: { chatCount: number; ch
   )
 }
 
-export function Coach({
-  id,
-  initial,
-  groups,
-  next,
-  prefill,
-  auto,
-  opener,
-  suggestions,
-}: {
-  id: string
-  initial: UIMessage[]
-  groups: ChatGroup[]
-  next: ChatCursor | null
-  prefill: string
-  auto: boolean
-  /** The day's first chat: the coach speaks first (coach-02). */
-  opener: boolean
-  suggestions: CoachSuggestion[]
-}) {
+export function Coach({ id, initial, groups, next, prefill, auto, suggestions }: { id: string; initial: UIMessage[]; groups: ChatGroup[]; next: ChatCursor | null; prefill: string; auto: boolean; suggestions: CoachSuggestion[] }) {
   const router = useRouter()
   const [input, setInput] = React.useState(prefill)
   const [error, setError] = React.useState<string | null>(null)
@@ -326,13 +279,10 @@ export function Coach({
       prepareSendMessagesRequest: ({ messages, id, trigger, messageId }) => ({ body: { id, message: messages.at(-1), trigger, messageId } }),
     }),
     onError: (e) => setError(ERRORS[/\b(limit|key|provider)\b/.exec(e.message)?.[1] ?? ""] ?? "Couldn’t get an answer. Try again."),
-    onFinish: ({ message, messages: all }) => {
+    onFinish: ({ message }) => {
       // Announce completed answers once; saved chats must not be read again on load.
       setAnnounce(plain(message))
-      const asked = all.filter((m) => m.role === "user" && !(m.metadata as { coachOpener?: unknown } | undefined)?.coachOpener).length
-      if (initial.length === 0 && all.length <= 2) router.replace(`/coach?c=${id}`, { scroll: false })
-      // The first question names the chat (an opened chat is "Today with Coach" until then): refresh the list.
-      else if (asked === 1 && all.some((m) => (m.metadata as { coachOpener?: unknown } | undefined)?.coachOpener)) router.refresh()
+      if (initial.length === 0) router.replace(`/coach?c=${id}`, { scroll: false })
     },
   })
   const [announce, setAnnounce] = React.useState("")
@@ -386,19 +336,12 @@ export function Coach({
     void sendMessage({ text: t })
     area.current?.focus({ preventScroll: true })
   }
-  // Opening the morning notification authorizes one brief request; the day's first chat opens with the coach's own
-  // turn, which the server writes and the screen never shows.
-  // Sent from a timeout the cleanup cancels: React's development double mount drops a request sent during the first
-  // mount, and a guard set then would block the second.
+  // Opening the morning notification authorizes one brief request.
   const asked = React.useRef(false)
   React.useEffect(() => {
-    if (asked.current || messages.length || !(auto || opener)) return
-    const t = setTimeout(() => {
-      asked.current = true
-      if (auto) send(prefill)
-      else void sendMessage({ text: "opener", metadata: { coachOpener: true } })
-    })
-    return () => clearTimeout(t)
+    if (!auto || asked.current) return
+    asked.current = true
+    send(prefill)
   })
   const edit = (messageId: string, text: string) => {
     if (busy) return
@@ -411,10 +354,6 @@ export function Coach({
     void regenerate(messageId ? { messageId } : undefined)
   }
   const lastAnswer = messages.at(-1)?.role === "assistant" ? messages.at(-1)!.id : null
-  const shown = messages.filter((m) => !(m.metadata as { coachOpener?: unknown } | undefined)?.coachOpener)
-  // Reply chips: the suggestions not asked yet, on an empty chat and after each finished answer.
-  const askedTexts = new Set(shown.flatMap((m) => (m.role === "user" ? [plain(m)] : [])))
-  const chips = busy || (shown.length > 0 && shown.at(-1)!.role !== "assistant") ? [] : suggestions.filter((s) => !askedTexts.has(s.text))
 
   const listOpen = usePanelOpen()
   const PANEL_BTN = "rounded-full text-muted-foreground hover:bg-foreground/8 hover:text-foreground"
@@ -457,7 +396,7 @@ export function Coach({
 
       <div className="mx-auto flex min-h-0 w-full max-w-[760px] flex-1 flex-col pb-[max(env(safe-area-inset-bottom),12px)] in-data-keyboard:pb-2 md:pb-6">
         <div ref={transcript} data-coach-transcript className="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-none pb-6">
-          {shown.length === 0 && !busy ? (
+          {messages.length === 0 ? (
             <div className="my-auto flex flex-col items-center py-8 text-center">
               <span aria-hidden className="grid size-12 place-items-center rounded-full bg-linear-to-br from-insight-from to-insight-to p-px">
                 <span className="grid size-full place-items-center rounded-full bg-background">
@@ -465,9 +404,22 @@ export function Coach({
                 </span>
               </span>
               <h2 className="mt-5 text-[22px] leading-7 font-bold tracking-[-0.01em] text-balance md:text-[26px] md:leading-8">What would you like to know?</h2>
+              <ul className="mt-8 grid w-full max-w-[600px] gap-2 sm:grid-cols-2">
+                {suggestions.map(({ text, key }) => {
+                  const Icon = SUGGESTION_ICONS[key]
+                  return (
+                  <li key={text} className="min-w-0">
+                    <button type="button" onClick={() => send(text)} className={SUGGESTION}>
+                      <Icon aria-hidden className="size-5 shrink-0 text-coach" strokeWidth={1.75} />
+                      <span className="min-w-0 flex-1 text-pretty">{text}</span>
+                      <ChevronRight aria-hidden className="size-4 shrink-0 text-muted-foreground transition-[translate] duration-150 ease-standard group-hover/suggestion:translate-x-0.5" strokeWidth={1.75} />
+                    </button>
+                  </li>
+                )})}
+              </ul>
               <SheetTrigger
                 sheet="checkin"
-                className="mt-6 inline-flex h-10 items-center gap-2 rounded-full px-4 text-[14px] font-medium text-foreground-secondary outline-none transition-[background-color,color,scale] duration-150 ease-standard hover:bg-foreground/[0.05] hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50 active:scale-[0.96]"
+                className="mt-3 inline-flex h-10 items-center gap-2 rounded-full px-4 text-[14px] font-medium text-foreground-secondary outline-none transition-[background-color,color,scale] duration-150 ease-standard hover:bg-foreground/[0.05] hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50 active:scale-[0.96]"
               >
                 <NotebookPen aria-hidden className="size-4" strokeWidth={1.75} />
                 Check in for today
@@ -475,11 +427,11 @@ export function Coach({
             </div>
           ) : (
             <div role="log" aria-label="Chat with Pulse’s coach" className="mt-2 space-y-7">
-              {shown.map((m, i) =>
+              {messages.map((m, i) =>
                 m.role === "user" ? (
                   <UserMessage key={m.id} m={m} busy={busy} onEdit={(text) => edit(m.id, text)} />
                 ) : (
-                  <AssistantMessage key={m.id} m={m} done={!busy || i < shown.length - 1} onRegenerate={!busy && m.id === lastAnswer ? () => again(m.id) : undefined} />
+                  <AssistantMessage key={m.id} m={m} done={!busy || i < messages.length - 1} onRegenerate={!busy && m.id === lastAnswer ? () => again(m.id) : undefined} />
                 ),
               )}
               {status === "submitted" && <Caption live>Thinking…</Caption>}
@@ -503,19 +455,6 @@ export function Coach({
         </div>
 
         <div className="z-20 shrink-0 pt-2">
-          {chips.length > 0 && (
-            <ul aria-label="Suggested replies" className="-mx-4 mb-3 flex snap-x gap-2 overflow-x-auto overscroll-x-contain px-4 [scrollbar-width:none] md:mx-0 md:px-0">
-              {chips.map(({ text }) => (
-                <li key={text}>
-                  <button type="button" onClick={() => send(text)} className={CHIP}>
-                    {text}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )}
-          <div className="flex items-end gap-2">
-          <NewChatButton composer />
           <form
             onSubmit={(e) => {
               e.preventDefault()
@@ -523,7 +462,7 @@ export function Coach({
             }}
             className={cn(
               GLASS,
-              "flex min-w-0 flex-1 items-end gap-1.5 rounded-[28px] p-1.5 ring-coach/40 transition-[box-shadow] duration-150 ease-standard has-[textarea:focus-visible]:ring-foreground/25",
+              "flex items-end gap-1.5 rounded-[28px] p-1.5 transition-[box-shadow] duration-150 ease-standard has-[textarea:focus-visible]:ring-foreground/25",
             )}
           >
             <label htmlFor="coach-input" className="sr-only">
@@ -543,17 +482,12 @@ export function Coach({
               rows={1}
               maxLength={2000}
               enterKeyHint="send"
-              placeholder="Ask Pulse anything"
+              placeholder="Message Coach"
               className="field-sizing-content max-h-40 min-h-11 min-w-0 flex-1 resize-none bg-transparent py-2.5 pl-3.5 text-[16px] leading-6 text-foreground caret-coach outline-none placeholder:text-muted-foreground"
             />
             {busy ? (
               <Button type="button" size="icon-touch" variant="secondary" onClick={() => stop()} aria-label="Stop">
                 <Square aria-hidden className="size-3.5 fill-current" />
-              </Button>
-            ) : FEATURES.coachVoice && !input.trim() ? (
-              // coach-02's microphone, built and off (FEATURES.coachVoice): Pulse has no speech input yet.
-              <Button type="button" size="icon-touch" variant="ghost" aria-label="Dictate" className="text-foreground-secondary">
-                <Mic aria-hidden strokeWidth={1.75} />
               </Button>
             ) : (
               <Button type="submit" size="icon-touch" disabled={!input.trim()} aria-label="Send">
@@ -561,7 +495,6 @@ export function Coach({
               </Button>
             )}
           </form>
-          </div>
         </div>
       </div>
     </div>

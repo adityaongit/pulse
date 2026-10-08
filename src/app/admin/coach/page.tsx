@@ -19,7 +19,6 @@ const requestTime = () => Date.now()
 const PROSE = {
   instructions: { label: "Instructions", description: "Keep the safety rules: no numbers without a tool, honest missing data, not medical advice.", rows: 18 },
   summary_instructions: { label: "Conversation summaries", description: "Preserve user preferences and earlier decisions. Measurements must be fetched fresh.", rows: 18 },
-  opener: { label: "Opening message", description: "What the coach is asked when it opens the day's first chat. The user never sees it.", rows: 6 },
   workout_glance: { label: "Workout glance", description: "The one-line take on a workout, shown on its screen. The workout's numbers are added after it.", rows: 6 },
 } as const
 

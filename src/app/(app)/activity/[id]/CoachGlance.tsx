@@ -4,8 +4,19 @@ import * as React from "react"
 import Link from "next/link"
 import { ChevronUp } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { Mark } from "@/components/brand/Mark"
 import { GLASS } from "@/components/shells/AppNav"
-import { CoachGlyph } from "../../coach/Coach"
+
+/** Pulse's mark in an indigo ring, as the coach's own empty state draws it. */
+function CoachGlyph() {
+  return (
+    <span aria-hidden className="grid size-7 shrink-0 place-items-center rounded-full bg-linear-to-br from-insight-from to-insight-to p-px">
+      <span className="grid size-full place-items-center rounded-full bg-background">
+        <Mark className="size-3.5" />
+      </span>
+    </span>
+  )
+}
 
 type State = { text: string | null; failed: boolean }
 

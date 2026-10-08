@@ -3,7 +3,6 @@ import { afterEach, expect, it, vi } from "vitest"
 import { CoachGlance } from "./CoachGlance"
 
 vi.mock("next/link", () => ({ default: ({ children, ...props }: React.ComponentProps<"a">) => <a {...props}>{children}</a> }))
-vi.mock("../../coach/Coach", () => ({ CoachGlyph: () => <span /> }))
 
 afterEach(() => {
   cleanup()

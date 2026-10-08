@@ -168,14 +168,11 @@ export async function loadChat(db: Db, userId: number, id: string): Promise<UIMe
   return r ? (r.messages as UIMessage[]) : null;
 }
 
-/** The coach's own opening turn (coach-02): saved with the chat, never shown or used as its title. */
-export const isOpener = (m: UIMessage) => m.role === "user" && (m.metadata as { coachOpener?: unknown } | undefined)?.coachOpener === true
-
 /** The first thing the user asked, cut to 60 characters. */
 export function titleOf(messages: UIMessage[]): string {
-  const first = messages.find((m) => m.role === "user" && !isOpener(m));
+  const first = messages.find((m) => m.role === "user");
   const text = first?.parts.map((p) => (p.type === "text" ? p.text : "")).join(" ").trim().replace(/\s+/g, " ") ?? "";
-  return (text.length > 60 ? `${text.slice(0, 59)}…` : text) || (messages.some(isOpener) ? "Today with Coach" : "New chat");
+  return (text.length > 60 ? `${text.slice(0, 59)}…` : text) || "New chat";
 }
 
 export async function saveChat(db: Db, userId: number, id: string, messages: UIMessage[]): Promise<void> {
