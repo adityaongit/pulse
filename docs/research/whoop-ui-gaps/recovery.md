@@ -64,6 +64,44 @@ Severity: missing-screen, missing-element, behaviour, visual. File names below a
 | 30 | Sleep Performance contributor taps to a Trend View with the same layout (inferred; not captured). | missing-screen | recovery-01 | `src/app/(app)/recovery/page.tsx:44` (links to `/sleep`) | Only HRV, RHR and Resp Rate trend views were captured. Pulse sends Sleep Performance to the Sleep screen instead of a trend screen. |
 | 31 | Floating coach button at lower right (round "W" glyph) over every screen. | missing-element | recovery-01 to 15 | Pulse has an equivalent round action button (`docs/design/spec.md` line 776) | Covered in the Pulse shell, not specific to Recovery. Listed so nobody redoes it. |
 
+## Status, score-screens phase (2026-10-08)
+
+Build steps for the score-screens phase: 1 trend helpers (`src/lib/trend.ts`), 2 Trend View query, 3 Trend View screen `/trend/[key]`, 4 `WeeklyTrends`, 5 Sleep, 6 Recovery, 7 Strain. "Hidden" means the component is built but off in `src/lib/features.ts` until Pulse has a data source. "Out of scope" means the owner excluded it for this phase. Decisions are recorded in `docs/design/spec.md` §11 from R29 onwards.
+
+| # | Plan | Status |
+|---|---|---|
+| 1 | Step 6: Behavior Insights card with automatic chips (sleep performance, strain, wake time, workout timing) | Planned |
+| 2 | Step 6: the card links to Journal insights (WHOOP's destination was not captured) | Planned |
+| 3 | Steps 4 and 6: Weekly Trends (Recovery, HRV, RHR, Respiratory rate, Sleep performance) | Planned |
+| 4 | Step 4: cards link to their Trend View | Planned |
+| 5 | Step 4: band-coloured value labels, today's column highlight, two-line labels | Planned |
+| 6 | Step 4: HRV line with ring markers and value labels | Planned |
+| 7 | Step 6: flat contributor rows showing today's value over the 30-day value, with a triangle | Planned |
+| 8 | Step 6: the baseline track is dropped | Planned |
+| 9 | Step 6: "Today vs. last 30 days" legend | Planned |
+| 10 | Step 6: the skin temperature row is hidden; it still counts in the score | Planned |
+| 11 | Step 6: no unit text after contributor values | Planned |
+| 12 | Step 6: insight link "Explore your recovery insights" to the Recovery Trend View | Planned |
+| 13 | Same link as gap 12 (WHOOP's screen was not captured) | Planned |
+| 14 | Step 6: "What shaped it" and "Tomorrow's forecast" are removed from Recovery | Planned |
+| 15 | Step 6: no band word under the ring | Planned |
+| 16 | Steps 5-7: the Recovery, Sleep and Strain headers read "TODAY" with no date arrows | Planned |
+| 17 | Step 3: metric dropdown | Planned |
+| 18 | Steps 1 and 3: relative % chip; Resp up is orange | In progress |
+| 19 | Step 3: W/M/6M beside the average, no 1Y | Planned |
+| 20 | Step 3: period stepper | Planned |
+| 21 | Steps 1 and 3: verdict sentence, including the typical-range wording | In progress |
+| 22 | Step 3: "Typical range" band with its legend at the top right | Planned |
+| 23 | Step 3: W ring markers, value labels, two-line day ticks | Planned |
+| 24 | Step 3: M line with a ringed latest point, a value tag and a tight axis | Planned |
+| 25 | Steps 1 and 3: 6M month segments with coloured % change | In progress |
+| 26 | Learn More carousel | Out of scope |
+| 27 | View all list | Out of scope |
+| 28 | Step 3: "What is X?" explainer in Pulse's own words | Planned |
+| 29 | Step 3: the Trend View has no day hero; `/metric/[key]` keeps it | Planned |
+| 30 | Step 6: the Sleep performance row opens its Trend View | Planned |
+| 31 | Already covered by the shell's coach button | No change |
+
 ## Already matches
 
 - Ring dial layout: large percentage with a small "%", "RECOVERY" label, wordmark above, band-colour arc, dark track, wordmark replaced by "PULSE" (`recovery/page.tsx:39`, `ScoreDial`).

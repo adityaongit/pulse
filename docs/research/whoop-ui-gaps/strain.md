@@ -71,6 +71,40 @@ flowchart TD
 | 26 | **Contributor rows are tappable into Trend Views** (inferred) and carry no chevron. Pulse shows a chevron only on rows that go somewhere (Steps and the five extras) and the three zone/strength rows are inert. | behaviour | strain-01, 02 | `strain.ts:73-79`; `src/components/metrics/KeyStatRow.tsx:128` | Fixed by gaps 1 to 3. Chevron styling is a Pulse choice; WHOOP shows none. |
 | 27 | **Insight card CTA and copy.** WHOOP: "Your body is capable of taking on moderate effort today. To maintain consistent exercise while balancing recovery, aim for moderate Day Strain between 9.2 and 13.2 today." with the link "EXPLORE YOUR STRAIN INSIGHTS →" (purple, caps). Pulse: "Your body needs rest today. Keep strain between 4.0 and 6.0." with "PLAN TONIGHT'S SLEEP →". | missing-element | strain-02, 03, 32, 33, 34 | `strain/page.tsx:78` | Copy differs by design (the target comes from Pulse's own model). There is no "Strain insights" destination in Pulse. The card styling already matches (gradient border). |
 
+## 3a. Status, score-screens phase (2026-10-08)
+
+Build steps for the score-screens phase: 1 trend helpers (`src/lib/trend.ts`), 2 Trend View query, 3 Trend View screen `/trend/[key]`, 4 `WeeklyTrends`, 5 Sleep, 6 Recovery, 7 Strain. "Hidden" means the component is built but off in `src/lib/features.ts` until Pulse has a data source. "Out of scope" means the owner excluded it for this phase. Decisions are recorded in `docs/design/spec.md` §11 from R29 onwards.
+
+| # | Plan | Status |
+|---|---|---|
+| 1 | Step 7: HR Zones 1-3 Trend View | Planned |
+| 2 | Step 7: HR Zones 4-5 Trend View | Planned |
+| 3 | Step 7: Strength Activity Time Trend View | Planned |
+| 4 | Step 7: Day Strain Trend View | Planned |
+| 5 | Step 3: Steps opens the shared Trend View; `/metric/steps` stays as the day screen | Planned |
+| 6 | Step 3: metric dropdown | Planned |
+| 7 | Steps 2-3: period stepper | Planned |
+| 8 | Steps 1-2: weekly totals for zones and strength (helper done) | In progress |
+| 9 | Steps 1 and 3: verdict sentence (helper done) | In progress |
+| 10 | Step 7: stacked zone bars with zone legend | Planned |
+| 11 | Steps 3 and 7: zones breakdown | Planned |
+| 12 | Step 7: strength breakdown by activity type | Planned |
+| 13 | Step 7: Day Strain breakdown with WHOOP bands (Light <10, Moderate 10-14, Strenuous 14-18, All Out >18) | Planned |
+| 14 | Step 3: footnote line | Planned |
+| 15 | Step 3: 6M month segments | Planned |
+| 16 | Step 3: AVG pill on the left; no 7,000 line on the Trend View | Planned |
+| 17 | Step 3: empty activity-time windows still draw axes and 0:00 | Planned |
+| 18 | Step 7: Add activity button (Home's info card) on the zones and strength Trend Views | Planned |
+| 19 | Step 7: goal buttons, behind a flag (Pulse has no goals) | Planned (hidden) |
+| 20 | Learn More carousel | Out of scope |
+| 21 | Steps 3 and 7: "What is Strength Activity Time?" explainer | Planned |
+| 22 | Steps 4 and 7: Weekly Trends with all six cards | Planned |
+| 23 | Step 4: fixed "Weekly Trends" heading, no range toggle | Planned |
+| 24 | Step 4: cards link to their Trend View | Planned |
+| 25 | Step 4: selected-day column highlight with two-line labels | Planned |
+| 26 | Step 7: zone and strength rows link to their Trend Views | Planned |
+| 27 | Step 7: "Explore your strain insights" link to the Day Strain Trend View | Planned |
+
 ## 4. Already matches (do not redo)
 
 - **Dial**: arc fill, centred value over "STRAIN" label, grey Strain Target arc with a white tick, back button and info button (`ScoreDial variant="strain"`, `strain/page.tsx:52`). The extra "SO FAR" tag and date arrows in the header are Pulse additions.

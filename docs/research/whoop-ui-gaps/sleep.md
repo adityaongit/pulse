@@ -75,6 +75,34 @@ Severity key: missing-screen, missing-element, behaviour, visual.
 | "EDIT" pencil on Last Night's Sleep | present | not adopted, Pulse cannot edit Fitbit sleep | `docs/design/spec.md` (v2 deltas, sleep section ~line 1790) |
 | Day arrows in the header (‹ TODAY ›) and the Breakdown / Timeline toggle on the stage card | header is "TODAY" only; stage rows only | Pulse adds a day switcher and a hypnogram toggle | `docs/design/spec.md:1774` (Breakdown/Timeline); `src/app/(app)/sleep/page.tsx:44` |
 
+## 3a. Status, score-screens phase (2026-10-08)
+
+Build steps for the score-screens phase: 1 trend helpers (`src/lib/trend.ts`), 2 Trend View query, 3 Trend View screen `/trend/[key]`, 4 `WeeklyTrends`, 5 Sleep, 6 Recovery, 7 Strain. "Hidden" means the component is built but off in `src/lib/features.ts` until Pulse has a data source. "Out of scope" means the owner excluded it for this phase. Decisions are recorded in `docs/design/spec.md` §11 from R29 onwards.
+
+| # | Plan | Status |
+|---|---|---|
+| 1 | Step 5: Sleep Stress contributor row, behind `FEATURES.sleepStress` (the stress algorithm excludes sleep minutes) | Planned (hidden) |
+| 2 | Step 5: Sleep Stress card (line, HIGH / MEDIUM / LOW rows), same flag | Planned (hidden) |
+| 3 | Steps 4-5: Weekly Trends with the seven cards in WHOOP order | Planned |
+| 4 | Step 4: each Weekly Trends card links to its Trend View | Planned |
+| 5 | Step 3: `/trend/[key]` Trend View screen | Planned |
+| 6 | Steps 2-3: period stepper (`?p=`) | Planned |
+| 7 | Step 1: relative % change (helper done), step 3 shows it | In progress |
+| 8 | Step 1: verdict sentence (helper done), step 3 shows it | In progress |
+| 9 | Step 3: days breakdown bar | Planned |
+| 10 | Learn More cards | Out of scope |
+| 11 | Step 3: "What is X?" explainer card | Planned |
+| 12 | Step 5: Sleep Stress Trend View (stacked HIGH / MEDIUM / LOW), same flag | Planned (hidden) |
+| 13 | Steps 3 and 5: Time in Bed Trend View with bed-to-wake bars | Planned |
+| 14 | Step 2: efficiency, restorative, hours vs. needed %, time in bed and sleep stress registered as trend metrics | Planned |
+| 15 | Step 3: W value labels, AVG pill on the left, fixed 0-100% axis for consistency | Planned |
+| 16 | Step 5: Asleep / Awake bars with wake ticks, drawn from the stored stage segments | Planned |
+| 17 | Step 5: Restorative Sleep row under the stage rows | Planned |
+| 18 | Step 5: stage colours as WHOOP (theme tokens) | Planned |
+| 19 | Step 5: "Explore your sleep insights" link to the Sleep Trend View | Planned |
+| 20 | Step 5: Hours vs. needed fades and legend order | Planned |
+| 21 | Step 5: consistency axis 21:00-13:00 and "Sat." day labels | Planned |
+
 ## 4. Already matches (do not redo)
 
 - Dial: large percentage, "SLEEP PERFORMANCE" on two lines, three-segment status bar beneath (`sleep/page.tsx:47-56`).
