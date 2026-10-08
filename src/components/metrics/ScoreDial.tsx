@@ -63,8 +63,6 @@ const SIZE = {
   lg: { box: "size-64 md:size-70", d: 256, ring: 17, value: "text-[31cqi] tracking-[-0.01em]" },
 } as const
 const COMPACT = { box: "size-16", d: 64, ring: 5, value: "text-[40cqi]" } as const
-// The reference app's strain hero runs larger than its percentages (cap 64 vs 48 pt) [latest-strain-1].
-const STRAIN_LG = "text-[40cqi]"
 // Trims each text box to cap height and baseline, so the cqi gaps between rows are the visible gaps.
 const TRIM = "leading-none [text-box:trim-both_cap_alphabetic]"
 
@@ -256,12 +254,14 @@ export function ScoreDial(props: ScoreDialProps) {
       )}
 
       {/* The hole: the square inside the stroke. One centred column whose type and gaps scale with the inner
-          diameter, so wordmark, value, label and tags keep the same clearance from the ring at every size (spec §11 F23). */}
+          diameter, so wordmark, value, label and tags keep the same clearance from the ring at every size (spec §11 F23).
+          Gaps follow the reference app's dials (recovery-01, sleep-01): about 8.5% of the ring's width over the value
+          and 8% under it, 10 and 9 cqi of the hole. */}
       <div className="absolute @container grid place-content-center justify-items-center text-center" style={{ inset: radii.hole }}>
         {lg && (!empty || loading) && !gauge && (
           // The wordmark over the value, as the reference app's ring carries its own (spec §11 F11; brand.md: never "PULSE" in a font).
           // Never under the brand minimum (h 15 px); `block` drops the inline line box that pushed it into the stroke.
-          <Wordmark className="mb-[6cqi] block h-[max(15px,6.8cqi)] text-foreground-secondary" />
+          <Wordmark className="mb-[10cqi] block h-[max(15px,6.8cqi)] text-foreground-secondary" />
         )}
         {loading ? (
           size !== "sm" && <SkeletonText className={cn("font-numeric font-bold", TRIM, s.value, lg ? "w-[2.4ch]" : "w-[2.2ch]")} />
@@ -274,7 +274,6 @@ export function ScoreDial(props: ScoreDialProps) {
               "font-numeric font-bold tabular-nums",
               TRIM,
               s.value,
-              lg && variant === "strain" && STRAIN_LG,
               empty && "text-muted-foreground",
               compact && gauge && r.word?.className,
             )}
@@ -283,21 +282,21 @@ export function ScoreDial(props: ScoreDialProps) {
             {r.unit && !empty && <span className="text-[0.55em]">{r.unit}</span>}
           </span>
         )}
-        {gauge && !compact && r.word && <span className={cn(DIAL_LABEL, TRIM, "mt-[4cqi]", r.word.className)}>{r.word.text}</span>}
-        {gauge && !compact && props.caption && <span className={cn("mt-[3cqi] text-xs font-medium text-foreground-secondary", TRIM)}>{props.caption}</span>}
+        {gauge && !compact && r.word && <span className={cn(DIAL_LABEL, TRIM, "mt-[8cqi]", r.word.className)}>{r.word.text}</span>}
+        {gauge && !compact && props.caption && <span className={cn("mt-[5cqi] text-xs font-medium text-foreground-secondary", TRIM)}>{props.caption}</span>}
         {lg && !gauge && (
           <>
-            <span className={cn(DIAL_LABEL, TRIM, "mt-[6cqi] max-w-36 text-balance")}>{r.label}</span>
+            <span className={cn(DIAL_LABEL, TRIM, "mt-[9cqi] max-w-36 text-balance")}>{r.label}</span>
             {/* No band word under the large ring: the colour carries it on screen, as in the reference app, and the
                 dial's accessible name still says it (spec §11 R34). */}
             {props.status && !empty && !loading && (
-              <span aria-hidden className="mt-[4cqi] flex gap-1">
+              <span aria-hidden className="mt-[8cqi] flex gap-1">
                 {(["poor", "sufficient", "optimal"] as const).map((k) => (
                   <span key={k} className={cn("h-1 w-5 rounded-full", props.status === k ? STATUS_LIT[k] : "bg-dial-track")} />
                 ))}
               </span>
             )}
-            {!loading && <span className="mt-[4cqi] flex max-w-[70cqi] justify-center empty:hidden">{tagNode}</span>}
+            {!loading && <span className="mt-[6cqi] flex max-w-[70cqi] justify-center empty:hidden">{tagNode}</span>}
           </>
         )}
       </div>

@@ -64,9 +64,9 @@ function Chart({ s, variant }: { s: StressSeries; variant: "full" | "spark" }) {
           domain={[first, last]}
           hide={!full}
           // The hours, then the time now in bold at the end of the line (dashboard-08), clear of the last hour.
-          ticks={full ? (s.now ? [...hourTicks(first, last, 4, tz).filter((t) => last - t > 5_400_000), s.now] : hourTicks(first, last, 4, tz)) : undefined}
+          ticks={full ? (s.now ? [...hourTicks(first, last, 6, tz).filter((t) => last - t >= 5 * 3_600_000), s.now] : hourTicks(first, last, 4, tz)) : undefined}
           tickFormatter={(v: number) => clock(v, tz)}
-          tick={full && s.now ? (p: { x?: number | string; y?: number | string; payload?: { value: number } }) => <NowTick {...p} now={s.now!} tz={tz} /> : undefined}
+          tick={full && s.now ? (p: { x?: number | string; y?: number | string; payload?: { value: number } }) => <NowTick {...p} first={first} now={s.now!} tz={tz} /> : undefined}
           interval={s.now ? 0 : "equidistantPreserveStart"}
           minTickGap={24}
           {...AXIS}
@@ -114,11 +114,13 @@ function Chart({ s, variant }: { s: StressSeries; variant: "full" | "spark" }) {
 }
 
 /** An hour tick, or the time now in bold. */
-function NowTick({ x, y, payload, now, tz }: { x?: number | string; y?: number | string; payload?: { value: number }; now: number; tz?: string }) {
+function NowTick({ x, y, payload, first, now, tz }: { x?: number | string; y?: number | string; payload?: { value: number }; first: number; now: number; tz?: string }) {
   if (!payload) return null
   const isNow = payload.value === now
+  // The first tick sits on the axis's left edge: anchored at its start so it isn't cut off.
+  const anchor = isNow ? "end" : payload.value <= first ? "start" : "middle"
   return (
-    <text x={x} y={y} dy="0.9em" textAnchor={isNow ? "end" : "middle"} fontSize={12} fontWeight={isNow ? 700 : 400} fill={isNow ? "var(--foreground)" : "var(--muted-foreground)"} className="font-numeric tabular-nums">
+    <text x={x} y={y} dy="0.9em" textAnchor={anchor} fontSize={12} fontWeight={isNow ? 700 : 400} fill={isNow ? "var(--foreground)" : "var(--muted-foreground)"} className="font-numeric tabular-nums">
       {clock(payload.value, tz)}
     </text>
   )
