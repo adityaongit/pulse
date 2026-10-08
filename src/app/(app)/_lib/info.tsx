@@ -52,10 +52,10 @@ export const STRAIN_INFO: InfoContent = {
       </p>
       <Rows
         rows={[
-          [null, "Light: 0 - 9.9"],
-          [null, "Moderate: 10 - 13.9"],
-          [null, "Strenuous: 14 - 17.9"],
-          [null, "All out: 18 - 21"],
+          [null, "Light: up to 10.0"],
+          [null, "Moderate: 10.1 - 14.0"],
+          [null, "Strenuous: 14.1 - 18.0"],
+          [null, "All Out: 18.1 - 21"],
         ]}
       />
       <p>

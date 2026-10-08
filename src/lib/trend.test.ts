@@ -87,8 +87,11 @@ describe("verdict", () => {
     );
   });
   it("words weekly totals", () => {
-    expect(verdict({ ...base, label: "zones 1-3", agg: "weekly", range: "m", now: 142, prior: 150 })).toBe(
-      "Your average weekly zones 1-3 total this month (142) was below your previous 30-day weekly total of 150.",
+    expect(verdict({ ...base, label: "time in HR zones 1-3", agg: "weekly", range: "w", now: 129, prior: 327 })).toBe(
+      "During this 7-day period, your total time in HR zones 1-3 (129) was below your previous 7-day total of 327.",
+    );
+    expect(verdict({ ...base, label: "time in HR zones 1-3", agg: "weekly", range: "m", now: 142, prior: 150 })).toBe(
+      "Your average weekly time in HR zones 1-3 over these four weeks (142) was below your previous four-week average of 150.",
     );
   });
 });

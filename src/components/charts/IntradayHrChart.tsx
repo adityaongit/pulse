@@ -3,7 +3,7 @@
 import * as React from "react"
 import { Activity, Moon } from "lucide-react"
 import { Area, AreaChart, CartesianGrid, ReferenceArea, ReferenceLine, XAxis, YAxis } from "recharts"
-import { DATA_COLORS } from "@/lib/bands"
+import { DATA_COLORS, ZONE_COLOR } from "@/lib/bands"
 import { bandColor } from "@/lib/charts"
 import { clockTicks, hourTicks, paddedDomain } from "@/lib/charts"
 import { clock } from "@/lib/format"
@@ -15,7 +15,6 @@ import { MetricState } from "@/components/shells/MetricState"
 import { useOptionalShellCalendar } from "@/components/shells/ShellStatus"
 import { ReasonPlaceholder } from "@/components/metrics/ReasonPlaceholder"
 import { AXIS, BandGradient, bandPaint, ChartFigure, FadeGradient, GlowDot, GRID, LINE_CURSOR, TOOLTIP_CLASS, TooltipLine, useSeriesAnimation, type Band } from "./ChartFrame"
-import { ZONE_COLOR } from "./ZoneBars"
 
 /** A marked stretch on an intraday chart. `label` is the short name: "Run", "Ride", "Strength", "Sleep", "Nap". */
 export type ChartSpan = { kind: "workout" | "sleep"; start: number; end: number; label: string }

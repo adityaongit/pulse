@@ -86,19 +86,19 @@ Build steps for the score-screens phase: 1 trend helpers (`src/lib/trend.ts`), 2
 | 14 | Step 6: "What shaped it" and "Tomorrow's forecast" are removed from Recovery | Planned |
 | 15 | Step 6: no band word under the ring | Planned |
 | 16 | Steps 5-7: the Recovery, Sleep and Strain headers read "TODAY" with no date arrows | Planned |
-| 17 | Step 3: metric dropdown | Planned |
-| 18 | Steps 1 and 3: relative % chip; Resp up is orange | In progress |
-| 19 | Step 3: W/M/6M beside the average, no 1Y | Planned |
-| 20 | Step 3: period stepper | Planned |
-| 21 | Steps 1 and 3: verdict sentence, including the typical-range wording | In progress |
-| 22 | Step 3: "Typical range" band with its legend at the top right | Planned |
-| 23 | Step 3: W ring markers, value labels, two-line day ticks | Planned |
-| 24 | Step 3: M line with a ringed latest point, a value tag and a tight axis | Planned |
-| 25 | Steps 1 and 3: 6M month segments with coloured % change | In progress |
+| 17 | Step 3: metric dropdown | Done (R29) |
+| 18 | Steps 1 and 3: relative % chip; Resp up is orange | Done on the Trend View (R30); contributor arrows in step 6 |
+| 19 | Step 3: W/M/6M beside the average, no 1Y | Done (R30) |
+| 20 | Step 3: period stepper | Done (R29) |
+| 21 | Steps 1 and 3: verdict sentence, including the typical-range wording | Done (R29) |
+| 22 | Step 3: "Typical range" band with its legend at the top right | Done (R30) |
+| 23 | Step 3: W ring markers, value labels, two-line day ticks | Done (R30) |
+| 24 | Step 3: M line with a ringed latest point, a value tag and a tight axis | Done (R30) |
+| 25 | Steps 1 and 3: 6M month segments with coloured % change | Done (R30) |
 | 26 | Learn More carousel | Out of scope |
 | 27 | View all list | Out of scope |
-| 28 | Step 3: "What is X?" explainer in Pulse's own words | Planned |
-| 29 | Step 3: the Trend View has no day hero; `/metric/[key]` keeps it | Planned |
+| 28 | Step 3: "What is X?" explainer in Pulse's own words | Done (R29) |
+| 29 | Step 3: the Trend View has no day hero; `/metric/[key]` keeps it | Done (R29) |
 | 30 | Step 6: the Sleep performance row opens its Trend View | Planned |
 | 31 | Already covered by the shell's coach button | No change |
 

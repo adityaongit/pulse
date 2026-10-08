@@ -26,6 +26,34 @@ export const DATA_COLORS = {
 } as const;
 export type DataColor = keyof typeof DATA_COLORS;
 
+/** Each zone's fill, cool to hot as WHOOP colours them: grey-blue, blue, green, orange, red. */
+export const ZONE_COLOR: Record<number, DataColor> = { 1: "sleep", 2: "strain", 3: "optimal", 4: "warning", 5: "recovery-red" };
+
+/**
+ * The colour of a Trend View part or breakdown band by its key (stack series, day bands, zones). Unknown keys, such
+ * as strength activity types, take strain blue.
+ */
+export function partColor(key: string): string {
+  const zone = /^z([1-5])$/.exec(key);
+  if (zone) return DATA_COLORS[ZONE_COLOR[Number(zone[1])]].css;
+  const strainBand = ["all_out", "strenuous", "moderate", "light"].indexOf(key);
+  if (strainBand >= 0) return `var(--strain-band-${strainBand + 1})`;
+  const named: Record<string, DataColor> = {
+    optimal: "optimal",
+    sufficient: "muted",
+    poor: "warning",
+    green: "recovery-green",
+    yellow: "recovery-yellow",
+    red: "recovery-red",
+    rem: "stage-rem",
+    deep: "stage-deep",
+    low: "stress-low",
+    medium: "stress-medium",
+    high: "stress-high",
+  };
+  return DATA_COLORS[named[key] ?? "strain"].css;
+}
+
 // --- Recovery (and Energy Bank, which bands exactly like Recovery) ---
 
 export type RecoveryBand = "green" | "yellow" | "red";

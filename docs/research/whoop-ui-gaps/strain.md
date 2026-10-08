@@ -77,27 +77,27 @@ Build steps for the score-screens phase: 1 trend helpers (`src/lib/trend.ts`), 2
 
 | # | Plan | Status |
 |---|---|---|
-| 1 | Step 7: HR Zones 1-3 Trend View | Planned |
-| 2 | Step 7: HR Zones 4-5 Trend View | Planned |
-| 3 | Step 7: Strength Activity Time Trend View | Planned |
-| 4 | Step 7: Day Strain Trend View | Planned |
-| 5 | Step 3: Steps opens the shared Trend View; `/metric/steps` stays as the day screen | Planned |
-| 6 | Step 3: metric dropdown | Planned |
-| 7 | Steps 2-3: period stepper | Planned |
-| 8 | Steps 1-2: weekly totals for zones and strength (helper done) | In progress |
-| 9 | Steps 1 and 3: verdict sentence (helper done) | In progress |
-| 10 | Step 7: stacked zone bars with zone legend | Planned |
-| 11 | Steps 3 and 7: zones breakdown | Planned |
-| 12 | Step 7: strength breakdown by activity type | Planned |
-| 13 | Step 7: Day Strain breakdown with WHOOP bands (Light <10, Moderate 10-14, Strenuous 14-18, All Out >18) | Planned |
-| 14 | Step 3: footnote line | Planned |
-| 15 | Step 3: 6M month segments | Planned |
-| 16 | Step 3: AVG pill on the left; no 7,000 line on the Trend View | Planned |
-| 17 | Step 3: empty activity-time windows still draw axes and 0:00 | Planned |
+| 1 | Step 7: HR Zones 1-3 Trend View | Done (R29): the screen; row links in step 7 |
+| 2 | Step 7: HR Zones 4-5 Trend View | Done (R29): the screen; row links in step 7 |
+| 3 | Step 7: Strength Activity Time Trend View | Done (R29): the screen; row links in step 7 |
+| 4 | Step 7: Day Strain Trend View | Done (R29): the screen; card link in step 4 |
+| 5 | Step 3: Steps opens the shared Trend View; `/metric/steps` stays as the day screen | Done (R29) |
+| 6 | Step 3: metric dropdown | Done (R29) |
+| 7 | Steps 2-3: period stepper | Done (R29) |
+| 8 | Steps 1-2: weekly totals for zones and strength (helper done) | Done (R29) |
+| 9 | Steps 1 and 3: verdict sentence (helper done) | Done (R29) |
+| 10 | Step 7: stacked zone bars with zone legend | Done (R29) on the Trend View |
+| 11 | Steps 3 and 7: zones breakdown | Done (R29) |
+| 12 | Step 7: strength breakdown by activity type | Done (R29) |
+| 13 | Step 7: Day Strain breakdown with WHOOP bands (Light <10, Moderate 10-14, Strenuous 14-18, All Out >18) | Done (R31) |
+| 14 | Step 3: footnote line | Done (R29) |
+| 15 | Step 3: 6M month segments | Done (R30) |
+| 16 | Step 3: AVG pill on the left; no 7,000 line on the Trend View | Done (R30) |
+| 17 | Step 3: empty activity-time windows still draw axes and 0:00 | Done (R29): zero days draw on the axis |
 | 18 | Step 7: Add activity button (Home's info card) on the zones and strength Trend Views | Planned |
 | 19 | Step 7: goal buttons, behind a flag (Pulse has no goals) | Planned (hidden) |
 | 20 | Learn More carousel | Out of scope |
-| 21 | Steps 3 and 7: "What is Strength Activity Time?" explainer | Planned |
+| 21 | Steps 3 and 7: "What is Strength Activity Time?" explainer | Done (R29) |
 | 22 | Steps 4 and 7: Weekly Trends with all six cards | Planned |
 | 23 | Step 4: fixed "Weekly Trends" heading, no range toggle | Planned |
 | 24 | Step 4: cards link to their Trend View | Planned |

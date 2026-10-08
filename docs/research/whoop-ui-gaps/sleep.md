@@ -85,17 +85,17 @@ Build steps for the score-screens phase: 1 trend helpers (`src/lib/trend.ts`), 2
 | 2 | Step 5: Sleep Stress card (line, HIGH / MEDIUM / LOW rows), same flag | Planned (hidden) |
 | 3 | Steps 4-5: Weekly Trends with the seven cards in WHOOP order | Planned |
 | 4 | Step 4: each Weekly Trends card links to its Trend View | Planned |
-| 5 | Step 3: `/trend/[key]` Trend View screen | Planned |
-| 6 | Steps 2-3: period stepper (`?p=`) | Planned |
-| 7 | Step 1: relative % change (helper done), step 3 shows it | In progress |
-| 8 | Step 1: verdict sentence (helper done), step 3 shows it | In progress |
-| 9 | Step 3: days breakdown bar | Planned |
+| 5 | Step 3: `/trend/[key]` Trend View screen | Done (R29) |
+| 6 | Steps 2-3: period stepper (`?p=`) | Done (R29) |
+| 7 | Step 1: relative % change (helper done), step 3 shows it | Done (R30) |
+| 8 | Step 1: verdict sentence (helper done), step 3 shows it | Done (R29) |
+| 9 | Step 3: days breakdown bar | Done (R29) |
 | 10 | Learn More cards | Out of scope |
-| 11 | Step 3: "What is X?" explainer card | Planned |
+| 11 | Step 3: "What is X?" explainer card | Done (R29) |
 | 12 | Step 5: Sleep Stress Trend View (stacked HIGH / MEDIUM / LOW), same flag | Planned (hidden) |
-| 13 | Steps 3 and 5: Time in Bed Trend View with bed-to-wake bars | Planned |
-| 14 | Step 2: efficiency, restorative, hours vs. needed %, time in bed and sleep stress registered as trend metrics | Planned |
-| 15 | Step 3: W value labels, AVG pill on the left, fixed 0-100% axis for consistency | Planned |
+| 13 | Steps 3 and 5: Time in Bed Trend View with bed-to-wake bars | Done (R29): the Trend View; the Sleep page link comes in step 5 |
+| 14 | Step 2: efficiency, restorative, hours vs. needed %, time in bed and sleep stress registered as trend metrics | Done (R29) |
+| 15 | Step 3: W value labels, AVG pill on the left, fixed 0-100% axis for consistency | Done (R30) |
 | 16 | Step 5: Asleep / Awake bars with wake ticks, drawn from the stored stage segments | Planned |
 | 17 | Step 5: Restorative Sleep row under the stage rows | Planned |
 | 18 | Step 5: stage colours as WHOOP (theme tokens) | Planned |

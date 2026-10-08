@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils"
-import { DATA_COLORS, type DataColor } from "@/lib/bands"
+import { DATA_COLORS, ZONE_COLOR, type DataColor } from "@/lib/bands"
 import { durationWords, hmm } from "@/lib/format"
 import type { Metric } from "@/lib/reasons"
 import { Skeleton, SkeletonText } from "@/components/ui/skeleton"
@@ -36,8 +36,6 @@ export type ZoneBarsProps =
       emptyCopy?: string
     }
 
-/** Each zone's fill, cool to hot as WHOOP colours them: grey-blue, blue, green, orange, red. */
-export const ZONE_COLOR: Record<number, DataColor> = { 1: "sleep", 2: "strain", 3: "optimal", 4: "warning", 5: "recovery-red" }
 
 function share(part: number, total: number) {
   if (!total || !part) return "0%"

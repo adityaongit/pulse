@@ -14,7 +14,7 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { EmptyState } from "@/components/shells/EmptyState"
 import { MetricState } from "@/components/shells/MetricState"
 import { useOptionalShellCalendar } from "@/components/shells/ShellStatus"
-import { StatusChip, ValueUnit } from "@/components/metrics/primitives"
+import { SEGMENT_ITEM, SEGMENT_TRACK, StatusChip, ValueUnit } from "@/components/metrics/primitives"
 import { AXIS, BAR_CURSOR, BandGradient, bandPaint, ChartFigure, FadeGradient, GlowDot, GRID, gutterLabel, labelGutter, LINE_CURSOR, useSeriesAnimation, wholeTick, type Band } from "./ChartFrame"
 
 export type TrendPoint = {
@@ -228,13 +228,13 @@ function Trend({ points, p }: { points: TrendPoint[]; p: TrendChartProps }) {
           )}
         </div>
         {!p.fixedRange && (
-          <ToggleGroup type="single" value={range} onValueChange={changeRange} spacing={0} className={cn("shrink-0 gap-0.5 rounded-lg bg-muted p-0.5", ranges.length > 3 && "w-full")} aria-label="Range">
+          <ToggleGroup type="single" value={range} onValueChange={changeRange} spacing={0} className={cn(SEGMENT_TRACK, ranges.length > 3 && "w-full")} aria-label="Range">
             {ranges.map((r) => (
               <ToggleGroupItem
                 key={r}
                 value={r}
                 aria-label={RANGE_ARIA[r]}
-                className={cn("h-10 min-w-11 rounded-md! px-3 font-numeric text-[13px] font-bold text-muted-foreground transition-[background-color,color] duration-150 ease-standard hover:bg-transparent hover:text-foreground data-[state=on]:bg-secondary data-[state=on]:text-foreground", ranges.length > 3 && "flex-1")}
+                className={cn(SEGMENT_ITEM, "rounded-md! hover:bg-transparent", ranges.length > 3 && "flex-1")}
               >
                 {RANGE_LABEL[r]}
               </ToggleGroupItem>
@@ -434,7 +434,7 @@ export function TrendChartSkeleton({
           {legend && <SkeletonText className="mt-1.5 w-40 text-xs leading-4" />}
           {chip && <Skeleton className="mt-1 h-6 w-28 rounded-md" />}
         </div>
-        <div className={cn("flex shrink-0 gap-0.5 rounded-lg bg-muted p-0.5", ranges.length > 3 && "w-full")}>
+        <div className={cn(SEGMENT_TRACK, ranges.length > 3 && "w-full")}>
           {ranges.map((r) => (
             <span key={r} className={cn("grid h-10 min-w-11 place-items-center rounded-md px-3 font-numeric text-[13px] font-bold text-muted-foreground/60", ranges.length > 3 && "flex-1")}>
               {RANGE_LABEL[r]}

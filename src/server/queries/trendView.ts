@@ -13,6 +13,7 @@ import {
   type BreakdownBand,
   type MonthSegment,
   type TrendAgg,
+  type TrendViewBar,
   type TrendViewRange,
 } from "@/lib/trend";
 import { addDays, localMinutes } from "../time";
@@ -208,7 +209,7 @@ export const TREND_VIEW = {
     ] },
   },
   zones13: {
-    group: "strain", label: "Heart Rate Zones 1-3", short: "time in zones 1-3", format: "duration", direction: "up", colorBy: "single", chart: "stack", agg: "weekly",
+    group: "strain", label: "Heart Rate Zones 1-3", short: "time in HR zones 1-3", format: "duration", direction: "up", colorBy: "single", chart: "stack", agg: "weekly",
     pick: zoneSum(0, 3), parts: zoneParts(0, 3), series: zoneSeries(0, 3), partBreakdown: "series", partialToday: true,
     footnote: "Zone time is derived from your heart rate through the day.",
     about: { title: "What are Heart Rate Zones 1-3?", body: [
@@ -217,7 +218,7 @@ export const TREND_VIEW = {
     ] },
   },
   zones45: {
-    group: "strain", label: "Heart Rate Zones 4-5", short: "time in zones 4-5", format: "duration", direction: "up", colorBy: "single", chart: "stack", agg: "weekly",
+    group: "strain", label: "Heart Rate Zones 4-5", short: "time in HR zones 4-5", format: "duration", direction: "up", colorBy: "single", chart: "stack", agg: "weekly",
     pick: zoneSum(3, 5), parts: zoneParts(3, 5), series: zoneSeries(3, 5), partBreakdown: "series", partialToday: true,
     footnote: "Zone time is derived from your heart rate through the day.",
     about: { title: "What are Heart Rate Zones 4-5?", body: [
@@ -258,8 +259,6 @@ const flagOff = (k: TrendViewKey) => {
   return f !== undefined && !FEATURES[f];
 };
 
-export type TrendViewBar = { from: string; to: string; value: number | null; provisional?: boolean; parts?: Record<string, number> | null };
-
 export type TrendViewVM = {
   key: TrendViewKey;
   label: string;
@@ -295,6 +294,11 @@ export type TrendViewVM = {
   breakdown: { title: string; unit: "days" | "duration"; items: { key: string; label: string; detail?: string; value: number }[] } | null;
   footnote: string | null;
   about: Def["about"];
+};
+
+const wholeMonths = (segs: MonthSegment[]) => {
+  const out = segs[0] && !segs[0].from.endsWith("-01") ? segs.slice(1) : segs;
+  return out.map((s, i) => (i === 0 ? { ...s, change: null } : s));
 };
 
 const PRIOR_WORD: Record<TrendViewRange, string> = { w: "week", m: "month", "6m": "6 months" };
@@ -343,7 +347,7 @@ export async function getTrendView(key: TrendViewKey, end: string, range: TrendV
   const cur = span(win.from, win.to);
   const old = span(prior.from, prior.to);
   // Today's running total is drawn, not averaged.
-  const settled = (ps: typeof cur) => ps.map((p) => (p.provisional ? { ...p, value: null } : p));
+  const settled = (ps: typeof cur) => (m.agg === "weekly" ? ps : ps.map((p) => (p.provisional ? { ...p, value: null } : p)));
 
   const headline = (ps: typeof cur) => (m.agg === "weekly" ? mean(weeklyTotals(ps).map((w) => w.value)) : mean(ps.map((p) => p.value)));
   const value = headline(settled(cur));
@@ -355,7 +359,7 @@ export async function getTrendView(key: TrendViewKey, end: string, range: TrendV
   const typical: [number, number] | null =
     typicalStats?.mean != null && typicalStats.sd !== undefined ? [typicalStats.mean - typicalStats.sd, typicalStats.mean + typicalStats.sd] : null;
 
-  const fmt = (v: number) => `${formatValue(m.format, v)}${m.unit === "%" ? "%" : m.unit ? ` ${m.unit}` : ""}`;
+  const fmt = (v: number) => `${formatValue(m.format, v)}${m.unit === "%" ? "%" : ""}`;
   const weeklyBars = m.agg === "weekly" && range !== "w";
   const bars: TrendViewBar[] = weeklyBars
     ? weeklyTotals(cur).map((w, i, all) => {
@@ -393,7 +397,7 @@ export async function getTrendView(key: TrendViewKey, end: string, range: TrendV
           }
         : null;
 
-  const todayNote = m.partialToday && win.to >= today && win.from <= today ? `Average does not include today (${formatDay(today, { month: "short", day: "numeric" })}).` : null;
+  const todayNote = m.partialToday && m.agg === "daily" && win.to >= today && win.from <= today ? `Average does not include today (${formatDay(today, { month: "short", day: "numeric" })}).` : null;
 
   return {
     key,
@@ -420,7 +424,7 @@ export async function getTrendView(key: TrendViewKey, end: string, range: TrendV
     tone,
     verdict: verdict({ label: m.short, range, agg: m.agg, now: value, prior: priorValue, fmt, typical }),
     bars,
-    segments: range === "6m" ? monthSegments(settled(cur), m.agg) : null,
+    segments: range === "6m" ? wholeMonths(monthSegments(settled(cur), m.agg)) : null,
     typical,
     breakdown,
     footnote: [m.footnote, todayNote].filter(Boolean).join(" ") || null,

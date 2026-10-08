@@ -3,6 +3,8 @@ import {
   Activity,
   ChartSpline,
   Armchair,
+  BedDouble,
+  CircleGauge,
   BatteryCharging,
   Building2,
   CalendarCheck,
@@ -72,6 +74,12 @@ export const STAT_ICON: Record<string, React.ReactNode> = {
   consistency: <CalendarCheck />,
   efficiency: <ChartNoAxesColumn />,
   restorative: <BatteryCharging />,
+  // Trend View metrics that have no summary row of their own (spec §11 R29).
+  recovery: <CircleGauge />,
+  hours_need: <Hourglass />,
+  time_in_bed: <BedDouble />,
+  sleep_stress: <ChartSpline />,
+  strain: <Flame />,
   // Extra metrics (src/lib/extraMetrics.ts) and the body measurements.
   distance: <Route />,
   floors: <Building2 />,

@@ -81,6 +81,15 @@ export function dayHref(href: string, d: string, today: string) {
 /** A metric's own detail screen (Steps, Distance, Weight, …): `/metric/steps`. */
 export const metricHref = (key: string) => `/metric/${key}`;
 
+/** A Trend View `/trend/[key]` (spec §11 R29), keeping the day and, when set, the range and period offset. */
+export function trendHref(key: string, o: { d?: string; today?: string; r?: string; p?: number } = {}) {
+  const q = new URLSearchParams();
+  if (o.d && o.d !== o.today) q.set("d", o.d);
+  if (o.r) q.set("r", o.r);
+  if (o.p) q.set("p", String(o.p));
+  return `/trend/${key}${q.size ? `?${q}` : ""}`;
+}
+
 /** `/activity/[id]`. Google's ids are resource names with slashes (`users/…/dataPoints/…`), so the id is encoded. */
 export const activityHref = (id: string) => `/activity/${encodeURIComponent(id)}`;
 

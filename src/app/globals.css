@@ -248,6 +248,15 @@
   --chart-3: #7ba1bb;
   --chart-4: #ffa722;
   --chart-5: var(--recovery-blue);
+  /* Trend View (spec §11 R29): the selected day's column, the faint daily trace behind 6M month segments, and the
+     Day Strain breakdown's four bands, All Out to Light, as fading strain blue. Built on other tokens, so one set
+     serves both themes. */
+  --chart-highlight: color-mix(in srgb, var(--foreground) 7%, transparent);
+  --chart-faint: color-mix(in srgb, var(--chart-5) 30%, transparent);
+  --strain-band-1: var(--strain);
+  --strain-band-2: color-mix(in srgb, var(--strain) 78%, var(--card));
+  --strain-band-3: color-mix(in srgb, var(--strain) 58%, var(--card));
+  --strain-band-4: color-mix(in srgb, var(--strain) 40%, var(--card));
 
   /* Hypnogram lanes, Google Health's hues so each stage reads apart: awake pink, REM pale cyan, light blue, deep violet */
   --stage-awake: #f48fb1;

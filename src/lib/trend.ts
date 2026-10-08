@@ -51,6 +51,9 @@ export function relativeChange(now: number | null, prior: number | null) {
 
 export type DayValue = { day: string; value: number | null };
 
+/** One Trend View column: a day, or a week (`from` < `to`) for weekly totals. */
+export type TrendViewBar = { from: string; to: string; value: number | null; provisional?: boolean; parts?: Record<string, number> | null };
+
 export const mean = (xs: readonly (number | null)[]) => {
   const v = xs.filter((x): x is number => x !== null && Number.isFinite(x));
   return v.length ? v.reduce((a, b) => a + b, 0) / v.length : null;
@@ -103,6 +106,9 @@ const WORD: Record<TrendViewRange, { this: string; prior: string }> = {
   "6m": { this: "over this period", prior: "previous 6-month" },
 };
 
+const WEEKS: Record<TrendViewRange, string> = { w: "this week", m: "over these four weeks", "6m": "over this period" };
+const WEEKS_PRIOR: Record<TrendViewRange, string> = { w: "previous 7-day total", m: "previous four-week average", "6m": "previous 6-month average" };
+
 /**
  * The one-sentence verdict. `typical` (the normal range) wins for vitals on W, as the reference app words RHR;
  * otherwise the change against the prior period decides: under 1% reads "consistent with".
@@ -123,10 +129,14 @@ export function verdict(o: {
     const where = now < lo ? "below" : now > hi ? "above" : "within";
     return `Your average ${label} during this 7-day period was ${where} its typical range (${fmt(lo)} - ${fmt(hi)}).`;
   }
-  const what = o.agg === "weekly" ? `Your ${range === "w" ? "" : "average weekly "}${label} total` : `Your average ${label}`;
-  const lead = `${what} ${WORD[range].this} (${fmt(now)})`;
-  if (prior === null) return `${lead}.`;
-  const change = relativeChange(now, prior);
+  const change = prior === null ? null : relativeChange(now, prior);
   const cmp = change === 0 || change === null ? "consistent with" : change > 0 ? "above" : "below";
-  return `${lead} was ${cmp} your ${WORD[range].prior} ${o.agg === "weekly" ? "weekly total" : "average"} of ${fmt(prior)}.`;
+  if (o.agg === "weekly") {
+    const lead = range === "w" ? `During this 7-day period, your total ${label} (${fmt(now)})` : `Your average weekly ${label} ${WEEKS[range]} (${fmt(now)})`;
+    if (prior === null) return `${lead}.`;
+    return `${lead} was ${cmp} your ${range === "w" ? "previous 7-day total" : WEEKS_PRIOR[range]} of ${fmt(prior)}.`;
+  }
+  const lead = `Your average ${label} ${WORD[range].this} (${fmt(now)})`;
+  if (prior === null) return `${lead}.`;
+  return `${lead} was ${cmp} your ${WORD[range].prior} average of ${fmt(prior)}.`;
 }

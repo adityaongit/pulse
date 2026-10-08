@@ -14,6 +14,11 @@ export const CAPTION = "text-xs leading-4 font-medium text-muted-foreground"
 export const CARD_BUTTON =
   "flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-secondary text-[13px] leading-4 font-bold tracking-[0.1em] uppercase transition-[background-color,scale] duration-150 ease-standard outline-none hover:bg-accent focus-visible:ring-3 focus-visible:ring-ring/50 active:scale-[0.96]"
 
+/** The W / M / 6M segmented control: its track and one segment (on: `data-[state=on]` or `aria-[current=page]`). */
+export const SEGMENT_TRACK = "flex shrink-0 gap-0.5 rounded-lg bg-muted p-0.5"
+export const SEGMENT_ITEM =
+  "grid h-10 min-w-11 place-items-center rounded-md px-3 font-numeric text-[13px] font-bold text-muted-foreground transition-[background-color,color] duration-150 ease-standard outline-none hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50 data-[state=on]:bg-secondary data-[state=on]:text-foreground aria-[current=page]:bg-secondary aria-[current=page]:text-foreground"
+
 export type TagKind = keyof typeof TAG_COPY | "so_far" | "partial_week" | "partial_month" | "estimate"
 const EXTRA_TAGS: Record<Exclude<TagKind, keyof typeof TAG_COPY>, string> = {
   so_far: "So far",
