@@ -5,7 +5,9 @@ import { X } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { Button } from "@/components/ui/button"
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog"
 import { Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerTitle } from "@/components/ui/drawer"
+import { DoneScreen } from "./DoneScreen"
 import { Sheet, SheetClose, SheetContent, SheetDescription, SheetTitle } from "@/components/ui/sheet"
 
 export type ResponsiveSheetProps = {
@@ -16,7 +18,14 @@ export type ResponsiveSheetProps = {
   children: React.ReactNode
   /** Stacked full-width actions: `Button size="sheet"` (white primary, then `variant="outline-pill"`). */
   footer?: React.ReactNode
-  size?: "default" | "tall"
+  /** "screen": the reference app's full-screen task (Journal, Customize Dashboard): the whole phone, a centred panel from 768 px. */
+  size?: "default" | "tall" | "screen"
+  /** Screen only: the header's right-hand control (the Journal's pencil). */
+  action?: React.ReactNode
+  /** Screen only: the sand glow at the top that fades into the sheet (the Journal). */
+  glow?: boolean
+  /** Screen only: replaces the sheet's content with a confirmation ("Saved", "Success"), then calls `onDone`. */
+  done?: { title: string; body: string; onDone: () => void } | null
   /** Where focus goes on close when nothing opened the sheet (it opened from the URL, e.g. `?checkin=1`). */
   fallbackFocus?: React.RefObject<HTMLElement | null>
 }
@@ -36,7 +45,7 @@ export const SHEET_SECTION =
  * sheet from 768 px (spec §4.8). X at the left, centred caps title, white pill actions. The one JS
  * breakpoint read. Focus moves in on open and back to the opener on close (Radix and vaul).
  */
-export function ResponsiveSheet({ open, onOpenChange, title, description, children, footer, size = "default", fallbackFocus }: ResponsiveSheetProps) {
+export function ResponsiveSheet({ open, onOpenChange, title, description, children, footer, size = "default", fallbackFocus, action, glow, done }: ResponsiveSheetProps) {
   const mobile = useIsMobile()
   // Radix returns focus to a DialogTrigger; these sheets are controlled without one, so remember the opener.
   const opener = React.useRef<HTMLElement | null>(null)
@@ -59,6 +68,58 @@ export function ResponsiveSheet({ open, onOpenChange, title, description, childr
   const foot = footer && (
     <div className="flex flex-col gap-3 px-4 pt-3 pb-[max(env(safe-area-inset-bottom),16px)] *:w-full md:px-6 md:pb-6">{footer}</div>
   )
+
+  if (size === "screen")
+    return (
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent
+          showCloseButton={false}
+          onOpenAutoFocus={() => {
+            opener.current = document.activeElement as HTMLElement | null
+          }}
+          onCloseAutoFocus={(e) => {
+            const target = opener.current?.isConnected && opener.current !== document.body ? opener.current : fallbackFocus?.current
+            if (!target) return
+            e.preventDefault()
+            target.focus()
+          }}
+          className={cn(
+            SHEET,
+            "flex flex-col gap-0 overflow-hidden p-0 text-base ring-0",
+            // The whole phone (safe areas inside); from 768 px a centred panel, as tall as the window allows.
+            "inset-0 top-0 left-0 h-svh max-w-none translate-x-0 translate-y-0 rounded-none pt-[env(safe-area-inset-top)]",
+            "md:inset-auto md:top-1/2 md:left-1/2 md:h-[min(880px,calc(100svh-48px))] md:w-[560px] md:max-w-[calc(100%-48px)] md:-translate-x-1/2 md:-translate-y-1/2 md:rounded-[28px] md:pt-2",
+            glow && "bg-linear-to-b from-glow-sand via-sheet via-45% to-sheet-bottom"
+          )}
+        >
+          {done ? (
+            <>
+              <DialogTitle className="sr-only">{done.title}</DialogTitle>
+              <DialogDescription className="sr-only">{done.body}</DialogDescription>
+              <DoneScreen title={done.title} body={done.body} onDone={done.onDone} />
+            </>
+          ) : (
+            <>
+              <div className="grid grid-cols-[44px_minmax(0,1fr)_44px] items-center gap-2 px-2 py-2">
+                <DialogClose asChild>
+                  <Button variant="ghost" size="icon-touch" aria-label="Close" className={CLOSE}>
+                    <X aria-hidden strokeWidth={1.75} className="size-[22px]" />
+                  </Button>
+                </DialogClose>
+                <div className="min-w-0 text-center">
+                  <DialogTitle className={TITLE}>{title}</DialogTitle>
+                  <DialogDescription className={cn(DESCRIPTION, "mt-0.5", !description && "sr-only")}>{description ?? title}</DialogDescription>
+                </div>
+                {action}
+              </div>
+              <div className="min-h-0 flex-1 overflow-y-auto overscroll-none px-4 pb-6 md:px-6">{children}</div>
+              {/* Pinned actions over a fade, so the list scrolls out under them (journal-01, dashboard-03). */}
+              {footer && <div className="relative before:pointer-events-none before:absolute before:inset-x-0 before:-top-10 before:h-10 before:bg-linear-to-b before:from-transparent before:to-sheet-bottom">{foot}</div>}
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
+    )
 
   if (mobile)
     return (
