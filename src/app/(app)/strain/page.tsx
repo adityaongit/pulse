@@ -9,7 +9,7 @@ import { ActivityCard } from "@/components/metrics/ActivityCard"
 import { InsightCard } from "@/components/metrics/InsightCard"
 import { KeyStatRow } from "@/components/metrics/KeyStatRow"
 import { ScoreDial } from "@/components/metrics/ScoreDial"
-import { DeltaMark, MetricTags } from "@/components/metrics/primitives"
+import { MetricTags } from "@/components/metrics/primitives"
 import { DetailShell } from "@/components/shells/DetailShell"
 import { EmptyState } from "@/components/shells/EmptyState"
 import { InfoButton } from "@/components/shells/InfoButton"
@@ -21,7 +21,7 @@ import { WeeklyTrends } from "@/components/metrics/WeeklyTrends"
 import type { StrainVM } from "@/server/queries/types"
 import { pageDay, type SearchParams } from "../_lib/day"
 import { STRAIN_INFO, STRAIN_TARGET_INFO } from "../_lib/info"
-import { CAPTION, hrSeries, LABEL, LEGEND, statProps } from "../_lib/view"
+import { CAPTION, hrSeries, LABEL, statProps, TodayVsLegend } from "../_lib/view"
 
 export const metadata = { title: "Strain", description: "Day Strain, your Strain Target, heart-rate zones, activities, calories burned and workout time." }
 
@@ -59,13 +59,7 @@ export default async function StrainPage({ searchParams }: PageProps<"/strain">)
               <KeyStatRow key={k.key} variant="row" {...statProps(k, { d, today })} />
             ))}
           </div>
-          <p className={cn(LEGEND, "flex items-center gap-2")}>
-            <span className="inline-flex items-center gap-1">
-              <DeltaMark dir="up" tone="good" />
-              <DeltaMark dir="down" tone="bad" />
-            </span>
-            Today vs. prior 30 days
-          </p>
+          <TodayVsLegend period="prior 30 days" />
         </Card>
       }
       insight={vm.coach && <InsightCard body={vm.coach} action={{ label: "Plan tonight’s sleep", href: dayHref("/sleep#planner", d, today) }} />}

@@ -252,7 +252,7 @@ function statSpecs(row: DayRow | undefined, isToday: boolean): Record<DashboardK
   const out = {
     hrv: spec((r) => r.metrics?.hrvMs, maybe(m?.hrvMs, vitalReason(row, isToday, true)), "ms", "up", metricHref("hrv")),
     rhr: spec(rhr, maybe(row && rhr(row), vitalReason(row, isToday)), "bpm", "down", metricHref("rhr")),
-    resp: spec((r) => r.metrics?.respBpm, maybe(m?.respBpm, vitalReason(row, isToday)), "rpm", "neutral", metricHref("resp")),
+    resp: spec((r) => r.metrics?.respBpm, maybe(m?.respBpm, vitalReason(row, isToday)), "rpm", "down", metricHref("resp")),
     sleep: spec((r) => r.sleep?.performance, sleepMetric(row, isToday), "%", "up", "/sleep"),
     calories: spec((r) => r.metrics?.calories, maybe(m?.calories, dailyReason), "kcal", "neutral", metricHref("calories")),
     steps: spec((r) => r.metrics?.steps, maybe(m?.steps, dailyReason), undefined, "up", metricHref("steps")),

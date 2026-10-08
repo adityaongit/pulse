@@ -128,7 +128,10 @@ function Row({ p, c }: { p: KeyStatRowProps; c: Computed }) {
           )}
           {p.direction !== "none" && (c.dir ? <DeltaMark dir={c.dir} tone={c.tone!} /> : <span />)}
           {c.avgText && !c.reason && (
-            <span className="font-numeric text-[13px] leading-4 font-medium text-muted-foreground tabular-nums">{c.avgText}</span>
+            <span className="font-numeric text-[13px] leading-4 font-medium text-muted-foreground tabular-nums">
+              {c.avgText}
+              {p.unit === "%" && "%"}
+            </span>
           )}
         </span>
         {p.href && p.variant !== "card" && <ChevronRight className="size-4 shrink-0 text-muted-foreground" strokeWidth={1.75} />}

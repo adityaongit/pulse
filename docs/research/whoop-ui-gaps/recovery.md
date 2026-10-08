@@ -70,24 +70,24 @@ Build steps for the score-screens phase: 1 trend helpers (`src/lib/trend.ts`), 2
 
 | # | Plan | Status |
 |---|---|---|
-| 1 | Step 6: Behavior Insights card with automatic chips (sleep performance, strain, wake time, workout timing) | Planned |
-| 2 | Step 6: the card links to Journal insights (WHOOP's destination was not captured) | Planned |
+| 1 | Step 6: Behavior Insights card with automatic chips (sleep performance, strain, wake time, workout timing) | Done (R34) |
+| 2 | Step 6: the card links to Journal insights (WHOOP's destination was not captured) | Done (R34) |
 | 3 | Steps 4 and 6: Weekly Trends (Recovery, HRV, RHR, Respiratory rate, Sleep performance) | Done (R32) |
 | 4 | Step 4: cards link to their Trend View | Done (R32) |
 | 5 | Step 4: band-coloured value labels, today's column highlight, two-line labels | Done (R32) |
 | 6 | Step 4: HRV line with ring markers and value labels | Done (R32) |
-| 7 | Step 6: flat contributor rows showing today's value over the 30-day value, with a triangle | Planned |
-| 8 | Step 6: the baseline track is dropped | Planned |
-| 9 | Step 6: "Today vs. last 30 days" legend | Planned |
-| 10 | Step 6: the skin temperature row is hidden; it still counts in the score | Planned |
-| 11 | Step 6: no unit text after contributor values | Planned |
-| 12 | Step 6: insight link "Explore your recovery insights" to the Recovery Trend View | Planned |
-| 13 | Same link as gap 12 (WHOOP's screen was not captured) | Planned |
-| 14 | Step 6: "What shaped it" and "Tomorrow's forecast" are removed from Recovery | Planned |
-| 15 | Step 6: no band word under the ring | Planned |
+| 7 | Step 6: flat contributor rows showing today's value over the 30-day value, with a triangle | Done (R34) |
+| 8 | Step 6: the baseline track is dropped | Done (R34) |
+| 9 | Step 6: "Today vs. last 30 days" legend | Done (R34) |
+| 10 | Step 6: the skin temperature row is hidden; it still counts in the score | Done (R34) |
+| 11 | Step 6: no unit text after contributor values | Done (R34) |
+| 12 | Step 6: insight link "Explore your recovery insights" to the Recovery Trend View | Done (R34) |
+| 13 | Same link as gap 12 (WHOOP's screen was not captured) | Done (R34) |
+| 14 | Step 6: "What shaped it" and "Tomorrow's forecast" are removed from Recovery | Done (R34) |
+| 15 | Step 6: no band word under the ring | Done (R34) |
 | 16 | Steps 5-7: the Recovery, Sleep and Strain headers read "TODAY" with no date arrows | Done (R33): the date alone on Recovery, Sleep and Strain |
 | 17 | Step 3: metric dropdown | Done (R29) |
-| 18 | Steps 1 and 3: relative % chip; Resp up is orange | Done on the Trend View (R30); contributor arrows in step 6 |
+| 18 | Steps 1 and 3: relative % chip; Resp up is orange | Done (R30, R34) |
 | 19 | Step 3: W/M/6M beside the average, no 1Y | Done (R30) |
 | 20 | Step 3: period stepper | Done (R29) |
 | 21 | Steps 1 and 3: verdict sentence, including the typical-range wording | Done (R29) |
@@ -99,7 +99,7 @@ Build steps for the score-screens phase: 1 trend helpers (`src/lib/trend.ts`), 2
 | 27 | View all list | Out of scope |
 | 28 | Step 3: "What is X?" explainer in Pulse's own words | Done (R29) |
 | 29 | Step 3: the Trend View has no day hero; `/metric/[key]` keeps it | Done (R29) |
-| 30 | Step 6: the Sleep performance row opens its Trend View | Planned |
+| 30 | Step 6: the Sleep performance row opens its Trend View | Done (R34) |
 | 31 | Already covered by the shell's coach button | No change |
 
 ## Already matches

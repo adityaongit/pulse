@@ -7,8 +7,6 @@ import { EnergyBankChartSkeleton } from "@/components/charts/EnergyBankChart"
 import { ZoneBarsSkeleton } from "@/components/charts/ZoneBars"
 import { TimelineSkeleton } from "@/components/metrics/ActivityCard"
 import { WeeklyTrendsSkeleton } from "@/components/metrics/WeeklyTrends"
-import { ContributorRowSkeleton } from "@/components/metrics/ContributorRow"
-import { DriverListSkeleton } from "@/components/metrics/DriverList"
 import { InsightCardSkeleton } from "@/components/metrics/InsightCard"
 import { KeyStatRowSkeleton } from "@/components/metrics/KeyStatRow"
 import { Wordmark } from "@/components/brand/Wordmark"
@@ -227,26 +225,13 @@ export function RecoverySkeleton() {
       action
       summary={
         <>
-          <div className="divide-y divide-border">{rows(5, () => <ContributorRowSkeleton />)}</div>
-          <p className={LEGEND}>Dot: today. Shaded: your normal range.</p>
+          {statRows(["Heart rate variability", "Resting heart rate", "Respiratory rate", "Sleep performance"])}
+          <p className={LEGEND}>Today vs. last 30 days</p>
         </>
       }
       primary={null}
       footer={<WeeklyTrendsSkeleton titles={["Recovery", "Heart Rate Variability", "Resting Heart Rate", "Respiratory Rate", "Sleep Performance"]} />}
-      secondary={[
-        <SectionShell key="drivers" variant="card" title="What shaped it" level={2}>
-          <DriverListSkeleton variant="recovery" unit="pts" rows={5} />
-        </SectionShell>,
-        <SectionShell key="forecast" variant="card" title="Tomorrow’s forecast" level={2} fill>
-          <div aria-hidden className="my-auto flex items-center gap-4 xl:flex-col xl:gap-3">
-            <ScoreDialSkeleton size="sm" label="Tomorrow" />
-            <span className="min-w-0 flex-1 xl:w-full xl:max-w-[32ch] xl:flex-none">
-              <SkeletonText className={`${CAPTION} w-full`} />
-              <SkeletonText className={`${CAPTION} w-2/3 xl:hidden`} />
-            </span>
-          </div>
-        </SectionShell>,
-      ]}
+      secondary={[]}
     />
   )
 }

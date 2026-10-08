@@ -11,16 +11,18 @@ async function scrollUntil(page: Page, done: () => Promise<boolean>) {
   }
 }
 
-test("1. morning check: Home → Recovery → drivers → back", async ({ page }) => {
+test("1. morning check: Home → Recovery → its Trend View → back", async ({ page }) => {
   const d = days().past!;
   await page.goto(withDay("/", d));
   await page.getByRole("link", { name: /^Recovery \d+ percent.*Open Recovery details$/ }).click();
   await expect(page).toHaveURL(url(withDay("/recovery", d)));
   await expect(page.getByRole("heading", { level: 1, name: "Recovery" })).toBeVisible();
-  await page.getByRole("link", { name: "See what shaped it" }).click();
-  const drivers = page.getByRole("region", { name: "What shaped it" });
-  await expect(drivers).toBeInViewport();
-  await expect(drivers.getByRole("listitem").first()).toContainText(/Recovery|effect/);
+  await page.getByRole("link", { name: "Explore your recovery insights" }).click();
+  await expect(page).toHaveURL(url(`/trend/recovery?d=${d}`));
+  await expect(page.getByRole("heading", { level: 1, name: "Trend view" })).toBeVisible();
+  await expect(page.getByText(/^Your average Recovery this month/)).toBeVisible();
+  await page.getByRole("link", { name: "Back" }).click();
+  await expect(page).toHaveURL(url(withDay("/recovery", d)));
   await page.getByRole("link", { name: "Back" }).click();
   await expect(page).toHaveURL(url(withDay("/", d)));
   await expect(page.getByRole("heading", { level: 1, name: "Home" })).toBeAttached();

@@ -288,7 +288,8 @@ export function ScoreDial(props: ScoreDialProps) {
         {lg && !gauge && (
           <>
             <span className={cn(DIAL_LABEL, TRIM, "mt-[6cqi] max-w-36 text-balance")}>{r.label}</span>
-            {r.word && <span className={cn(DIAL_LABEL, TRIM, "mt-[3cqi]", r.word.className)}>{r.word.text}</span>}
+            {/* No band word under the large ring: the colour carries it on screen, as in the reference app, and the
+                dial's accessible name still says it (spec §11 R34). */}
             {props.status && !empty && !loading && (
               <span aria-hidden className="mt-[4cqi] flex gap-1">
                 {(["poor", "sufficient", "optimal"] as const).map((k) => (

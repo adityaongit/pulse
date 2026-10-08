@@ -11,6 +11,8 @@ export type SectionShellProps = {
   info?: InfoContent | false
   action?: { label: string; href: string } | React.ReactNode
   aside?: React.ReactNode
+  /** Cards: a small icon before the title (Behavior insights' lightbulb). */
+  icon?: React.ReactNode
   href?: string
   /** Heading level; cards default to h3 inside a section, h2 otherwise. */
   level?: 2 | 3
@@ -42,7 +44,7 @@ export const CARD_LINK = cn(
   "block transition-[scale,--tw-gradient-from] duration-150 ease-standard outline-none hover:from-card-hover focus-visible:ring-3 focus-visible:ring-ring/50 active:scale-[0.96]"
 )
 
-export function SectionShell({ variant, title, info, action, aside, href, level, id, fill, className, children }: SectionShellProps) {
+export function SectionShell({ variant, title, info, action, aside, icon, href, level, id, fill, className, children }: SectionShellProps) {
   const headingId = `${id ?? slug(title)}-title`
   const actionNode = isLinkAction(action) ? <ActionLink {...action} /> : action
 
@@ -71,7 +73,8 @@ export function SectionShell({ variant, title, info, action, aside, href, level,
   const H = level === 2 ? "h2" : "h3"
   const header = (
     <div className="mb-3 flex min-h-6 items-center justify-between gap-2">
-      <H id={headingId} className="min-w-0 text-xs leading-4 font-bold tracking-[0.1em] text-balance uppercase">
+      <H id={headingId} className="flex min-w-0 items-center gap-2 text-xs leading-4 font-bold tracking-[0.1em] text-balance uppercase">
+        {icon && <span aria-hidden className="grid size-5 shrink-0 place-items-center text-muted-foreground [&_svg]:size-5 [&_svg]:stroke-[1.75]">{icon}</span>}
         {title}
       </H>
       <div className="flex shrink-0 items-center gap-2">

@@ -107,7 +107,7 @@ export type DeltaDir = "up" | "down" | "flat";
 export const GOOD_DIRECTION = {
   hrv: "up",
   resting_hr: "down",
-  respiratory_rate: "neutral",
+  respiratory_rate: "down",
   sleep_performance: "up",
   hours: "up",
   consistency: "up",

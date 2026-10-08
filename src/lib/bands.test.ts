@@ -35,7 +35,10 @@ describe("deltaTone", () => {
     expect(deltaTone("down", 95, 100, 5)).toEqual({ dir: "flat", tone: "neutral" });
   });
   it("neutral metrics keep the arrow but never a tone", () => {
-    expect(deltaTone(GOOD_DIRECTION.respiratory_rate, 16, 14.5, 0.5)).toEqual({ dir: "up", tone: "neutral" });
+    expect(deltaTone(GOOD_DIRECTION.strain, 16, 14.5, 0.5)).toEqual({ dir: "up", tone: "neutral" });
+  });
+  it("a rise in respiratory rate is bad, as the reference app colours it (spec §11 R34)", () => {
+    expect(deltaTone(GOOD_DIRECTION.respiratory_rate, 16, 14.5, 0.5)).toEqual({ dir: "up", tone: "bad" });
   });
   it("skin temperature is good toward zero", () => {
     expect(deltaTone("toward_zero", 0.1, 0.6, 0.2).tone).toBe("good");

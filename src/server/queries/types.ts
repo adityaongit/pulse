@@ -1,3 +1,4 @@
+import type { BehaviorChip } from "@/core/algorithms/behaviorChips";
 // View models returned by server/queries, one per screen (spec §7). Shapes mirror the U12 kit props
 // (src/lib/reasons.ts Metric, ZoneBars' ZoneRow, DriverList's DriverItem…), importing only types from the kit.
 // Conventions: instants are epoch **milliseconds** (as the kit's charts and cards take them), days are
@@ -171,11 +172,13 @@ export type RecoveryVM = {
   isToday: boolean;
   recovery: Metric<number>;
   band: Band | null;
+  /** The score's inputs with their baselines and points (the coach reads them). */
   contributors: Contributor[];
+  /** The screen's rows, as the reference app shows them: today against the prior 30 days (spec §11 R34). */
+  summary: KeyStat[];
   insight: string | null;
-  trend: Trend;
-  drivers: Metric<DriverItem[]>;
-  forecast: Metric<{ value: number; low: number; high: number; band: Band }>;
+  /** Behavior Insights: what held the day before, toned by its next-day Recovery effect (docs/algorithms/behavior-chips.md). */
+  behaviors: BehaviorChip[];
 };
 
 // ── Strain and Activity ──────────────────────────────────────────────────────

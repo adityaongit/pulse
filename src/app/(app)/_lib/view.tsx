@@ -39,6 +39,8 @@ import type { HrSeries } from "@/components/charts/IntradayHrChart"
 import type { StressSeries } from "@/components/charts/StressChart"
 import type { TrendPoint } from "@/components/charts/TrendChart"
 import type { KeyStatRowProps } from "@/components/metrics/KeyStatRow"
+import { DeltaMark } from "@/components/metrics/primitives"
+import { cn } from "@/lib/utils"
 import type { FormatKey } from "@/lib/format"
 import { dayHref, RANGE_DAYS, type TrendRange } from "@/lib/url"
 import type { EnergyBankVM, HrChart, KeyStat, Metric, StressDayChart, Trend } from "@/server/queries/types"
@@ -46,6 +48,21 @@ import type { EnergyBankVM, HrChart, KeyStat, Metric, StressDayChart, Trend } fr
 export { CAPTION, LABEL } from "@/components/metrics/primitives"
 /** The inset legend strip under a summary card (spec §7.2, §7.3, §7.5). */
 export const LEGEND = "mt-1 mb-3 rounded-lg bg-inset px-3 py-2 text-xs leading-4 font-medium text-foreground-secondary"
+
+/** The strip under a score's rows: the two arrows and "Today vs. prior 30 days" (Strain) or "last 30 days" (Recovery). */
+export function TodayVsLegend({ period }: { period: string }) {
+  return (
+    <p className={cn(LEGEND, "flex items-center gap-2")}>
+      <span aria-hidden className="inline-flex items-center gap-1">
+        <DeltaMark dir="up" tone="good" />
+        <DeltaMark dir="down" tone="bad" />
+      </span>
+      <span>
+        <span className="font-semibold text-foreground">Today</span> vs. {period}
+      </span>
+    </p>
+  )
+}
 
 /** Maps a metric's value, keeping its reason and tags. */
 export const mapMetric = <A, B>(m: Metric<A>, f: (a: A) => B): Metric<B> =>
