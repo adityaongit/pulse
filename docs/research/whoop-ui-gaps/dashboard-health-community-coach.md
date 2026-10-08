@@ -99,6 +99,51 @@ Pulse refs were checked against the files on 2026-10-08.
 | 37 | AI toast on workout screens. A glass pill with the W glyph reading "Analyzing…" sits at the bottom right on the weightlifting detail; on the running detail the same pill is empty and wide **(inferred: expanding or collapsing)**. Pulse activity screens have no coach hint. | missing-element | activity-01, activity-05 | none | Nothing under `src/app/(app)/activity` uses the coach. Needs coach access, so the pill should only show then. |
 | 38 | Coach sheet look. The sheet is translucent with a purple-blue gradient at the top, so the screen behind it shows through. Pulse's page is opaque, with a glass composer. | visual | coach-01 | `src/app/(app)/coach/Coach.tsx:485` | |
 
+## 3a. Status, activities-and-journal phase (2026-10-08)
+
+Build steps are listed in [activity-and-journal.md §3a](activity-and-journal.md). "Hidden" means the component is built but off in `src/lib/features.ts` until Pulse has a data source. "Out of scope" means the owner excluded it. Pulse is self-hosted and single-user, so every Community row is "Out of scope (no community)" and none of it is built, hidden or not. Decisions are recorded in `docs/design/spec.md` §11 from R36 onwards.
+
+| # | Plan | Status |
+|---|---|---|
+| 1 | Stress Monitor as a dashboard tile | Done (R24, Home phase) |
+| 2 | Step 7: tile body: moon and walking icons, ticks to now, line toned by level | Open |
+| 3 | Step 7: Sleep Consistency and Hours of Sleep rows | Open |
+| 4 | Step 7: VO2 Max, Recovery and Day Strain rows | Open |
+| 5 | Step 7: HR Zones 1-3, 4-5 and All (weekly) and Strength Activity Time rows | Open |
+| 6 | Step 7: Restorative Sleep (%), Restorative Sleep (hours) and Sleep Debt rows | Open |
+| 7 | Step 7: Lean Body Mass row (weight × (1 − body fat)) | Open |
+| 8 | Step 7: the reference default set and order (phone default unchanged) | Open |
+| 9 | "CUSTOMIZE" with a pencil, no aside | Done (R23, Home phase) |
+| 10 | Step 7: values without units (the accessible name keeps them) | Open |
+| 11 | Steps 1 and 7: full-screen editor with drag handles that also move by keyboard | Open |
+| 12 | Step 7: one outline SAVE; Reset to default goes | Open |
+| 13 | Steps 1 and 7: SUCCESS screen (`DoneScreen`) | Open |
+| 14 | Discover More promo cards | Out of scope (promotions) |
+| 15 | Step 8: Stress Monitor first, then the orb, Pace of Aging and Health Monitor | Open |
+| 16 | Step 8: orb without a card | Open |
+| 17 | Step 8: Pace of Aging card with GO TO HEALTHSPAN | Open |
+| 18 | Step 8: sparkline toned by level, white end dot | Open |
+| 19 | "Upgrade to Access" promo | Out of scope (nothing to sell) |
+| 20 | Step 8: Blood Pressure Insights, behind a flag (no source) | Open |
+| 21 | Step 9: factor rows expand in place | Open |
+| 22 | Step 9: 6-month and 30-day markers; the age target moves into the row's text | Open |
+| 23 | Step 9: segmented bar with end labels, years on the right | Open |
+| 24 | Step 9: per-state copy ("Outperforming") | Open |
+| 25 | Step 9: VIEW TREND to the factor's Trend View | Open |
+| 26 | Community tab | Out of scope (no community) |
+| 27 | Teams list | Out of scope (no community) |
+| 28 | Recommended Teams | Out of scope (no community) |
+| 29 | Team screen and chat | Out of scope (no community) |
+| 30 | Build Your Community | Out of scope (no community) |
+| 31 | Coach as a bottom sheet | No change: the owner kept the full page (R36) |
+| 32 | Step 10: header with the ring glyph, version pill and history icon | Open |
+| 33 | Step 10: "+" and the reference composer; the microphone behind a flag | Open |
+| 34 | Step 10: the coach speaks first | Open |
+| 35 | Step 10: copy as a clipboard icon; thumbs up and down behind a flag | Open |
+| 36 | Step 10: one scrolling row of reply chips, follow-ups after a reply | Open |
+| 37 | Step 10: "Analyzing…" pill on workouts (with activity gap 12) | Open |
+| 38 | Translucent sheet look | No change: the owner kept the full page (R36) |
+
 ## 4. Already matches (do not redo)
 
 - My Dashboard row style: caps label with icon, today's value large, the 30-day value below in muted text, orange down, green up and grey dot arrows, one card per row (`KeyStatRow variant="card"`, `src/app/(app)/(home)/page.tsx:266`).

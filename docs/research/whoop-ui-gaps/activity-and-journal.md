@@ -85,6 +85,42 @@ Severity: missing-screen, missing-element, behaviour, visual. "Pulse ref" is `pa
 | 28 | Behaviour catalogue: a long A-Z list of defined behaviours (Accutane, Acne, Acupuncture, Adaptogen Mushrooms, Added Sugar, AD(H)D Medication, Afternoon Snack, AG1, Air Travel, Alcohol, Allergy Medication, Alpha-lipoic acid, Anti-Androgen, Anti-Anxiety Medication, Blood Donation, Caffeine, Camping, Caregiving, Car or Train travel, Family and Friends, Feeding Baby at Night, Intermittent Fasting, Night Shifts, Nursing, On-Call Shift, Outdoor Time, Parenting, Plasma Donation, Ramadan, Relationship Status, Remote Work, Sexual Activity, Shared Bedroom With Child...). Each row has a name and a one-line daily question under it ("Took Accutane?"). | missing-element | journal-04..09 | `src/lib/journal.ts:5-15` (9 built-in tags with icons: alcohol, late caffeine, late meal, screen in bed, meditation, stretching, sauna, travel, illness) | Pulse also allows custom tags (`CheckIn.tsx:319-351`, `Behaviours.tsx:75`) which WHOOP's screens do not show. Each added tag needs 5 days with and without for Insights (spec.md §7.12 empty copy), so a big catalogue will mostly stay at "Needs more data". |
 | 29 | Selection model: an at-top "selected" group (journal-04 shows "Mouth Tape ✓") above a "NOT SELECTED" rule, 28 px checkboxes (white outline, blue fill with a check when on) on the right of each row, and a white-outline pill "SAVE BEHAVIORS" pinned at the bottom with a gradient behind it; sheet has a drag grabber at the top and X at left. Nothing applies until Save. | behaviour | journal-04..09 | `src/app/(app)/more/behaviours/Behaviours.tsx:118` (switch per row that writes instantly, up/down reorder arrows at line 111, no save button) | Pulse's instant-write with optimistic rollback (`Behaviours.tsx:42-52`) and reorder have no WHOOP equivalent in these screenshots. |
 
+## 3a. Status, activities-and-journal phase (2026-10-08)
+
+Build steps for the last phase (shared with [dashboard-health-community-coach.md](dashboard-health-community-coach.md)): 1 shared full-screen sheet (`ResponsiveSheet size="screen"`) and `DoneScreen`, 2 journal data (behaviour catalogue, notes, follow-up value), 3 Journal full-screen modal, 4 Select Behaviors, 5 activity detail, 6 Add Activity, Select Activity and Start Activity (hidden), 7 My Dashboard, 8 Health tab, 9 Healthspan factors, 10 Coach, 11 landing site. "Hidden" means the component is built but off in `src/lib/features.ts` until Pulse has a data source. Decisions are recorded in `docs/design/spec.md` §11 from R36 onwards.
+
+| # | Plan | Status |
+|---|---|---|
+| 1 | Step 6: Add Activity form, behind a flag (Google Health takes no written sessions) | Open |
+| 2 | Step 6: Select Activity picker (static catalogue), opened by the hidden Add and Start flows | Open |
+| 3 | Step 6: Start Activity live screen, behind `FEATURES.startActivity` | Open |
+| 4 | Steps 1 and 3: SAVED screen (`DoneScreen`) replaces the toast | Open |
+| 5 | Step 5: Cardio / Muscular split, behind a flag (no muscular load source) | Open |
+| 6 | Step 5: strain chip against the sport's 30-day average | Open |
+| 7 | Step 5: Activity Steps from the step minutes inside the workout | Open |
+| 8 | Step 5: "Get More from Your Workouts" banner, behind `FEATURES.strengthTrainer` | Open |
+| 9 | Step 5: overflow menu (the day's Strain, heart-rate settings) | Open |
+| 10 | Step 5: zone footnote links "View HR Settings" to the profile in `/settings` | Open |
+| 11 | Step 5: Key Statistics carousel with a Duration tile | Open |
+| 12 | Step 10: coach pill ("Analyzing…") replaces the insight card when the coach is on | Open |
+| 13 | Step 5: dashed start and end markers with times; the span bar and zone strips go | Open |
+| 14 | Step 5: typical band on zone rows | Open |
+| 15 | Step 5: zone colours at 0%, Zone 0 white; the "+N min" deltas go | Open |
+| 16 | Steps 1 and 3: Journal as a full-screen modal with the sand glow and the pencil | Open |
+| 17 | Step 3: day strip and "‹ TODAY ›" inside the journal | Open |
+| 18 | Step 3: "What's happening today, April 15?" heading | Open |
+| 19 | Steps 2 and 3: Daytime / Nighttime / Status groups | Open |
+| 20 | Step 3: one card per full-sentence question, no icon | Open |
+| 21 | Step 3: ✕ / ✓ answer buttons (44 px) | Open |
+| 22 | Steps 2 and 3: follow-up slider | Open |
+| 23 | Steps 2 and 3: Notes | Open |
+| 24 | Step 3: "Dismiss journal?" dialog with "Don't show me this message again" | Open |
+| 25 | Step 4: pencil opens Select Behaviors | Open |
+| 26 | Step 4: search field | Open |
+| 27 | Steps 2 and 4: category tabs | Open |
+| 28 | Steps 2 and 4: behaviour catalogue with a daily question per row | Open |
+| 29 | Step 4: selected group, checkboxes and SAVE BEHAVIORS; reorder and instant toggles go | Open |
+
 ## 4. Already matches
 
 - Activity header: back chevron left, sport icon, sport name in caps, time range "10:37 to 11:29" under it. Pulse: `src/app/(app)/activity/[id]/page.tsx:38-43`.

@@ -22,6 +22,7 @@ Each gap file has a status table with one row per gap; decisions are in `docs/de
 | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | --- |
 | Home (2026-10-08) | Home | 19 | see [home.md §3a](home.md) | | | | | R20-R28 |
 | Score screens (2026-10-08) | Sleep, Recovery, Strain | 79 | 70 | 4 | 4 | 1 | 0 | R29-R35 |
+| Activities, journal, dashboard, health, coach (2026-10-08) | Activities and Journal; Dashboard, Health, Community, Coach | 67 | 2 | 0 | 7 | 2 | 56 | R36- |
 
 The score-screens phase built the shared Trend View (`/trend/[key]`) and Weekly Trends once and used them on all three screens. Hidden: the Sleep Stress row, card and Trend View (`FEATURES.sleepStress`; the stress model leaves sleep minutes out) and the goal buttons (`FEATURES.goals`; Pulse has no goals). Out of scope: Learn More videos and articles and their View all lists. The Recovery forecast is still computed but no longer shown, so its How it works entry and landing page were removed.
 
