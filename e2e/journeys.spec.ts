@@ -197,7 +197,7 @@ test("9. More hub: Trends and a metric switch, a custom behaviour in the check-i
   await expect(page).toHaveURL(url("/more/behaviours"));
   await page.getByLabel("Add a behaviour").fill(name);
   await page.getByRole("button", { name: "Add behaviour", exact: true }).click();
-  await expect(page.getByRole("switch", { name: `Show ${name} in the check-in` })).toBeChecked();
+  await expect(page.getByRole("checkbox", { name: new RegExp(`^${name}`) })).toBeChecked();
   await page.goto("/journal?checkin=1");
   const sheet = page.getByRole("dialog", { name: "Journal" });
   await expect(sheet.getByRole("radiogroup", { name: `${name}?` })).toBeVisible();

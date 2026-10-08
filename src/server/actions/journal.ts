@@ -6,12 +6,12 @@ import { z } from "zod";
 import { currentUser, SIGNED_OUT } from "../auth";
 import { getDb } from "../db";
 import { intradayDirty, journalEntries, journalNotes, journalTags } from "../db/schema";
-import { addTag, MAX_TAGS, reorderTags, selectTags, setTagHidden, tagKey } from "../journalTags";
+import { addTag, MAX_TAGS, selectTags, tagKey } from "../journalTags";
 import { userCtx } from "../queries/common";
-import { getJournal } from "../queries/journal";
+import { getBehaviours, getJournal } from "../queries/journal";
 import { userTimeZone } from "../profile";
 import { localDay } from "../time";
-import type { JournalVM } from "../queries/types";
+import type { BehavioursVM, JournalVM } from "../queries/types";
 import { requestSync } from "../worker";
 import { inDayRange } from "@/lib/url";
 
@@ -96,6 +96,13 @@ export async function saveJournalNote(input: z.input<typeof Note>): Promise<Acti
   return { ok: true, data: undefined };
 }
 
+/** Read-only: every behaviour the user has, hidden ones included, for Select Behaviors over the journal. */
+export async function loadBehaviours(): Promise<ActionResult<BehavioursVM>> {
+  const user = await currentUser();
+  if (!user) return SIGNED_OUT;
+  return { ok: true, data: await getBehaviours(await userCtx(user.userId)) };
+}
+
 const Selection = z.object({ tags: z.array(z.string().min(1).max(64)).max(200) });
 
 /**
@@ -138,28 +145,4 @@ const revalidateTags = () => {
   revalidatePath("/more/behaviours");
 };
 
-const Hidden = z.object({ tag: z.string().min(1).max(64), hidden: z.boolean() });
 
-/** Hides a behaviour from the check-in sheet, or shows it again. Its past answers stay and still count in insights. */
-export async function setBehaviourHidden(input: z.input<typeof Hidden>): Promise<ActionResult> {
-  const user = await currentUser();
-  if (!user) return SIGNED_OUT;
-  const r = Hidden.safeParse(input);
-  if (!r.success) return { ok: false, error: r.error.issues[0].message };
-  if (!(await setTagHidden(getDb(), user.userId, r.data.tag, r.data.hidden))) return { ok: false, error: `Unknown tag: ${r.data.tag}` };
-  revalidateTags();
-  return { ok: true, data: undefined };
-}
-
-const Order = z.object({ tags: z.array(z.string().min(1).max(64)).min(1).max(200) });
-
-/** Sets the order of one check-in group's behaviours. */
-export async function reorderBehaviours(input: z.input<typeof Order>): Promise<ActionResult> {
-  const user = await currentUser();
-  if (!user) return SIGNED_OUT;
-  const r = Order.safeParse(input);
-  if (!r.success) return { ok: false, error: r.error.issues[0].message };
-  if (!(await reorderTags(getDb(), user.userId, r.data.tags))) return { ok: false, error: "Unknown or repeated tag" };
-  revalidateTags();
-  return { ok: true, data: undefined };
-}

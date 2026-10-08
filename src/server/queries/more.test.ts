@@ -3,7 +3,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { EXTRA_KEYS } from "@/lib/extraMetrics";
 import { type Db, row, sql } from "../db";
 import { dailyScores } from "../db/schema";
-import { addTag, reorderTags, setTagHidden } from "../journalTags";
+import { addTag, selectTags } from "../journalTags";
 import { ctxFor, freshDb, seeded, USER } from "../testing";
 import { addDays } from "../time";
 import { getBehaviours, getJournal, getJournalInsights } from "./journal";
@@ -112,31 +112,28 @@ describe("Behaviours", () => {
   it("a hidden behaviour leaves the check-in, keeps its answers, History labels and insights", async () => {
     const ctx = ctxFor(db);
     const before = await getJournalInsights("recovery", ctx);
-    const answers = (await getBehaviours(ctx)).tags.find((t) => t.tag === "alcohol")!.answers;
-    expect(answers).toBeGreaterThan(0);
-    await setTagHidden(db, USER, "alcohol", true);
+    const all = (await getBehaviours(ctx)).tags.map((t) => t.tag);
+    await selectTags(db, USER, all.filter((t) => t !== "alcohol"));
     try {
       const day = addDays(todayOf(ctx), -2);
       const j = await getJournal(day, ctx);
       expect(j.tags.some((t) => t.tag === "alcohol")).toBe(false);
       expect(j.history.some((h) => h.yes.includes("Alcohol"))).toBe(true);
-      expect((await getBehaviours(ctx)).tags.find((t) => t.tag === "alcohol")).toMatchObject({ hidden: true, answers });
+      expect((await getBehaviours(ctx)).tags.find((t) => t.tag === "alcohol")).toMatchObject({ hidden: true });
       expect((await getJournalInsights("recovery", ctx))).toEqual(before);
       expect((await getMore(ctx)).behaviours).toEqual({ shown: 8, total: 9 });
     } finally {
-      await setTagHidden(db, USER, "alcohol", false);
+      await selectTags(db, USER, all);
     }
   });
 
-  it("orders each group by position, and new custom tags go last", async () => {
+  it("sorts the defaults into the journal's sections, and new custom tags go last", async () => {
     const ctx = ctxFor(db);
-    expect(await reorderTags(db, USER, ["sauna", "meditation", "stretching"])).toBe(true);
     await addTag(db, USER, "cold_plunge", "Cold plunge");
     const tags = (await getJournal(todayOf(ctx), ctx)).tags;
-    expect(tags.filter((t) => t.section === "daytime").map((t) => t.tag)).toEqual(["late_caffeine", "sauna", "meditation", "stretching"]);
+    expect(tags.filter((t) => t.section === "daytime").map((t) => t.tag)).toEqual(["late_caffeine", "meditation", "stretching", "sauna"]);
     expect(tags.filter((t) => t.section === "nighttime").map((t) => t.tag)).toEqual(["alcohol", "late_meal", "screen_in_bed"]);
     expect(tags.at(-1)).toMatchObject({ tag: "cold_plunge", section: "custom", question: "Cold plunge?", hidden: false });
-    expect(await reorderTags(db, USER, ["sauna", "unknown"])).toBe(false);
   });
 });
 

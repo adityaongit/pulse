@@ -1,12 +1,12 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
-import { and, asc, eq, inArray } from "drizzle-orm";
+import { and, asc, eq } from "drizzle-orm";
 import type { Db } from "../db";
 import { intradayDirty, journalEntries, journalNotes, journalTags } from "../db/schema";
 import { DEFAULT_JOURNAL_TAGS, ensureDefaultTags, MAX_TAGS } from "../journalTags";
 import { needsRecompute } from "../pipeline";
 import { saveProfile } from "../profile";
 import { addUser, freshDb, USER } from "../testing";
-import { addCustomTag, loadCheckIn, reorderBehaviours, saveBehaviors, saveJournalEntry, saveJournalNote, setBehaviourHidden } from "./journal";
+import { addCustomTag, loadBehaviours, loadCheckIn, saveBehaviors, saveJournalEntry, saveJournalNote } from "./journal";
 
 const h = vi.hoisted(() => ({ db: undefined as unknown, revalidate: vi.fn(), requestSync: vi.fn(), user: null as unknown }));
 vi.mock("../worker", () => ({ requestSync: h.requestSync }));
@@ -152,43 +152,32 @@ describe("addCustomTag", () => {
   });
 
   it("puts a new behaviour after every existing one", async () => {
-    await reorderBehaviours({ tags: ["late_workout", "cold_plunge"] });
+    const before = await order(eq(journalTags.isDefault, false));
     await addCustomTag({ label: "Nap" });
-    expect(await order(eq(journalTags.isDefault, false))).toEqual(["late_workout", "cold_plunge", "nap"]);
+    expect(await order(eq(journalTags.isDefault, false))).toEqual([...before, "nap"]);
   });
 });
 
-describe("setBehaviourHidden and reorderBehaviours", () => {
+describe("saveBehaviors", () => {
   const tag = async (t: string) => (await allTags()).find((x) => x.tag === t)!;
+  const everyoneBut = async (t: string) => (await allTags()).map((x) => x.tag).filter((x) => x !== t);
 
-  it("signed out, both are refused and nothing changes", async () => {
+  it("signed out, it is refused and nothing changes", async () => {
     h.user = null;
-    expect(await setBehaviourHidden({ tag: "sauna", hidden: true })).toEqual({ ok: false, error: "Signed out. Sign in again." });
-    expect(await reorderBehaviours({ tags: ["sauna", "meditation"] })).toEqual({ ok: false, error: "Signed out. Sign in again." });
-    expect(await tag("sauna")).toMatchObject({ hidden: false, position: 0 });
+    expect(await saveBehaviors({ tags: [] })).toEqual({ ok: false, error: "Signed out. Sign in again." });
+    expect((await tag("sauna")).hidden).toBe(false);
   });
 
-  it("hides and shows a behaviour without touching its answers", async () => {
+  it("hides a behaviour left out without touching its answers, and shows it again", async () => {
     await saveJournalEntry({ day: "2026-10-01", tag: "sauna", value: true });
-    expect(await setBehaviourHidden({ tag: "sauna", hidden: true })).toEqual({ ok: true, data: undefined });
+    expect(await saveBehaviors({ tags: await everyoneBut("sauna") })).toEqual({ ok: true, data: undefined });
     expect((await tag("sauna")).hidden).toBe(true);
     expect(await entries()).toEqual([{ day: "2026-10-01", tag: "sauna", value: 1 }]);
     // A hidden behaviour can still be answered (an old check-in edited) and is shown again on request.
     expect(await saveJournalEntry({ day: "2026-09-30", tag: "sauna", value: false })).toMatchObject({ ok: true });
-    expect(await setBehaviourHidden({ tag: "sauna", hidden: false })).toMatchObject({ ok: true });
+    expect(await saveBehaviors({ tags: (await allTags()).map((x) => x.tag) })).toMatchObject({ ok: true });
     expect((await tag("sauna")).hidden).toBe(false);
     expect(h.revalidate).toHaveBeenCalledWith("/more/behaviours");
-    expect(await setBehaviourHidden({ tag: "nope", hidden: true })).toEqual({ ok: false, error: "Unknown tag: nope" });
-  });
-
-  it("writes one group's order and refuses unknown or repeated tags whole", async () => {
-    expect(await reorderBehaviours({ tags: ["stretching", "sauna", "meditation"] })).toMatchObject({ ok: true });
-    expect(await order(inArray(journalTags.tag, ["meditation", "stretching", "sauna"]))).toEqual(["stretching", "sauna", "meditation"]);
-    expect(await reorderBehaviours({ tags: ["sauna", "nope"] })).toMatchObject({ ok: false });
-    expect(await reorderBehaviours({ tags: ["sauna", "sauna"] })).toMatchObject({ ok: false });
-    expect(await reorderBehaviours({ tags: [] })).toMatchObject({ ok: false });
-    expect((await tag("stretching")).position).toBe(0);
-    expect((await tag("sauna")).position).toBe(1);
   });
 });
 
@@ -196,10 +185,11 @@ describe("per user", () => {
   it("another user's behaviours and answers are untouched; their custom tag is unknown here", async () => {
     await db.insert(journalTags).values({ userId: other, tag: "their_tag", label: "Their tag" });
     expect(await saveJournalEntry({ day: "2026-10-01", tag: "their_tag", value: true })).toEqual({ ok: false, error: "Unknown tag: their_tag" });
-    await setBehaviourHidden({ tag: "alcohol", hidden: true });
+    const mine = (await allTags()).map((x) => x.tag);
+    await saveBehaviors({ tags: mine.filter((x) => x !== "alcohol") });
     const [theirs] = await db.select().from(journalTags).where(and(eq(journalTags.userId, other), eq(journalTags.tag, "alcohol")));
     expect(theirs.hidden).toBe(false);
-    await setBehaviourHidden({ tag: "alcohol", hidden: false });
+    await saveBehaviors({ tags: mine });
     // Same key, two users: both can have it.
     expect(await addCustomTag({ label: "Their tag" })).toEqual({ ok: true, data: { tag: "their_tag" } });
   });
@@ -239,5 +229,7 @@ describe("follow-ups, notes and Select Behaviors", () => {
     const theirs = await db.select().from(journalTags).where(eq(journalTags.userId, other));
     expect(theirs.every((t) => !t.hidden) && theirs.some((t) => t.tag === "mouth_tape")).toBe(false);
     await saveBehaviors({ tags: DEFAULT_JOURNAL_TAGS.map((d) => d.tag) });
+    const r = await loadBehaviours();
+    expect(r.ok && r.data.tags.find((t) => t.tag === "mouth_tape")).toMatchObject({ hidden: true, section: "nighttime", question: "Wore mouth tape while sleeping?" });
   });
 });

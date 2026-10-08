@@ -202,9 +202,9 @@ describe("screen queries are scoped to one user", () => {
     expect(archive.weeks.map((w) => w.period)).toEqual(["1999-W01"]);
     expect(archive.months).toEqual([]);
     const behaviours = vms.behaviours as Awaited<ReturnType<typeof getBehaviours>>;
-    expect(behaviours.tags.map((t) => [t.tag, t.label, t.answers])).toEqual([
-      ["alcohol", "INTRUDER Alcohol", 1],
-      ["intruder_tag", "INTRUDER tag", 1],
+    expect(behaviours.tags.map((t) => [t.tag, t.label])).toEqual([
+      ["alcohol", "INTRUDER Alcohol"],
+      ["intruder_tag", "INTRUDER tag"],
     ]);
     const yourData = vms.yourData as Awaited<ReturnType<typeof getYourData>>;
     expect(yourData).toMatchObject({ first: "2026-01-01", days: 1, answers: 2 });

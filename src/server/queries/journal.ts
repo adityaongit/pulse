@@ -1,7 +1,7 @@
 import type { ImpactMetric, TagImpact } from "@/core/algorithms/journalImpact";
 import type { JournalImpactRow } from "../pipeline";
 import { addDays } from "../time";
-import { and, count, desc, eq, gte, isNotNull, lte } from "drizzle-orm";
+import { and, desc, eq, gte, isNotNull, lte } from "drizzle-orm";
 import { behavior, questionOf } from "@/lib/behaviors";
 import { dailyScores, journalEntries, journalNotes, journalTags } from "../db/schema";
 import { finite, loadDays, meanSd, type QueryCtx, todayOf } from "./common";
@@ -19,15 +19,9 @@ async function tagsOf(ctx: QueryCtx): Promise<JournalTag[]> {
   return rows.map((r) => ({ tag: r.tag, label: r.label, question: questionOf(r.tag, r.label), section: behavior(r.tag)?.section ?? "custom", isDefault: r.isDefault, hidden: r.hidden }));
 }
 
-/** More › Behaviours: every tag, hidden ones included, with how many days answered it. */
+/** More › Behaviours and Select Behaviors: every tag, hidden ones included. */
 export async function getBehaviours(ctx: QueryCtx): Promise<BehavioursVM> {
-  const j = journalEntries;
-  const [tags, n] = await Promise.all([
-    tagsOf(ctx),
-    ctx.db.select({ tag: j.tag, n: count() }).from(j).where(eq(j.userId, ctx.userId)).groupBy(j.tag),
-  ]);
-  const counts = new Map(n.map((r) => [r.tag, r.n]));
-  return { tags: tags.map((t) => ({ ...t, answers: counts.get(t.tag) ?? 0 })) };
+  return { tags: await tagsOf(ctx) };
 }
 
 function entriesBetween(ctx: QueryCtx, from: string, to: string) {

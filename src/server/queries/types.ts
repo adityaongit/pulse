@@ -436,8 +436,8 @@ export type FitnessVM = {
 /** A behaviour: its journal question and section come from the catalogue (src/lib/behaviors.ts); a custom one sits under "custom". */
 export type JournalTag = { tag: string; label: string; question: string; section: JournalSection; isDefault: boolean; hidden: boolean };
 
-/** More › Behaviours: every tag in check-in order, hidden ones included, with its answered-day count. */
-export type BehavioursVM = { tags: (JournalTag & { answers: number })[] };
+/** More › Behaviours and Select Behaviors: every tag in journal order, hidden ones included. */
+export type BehavioursVM = { tags: JournalTag[] };
 
 export type JournalVM = {
   day: string;

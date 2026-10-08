@@ -106,7 +106,7 @@ Build steps for the last phase (shared with [dashboard-health-community-coach.md
 | 13 | Step 5: dashed start and end markers with times; the span bar and zone strips go | Open |
 | 14 | Step 5: typical band on zone rows | Open |
 | 15 | Step 5: zone colours at 0%, Zone 0 white; the "+N min" deltas go | Open |
-| 16 | Steps 1 and 3: Journal as a full-screen modal with the sand glow and the pencil | Done (R37); the pencil lands with step 4 |
+| 16 | Steps 1 and 3: Journal as a full-screen modal with the sand glow and the pencil | Done (R37, R38) |
 | 17 | Step 3: day strip and "‹ TODAY ›" inside the journal | Done (R37) |
 | 18 | Step 3: "What's happening today, April 15?" heading | Done (R37) |
 | 19 | Steps 2 and 3: Daytime / Nighttime / Status groups | Done (R37) |
@@ -115,11 +115,11 @@ Build steps for the last phase (shared with [dashboard-health-community-coach.md
 | 22 | Steps 2 and 3: follow-up slider | Done (R37) |
 | 23 | Steps 2 and 3: Notes | Done (R37) |
 | 24 | Step 3: "Dismiss journal?" dialog with "Don't show me this message again" | Done (R37) |
-| 25 | Step 4: pencil opens Select Behaviors | Open |
-| 26 | Step 4: search field | Open |
-| 27 | Steps 2 and 4: category tabs | Open |
-| 28 | Steps 2 and 4: behaviour catalogue with a daily question per row | Open |
-| 29 | Step 4: selected group, checkboxes and SAVE BEHAVIORS; reorder and instant toggles go | Open |
+| 25 | Step 4: pencil opens Select Behaviors | Done (R38) |
+| 26 | Step 4: search field | Done (R38) |
+| 27 | Steps 2 and 4: category tabs | Done (R38) |
+| 28 | Steps 2 and 4: behaviour catalogue with a daily question per row | Done (R38) |
+| 29 | Step 4: selected group, checkboxes and SAVE BEHAVIORS; reorder and instant toggles go | Done (R38) |
 
 ## 4. Already matches
 

@@ -1,52 +1,37 @@
 import { DetailShell } from "@/components/shells/DetailShell"
-import { SectionShell } from "@/components/shells/SectionShell"
+import { SHEET_SECTION } from "@/components/shells/ResponsiveSheet"
 import { Skeleton, SkeletonText } from "@/components/ui/skeleton"
 
-/** The default groups and their sizes (src/server/journalTags.ts); custom ones only add rows below. */
-const GROUPS: [string, number][] = [
-  ["Evening", 4],
-  ["Recovery", 3],
-  ["Context", 2],
-]
-
-/** Behaviours: the intro, each group's card with its rows' boxes, and Your behaviours with the add form (spec §5.19). */
+/** Behaviours: the intro, the search field, the category tabs and the nine default rows under "Selected" (spec §5.19). */
 export default function Loading() {
   return (
     <DetailShell loading
       title="Behaviours"
       primary={
-        <div aria-hidden className="mx-auto flex w-full max-w-[640px] flex-col gap-3 md:gap-4">
+        <div aria-hidden className="mx-auto flex w-full max-w-[640px] flex-col gap-6">
           <p className="max-w-[65ch] text-[15px] leading-[22px] text-pretty text-foreground-secondary">
-            Choose what the check-in asks. A hidden behaviour leaves the check-in, but its past answers stay and still count in your insights.
+            Choose what your journal asks. A behaviour you leave out keeps its past answers, and they still count in your insights.
           </p>
-          {GROUPS.map(([title, n]) => (
-            <SectionShell key={title} variant="card" level={2} title={title}>
-              <ul className="divide-y divide-border">
-                {Array.from({ length: n }, (_, i) => (
-                  <li key={i} className="flex min-h-14 items-center gap-2 py-1.5">
-                    <Skeleton className="size-5 shrink-0 rounded-md" />
-                    <span className="ml-1 min-w-0 flex-1">
-                      <SkeletonText className="w-28 text-[15px] leading-[22px]" />
-                      <SkeletonText className="w-24 text-xs leading-4" />
-                    </span>
-                    <span className="size-11" />
-                    <span className="size-11" />
-                    <Skeleton className="mx-1 h-[18.4px] w-8 rounded-full" />
-                  </li>
-                ))}
-              </ul>
-            </SectionShell>
-          ))}
-          <SectionShell variant="card" level={2} title="Your behaviours">
-            <SkeletonText className="w-44 text-[15px] leading-[22px]" />
-            <div className="mt-4 space-y-2 border-t border-border pt-4">
-              <p className="text-[15px] leading-[22px] font-medium">Add a behaviour</p>
-              <div className="flex gap-2">
-                <Skeleton className="h-11 min-w-0 flex-1 rounded-lg" />
-                <Skeleton className="h-11 w-[68px] rounded-xl" />
-              </div>
+          <div>
+            <Skeleton className="h-12 rounded-xl" />
+            <div className="mt-3 flex h-11 items-center gap-6 overflow-hidden px-2.5">
+              {["w-6", "w-36", "w-36", "w-28"].map((w, i) => (
+                <SkeletonText key={i} className={`${w} shrink-0 text-xs leading-4`} />
+              ))}
             </div>
-          </SectionShell>
+            <p className={`${SHEET_SECTION} mt-4`}>Selected</p>
+            <ul className="mt-1">
+              {Array.from({ length: 9 }, (_, i) => (
+                <li key={i} className="flex min-h-16 items-center gap-4 py-2">
+                  <span className="min-w-0 flex-1">
+                    <SkeletonText className="w-32 text-[17px] leading-6" />
+                    <SkeletonText className="w-48 text-[15px] leading-[22px]" />
+                  </span>
+                  <Skeleton className="size-7 rounded-lg" />
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       }
     />

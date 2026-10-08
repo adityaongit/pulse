@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { useSearchParams } from "next/navigation"
-import { Check, ChevronLeft, ChevronRight, LoaderCircle, X } from "lucide-react"
+import { Check, ChevronLeft, ChevronRight, LoaderCircle, Pencil, X } from "lucide-react"
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"
 import { behavior, followUpText, JOURNAL_SECTIONS, questionOf } from "@/lib/behaviors"
@@ -27,6 +27,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Slider } from "@/components/ui/slider"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
+import { SelectBehaviorsSheet } from "../more/behaviours/SelectBehaviors"
 
 /** journal-01's answer keys: a grey square each; "no" lights white, "yes" blue. 44 px for touch. */
 const ANSWER =
@@ -126,7 +127,9 @@ export function CheckInSheet() {
   const [open, setOpen] = React.useState(false)
   const [day, setDay] = React.useState(urlDay)
   const [data, setData] = React.useState<Loaded | null>(null)
-  const [request, setRequest] = React.useState<{ day: string; n: number } | null>(null)
+  // keep: reload the questions only (after Select Behaviors), leaving the answers being entered alone.
+  const [request, setRequest] = React.useState<{ day: string; n: number; keep?: boolean } | null>(null)
+  const [picking, setPicking] = React.useState(false)
   const [loadError, setLoadError] = React.useState(false)
   const [values, setValues] = React.useState<Values>({})
   const [details, setDetails] = React.useState<Values>({})
@@ -166,6 +169,7 @@ export function CheckInSheet() {
         if (!live) return
         if (!r.ok) return setLoadError(true)
         setData({ day: request.day, ...r.data })
+        if (request.keep) return
         setValues({ ...r.data.checkIn.entries })
         setDetails({ ...r.data.checkIn.details })
         setNote(r.data.checkIn.note)
@@ -310,6 +314,11 @@ export function CheckInSheet() {
         size="screen"
         glow
         fallbackFocus={fallback}
+        action={
+          <Button variant="ghost" size="icon-touch" aria-label="Select behaviours" aria-haspopup="dialog" onClick={() => setPicking(true)} className="text-foreground hover:bg-foreground/8">
+            <Pencil aria-hidden strokeWidth={1.75} className="size-[22px]" />
+          </Button>
+        }
         done={done ? { title: "Saved", body: "Have a great day!", onDone: finish } : null}
         footer={
           <>
@@ -468,6 +477,8 @@ export function CheckInSheet() {
           </section>
         )}
       </ResponsiveSheet>
+
+      <SelectBehaviorsSheet open={picking} onOpenChange={setPicking} onSaved={() => setRequest((r) => ({ day, n: (r?.n ?? 0) + 1, keep: true }))} />
 
       {/* journal-15. */}
       <Dialog open={!!confirm} onOpenChange={(o) => !o && keepEditing()}>

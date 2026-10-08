@@ -51,35 +51,7 @@ export async function addTag(db: Db, userId: number, tag: string, label: string)
   return n >= MAX_TAGS ? "full" : "exists";
 }
 
-/** Hides a tag from the check-in sheet or shows it again. Its answers are untouched. False for an unknown tag. */
-export async function setTagHidden(db: Db, userId: number, tag: string, hidden: boolean): Promise<boolean> {
-  const r = await db
-    .update(journalTags)
-    .set({ hidden })
-    .where(and(eq(journalTags.userId, userId), eq(journalTags.tag, tag)))
-    .returning({ tag: journalTags.tag });
-  return r.length > 0;
-}
 
-/**
- * Orders `tags` (one check-in group, in its new order) by writing their positions 0..n-1. Other groups keep
- * theirs: groups render apart, so only the order inside a group matters. False, writing nothing, if any tag is unknown.
- */
-export async function reorderTags(db: Db, userId: number, tags: string[]): Promise<boolean> {
-  if (new Set(tags).size !== tags.length) return false;
-  if (!tags.length) return true;
-  const known = await db
-    .select({ tag: journalTags.tag })
-    .from(journalTags)
-    .where(and(eq(journalTags.userId, userId), inArray(journalTags.tag, tags)));
-  if (known.length !== tags.length) return false;
-  await db.transaction(async (tx) => {
-    for (const [i, t] of tags.entries()) {
-      await tx.update(journalTags).set({ position: i }).where(and(eq(journalTags.userId, userId), eq(journalTags.tag, t)));
-    }
-  });
-  return true;
-}
 
 /**
  * Makes `tags` the behaviours the journal asks: adds catalogue behaviours the user has no row for (at the end), shows
