@@ -33,7 +33,8 @@ import { EditDashboard } from "../_lib/EditDashboard"
 import { MyPlan } from "../_lib/MyPlan"
 import { PlusMenu } from "../_lib/PlusMenu"
 import { HomeInsight } from "../_lib/HomeInsight"
-import { ADD_ACTIVITY_INFO, ENERGY_INFO, STRAIN_RECOVERY_INFO, TONIGHT_INFO } from "../_lib/info"
+import { AddActivityTrigger } from "../_lib/AddActivity"
+import { ENERGY_INFO, STRAIN_RECOVERY_INFO, TONIGHT_INFO } from "../_lib/info"
 import { TonightPlan } from "../_lib/TonightPlan"
 import { CAPTION, energySeries, LABEL, statProps, stressSeries } from "../_lib/view"
 
@@ -193,10 +194,10 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
                 {/* the reference app's "+ Add activity", on past days too, beside "Start activity" today (home-01, home-03).
                     Pulse imports workouts, so Add explains where they come from (§11 R2); Start needs live recording. */}
                 <div className={cn("mt-3 grid gap-3", startActivity && "grid-cols-2")}>
-                  <InfoCardTrigger info={ADD_ACTIVITY_INFO} className={CARD_BUTTON}>
+                  <AddActivityTrigger className={CARD_BUTTON}>
                     <Plus aria-hidden className="size-5" strokeWidth={2} />
                     Add activity
-                  </InfoCardTrigger>
+                  </AddActivityTrigger>
                   {startActivity && (
                     <SheetTrigger sheet="start-activity" className={CARD_BUTTON}>
                       <Timer aria-hidden className="size-5" strokeWidth={2} />

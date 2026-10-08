@@ -3,6 +3,9 @@ import { connection } from "next/server"
 import { redirect } from "next/navigation"
 import { currentUser } from "@/server/auth"
 import { AppShell } from "@/components/shells/AppShell"
+import { FEATURES } from "@/lib/features"
+import { activityLogContext } from "@/server/queries/home"
+import { ActivitySheets } from "./activity/LogActivity"
 import { CheckInSheet } from "./journal/CheckIn"
 import { avatarSrc } from "@/server/avatar"
 import { coachAccess } from "@/server/coach/store"
@@ -31,13 +34,20 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
   if (!ctx) redirect("/onboarding")
   // Fire and forget: the worker throttles itself; the page renders from what is already stored.
   requestSync({ userId: user.userId })
-  const [status, avatar, coach] = await Promise.all([getShellStatus(ctx), avatarSrc(db, user.userId), coachAccess(db, user.userId)])
+  const [status, avatar, coach, logging] = await Promise.all([
+    getShellStatus(ctx),
+    avatarSrc(db, user.userId),
+    coachAccess(db, user.userId),
+    // The hidden Add / Start Activity flows read today's Strain Target and recent workouts only when one is on.
+    FEATURES.logActivity || FEATURES.startActivity ? activityLogContext(ctx) : null,
+  ])
   return (
     <AppShell live status={{ ...status, avatar, coach, userId: user.userId }}>
       {children}
       {/* One check-in sheet for every screen, opened over it by `?checkin=1` (spec §11 UX2). */}
       <Suspense>
         <CheckInSheet />
+        {logging && <ActivitySheets {...logging} />}
       </Suspense>
     </AppShell>
   )

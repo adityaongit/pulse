@@ -6,7 +6,7 @@ import { Check, ChevronLeft, ChevronRight, LoaderCircle, Pencil, X } from "lucid
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"
 import { behavior, followUpText, JOURNAL_SECTIONS, questionOf } from "@/lib/behaviors"
-import { DAY, dayLabel, formatDay } from "@/lib/format"
+import { DAY, dayLabel, formatDay, MISSING } from "@/lib/format"
 import { haptic } from "@/lib/haptics"
 import { enqueue } from "@/lib/offline-queue"
 import { addDays, parseDay } from "@/lib/url"
@@ -405,7 +405,7 @@ export function CheckInSheet() {
                               <span id={`follow-${t.tag}`} className="text-[15px] leading-[22px] text-foreground-secondary">
                                 {f.question}
                               </span>
-                              <span className="font-numeric text-[15px] leading-[22px] font-semibold tabular-nums">{d === undefined ? "--" : followUpText(f, d)}</span>
+                              <span className="font-numeric text-[15px] leading-[22px] font-semibold tabular-nums">{d === undefined ? MISSING : followUpText(f, d)}</span>
                             </div>
                             <Slider
                               aria-label={f.question}

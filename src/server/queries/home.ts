@@ -10,6 +10,7 @@ import { insightOf as recoveryInsight } from "./recovery";
 import { insightOf as sleepInsight } from "./sleep";
 import { coach } from "./strain";
 import {
+  activityKind,
   type DayRow,
   hrReason,
   loadDays,
@@ -37,7 +38,7 @@ import {
   recoveryBand,
   toStrain,
 } from "./common";
-import type { EnergyBankVM, HomeVM, KeyStat, Metric, VitalKey } from "./types";
+import type { ActivityKind, EnergyBankVM, HomeVM, KeyStat, Metric, VitalKey } from "./types";
 
 export const VITAL_LABEL: Record<VitalKey, string> = {
   resp: "Respiratory rate",
@@ -308,4 +309,13 @@ export async function latestReport(ctx: QueryCtx, kind: "week" | "month") {
     if (!d.partial && d.days > 0) return { period: r.period, start: d.start, end: d.end };
   }
   return null;
+}
+
+/** What the hidden Add / Start Activity flows read (FEATURES.logActivity, startActivity): today's Strain Target and the kinds of the last 30 days' workouts, newest first. */
+export async function activityLogContext(ctx: QueryCtx): Promise<{ strainTarget: [number, number] | null; recent: ActivityKind[] }> {
+  const today = todayOf(ctx);
+  const [rows, recent] = await Promise.all([loadDays(ctx, today, today), exercisesBetween(ctx, addDays(today, -30), today)]);
+  const t = rows.get(today)?.strainTarget;
+  const kinds = [...recent].sort((a, b) => b.startTs - a.startTs).map((e) => activityKind(e.type));
+  return { strainTarget: t?.reason === null ? [t.low, t.high] : null, recent: [...new Set(kinds)] };
 }

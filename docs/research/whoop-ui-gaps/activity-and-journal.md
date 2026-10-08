@@ -91,9 +91,9 @@ Build steps for the last phase (shared with [dashboard-health-community-coach.md
 
 | # | Plan | Status |
 |---|---|---|
-| 1 | Step 6: Add Activity form, behind a flag (Google Health takes no written sessions) | Open |
-| 2 | Step 6: Select Activity picker (static catalogue), opened by the hidden Add and Start flows | Open |
-| 3 | Step 6: Start Activity live screen, behind `FEATURES.startActivity` | Open |
+| 1 | Step 6: Add Activity form, behind a flag (Google Health takes no written sessions) | Hidden (R40, `FEATURES.logActivity`) |
+| 2 | Step 6: Select Activity picker (static catalogue), opened by the hidden Add and Start flows | Hidden (R40): built, opened only by the hidden Add and Start flows |
+| 3 | Step 6: Start Activity live screen, behind `FEATURES.startActivity` | Hidden (R40, `FEATURES.startActivity`) |
 | 4 | Steps 1 and 3: SAVED screen (`DoneScreen`) replaces the toast | Done (R37) |
 | 5 | Step 5: Cardio / Muscular split, behind a flag (no muscular load source) | Hidden (R39, `FEATURES.muscularLoad`) |
 | 6 | Step 5: strain chip against the sport's 30-day average | Done (R39) |

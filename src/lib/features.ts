@@ -5,6 +5,8 @@
 export const FEATURES = {
   /** Record a workout live (type picker, map, live heart rate). Pulse imports workouts from Fitbit instead. */
   startActivity: false,
+  /** Add a past workout by hand (type picker, start and end). Pulse can't write a workout to Google Health. */
+  logActivity: false,
   /** Log a strength session exercise by exercise. */
   strengthTrainer: false,
   /** Share a live workout card. */

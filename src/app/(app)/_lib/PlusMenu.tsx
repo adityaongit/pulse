@@ -24,7 +24,7 @@ export function PlusMenu({ label }: { label: string }) {
   const [info, setInfo] = React.useState(false)
   const entries: Entry[] = [
     { key: "start", label: "Start activity", icon: Timer, shown: FEATURES.startActivity, onSelect: () => openSheet("start-activity") },
-    { key: "add", label: "Add activity", icon: Plus, shown: true, onSelect: () => setInfo(true) },
+    { key: "add", label: "Add activity", icon: Plus, shown: true, onSelect: () => (FEATURES.logActivity ? openSheet("add-activity") : setInfo(true)) },
     { key: "strength", label: "Strength trainer", icon: Dumbbell, shown: FEATURES.strengthTrainer, onSelect: () => openSheet("strength") },
     { key: "journal", label: "Complete your journal", icon: NotebookPen, shown: true, onSelect: () => openSheet("checkin") },
     { key: "live", label: "Share live", icon: Camera, shown: FEATURES.liveShare, onSelect: () => openSheet("live") },

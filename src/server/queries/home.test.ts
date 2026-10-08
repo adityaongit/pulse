@@ -7,7 +7,7 @@ import { recompute } from "../pipeline";
 import { copyDb, ctxFor, dayAt, OPTS, seeded, USER } from "../testing";
 import { getActivity } from "./activity";
 import { getFitness, getHealthHub, getHealthspan, getMonitor, getStress } from "./health";
-import { getHome } from "./home";
+import { activityLogContext, getHome } from "./home";
 import { getJournal, getJournalInsights } from "./journal";
 import { getRecovery } from "./recovery";
 import { getReport } from "./reports";
@@ -298,5 +298,16 @@ describe("every screen query", () => {
     // Day 156 had no heart rate at all; day 157 got the band back late in the evening.
     expect((await getShellStatus(ctxFor(db))).streak).toEqual({ days: 179 - 157 + 1, asOf: dayAt(179) });
     expect((await getShellStatus(ctxFor(early, BEFORE_WAKE))).streak).toEqual({ days: 178 - 157 + 1, asOf: dayAt(178) });
+  });
+});
+
+describe("activityLogContext", () => {
+  it("reads today's Strain Target and the kinds of the last 30 days' workouts, newest first, once each", async () => {
+    const db = await seeded();
+    const ctx = ctxFor(db);
+    const r = await activityLogContext(ctx);
+    expect(r.strainTarget === null || r.strainTarget[0] <= r.strainTarget[1]).toBe(true);
+    expect(r.recent.length).toBeGreaterThan(0);
+    expect(new Set(r.recent).size).toBe(r.recent.length);
   });
 });

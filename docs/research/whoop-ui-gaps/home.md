@@ -88,7 +88,7 @@ Decisions are in `docs/design/spec.md` §11 R20 to R27. "Hidden" means the compo
 |---|---|
 | 1 | Done: "+" opens the action menu and turns into an X (R20). Add activity and Complete your journal are live. |
 | 2 | Hidden: the Start activity button beside Add activity (`FEATURES.startActivity`). |
-| 3 | Open: the Start activity flow itself (type picker, live map). It belongs to the activities area and needs live recording. |
+| 3 | Hidden: the Start activity flow (type picker, Track route, live heart rate, Strain Target) is built behind `FEATURES.startActivity` (spec R40); recording needs a live source. |
 | 4 | Hidden: the Strength trainer entry in the menu. Its screen is not built. |
 | 5 | Hidden: the Share live entry in the menu. Its screen is not built. |
 | 6 | Hidden: My Plan card (`_lib/MyPlan.tsx`, R26). |

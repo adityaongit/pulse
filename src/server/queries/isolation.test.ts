@@ -29,7 +29,7 @@ import { getActivity } from "./activity";
 import { getCalendarMonth } from "./calendar";
 import type { QueryCtx } from "./common";
 import { getFitness, getHealthHub, getHealthspan, getMonitor, getStress } from "./health";
-import { dashboardKeys, getHome } from "./home";
+import { dashboardKeys, getHome, activityLogContext } from "./home";
 import { getBehaviours, getJournal, getJournalInsights } from "./journal";
 import { getLog } from "./log";
 import { DETAIL_KEYS, getMetricDetail } from "./metric";
@@ -66,6 +66,7 @@ async function screens(ctx: QueryCtx, activityId: string | null, period: string 
   for (const m of ["hrv", "zones13", "strength", "time_in_bed"] as const) out[`trendView:${m}`] = await getTrendView(m, TODAY, "m", 0, ctx);
   for (const m of ["recovery", "hrv", "sleep"] as const) out[`insights:${m}`] = await getJournalInsights(m, ctx);
   Object.assign(out, {
+    activityLog: await activityLogContext(ctx),
     hub: await getHealthHub(ctx),
     fitness: await getFitness(ctx),
     activities: await getActivities(3650, ctx),
