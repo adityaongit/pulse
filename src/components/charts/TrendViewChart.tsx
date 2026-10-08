@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Area, Bar, CartesianGrid, Cell, ComposedChart, LabelList, Line, Rectangle, ReferenceArea, ReferenceLine, useXAxisScale, useYAxisScale, XAxis, YAxis } from "recharts"
+import { Area, Bar, CartesianGrid, Cell, ComposedChart, LabelList, Line, Rectangle, ReferenceArea, ReferenceLine, usePlotArea, useXAxisScale, useYAxisScale, XAxis, YAxis } from "recharts"
 import { DATA_COLORS, deltaTone, partColor, recoveryColor, type GoodDirection } from "@/lib/bands"
 import { formatDay, formatValue, hmm, type FormatKey } from "@/lib/format"
 import type { MonthSegment, TrendViewBar, TrendViewRange } from "@/lib/trend"
@@ -10,8 +10,9 @@ import { AXIS, ChartFigure, GRID, Pill, useSeriesAnimation, wholeTick } from "./
 export type TrendViewChartProps = {
   label: string
   bars: TrendViewBar[]
-  /** `range`: bars from bed to wake on an inverted clock axis (`parts.bed`, `parts.wake` in minutes from midnight). */
-  chart: "bars" | "line" | "stack" | "range"
+  /** `range`: bars from bed to wake on an inverted clock axis (`parts.bed`, `parts.wake` in minutes from midnight);
+   * `pair`: two labelled lines, `series[0]` under `series[1]` (hours of sleep against sleep needed). */
+  chart: "bars" | "line" | "stack" | "range" | "pair"
   range: TrendViewRange
   colorBy: "band" | "strain" | "sleep" | "single" | "stress"
   format: FormatKey
@@ -63,6 +64,18 @@ function DayTick({ x, y, payload, range, selected, weekly }: { x?: number | stri
       {bottom && <tspan x={x} dy="1.25em">{bottom}</tspan>}
     </text>
   )
+}
+
+/**
+ * The selected day's column: a soft rounded band the full height of the plot and its tick, as the reference app
+ * marks today in Weekly Trends. Columns split the plot evenly (category axis, no padding).
+ */
+function Highlight({ index, count }: { index: number; count: number }) {
+  const area = usePlotArea()
+  if (!area) return null
+  const step = area.width / count
+  const w = Math.min(step * 0.86, 44)
+  return <rect x={area.x + step * (index + 0.5) - w / 2} y={area.y - 4} width={w} height={area.height + 46} rx={6} fill="var(--chart-highlight)" pointerEvents="none" />
 }
 
 /** The left "AVG." pill on the average line (the reference app pins it to the axis, not the right edge). */
@@ -153,23 +166,26 @@ export function TrendViewChart(p: TrendViewChartProps) {
   }))
   const keys = rows.map((r) => r.key)
   const values = rows.flatMap((r) => (r.value === null ? [] : [r.value]))
+  const pair = p.chart === "pair" && !six && p.series?.length === 2 ? p.series : null
+  const partVals = pair ? rows.flatMap((r) => pair.flatMap((s) => (r.parts?.[s.key] != null ? [r.parts[s.key]] : []))) : []
   const segVals = (p.segments ?? []).flatMap((s) => (s.value === null ? [] : [s.value]))
 
   // Lines get a tight axis around the data and the typical range; bars stand on zero.
   const lineDomain = (): [number, number] => {
-    const xs = [...values, ...segVals, ...(p.typical ?? [])]
+    const xs = [...values, ...partVals, ...segVals, ...(p.typical ?? [])]
     if (!xs.length) return [0, 1]
     const lo = Math.min(...xs)
     const hi = Math.max(...xs)
     const pad = Math.max((hi - lo) * 0.25, Math.abs(hi) * 0.02, 1)
-    return [Math.max(0, Math.floor(lo - pad)), Math.ceil(hi + pad)]
+    // A pair labels its lower line under the points, so it keeps twice the room at the bottom.
+    return [Math.max(0, Math.floor(lo - (p.chart === "pair" ? 2 : 1) * pad)), Math.ceil(hi + pad)]
   }
   const rangeDomain: [number, number] = [
     Math.min(-180, ...rows.flatMap((r) => (r.span ? [Math.floor((r.span[0] - 60) / 240) * 240 + 60] : []))),
     Math.max(780, ...rows.flatMap((r) => (r.span ? [Math.ceil((r.span[1] - 60) / 240) * 240 + 60] : []))),
   ]
   const domain: [number, number] =
-    p.chart === "range" ? rangeDomain : p.domain ?? (p.chart === "line" || (six && !weekly && p.chart !== "stack") ? lineDomain() : [0, Math.max(1, ...values, ...segVals) * 1.15])
+    p.chart === "range" ? rangeDomain : p.domain ?? (p.chart === "line" || p.chart === "pair" || (six && !weekly && p.chart !== "stack") ? lineDomain() : [0, Math.max(1, ...values, ...segVals) * 1.15])
   const yTicks = p.domain && p.domain[1] === 100 ? [0, 25, 50, 75, 100] : p.domain && p.domain[1] === 21 ? [0, 5, 10, 15, 21] : niceTicks(domain, p.format === "duration")
   const ticks = p.chart === "range" ? Array.from({ length: Math.round((domain[1] - domain[0]) / 240) + 1 }, (_, i) => domain[0] + i * 240) : undefined
 
@@ -184,7 +200,7 @@ export function TrendViewChart(p: TrendViewChartProps) {
 
   return (
     <ChartFigure summary={summary} config={{ value: { label: p.label, color: single } }} className={height}>
-      <ComposedChart data={rows} margin={{ top: labelled || p.chart === "range" ? 22 : 10, right: p.chart === "line" && !six ? 24 : 6, bottom: p.chart === "range" ? 12 : 0, left: 0 }}>
+      <ComposedChart data={rows} margin={{ top: labelled || p.chart === "range" ? 22 : 10, right: p.chart === "line" && p.range === "m" ? 24 : 6, bottom: p.chart === "range" || p.chart === "pair" ? 12 : 0, left: 0 }}>
         <CartesianGrid {...GRID} />
         <defs>
           <linearGradient id={`area-${uid}`} x1="0" y1="0" x2="0" y2="1">
@@ -192,7 +208,7 @@ export function TrendViewChart(p: TrendViewChartProps) {
             <stop offset="100%" stopColor={single} stopOpacity={0} />
           </linearGradient>
         </defs>
-        {p.selected && keys.includes(p.selected) && <ReferenceArea x1={p.selected} x2={p.selected} fill="var(--chart-highlight)" fillOpacity={1} ifOverflow="visible" />}
+        {p.selected && keys.includes(p.selected) && <Highlight index={keys.indexOf(p.selected)} count={keys.length} />}
         {p.typical && <ReferenceArea y1={p.typical[0]} y2={p.typical[1]} fill="var(--chart-band)" fillOpacity={1} />}
         <XAxis
           dataKey="key"
@@ -213,8 +229,43 @@ export function TrendViewChart(p: TrendViewChartProps) {
           tickFormatter={(v: number) => (p.chart === "range" ? clockOf(v) : p.format === "duration" ? hmm(v) : `${wholeTick(fmt)(v)}${p.unit === "%" ? "%" : ""}`)}
           tick={{ fontSize: 12, fill: "var(--muted-foreground)" }}
         />
+        {/* A line-only chart lays its points edge to edge; an invisible bar gives it the same columns as the bar
+            charts, so points sit over their day labels and the highlight lines up. */}
+        {(p.chart === "line" || p.chart === "pair" || (faint && !weekly && p.chart !== "stack")) && <Bar dataKey="value" shape={() => <g />} isAnimationActive={false} />}
         {showAvg && <ReferenceLine y={p.average!} stroke="var(--foreground)" strokeOpacity={0.7} strokeDasharray="4 3" />}
-        {p.chart === "range" ? (
+        {pair ? (
+          pair.map((s, i) => {
+            const color = partColor(s.key)
+            return (
+              <Line key={s.key} dataKey={`part_${s.key}`} type="linear" stroke={color} strokeWidth={2} connectNulls={false} activeDot={false} {...anim}
+                dot={(d: { cx?: number; cy?: number; index?: number; value?: unknown }) =>
+                  d.value == null || d.cx == null || d.cy == null || (p.range === "m" && d.index !== last) ? (
+                    <g key={d.index} />
+                  ) : (
+                    <circle key={d.index} cx={d.cx} cy={d.cy} r={4.5} fill="var(--card)" stroke={color} strokeWidth={2} />
+                  )
+                }
+              >
+                {/* Each day the lower line labels under its point and the upper over it, so the two never collide. */}
+                {p.range === "w" && (
+                  <LabelList
+                    dataKey={`part_${s.key}`}
+                    content={(l: { x?: number | string; y?: number | string; index?: number; value?: unknown }) => {
+                      if (l.value == null) return null
+                      const other = rows[l.index ?? 0]?.parts?.[pair[1 - i].key]
+                      const below = other != null && (Number(l.value) < other || (Number(l.value) === other && i === 0))
+                      return (
+                        <text x={Number(l.x)} y={Number(l.y) + (below ? 20 : -10)} textAnchor="middle" fontSize={12} fontWeight={700} fill={color}>
+                          {fmt(Number(l.value))}
+                        </text>
+                      )
+                    }}
+                  />
+                )}
+              </Line>
+            )
+          })
+        ) : p.chart === "range" ? (
           <Bar dataKey="span" shape={(b: object) => <RangeBar {...b} color={single} />} {...anim} />
         ) : p.chart === "line" || (faint && !weekly && p.chart !== "stack") ? (
           [

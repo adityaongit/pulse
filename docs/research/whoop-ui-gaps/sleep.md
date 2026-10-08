@@ -83,8 +83,8 @@ Build steps for the score-screens phase: 1 trend helpers (`src/lib/trend.ts`), 2
 |---|---|---|
 | 1 | Step 5: Sleep Stress contributor row, behind `FEATURES.sleepStress` (the stress algorithm excludes sleep minutes) | Planned (hidden) |
 | 2 | Step 5: Sleep Stress card (line, HIGH / MEDIUM / LOW rows), same flag | Planned (hidden) |
-| 3 | Steps 4-5: Weekly Trends with the seven cards in WHOOP order | Planned |
-| 4 | Step 4: each Weekly Trends card links to its Trend View | Planned |
+| 3 | Steps 4-5: Weekly Trends with the seven cards in WHOOP order | Done (R32) |
+| 4 | Step 4: each Weekly Trends card links to its Trend View | Done (R32) |
 | 5 | Step 3: `/trend/[key]` Trend View screen | Done (R29) |
 | 6 | Steps 2-3: period stepper (`?p=`) | Done (R29) |
 | 7 | Step 1: relative % change (helper done), step 3 shows it | Done (R30) |

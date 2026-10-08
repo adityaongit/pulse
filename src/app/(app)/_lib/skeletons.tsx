@@ -7,6 +7,7 @@ import { EnergyBankChartSkeleton } from "@/components/charts/EnergyBankChart"
 import { TrendChartSkeleton } from "@/components/charts/TrendChart"
 import { ZoneBarsSkeleton } from "@/components/charts/ZoneBars"
 import { TimelineSkeleton } from "@/components/metrics/ActivityCard"
+import { WeeklyTrendsSkeleton } from "@/components/metrics/WeeklyTrends"
 import { ContributorRowSkeleton } from "@/components/metrics/ContributorRow"
 import { DriverListSkeleton } from "@/components/metrics/DriverList"
 import { InsightCardSkeleton } from "@/components/metrics/InsightCard"
@@ -181,6 +182,7 @@ function DialDetail({
   primary,
   secondary,
   action = false,
+  footer,
 }: {
   title: string
   dial: "recovery" | "strain" | "sleep"
@@ -189,9 +191,11 @@ function DialDetail({
   summary: React.ReactNode
   primary: React.ReactNode
   secondary: React.ReactNode[]
+  footer?: React.ReactNode
 }) {
   return (
     <DetailShell loading
+      footer={footer}
       title={title}
       dateSwitcher={{ mode: "day", placement: "header" }}
       notch
@@ -228,11 +232,8 @@ export function RecoverySkeleton() {
           <p className={LEGEND}>Dot: today. Shaded: your normal range.</p>
         </>
       }
-      primary={
-        <CardSkeleton title="Recovery trend">
-          <TrendChartSkeleton chip />
-        </CardSkeleton>
-      }
+      primary={null}
+      footer={<WeeklyTrendsSkeleton titles={["Recovery", "Heart Rate Variability", "Resting Heart Rate", "Respiratory Rate", "Sleep Performance"]} />}
       secondary={[
         <SectionShell key="drivers" variant="card" title="What shaped it" level={2}>
           <DriverListSkeleton variant="recovery" unit="pts" rows={5} />
@@ -278,16 +279,8 @@ export function StrainSkeleton() {
         <CardSkeleton key="activities" title="Activities">
           <TimelineSkeleton rows={1} />
         </CardSkeleton>,
-        <CardSkeleton key="trend" title="Strain trend">
-          <TrendChartSkeleton chip caption />
-        </CardSkeleton>,
-        <CardSkeleton key="calories" title="Calories burned">
-          <TrendChartSkeleton ranges={["w", "m"]} day legend />
-        </CardSkeleton>,
-        <CardSkeleton key="workouts" title="Workout duration">
-          <TrendChartSkeleton ranges={["w", "m"]} chip />
-        </CardSkeleton>,
       ]}
+      footer={<WeeklyTrendsSkeleton titles={["Strain", "HR Zones 1-3", "HR Zones 4-5", "Steps", "Calories", "Strength Activity Time"]} />}
     />
   )
 }
@@ -339,12 +332,6 @@ export function SleepSkeleton() {
             <Skeleton className="h-52 rounded-lg" />
           </div>
         </CardSkeleton>,
-        <CardSkeleton key="restorative" title="Restorative sleep">
-          <TrendChartSkeleton chip />
-        </CardSkeleton>,
-        <CardSkeleton key="efficiency" title="Sleep efficiency">
-          <TrendChartSkeleton chip />
-        </CardSkeleton>,
         <CardSkeleton key="details" title="Details">
           {statRows(["Time in bed", "Wake events", "Respiratory rate", "Sleep debt"])}
         </CardSkeleton>,
@@ -368,6 +355,7 @@ export function SleepSkeleton() {
           </div>
         </SectionShell>,
       ]}
+      footer={<WeeklyTrendsSkeleton titles={["Sleep Performance", "Hours vs. Needed (hours)", "Hours vs. Needed (%)", "Restorative Sleep", "Sleep Consistency", "Time in Bed", "Sleep Efficiency"]} />}
     />
   )
 }

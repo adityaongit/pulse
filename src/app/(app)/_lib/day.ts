@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation"
-import { parseDay, parseRange } from "@/lib/url"
+import { parseDay } from "@/lib/url"
 import { todayOf, userCtx } from "@/server/queries/common"
 
 export type SearchParams = Promise<Record<string, string | string[] | undefined>>
@@ -17,6 +17,5 @@ export async function pageDay(searchParams: SearchParams, path: string) {
     for (const [k, v] of Object.entries(sp)) if (k !== "d" && typeof v === "string") q.set(k, v)
     redirect(q.size ? `${path}?${q}` : path)
   }
-  // The trend card is the reference app's "Weekly trends" while the range is W [latest-recovery-weekly-1].
-  return { d, today, timeZone: ctx.timeZone, weekly: parseRange(sp.r) === "w", ctx }
+  return { d, today, timeZone: ctx.timeZone, ctx }
 }

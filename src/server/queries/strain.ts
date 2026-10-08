@@ -22,12 +22,10 @@ import {
   type QueryCtx,
   strainMetric,
   todayOf,
-  toStrain,
   type ExerciseRow,
-  trendPoints,
 } from "./common";
 import { ZONE_NAMES } from "@/core/scoring/zones";
-import type { HrChart, KeyStat, Metric, SplitPoint, StrainVM, ZoneRow } from "./types";
+import type { HrChart, KeyStat, Metric, StrainVM, ZoneRow } from "./types";
 
 /** The activity roll-ups the Strain summary shows after Steps (spec §11 EX1). */
 export const STRAIN_EXTRAS = ["distance", "floors", "active_minutes", "azm", "active_calories"] as const satisfies readonly ExtraKey[];
@@ -77,11 +75,6 @@ export async function getStrain(day: string, ctx: QueryCtx): Promise<StrainVM> {
     ...STRAIN_EXTRAS.map(extra),
   ];
 
-  const pts = trendPoints(rows, day, (r) => (finite(r.s1?.effort) ? toStrain(r.s1.effort) : null));
-  // Today's calories and workouts are running totals: drawn faded, like a provisional score.
-  const soFar = (r: DayRow) => isToday && r.day === day;
-  const workoutMin = new Map<string, number>();
-  for (const e of exs) workoutMin.set(e.day, (workoutMin.get(e.day) ?? 0) + (e.endTs - e.startTs) / 60);
 
   return {
     day,
@@ -96,24 +89,7 @@ export async function getStrain(day: string, ctx: QueryCtx): Promise<StrainVM> {
     maxHr: row?.s1?.maxHr ?? ctx.profile.maxHr,
     zoneNote: zoneNote(row, ctx),
     activities: exs.filter((e) => e.day === day).map((e) => activityItem(e, row)).sort((a, b) => b.start - a.start),
-    trend: { points: pts, target: target.value ? [target.value.low, target.value.high] : null },
-    calories: calorieSplit(rows, day, soFar),
-    workouts: { points: trendPoints(rows, day, (r) => workoutMin.get(r.day) ?? 0, 60, soFar) },
   };
-}
-
-/**
- * Google's daily total (`total-calories`) split into active (`active-energy-burned`) and resting. Google has no daily
- * basal roll-up, so resting is the remainder; active is capped at the total so resting never goes below 0. A day with a
- * total but no active value keeps its total and `parts: null` (no breakdown), never a guessed split.
- */
-export function calorieSplit(rows: Map<string, DayRow>, day: string, provisional?: (r: DayRow) => boolean, n = 30): SplitPoint[] {
-  return trendPoints(rows, day, (r) => r.metrics?.calories, n, provisional).map((p) => {
-    const active = rows.get(p.day)?.extra.active_calories;
-    if (p.value === null || !finite(active)) return { ...p, parts: null };
-    const a = Math.min(Math.max(0, active), p.value);
-    return { ...p, parts: { active: a, resting: p.value - a } };
-  });
 }
 
 const fmt1 = (x: number) => x.toFixed(1);

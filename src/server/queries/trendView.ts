@@ -23,14 +23,16 @@ import { activityKind, exercisesBetween, finite, firstDay, loadDays, meanSd, tod
 // against the window before it, with a verdict, a breakdown and an explainer.
 
 export type TrendViewGroup = "recovery" | "sleep" | "strain";
-export type TrendViewChart = "bars" | "line" | "stack" | "range";
+export type TrendViewChart = "bars" | "line" | "stack" | "range" | "pair";
 
-type Ctx = { strength: Map<string, { min: number; byType: Record<string, number> }>; tz: string };
+type Ctx = { strength: Map<string, { min: number; byType: Record<string, number> }>; tz: string; rows: Map<string, DayRow> };
 
 type Def = {
   group: TrendViewGroup;
   /** The dropdown's name ("Heart Rate Variability"). */
   label: string;
+  /** The Weekly Trends card's title when it differs ("Hours vs. Needed (hours)"). */
+  card?: string;
   /** The verdict's name ("HRV"). */
   short: string;
   unit?: string;
@@ -40,7 +42,8 @@ type Def = {
   chart: TrendViewChart;
   agg: TrendAgg;
   pick: (r: DayRow, x: Ctx) => number | null | undefined;
-  /** `stack`: the day's parts by series key; `range`: bed and wake as minutes from midnight (bed negative before it). */
+  /** `stack`: the day's parts by series key; `range`: bed and wake as minutes from midnight (bed negative before it);
+   * `pair`: the two lines' values. */
   parts?: (r: DayRow, x: Ctx) => Record<string, number> | null;
   /** Series keys bottom first, for `stack` charts and part breakdowns. */
   series?: readonly { key: string; label: string }[];
@@ -79,6 +82,12 @@ const zoneSum = (from: number, to: number) => (r: DayRow) => {
 };
 const zoneSeries = (from: number, to: number) => Array.from({ length: to - from }, (_, k) => ({ key: `z${from + k + 1}`, label: `Zone ${from + k + 1}` }));
 const worn = (r: DayRow) => (r.s1?.hrCount ?? 0) > 0;
+/** The night's need: the plan made the evening before, else the baseline need (as the Sleep page reads it). */
+const needMin = (r: DayRow, x: Ctx) => {
+  if (!r.sleep) return null;
+  const plan = x.rows.get(addDays(r.day, -1))?.sleepPlanner;
+  return plan && plan.reason === null ? plan.needMin : r.sleep.needHours * 60;
+};
 
 export const TREND_VIEW = {
   recovery: {
@@ -129,16 +138,24 @@ export const TREND_VIEW = {
     ] },
   },
   hours: {
-    group: "sleep", label: "Hours of Sleep", short: "hours of sleep", format: "duration", direction: "up", colorBy: "sleep", chart: "bars", agg: "daily",
+    group: "sleep", label: "Hours of Sleep", card: "Hours vs. Needed (hours)", short: "hours of sleep", format: "duration", direction: "up", colorBy: "sleep", chart: "pair", agg: "daily",
     pick: (r) => r.sleep?.main?.asleepMin,
+    parts: (r, x) => {
+      const need = needMin(r, x);
+      return r.sleep?.main && need !== null ? { asleep: r.sleep.main.asleepMin, need } : null;
+    },
+    series: [{ key: "asleep", label: "Hours of sleep" }, { key: "need", label: "Sleep needed" }],
     about: { title: "What is Hours of Sleep?", body: [
       "Hours of sleep is the time you actually spent asleep in your main sleep, not counting time awake in bed.",
       "Most adults need between seven and nine hours, and your own need changes with strain and sleep debt.",
     ] },
   },
   hours_need: {
-    group: "sleep", label: "Hours vs. Needed", short: "hours vs. needed", unit: "%", format: "int", direction: "up", colorBy: "sleep", chart: "bars", agg: "daily",
-    pick: (r) => (r.sleep?.main ? (r.sleep.main.asleepMin / (r.sleep.needHours * 60)) * 100 : null),
+    group: "sleep", label: "Hours vs. Needed", card: "Hours vs. Needed (%)", short: "hours vs. needed", unit: "%", format: "int", direction: "up", colorBy: "sleep", chart: "bars", agg: "daily",
+    pick: (r, x) => {
+      const need = needMin(r, x);
+      return r.sleep?.main && need ? (r.sleep.main.asleepMin / need) * 100 : null;
+    },
     domain: [0, 100], bands: SLEEP_BANDS("Hours vs. needed breakdown (days)", 85, 70),
     about: { title: "What is Hours vs. Needed?", body: [
       "Hours vs. needed is the sleep you got as a share of the sleep your body needed that night.",
@@ -195,7 +212,7 @@ export const TREND_VIEW = {
     ] },
   },
   strain: {
-    group: "strain", label: "Day Strain", short: "Day Strain", format: "decimal1", direction: "neutral", colorBy: "strain", chart: "bars", agg: "daily",
+    group: "strain", label: "Day Strain", card: "Strain", short: "Day Strain", format: "decimal1", direction: "neutral", colorBy: "strain", chart: "bars", agg: "daily",
     pick: (r) => (finite(r.s1?.effort) ? toStrain(r.s1.effort) : null), partialToday: true, domain: [0, 21],
     bands: { title: "Strain breakdown (days)", round: 1, list: [
       { key: "all_out", label: "All Out", min: 18.1, detail: ">18.0" },
@@ -209,7 +226,7 @@ export const TREND_VIEW = {
     ] },
   },
   zones13: {
-    group: "strain", label: "Heart Rate Zones 1-3", short: "time in HR zones 1-3", format: "duration", direction: "up", colorBy: "single", chart: "stack", agg: "weekly",
+    group: "strain", label: "Heart Rate Zones 1-3", card: "HR Zones 1-3", short: "time in HR zones 1-3", format: "duration", direction: "up", colorBy: "single", chart: "stack", agg: "weekly",
     pick: zoneSum(0, 3), parts: zoneParts(0, 3), series: zoneSeries(0, 3), partBreakdown: "series", partialToday: true,
     footnote: "Zone time is derived from your heart rate through the day.",
     about: { title: "What are Heart Rate Zones 1-3?", body: [
@@ -218,7 +235,7 @@ export const TREND_VIEW = {
     ] },
   },
   zones45: {
-    group: "strain", label: "Heart Rate Zones 4-5", short: "time in HR zones 4-5", format: "duration", direction: "up", colorBy: "single", chart: "stack", agg: "weekly",
+    group: "strain", label: "Heart Rate Zones 4-5", card: "HR Zones 4-5", short: "time in HR zones 4-5", format: "duration", direction: "up", colorBy: "single", chart: "stack", agg: "weekly",
     pick: zoneSum(3, 5), parts: zoneParts(3, 5), series: zoneSeries(3, 5), partBreakdown: "series", partialToday: true,
     footnote: "Zone time is derived from your heart rate through the day.",
     about: { title: "What are Heart Rate Zones 4-5?", body: [
@@ -262,6 +279,8 @@ const flagOff = (k: TrendViewKey) => {
 export type TrendViewVM = {
   key: TrendViewKey;
   label: string;
+  /** The Weekly Trends card's title. */
+  card: string;
   unit?: string;
   format: FormatKey;
   direction: GoodDirection;
@@ -314,7 +333,7 @@ export async function getTrendView(key: TrendViewKey, end: string, range: TrendV
   // The typical range looks back 60 days from the window's end, so it may reach before the prior window.
   const loadFrom = m.typical ? (addDays(win.to, -59) < prior.from ? addDays(win.to, -59) : prior.from) : prior.from;
   const [rows, first, exs] = await Promise.all([
-    loadDays(ctx, loadFrom, win.to),
+    loadDays(ctx, addDays(loadFrom, -1), win.to),
     firstDay(ctx),
     m.partBreakdown === "strength" ? exercisesBetween(ctx, prior.from, win.to) : Promise.resolve([] as ExerciseRow[]),
   ]);
@@ -327,7 +346,7 @@ export async function getTrendView(key: TrendViewKey, end: string, range: TrendV
     s.byType[typeName(e)] = (s.byType[typeName(e)] ?? 0) + min;
     strength.set(e.day, s);
   }
-  const x: Ctx = { strength, tz: ctx.timeZone };
+  const x: Ctx = { strength, tz: ctx.timeZone, rows };
 
   const day = (d: string) => {
     const r = rows.get(d);
@@ -402,6 +421,7 @@ export async function getTrendView(key: TrendViewKey, end: string, range: TrendV
   return {
     key,
     label: m.label,
+    card: m.card ?? m.label,
     ...(m.unit && { unit: m.unit }),
     format: m.format,
     direction: m.direction,
@@ -431,3 +451,7 @@ export async function getTrendView(key: TrendViewKey, end: string, range: TrendV
     about: m.about,
   };
 }
+
+/** Weekly Trends (spec §11 R32): each metric's 7 days ending on `day`, the same view model as its Trend View's W. */
+export const getWeeklyTrends = (keys: readonly TrendViewKey[], day: string, ctx: QueryCtx) =>
+  Promise.all(keys.filter((k) => !flagOff(k)).map((k) => getTrendView(k, day, "w", 0, ctx)));

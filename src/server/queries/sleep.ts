@@ -103,11 +103,6 @@ export async function getSleep(day: string, ctx: QueryCtx): Promise<SleepVM> {
     nightHr,
     hoursVsNeed,
     consistency,
-    restorative: trendPoints(rows, day, (r) => (r.sleep?.main?.deepMin != null && r.sleep.main.remMin != null ? r.sleep.main.deepMin + r.sleep.main.remMin : null), 30).map((p) => {
-      const m = rows.get(p.day)?.sleep?.main;
-      return { ...p, parts: p.value !== null && m ? { deep: m.deepMin!, rem: m.remMin! } : null };
-    }),
-    efficiencyTrend: { points: trendPoints(rows, day, efficiencyPct) },
     details,
     debtTrend: {
       points: trendPoints(rows, day, (r) => (r.sleep?.main ? r.sleep.debtMin / 60 : null)),

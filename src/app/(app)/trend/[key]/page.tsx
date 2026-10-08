@@ -2,13 +2,13 @@ import Link from "next/link"
 import { notFound } from "next/navigation"
 import { ChevronLeft, ChevronRight, Info } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { partColor } from "@/lib/bands"
 import { formatValue } from "@/lib/format"
 import { parseOffset, parseTrendRange, TREND_VIEW_RANGES, type TrendViewRange } from "@/lib/trend"
 import { trendHref } from "@/lib/url"
 import { TrendViewChart } from "@/components/charts/TrendViewChart"
 import { BreakdownBar } from "@/components/metrics/BreakdownBar"
 import { LABEL, SEGMENT_ITEM, SEGMENT_TRACK, StatusChip, ValueUnit } from "@/components/metrics/primitives"
+import { TrendLegend } from "@/components/metrics/TrendLegend"
 import { TrendMetricMenu } from "@/components/metrics/TrendMetricMenu"
 import { DetailShell } from "@/components/shells/DetailShell"
 import { SectionShell } from "@/components/shells/SectionShell"
@@ -47,7 +47,7 @@ export default async function TrendViewPage({ params, searchParams }: PageProps<
           <Headline vm={vm} href={href} />
           <p className="max-w-[60ch] text-[17px] leading-6 font-medium text-pretty">{vm.verdict}</p>
           <div className="min-w-0">
-            <Legend vm={vm} />
+            <TrendLegend chart={vm.chart} series={vm.series} typical={!!vm.typical} />
             <TrendViewChart
               label={vm.label}
               bars={vm.bars}
@@ -134,27 +134,5 @@ function Headline({ vm, href }: { vm: TrendViewVM; href: (o: { r?: TrendViewRang
         </nav>
       </div>
     </div>
-  )
-}
-
-/** The legend over the chart: the typical-range swatch (vitals) or the stack's parts, top right as the reference app sets it. */
-function Legend({ vm }: { vm: TrendViewVM }) {
-  if (vm.typical)
-    return (
-      <p className={cn(LABEL, "mb-2 flex items-center justify-end gap-2 text-foreground-secondary")}>
-        <span aria-hidden className="size-2.5 rounded-[2px] bg-chart-band ring-1 ring-foreground/15" />
-        Typical range
-      </p>
-    )
-  if (!vm.series || vm.chart !== "stack") return null
-  return (
-    <p className={cn(LABEL, "mb-2 flex flex-wrap items-center justify-end gap-x-4 gap-y-1 text-foreground-secondary")}>
-      {[...vm.series].reverse().map((s) => (
-        <span key={s.key} className="inline-flex items-center gap-1.5">
-          <span aria-hidden className="size-2.5 rounded-[2px]" style={{ background: partColor(s.key) }} />
-          {s.label}
-        </span>
-      ))}
-    </p>
   )
 }

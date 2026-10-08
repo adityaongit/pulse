@@ -72,10 +72,10 @@ Build steps for the score-screens phase: 1 trend helpers (`src/lib/trend.ts`), 2
 |---|---|---|
 | 1 | Step 6: Behavior Insights card with automatic chips (sleep performance, strain, wake time, workout timing) | Planned |
 | 2 | Step 6: the card links to Journal insights (WHOOP's destination was not captured) | Planned |
-| 3 | Steps 4 and 6: Weekly Trends (Recovery, HRV, RHR, Respiratory rate, Sleep performance) | Planned |
-| 4 | Step 4: cards link to their Trend View | Planned |
-| 5 | Step 4: band-coloured value labels, today's column highlight, two-line labels | Planned |
-| 6 | Step 4: HRV line with ring markers and value labels | Planned |
+| 3 | Steps 4 and 6: Weekly Trends (Recovery, HRV, RHR, Respiratory rate, Sleep performance) | Done (R32) |
+| 4 | Step 4: cards link to their Trend View | Done (R32) |
+| 5 | Step 4: band-coloured value labels, today's column highlight, two-line labels | Done (R32) |
+| 6 | Step 4: HRV line with ring markers and value labels | Done (R32) |
 | 7 | Step 6: flat contributor rows showing today's value over the 30-day value, with a triangle | Planned |
 | 8 | Step 6: the baseline track is dropped | Planned |
 | 9 | Step 6: "Today vs. last 30 days" legend | Planned |

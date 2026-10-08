@@ -3,7 +3,6 @@ import { BAND_COLOR } from "@/lib/bands"
 import type { FormatKey } from "@/lib/format"
 import { dayHref, metricHref } from "@/lib/url"
 import { reasonCopy } from "@/lib/reasons"
-import { TrendChart } from "@/components/charts/TrendChart"
 import { ContributorRow } from "@/components/metrics/ContributorRow"
 import { DriverList } from "@/components/metrics/DriverList"
 import { InsightCard } from "@/components/metrics/InsightCard"
@@ -14,21 +13,25 @@ import { EmptyState } from "@/components/shells/EmptyState"
 import { SectionShell } from "@/components/shells/SectionShell"
 import { Card } from "@/components/ui/card"
 import { getRecovery } from "@/server/queries/recovery"
+import { getWeeklyTrends, type TrendViewKey } from "@/server/queries/trendView"
+import { WeeklyTrends } from "@/components/metrics/WeeklyTrends"
 import type { Contributor, RecoveryVM } from "@/server/queries/types"
 import { pageDay, type SearchParams } from "../_lib/day"
 import { RECOVERY_INFO } from "../_lib/info"
-import { CAPTION, LEGEND, trendProps } from "../_lib/view"
+import { CAPTION, LEGEND } from "../_lib/view"
 
 export const metadata = { title: "Recovery", description: "What shaped your Recovery: HRV, resting heart rate, breathing, sleep and skin temperature against your baseline." }
 
 const ICON: Record<Contributor["key"], React.ReactNode> = { hrv: <Activity />, rhr: <Heart />, resp: <Wind />, sleep: <Moon />, skinTemp: <Thermometer /> }
 const FORMAT: Record<Contributor["key"], FormatKey> = { hrv: "int", rhr: "int", resp: "decimal1", sleep: "int", skinTemp: "signed1" }
 
+/** Weekly Trends: Recovery and HRV as captured (recovery-12..15), then the other contributors in row order. */
+const WEEKLY: readonly TrendViewKey[] = ["recovery", "hrv", "rhr", "resp", "sleep"]
+
 export default async function RecoveryPage({ searchParams }: PageProps<"/recovery">) {
-  const { d, today, weekly, ctx } = await pageDay(searchParams as SearchParams, "/recovery")
-  const vm = await getRecovery(d, ctx)
+  const { d, today, ctx } = await pageDay(searchParams as SearchParams, "/recovery")
+  const [vm, weekly] = await Promise.all([getRecovery(d, ctx), getWeeklyTrends(WEEKLY, d, ctx)])
   const r = vm.recovery
-  const trend = trendProps(vm.trend)
 
   return (
     <DetailShell
@@ -48,11 +51,6 @@ export default async function RecoveryPage({ searchParams }: PageProps<"/recover
         </Card>
       }
       insight={vm.insight && <InsightCard body={vm.insight} action={{ label: "See what shaped it", href: "#drivers" }} />}
-      primary={
-        <SectionShell variant="card" title={weekly ? "Weekly trends" : "Recovery trend"} level={2}>
-          <TrendChart label="Recovery" unit="%" format="int" colorBy="band" direction="up" {...trend} />
-        </SectionShell>
-      }
       secondary={[
         <SectionShell key="drivers" variant="card" title="What shaped it" id="drivers" level={2}>
           <Drivers vm={vm} />
@@ -63,6 +61,7 @@ export default async function RecoveryPage({ searchParams }: PageProps<"/recover
           </div>
         </SectionShell>,
       ]}
+      footer={<WeeklyTrends cards={weekly} d={d} today={today} />}
     />
   )
 }

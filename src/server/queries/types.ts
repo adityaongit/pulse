@@ -208,11 +208,6 @@ export type StrainVM = {
   /** How the zones are set: five on heart-rate reserve from the day's resting and max heart rate. */
   zoneNote: string;
   activities: ActivityItem[];
-  trend: Trend;
-  /** 30 days ending on the day: total kcal split into active and resting (resting = total − active, never below 0). */
-  calories: SplitPoint[];
-  /** 60 days ending on the day: minutes of recorded workouts (0 on a day with data but none). */
-  workouts: Trend;
 };
 
 export type ActivityVM = {
@@ -269,10 +264,6 @@ export type SleepVM = {
      */
     nights: ({ day: string; label: string; bed: number; wake: number; typicalBed: number | null; typicalWake: number | null } | null)[];
   }>;
-  /** Deep and REM minutes per night, 30 nights ending on the day (WHOOP's Restorative sleep bars). */
-  restorative: SplitPoint[];
-  /** Sleep efficiency per night, % (WHOOP's Sleep efficiency trend). */
-  efficiencyTrend: Trend;
   details: KeyStat[];
   debtTrend: Trend;
   planner: Metric<SleepPlanVM & { weekdayWake: boolean }>;

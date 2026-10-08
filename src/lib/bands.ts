@@ -46,6 +46,8 @@ export function partColor(key: string): string {
     yellow: "recovery-yellow",
     red: "recovery-red",
     rem: "stage-rem",
+    asleep: "sleep",
+    need: "optimal",
     deep: "stage-deep",
     low: "stress-low",
     medium: "stress-medium",

@@ -80,7 +80,7 @@ Build steps for the score-screens phase: 1 trend helpers (`src/lib/trend.ts`), 2
 | 1 | Step 7: HR Zones 1-3 Trend View | Done (R29): the screen; row links in step 7 |
 | 2 | Step 7: HR Zones 4-5 Trend View | Done (R29): the screen; row links in step 7 |
 | 3 | Step 7: Strength Activity Time Trend View | Done (R29): the screen; row links in step 7 |
-| 4 | Step 7: Day Strain Trend View | Done (R29): the screen; card link in step 4 |
+| 4 | Step 7: Day Strain Trend View | Done (R29, R32): the screen and its Weekly Trends card |
 | 5 | Step 3: Steps opens the shared Trend View; `/metric/steps` stays as the day screen | Done (R29) |
 | 6 | Step 3: metric dropdown | Done (R29) |
 | 7 | Steps 2-3: period stepper | Done (R29) |
@@ -98,10 +98,10 @@ Build steps for the score-screens phase: 1 trend helpers (`src/lib/trend.ts`), 2
 | 19 | Step 7: goal buttons, behind a flag (Pulse has no goals) | Planned (hidden) |
 | 20 | Learn More carousel | Out of scope |
 | 21 | Steps 3 and 7: "What is Strength Activity Time?" explainer | Done (R29) |
-| 22 | Steps 4 and 7: Weekly Trends with all six cards | Planned |
-| 23 | Step 4: fixed "Weekly Trends" heading, no range toggle | Planned |
-| 24 | Step 4: cards link to their Trend View | Planned |
-| 25 | Step 4: selected-day column highlight with two-line labels | Planned |
+| 22 | Steps 4 and 7: Weekly Trends with all six cards | Done (R32) |
+| 23 | Step 4: fixed "Weekly Trends" heading, no range toggle | Done (R32) |
+| 24 | Step 4: cards link to their Trend View | Done (R32) |
+| 25 | Step 4: selected-day column highlight with two-line labels | Done (R32) |
 | 26 | Step 7: zone and strength rows link to their Trend Views | Planned |
 | 27 | Step 7: "Explore your strain insights" link to the Day Strain Trend View | Planned |
 

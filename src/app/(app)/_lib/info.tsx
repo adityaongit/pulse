@@ -77,25 +77,6 @@ export const STRAIN_TARGET_INFO: InfoContent = {
   ),
 }
 
-export const CALORIES_INFO: InfoContent = {
-  title: "Calories burned",
-  body: (
-    <>
-      <p>
-        Each bar is the day’s total from Google Health, split into what you burned by moving and what your body burned at rest. Today’s bar is a
-        running total until midnight.
-      </p>
-      <Rows
-        rows={[
-          ["bg-energy-active", "Active: walking, workouts and other movement."],
-          ["bg-energy-resting", "Resting: the rest of the total, your body’s baseline burn."],
-          ["border border-dashed border-muted-foreground", "Dashed: a day with a total but no active figure, so Pulse shows no split."],
-        ]}
-      />
-    </>
-  ),
-}
-
 export const SLEEP_INFO: InfoContent = {
   title: "How Sleep works",
   body: (

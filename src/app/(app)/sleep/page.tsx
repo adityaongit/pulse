@@ -1,7 +1,6 @@
 import { cn } from "@/lib/utils"
 import { clock, hmm } from "@/lib/format"
-import { TrendChart, type TrendSeries } from "@/components/charts/TrendChart"
-import { DATA_COLORS } from "@/lib/bands"
+import { TrendChart } from "@/components/charts/TrendChart"
 import { InsightCard } from "@/components/metrics/InsightCard"
 import { KeyStatRow } from "@/components/metrics/KeyStatRow"
 import { ReasonPlaceholder } from "@/components/metrics/ReasonPlaceholder"
@@ -11,6 +10,8 @@ import { DetailShell } from "@/components/shells/DetailShell"
 import { SectionShell } from "@/components/shells/SectionShell"
 import { Card } from "@/components/ui/card"
 import { getSleep } from "@/server/queries/sleep"
+import { getWeeklyTrends, type TrendViewKey } from "@/server/queries/trendView"
+import { WeeklyTrends } from "@/components/metrics/WeeklyTrends"
 import type { SleepVM } from "@/server/queries/types"
 import { pageDay, type SearchParams } from "../_lib/day"
 import { HashScroll } from "../_lib/HashScroll"
@@ -26,15 +27,12 @@ const STATUS_LEGEND = [
   ["bg-optimal", "Optimal"],
 ] as const
 
-const RESTORATIVE_PARTS: readonly TrendSeries[] = [
-  { key: "rem", label: "REM", color: DATA_COLORS["stage-rem"].css },
-  { key: "deep", label: "Deep", color: DATA_COLORS["stage-deep"].css },
-]
-const WEEK_MONTH = ["w", "m"] as const
+/** Weekly Trends, in the reference app's order (sleep-28..34). */
+const WEEKLY: readonly TrendViewKey[] = ["sleep", "hours", "hours_need", "restorative", "consistency", "time_in_bed", "efficiency"]
 
 export default async function SleepPage({ searchParams }: PageProps<"/sleep">) {
   const { d, today, timeZone, ctx } = await pageDay(searchParams as SearchParams, "/sleep")
-  const vm = await getSleep(d, ctx)
+  const [vm, weekly] = await Promise.all([getSleep(d, ctx), getWeeklyTrends(WEEKLY, d, ctx)])
   const p = vm.performance
 
   return (
@@ -85,21 +83,6 @@ export default async function SleepPage({ searchParams }: PageProps<"/sleep">) {
         <SectionShell key="consistency" variant="card" title="Sleep consistency" level={2}>
           <SleepConsistency vm={vm} />
         </SectionShell>,
-        <SectionShell key="restorative" variant="card" title="Restorative sleep" level={2}>
-          <TrendChart
-            label="Restorative sleep"
-            format="duration"
-            colorBy="single"
-            stack={RESTORATIVE_PARTS}
-            headline="day"
-            ranges={WEEK_MONTH}
-            defaultRange="w"
-            data={{ value: vm.restorative.map((p) => ({ date: p.day, value: p.value, parts: p.parts })), reason: null, provisional: false }}
-          />
-        </SectionShell>,
-        <SectionShell key="efficiency" variant="card" title="Sleep efficiency" level={2}>
-          <TrendChart label="Sleep efficiency" unit="%" format="int" colorBy="sleep" direction="up" line defaultRange="w" {...trendProps(vm.efficiencyTrend)} />
-        </SectionShell>,
         <SectionShell key="details" variant="card" title="Details" info={{ title: "Sleep stages", body: "Time in each sleep stage during the main sleep session, as estimated by your Fitbit." }} level={2}>
           <div className="divide-y divide-border">
             {vm.details.map((k) => (
@@ -115,6 +98,7 @@ export default async function SleepPage({ searchParams }: PageProps<"/sleep">) {
           <HashScroll />
         </SectionShell>,
       ]}
+      footer={<WeeklyTrends cards={weekly} d={d} today={today} />}
     />
   )
 }
