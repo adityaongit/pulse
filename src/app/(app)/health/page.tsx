@@ -146,7 +146,7 @@ function Monitor({ m }: { m: HealthHubVM["monitor"] }) {
           <div className="space-y-4">
             {readings(v)}
             <div className="flex items-center gap-3 rounded-lg bg-inset px-3 py-2.5">
-              <span className={cn("grid size-5 shrink-0 place-items-center rounded-sm", all ? "bg-optimal text-primary-foreground" : "bg-warning text-primary-foreground")}>
+              <span className={cn("grid size-5 shrink-0 place-items-center rounded-sm", all ? "bg-optimal text-background" : "bg-warning text-primary-foreground")}>
                 {all ? <Check aria-hidden className="size-3.5" strokeWidth={3} /> : <TriangleAlert aria-hidden className="size-3" strokeWidth={2.5} />}
               </span>
               <span className="text-[15px] leading-[22px] tabular-nums">

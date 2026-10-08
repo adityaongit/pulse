@@ -177,7 +177,8 @@
   --popover-top: #2a373f;
   --popover-foreground: #ffffff;
   /* Calls to action: the reference brand's teal, with ink on it, in both themes. */
-  --primary: #00f19f;
+  /* Actions are white with ink (spec §5 "default": the "+", SAVE); green stays a data colour (--optimal). */
+  --primary: #ffffff;
   --primary-foreground: #101518;
   --secondary: #3b4244;
   --secondary-foreground: #ffffff;
@@ -343,8 +344,8 @@
   --popover: #ffffff;
   --popover-top: #ffffff;
   --popover-foreground: #101518;
-  --primary: #00f19f;
-  --primary-foreground: #101518;
+  --primary: #101518;
+  --primary-foreground: #ffffff;
   --secondary: #e4e8eb;
   --secondary-foreground: #101518;
   --muted: #eef1f3;
