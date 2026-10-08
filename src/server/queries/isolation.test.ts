@@ -38,6 +38,7 @@ import { getMore, getSettings, getShellStatus, getWearStreak, getYourData } from
 import { getSleep } from "./sleep";
 import { getStrain } from "./strain";
 import { getTrends } from "./trends";
+import { getTrendView } from "./trendView";
 
 const TODAY = dayAt(179);
 const PAST = dayAt(170);
@@ -61,6 +62,7 @@ async function screens(ctx: QueryCtx, activityId: string | null, period: string 
   }
   for (const key of DETAIL_KEYS) out[`metric:${key}`] = await getMetricDetail(key, TODAY, ctx);
   for (const m of ["recovery", "hrv", "steps", "weight", "glucose"] as const) out[`trends:${m}`] = await getTrends(m, ctx);
+  for (const m of ["hrv", "zones13", "strength", "time_in_bed"] as const) out[`trendView:${m}`] = await getTrendView(m, TODAY, "m", 0, ctx);
   for (const m of ["recovery", "hrv", "sleep"] as const) out[`insights:${m}`] = await getJournalInsights(m, ctx);
   Object.assign(out, {
     hub: await getHealthHub(ctx),

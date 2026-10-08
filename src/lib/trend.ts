@@ -87,7 +87,7 @@ export function monthSegments(points: readonly DayValue[], agg: TrendAgg = "dail
 export type BreakdownBand = { key: string; label: string; min: number };
 
 /** How many days fall in each band. */
-export function bandCounts(values: readonly (number | null)[], bands: readonly BreakdownBand[]) {
+export function bandCounts<B extends BreakdownBand>(values: readonly (number | null)[], bands: readonly B[]) {
   const counts = bands.map((b) => ({ ...b, count: 0 }));
   for (const v of values) {
     if (v === null) continue;

@@ -13,4 +13,8 @@ export const FEATURES = {
   myPlan: false,
   /** A smart alarm set from Pulse. Fitbit's alarms are not readable through Google Health. */
   sleepAlarm: false,
+  /** Share of the night in high, medium and low stress. Pulse's stress model leaves sleep minutes out. */
+  sleepStress: false,
+  /** Weekly zone, strength and step goals. Pulse has no goals or weekly plan. */
+  goals: false,
 } as const
