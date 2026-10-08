@@ -58,6 +58,8 @@ type Def = {
   /** Fixed axis floor and ceiling. */
   domain?: [number, number];
   footnote?: string;
+  /** Buttons under the chart: "Add activity" (zones, strength) and the goal button's label (behind `FEATURES.goals`). */
+  actions?: { addActivity?: boolean; goal?: string };
   flag?: keyof typeof FEATURES;
   about: { title: string; body: readonly string[] };
 };
@@ -229,6 +231,7 @@ export const TREND_VIEW = {
     group: "strain", label: "Heart Rate Zones 1-3", card: "HR Zones 1-3", short: "time in HR zones 1-3", format: "duration", direction: "up", colorBy: "single", chart: "stack", agg: "weekly",
     pick: zoneSum(0, 3), parts: zoneParts(0, 3), series: zoneSeries(0, 3), partBreakdown: "series", partialToday: true,
     footnote: "Zone time is derived from your heart rate through the day.",
+    actions: { addActivity: true, goal: "Set a HR zones goal in Weekly Plan" },
     about: { title: "What are Heart Rate Zones 1-3?", body: [
       "Zones 1 to 3 cover light to moderate effort, 50 to 80% of your heart-rate reserve: brisk walks, easy runs, steady rides.",
       "Time here builds your aerobic base and helps recovery without adding much fatigue.",
@@ -238,6 +241,7 @@ export const TREND_VIEW = {
     group: "strain", label: "Heart Rate Zones 4-5", card: "HR Zones 4-5", short: "time in HR zones 4-5", format: "duration", direction: "up", colorBy: "single", chart: "stack", agg: "weekly",
     pick: zoneSum(3, 5), parts: zoneParts(3, 5), series: zoneSeries(3, 5), partBreakdown: "series", partialToday: true,
     footnote: "Zone time is derived from your heart rate through the day.",
+    actions: { addActivity: true, goal: "Update your HR zones 4-5 goal" },
     about: { title: "What are Heart Rate Zones 4-5?", body: [
       "Zones 4 and 5 are hard effort, above 80% of your heart-rate reserve: intervals, races and the end of a hard climb.",
       "A little time here each week raises your fitness ceiling; too much without rest adds strain faster than you recover.",
@@ -247,6 +251,7 @@ export const TREND_VIEW = {
     group: "strain", label: "Strength Activity Time", short: "strength activity time", format: "duration", direction: "up", colorBy: "single", chart: "bars", agg: "weekly",
     pick: (r, x) => (worn(r) || x.strength.has(r.day) ? (x.strength.get(r.day)?.min ?? 0) : null), partBreakdown: "strength", partialToday: true,
     footnote: "Strength activity time is derived from your logged strength workouts.",
+    actions: { addActivity: true, goal: "Set a goal in Weekly Plan" },
     about: { title: "What is Strength Activity Time?", body: [
       "Strength activity time is the time you spent in resistance training: weights, bodyweight work, CrossFit and similar sessions.",
       "Regular strength work builds muscle and bone and supports healthy ageing. Most guidelines suggest at least two sessions a week.",
@@ -255,6 +260,7 @@ export const TREND_VIEW = {
   steps: {
     group: "strain", label: "Steps", short: "steps", format: "grouped", direction: "up", colorBy: "single", chart: "bars", agg: "daily",
     pick: (r) => r.metrics?.steps, partialToday: true,
+    actions: { goal: "Update your daily step goal" },
     about: { title: "What are Steps?", body: [
       "Steps are counted by your Fitbit through the day. They are a simple measure of how much you move outside workouts.",
     ] },
@@ -312,6 +318,7 @@ export type TrendViewVM = {
   typical: [number, number] | null;
   breakdown: { title: string; unit: "days" | "duration"; items: { key: string; label: string; detail?: string; value: number }[] } | null;
   footnote: string | null;
+  actions: NonNullable<Def["actions"]>;
   about: Def["about"];
 };
 
@@ -448,6 +455,7 @@ export async function getTrendView(key: TrendViewKey, end: string, range: TrendV
     typical,
     breakdown,
     footnote: [m.footnote, todayNote].filter(Boolean).join(" ") || null,
+    actions: m.actions ?? {},
     about: m.about,
   };
 }

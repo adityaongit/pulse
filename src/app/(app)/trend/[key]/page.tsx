@@ -1,19 +1,23 @@
 import Link from "next/link"
 import { notFound } from "next/navigation"
-import { ChevronLeft, ChevronRight, Info } from "lucide-react"
+import { ChevronLeft, ChevronRight, Info, Plus, Target } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { formatValue } from "@/lib/format"
 import { parseOffset, parseTrendRange, TREND_VIEW_RANGES, type TrendViewRange } from "@/lib/trend"
 import { trendHref } from "@/lib/url"
 import { TrendViewChart } from "@/components/charts/TrendViewChart"
 import { BreakdownBar } from "@/components/metrics/BreakdownBar"
-import { LABEL, SEGMENT_ITEM, SEGMENT_TRACK, StatusChip, ValueUnit } from "@/components/metrics/primitives"
+import { CARD_BUTTON, LABEL, SEGMENT_ITEM, SEGMENT_TRACK, StatusChip, ValueUnit } from "@/components/metrics/primitives"
 import { TrendLegend } from "@/components/metrics/TrendLegend"
 import { TrendMetricMenu } from "@/components/metrics/TrendMetricMenu"
 import { DetailShell } from "@/components/shells/DetailShell"
+import { InfoCardTrigger } from "@/components/shells/InfoButton"
+import { SheetTrigger } from "@/components/shells/SheetTrigger"
+import { FEATURES } from "@/lib/features"
 import { SectionShell } from "@/components/shells/SectionShell"
 import { getTrendView, isTrendViewKey, priorLabel, TREND_VIEW, type TrendViewVM } from "@/server/queries/trendView"
 import { pageDay, type SearchParams } from "../../_lib/day"
+import { ADD_ACTIVITY_INFO } from "../../_lib/info"
 import { STAT_ICON } from "../../_lib/view"
 
 const RANGE_TEXT: Record<TrendViewRange, string> = { w: "W", m: "M", "6m": "6M" }
@@ -70,6 +74,23 @@ export default async function TrendViewPage({ params, searchParams }: PageProps<
               </p>
             )}
           </div>
+          {/* Pulse imports workouts, so Add activity explains where they come from (§11 R2); goals wait for a plan. */}
+          {(vm.actions.addActivity || (FEATURES.goals && vm.actions.goal)) && (
+            <div className="grid gap-3 sm:grid-cols-2">
+              {vm.actions.addActivity && (
+                <InfoCardTrigger info={ADD_ACTIVITY_INFO} className={CARD_BUTTON}>
+                  <Plus aria-hidden className="size-5" strokeWidth={2} />
+                  Add activity
+                </InfoCardTrigger>
+              )}
+              {FEATURES.goals && vm.actions.goal && (
+                <SheetTrigger sheet="goals" className={CARD_BUTTON}>
+                  <Target aria-hidden className="size-5" strokeWidth={2} />
+                  {vm.actions.goal}
+                </SheetTrigger>
+              )}
+            </div>
+          )}
         </div>
       }
       secondary={[

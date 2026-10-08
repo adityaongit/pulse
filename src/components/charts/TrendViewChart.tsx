@@ -35,6 +35,9 @@ export type TrendViewChartProps = {
 const colorOf = (colorBy: TrendViewChartProps["colorBy"], v: number) =>
   colorBy === "band" ? DATA_COLORS[recoveryColor(v)].css : colorBy === "strain" ? DATA_COLORS.strain.css : colorBy === "sleep" ? DATA_COLORS.sleep.css : DATA_COLORS["chart-5"].css
 
+/** A bar's colour as text: red text uses the lifted red token for contrast (spec §2.3). */
+const textColor = (fill: string | undefined) => (fill === DATA_COLORS["recovery-red"].css ? "var(--recovery-red-text)" : (fill ?? "var(--foreground)"))
+
 /** "21:00" from minutes after midnight (negative before it). */
 const clockOf = (m: number) => {
   const x = ((Math.round(m) % 1440) + 1440) % 1440
@@ -315,23 +318,21 @@ export function TrendViewChart(p: TrendViewChartProps) {
             {rows.map((r) => (
               <Cell key={r.key} fill={r.fill ?? "transparent"} fillOpacity={faint ? 0.35 : r.opacity} />
             ))}
-            {labelled && !faint && (
-              <LabelList
-                dataKey="text"
-                content={(l: { x?: number | string; y?: number | string; width?: number | string; index?: number; value?: unknown }) => (
-                  <text x={Number(l.x) + Number(l.width) / 2} y={Number(l.y) - 6} textAnchor="middle" fontSize={12} fontWeight={700} fill={rows[l.index ?? 0]?.fill ?? "var(--foreground)"}>
-                    {String(l.value ?? "")}
-                  </text>
-                )}
-              />
-            )}
           </Bar>
         )}
-        {/* A stack's total over each column. A label on the top part goes missing when that part is zero, so an
-            invisible line on the total carries it; its points sit at the column centres. */}
-        {p.chart === "stack" && labelled && !faint && (
+        {/* Each column's value over it. Recharts drops a label on a zero-height bar (a 0:00 day, a zero top part),
+            so an invisible line on the total carries the labels; its points sit at the column centres. A bar's label
+            takes the bar's colour, a stack's total the text colour. */}
+        {(p.chart === "stack" || p.chart === "bars") && labelled && !faint && (
           <Line dataKey="value" stroke="none" dot={false} activeDot={false} isAnimationActive={false}>
-            <LabelList dataKey="text" position="top" offset={8} fill="var(--foreground)" fontSize={12} fontWeight={700} />
+            <LabelList
+              dataKey="text"
+              content={(l: { x?: number | string; y?: number | string; index?: number; value?: unknown }) => (
+                <text x={Number(l.x)} y={Number(l.y) - 8} textAnchor="middle" fontSize={12} fontWeight={700} fill={p.chart === "bars" ? textColor(rows[l.index ?? 0]?.fill) : "var(--foreground)"}>
+                  {String(l.value ?? "")}
+                </text>
+              )}
+            />
           </Line>
         )}
         {showAvg && <AvgPill value={p.average!} />}

@@ -2,7 +2,7 @@ import { Flame } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { formatValue } from "@/lib/format"
 import { reasonCopy } from "@/lib/reasons"
-import { dayHref, activityHref } from "@/lib/url"
+import { activityHref, trendHref } from "@/lib/url"
 import { IntradayHrChart } from "@/components/charts/IntradayHrChart"
 import { ZoneBars } from "@/components/charts/ZoneBars"
 import { ActivityCard } from "@/components/metrics/ActivityCard"
@@ -62,7 +62,7 @@ export default async function StrainPage({ searchParams }: PageProps<"/strain">)
           <TodayVsLegend period="prior 30 days" />
         </Card>
       }
-      insight={vm.coach && <InsightCard body={vm.coach} action={{ label: "Plan tonight’s sleep", href: dayHref("/sleep#planner", d, today) }} />}
+      insight={vm.coach && <InsightCard body={vm.coach} action={{ label: "Explore your strain insights", href: trendHref("strain", { d, today }) }} />}
       primary={
         <SectionShell variant="card" title="Heart rate" level={2}>
           <IntradayHrChart data={hrSeries(vm.hr, vm.maxHr)} />

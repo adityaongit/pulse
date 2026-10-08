@@ -17,6 +17,8 @@ describe("getStrain summary", () => {
   it("lists the extras after Steps with the catalogue's unit, format and direction, and a 30-day average", async () => {
     const vm = await getStrain(dayAt(178), ctxFor(db));
     expect(vm.summary.map((k) => k.key)).toEqual(["zones13", "zones45", "strength", "steps", ...STRAIN_EXTRAS]);
+    // The reference app's four rows open their Trend Views; the extras keep their metric screens (spec §11 R35).
+    expect(vm.summary.slice(0, 4).map((k) => k.href)).toEqual(["/trend/zones13", "/trend/zones45", "/trend/strength", "/trend/steps"]);
     const distance = vm.summary.find((k) => k.key === "distance")!;
     expect(distance).toMatchObject({ label: "Distance", unit: "km", format: "decimal2", direction: "up" });
     expect(distance.metric.value).toBeGreaterThan(0);
