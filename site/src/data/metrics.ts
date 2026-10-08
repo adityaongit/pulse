@@ -108,7 +108,7 @@ const META: Record<string, Meta> = {
     scale: recoveryScale,
     shot: "phone-recovery",
     sources: [S.noop, S.plews2013, S.buchheit2014, S.altini2021],
-    related: ["hrv", "resting-heart-rate", "sleep", "recovery-forecast", "strain-target"],
+    related: ["hrv", "resting-heart-rate", "sleep", "strain-target"],
     faq: [
       {
         q: "Does the Fitbit Air have a recovery score?",
@@ -329,14 +329,6 @@ const META: Record<string, Meta> = {
     shot: "laptop-sleep",
     sources: [S.phillips2017, S.windred2024],
     related: ["sleep", "sleep-planner", "pulse-age"],
-  },
-  "recovery-forecast": {
-    title: "Recovery forecast: an estimate of tomorrow's Recovery",
-    description: "Pulse estimates tomorrow morning's Recovery from your recent scores, today's Strain and a planned night of sleep, with an honest error range.",
-    keywords: ["predict recovery score", "recovery forecast"],
-    scale: recoveryScale,
-    sources: [],
-    related: ["recovery", "sleep-planner", "strain"],
   },
   "training-load": {
     slug: "fitness-fatigue-form",

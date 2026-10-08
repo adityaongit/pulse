@@ -554,45 +554,6 @@ export const SCORE_DOCS: ScoreDoc[] = [
     ],
   },
   {
-    slug: "recovery-forecast",
-    name: "Recovery forecast",
-    summary: "An estimate of tomorrow morning’s Recovery.",
-    href: "/recovery",
-    sections: [
-      {
-        title: "What goes in",
-        rows: [
-          { term: "Recent Recovery", detail: "Your last 14\u00a0scores." },
-          { term: "Today’s Strain", detail: "So far, against your average over the last 14\u00a0days." },
-          { term: "Tonight’s sleep", detail: "Pulse assumes you sleep tonight’s Peak need." },
-        ],
-      },
-      {
-        title: "How it is weighted",
-        paragraphs: ["The forecast starts from your 14-day average Recovery and adds three nudges:"],
-        rows: [
-          { term: "Strain", detail: "About 3.6\u00a0points off for each Strain point above your 14-day average, or on for each below, up to 12." },
-          { term: "Sleep", detail: "Planned sleep 10% above your usual need adds 1.4\u00a0points, up to 3.5; less than your need takes points off." },
-          { term: "Trend", detail: "If Recovery has been climbing or falling, it eases back by the daily slope, up to 8\u00a0points." },
-        ],
-      },
-      {
-        title: "What the bands mean",
-        rows: [
-          { term: "67-100%", detail: "Green, as for Recovery." },
-          { term: "34-66%", detail: "Yellow." },
-          { term: "0-33%", detail: "Red." },
-        ],
-      },
-      {
-        title: "Limits",
-        paragraphs: [
-          "The forecast starts after 14\u00a0nights of Recovery. Its uncertainty is the spread of your last 14\u00a0scores, at least ±8\u00a0points, so read it as a rough guide. It cannot know tonight’s alcohol, stress or illness, or whether you actually sleep the plan.",
-        ],
-      },
-    ],
-  },
-  {
     slug: "training-load",
     name: "Fitness, fatigue and form",
     summary: "Your long-term and short-term training load, and the gap between them.",

@@ -14,6 +14,17 @@ Severity: **missing-screen** (a whole screen or flow is absent), **missing-eleme
 | Dashboard, Health, Community, Coach | [dashboard-health-community-coach.md](dashboard-health-community-coach.md) | 4 | 19 | 6 | 9 | 38 |
 | **Total** | | **23** | **71** | **31** | **40** | **165** |
 
+## Status by phase
+
+Each gap file has a status table with one row per gap; decisions are in `docs/design/spec.md` §11.
+
+| Phase | Areas | Gaps | Done | Hidden behind a flag | Out of scope | No change | Open | Decisions |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | --- |
+| Home (2026-10-08) | Home | 19 | see [home.md §3a](home.md) | | | | | R20-R28 |
+| Score screens (2026-10-08) | Sleep, Recovery, Strain | 79 | 70 | 4 | 4 | 1 | 0 | R29-R35 |
+
+The score-screens phase built the shared Trend View (`/trend/[key]`) and Weekly Trends once and used them on all three screens. Hidden: the Sleep Stress row, card and Trend View (`FEATURES.sleepStress`; the stress model leaves sleep minutes out) and the goal buttons (`FEATURES.goals`; Pulse has no goals). Out of scope: Learn More videos and articles and their View all lists. The Recovery forecast is still computed but no longer shown, so its How it works entry and landing page were removed.
+
 ## What the files agree on
 
 Pulse already matches WHOOP's main screens closely. The Home layout, the three dials, the Sleep page and the Strain page, the workout detail and the My Dashboard rows all follow WHOOP. Most of the work is in the screens around them. Several gaps repeat across areas, so building each one once closes many rows.

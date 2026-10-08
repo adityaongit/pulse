@@ -41,7 +41,7 @@ const dials: { part: Part; name: string; line: string; href: string }[] = [
 type Tile = { name: string; line: string; shot: Shot; crop: [number, number]; tone: string; area: string }
 const tiles: Tile[] = [
   { area: "age", name: "Pulse Age", line: "How old your body is behaving, and whether that is speeding up or slowing down.", shot: "phone-healthspan", crop: [126, 560], tone: "255 167 34" },
-  { area: "rec", name: "Recovery, explained", line: "HRV, resting heart rate, breathing and sleep, each against your own baseline.", shot: "phone-recovery", crop: [358, 436], tone: "22 236 6" },
+  { area: "rec", name: "Recovery, explained", line: "HRV, resting heart rate, breathing and sleep, each against your last 30 days.", shot: "phone-recovery", crop: [358, 436], tone: "22 236 6" },
   { area: "str", name: "Strain Target", line: "A range for today, set by how recovered you are.", shot: "phone-strain", crop: [360, 434], tone: "0 147 231" },
   { area: "sts", name: "Stress Monitor", line: "Your stress through the day, on a 0 to 3 scale.", shot: "phone-stress", crop: [84, 440], tone: "103 174 230" },
   { area: "jrn", name: "Journal", line: "Log water, food, weight and mood, and see what moves tomorrow’s Recovery.", shot: "phone-journal", crop: [44, 560], tone: "0 241 159" },
