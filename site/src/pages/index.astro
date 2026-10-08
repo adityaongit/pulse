@@ -44,7 +44,7 @@ const tiles: Tile[] = [
   { area: "rec", name: "Recovery, explained", line: "HRV, resting heart rate, breathing and sleep, each against your last 30 days.", shot: "phone-recovery", crop: [358, 436], tone: "22 236 6" },
   { area: "str", name: "Strain Target", line: "A range for today, set by how recovered you are.", shot: "phone-strain", crop: [360, 434], tone: "0 147 231" },
   { area: "sts", name: "Stress Monitor", line: "Your stress through the day, on a 0 to 3 scale.", shot: "phone-stress", crop: [84, 440], tone: "103 174 230" },
-  { area: "jrn", name: "Journal", line: "Log water, food, weight and mood, and see what moves tomorrow’s Recovery.", shot: "phone-journal", crop: [44, 560], tone: "0 241 159" },
+  { area: "jrn", name: "Journal", line: "Answer the questions you pick from fifty behaviours, add a note, and see what moves tomorrow’s Recovery.", shot: "phone-journal", crop: [44, 560], tone: "0 241 159" },
   { area: "hrt", name: "Health Monitor", line: "Last night’s vitals against your normal range, with ECG readings and irregular rhythm notifications below.", shot: "phone-health-monitor", crop: [40, 440], tone: "255 90 106" },
   { area: "trd", name: "Trends", line: "Any metric by week, month, six months or year.", shot: "phone-trends", crop: [192, 420], tone: "0 147 231" },
   { area: "rep", name: "Reports", line: "A weekly and monthly read of how it went.", shot: "phone-reports", crop: [132, 560], tone: "123 161 187" },
@@ -66,7 +66,7 @@ const extras: { icon: string; label: string }[] = [
 const coach = [
   { icon: "lock-keyhole", t: "Your key, your provider", d: "Anthropic, OpenAI, Gemini, Vercel AI Gateway, OpenRouter, or a model on your own server. The key is encrypted and never reaches the browser." },
   { icon: "eye", t: "Reads, never writes", d: "Read-only tools look up sleep, workouts, trends and habits. Evidence cards link back to your data." },
-  { icon: "sparkles", t: "Advice for your day", d: "Suggestions adapt to your Recovery, sleep, HRV and accumulated strain. Older turns are summarized so longer chats keep their context." },
+  { icon: "sparkles", t: "Advice for your day", d: "Suggestions adapt to your Recovery, sleep, HRV and accumulated strain, and each workout gets a one-line take. Older turns are summarized so longer chats keep their context." },
   { icon: "toggle-left", t: "Off until you turn it on", d: "Admins choose who gets the coach. Without it, the same button opens the evening check-in." },
 ]
 
@@ -75,9 +75,9 @@ const story: { shot: Shot; name: string; icon: string; text: string }[] = [
     shot: "laptop-dashboard-editor",
     name: "My Dashboard",
     icon: "layout-dashboard",
-    text: "Choose which metrics sit on Home and in what order: heart rate variability first and steps last, or the other way round.",
+    text: "Pick the metrics on Home, from Recovery and sleep consistency to weekly heart-rate zones and lean body mass, and drag them into the order you want.",
   },
-  { shot: "laptop-health", name: "Health", icon: "heart-pulse", text: "Pulse Age, the Health Monitor, stress, fitness and heart rate on one screen, so a change in one is easy to check against the rest." },
+  { shot: "laptop-health", name: "Health", icon: "heart-pulse", text: "Stress, Pulse Age and its pace, the Health Monitor, fitness and heart rate on one screen, so a change in one is easy to check against the rest." },
   { shot: "laptop-health-monitor", name: "Health Monitor", icon: "activity", text: "Last night’s five vitals against your normal range, with ECG readings and body measurements beside them." },
   { shot: "laptop-trends", name: "Trends", icon: "chart-column", text: "Any metric by week, month, six months or year, with the averages to compare against." },
 ]
