@@ -80,6 +80,32 @@ Pulse refs were checked against the current files. "none" means no code exists.
 | 18 | Date pill text. WHOOP prints "TUE., APR. 14" (abbreviated weekday and month with periods, uppercase). Pulse prints "Mon, Sep 28" style. | visual | home-03-past-day-activities.png, home-07-past-day-activities.png | `src/components/shells/DateSwitcher.tsx:112` | Spec §4.3.1 chose `EEE, MMM d`. Casing may already be uppercased by CSS; check the rendered past-day pill. |
 | 19 | Daily Outlook banner: warm tan-to-slate gradient with a sun icon and a cream/gold chevron at the right. Pulse's banner uses the outlook gradient tokens with a coach-coloured (blue) chevron, and tapping opens an info dialog. WHOOP's tap target is not shown. | visual | home-01-today-overview.png, home-02-my-day.png | `src/app/(app)/(home)/page.tsx:294`, `src/app/(app)/(home)/page.tsx:304` | Check the rendered gradient against the reference; I could not see it in the demo tile because the tab bar covered it. On past days WHOOP hides the banner (home-03), Pulse shows "Your day in review" (spec R3, intentional). |
 
+## 3a. Status after the clone pass (2026-10-08)
+
+Decisions are in `docs/design/spec.md` §11 R20 to R27. "Hidden" means the component is built but off in `src/lib/features.ts` until Pulse has a data source.
+
+| # | Status |
+|---|---|
+| 1 | Done: "+" opens the action menu and turns into an X (R20). Add activity and Complete your journal are live. |
+| 2 | Hidden: the Start activity button beside Add activity (`FEATURES.startActivity`). |
+| 3 | Open: the Start activity flow itself (type picker, live map). It belongs to the activities area and needs live recording. |
+| 4 | Hidden: the Strength trainer entry in the menu. Its screen is not built. |
+| 5 | Hidden: the Share live entry in the menu. Its screen is not built. |
+| 6 | Hidden: My Plan card (`_lib/MyPlan.tsx`, R26). |
+| 7 | Hidden: the alarm state of Tonight's sleep (R25). |
+| 8 | Done: Tonight's sleep shows on today only (R22). |
+| 9 | Done: Add activity shows on past days (R21). |
+| 10 | Done: the monitor cards come right after the dials (R22). |
+| 11 | Done: Tonight's sleep comes before My journal (R22). |
+| 12 | Already matched: `HomeHeader` morphs the dials into the ring row with the scroll on phones. This row was wrong. |
+| 13 | Done: the "+" is a white key (R20). |
+| 14 | Done: "N/M Metrics" sub-line, and the title fits one line from 390 px (R27). |
+| 15 | Done: "CUSTOMIZE" with a pencil, no aside (R23). |
+| 16 | Done: the Stress Monitor dashboard tile (R24). |
+| 17 | Done: the Home tab icon is a house framing a chart (R27). |
+| 18 | Done: date pill "Mon., Sep. 28" (R27). |
+| 19 | Done: the outlook chevron uses the cream accent (R27). |
+
 ## 4. Intentional differences already recorded (do not redo)
 
 - Past-day monitor cards, kept where WHOOP hides them: spec V7.
