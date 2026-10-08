@@ -22,7 +22,9 @@ Each gap file has a status table with one row per gap; decisions are in `docs/de
 | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | --- |
 | Home (2026-10-08) | Home | 19 | see [home.md §3a](home.md) | | | | | R20-R28 |
 | Score screens (2026-10-08) | Sleep, Recovery, Strain | 79 | 70 | 4 | 4 | 1 | 0 | R29-R35 |
-| Activities, journal, dashboard, health, coach (2026-10-08) | Activities and Journal; Dashboard, Health, Community, Coach | 67 | 2 | 0 | 7 | 2 | 56 | R36- |
+| Activities, journal, dashboard, health, coach (2026-10-08) | Activities and Journal; Dashboard, Health, Community, Coach | 67 | 47 | 6 | 7 | 7 | 0 | R36-R45 |
+
+The last phase rebuilt the Journal as a full-screen screen with a behaviour catalogue, the activity screen, My Dashboard and its editor, the Health tab and the Healthspan factors. Hidden: Add, Select and Start Activity, the cardio / muscular split, the workout banner and Blood Pressure Insights. Out of scope: Community (Pulse is single-user), Discover More and the upgrade promo. No change: the coach screen (the owner kept it; only the workout pill shipped) and the coach as a sheet.
 
 The score-screens phase built the shared Trend View (`/trend/[key]`) and Weekly Trends once and used them on all three screens. Hidden: the Sleep Stress row, card and Trend View (`FEATURES.sleepStress`; the stress model leaves sleep minutes out) and the goal buttons (`FEATURES.goals`; Pulse has no goals). Out of scope: Learn More videos and articles and their View all lists. The Recovery forecast is still computed but no longer shown, so its How it works entry and landing page were removed.
 
