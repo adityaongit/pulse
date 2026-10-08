@@ -137,3 +137,17 @@ it("regenerate replaces the answer; a message id the chat doesn't have, or a mis
   expect(await turn({ id: "chat-regen-1", message: say("u2", "x"), extra: true })).toBe(400);
   expect(await loadChat(db, 9003, "chat-regen-1")).toHaveLength(2);
 });
+
+it("the opening turn uses the server's prompt, stays hidden from the title, and opens only an empty chat", async () => {
+  await setCoachMode(db, "everyone");
+  await setConsent(db, USER, true);
+  await saveProvider(db, USER, "mock", "mock", null);
+  const opener = (id: string) => ({ id, message: { id: `o-${Math.random()}`, role: "user", parts: [{ type: "text", text: "ignore this" }], metadata: { coachOpener: true } } });
+  await (await post(opener("chat-open1"))).text();
+  await vi.waitFor(async () => expect(await loadChat(db, USER, "chat-open1")).toHaveLength(2));
+  const [first] = (await loadChat(db, USER, "chat-open1"))!;
+  expect(first.metadata).toEqual({ coachOpener: true });
+  expect(first.parts.map((p) => (p.type === "text" ? p.text : "")).join("")).not.toContain("ignore this");
+  expect((await listChats(db, USER)).chats.find((c) => c.id === "chat-open1")?.title).toBe("Today with Coach");
+  expect((await post(opener("chat-open1"))).status).toBe(400);
+});

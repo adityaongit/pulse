@@ -3,7 +3,7 @@
 import * as React from "react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
-import { Ellipsis, MessageSquarePlus } from "lucide-react"
+import { Ellipsis, MessageSquarePlus, Plus } from "lucide-react"
 import { toast } from "sonner"
 import { deleteChatAction, moreChatsAction } from "@/server/actions/coach"
 import type { ChatCursor, ChatGroup, ChatRow } from "@/server/coach/store"
@@ -101,10 +101,17 @@ function ChatItem({ chat, current }: { chat: ChatRow; current: boolean }) {
  * Starts a fresh chat. A button, not a link: on /coach already, a link to /coach changes nothing, so this navigates
  * and refreshes, and the server hands out a new chat id every time.
  */
-export function NewChatButton({ label, className }: { label?: boolean; className?: string }) {
+/** New chat: a sidebar row (`label`), an icon (the bar), or the composer's square "+" (coach-02). */
+export function NewChatButton({ label, composer, className }: { label?: boolean; composer?: boolean; className?: string }) {
   const router = useRouter()
   const open = useOpenChat()
   const start = () => open("/coach", () => router.refresh())
+  if (composer)
+    return (
+      <Button type="button" variant="secondary" size="icon-touch" aria-label="New chat" onClick={start} className={cn("size-11 shrink-0 rounded-xl", className)}>
+        <Plus aria-hidden strokeWidth={2} className="size-5" />
+      </Button>
+    )
   return label ? (
     // A nav row (AppNav's sidebar items): quiet until hovered.
     <Button

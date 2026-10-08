@@ -65,7 +65,13 @@ export async function POST(req: Request) {
   const tools = coachTools(ctx, texts);
   const previous = historyFor((await loadChat(db, user.userId, id)) ?? [], body.data);
   if (!previous) return fail(400, "bad_request");
-  const incoming: UIMessage = { id: body.data.message.id, role: "user", parts: body.data.message.parts as UIMessage["parts"] };
+  // The opening turn (coach-02) carries no words of the user's: the server supplies the prompt, so a client can't
+  // smuggle text under the hidden flag, and it opens only an empty chat.
+  const opener = (body.data.message as { metadata?: { coachOpener?: unknown } }).metadata?.coachOpener === true;
+  if (opener && previous.length) return fail(400, "bad_request");
+  const incoming: UIMessage = opener
+    ? { id: body.data.message.id, role: "user", parts: [{ type: "text", text: texts("opener") }], metadata: { coachOpener: true } }
+    : { id: body.data.message.id, role: "user", parts: body.data.message.parts as UIMessage["parts"] };
   const messages = await validateUIMessages({ messages: [...previous, incoming], tools }).catch(() => null);
   if (!messages) return fail(400, "bad_request");
 

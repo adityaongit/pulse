@@ -102,7 +102,7 @@ Build steps for the last phase (shared with [dashboard-health-community-coach.md
 | 9 | Step 5: overflow menu (the day's Strain, heart-rate settings) | Done (R39) |
 | 10 | Step 5: zone footnote links "View HR Settings" to the profile in `/settings` | Done (R39) |
 | 11 | Step 5: Key Statistics carousel with a Duration tile | Done (R39) |
-| 12 | Step 10: coach pill ("Analyzing…") replaces the insight card when the coach is on | Open |
+| 12 | Step 10: coach pill ("Analyzing…") replaces the insight card when the coach is on | Done (R44) |
 | 13 | Step 5: dashed start and end markers with times; the span bar and zone strips go | Done (R39) |
 | 14 | Step 5: typical band on zone rows | Done (R39) |
 | 15 | Step 5: zone colours at 0%, Zone 0 white; the "+N min" deltas go | Done (R39) |

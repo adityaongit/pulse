@@ -191,15 +191,17 @@ test("coach: an admin turns it on, the P button opens it, set-up, a question wit
   await page.getByRole("radio", { name: "Test model" }).click();
   await page.getByRole("button", { name: "Test and save" }).click();
 
-  await expect(page.getByRole("heading", { name: "What would you like to know?" })).toBeVisible();
-  await expect(page.getByRole("button", { name: "Check in for today" })).toBeVisible();
-  await shot(page, "11-coach-empty");
-  await page.getByRole("button", { name: "Today's brief" }).click();
-
+  // The day's first chat: the coach speaks first (its own turn stays hidden), then offers reply chips.
   const log = page.getByRole("log", { name: "Chat with Pulse’s coach" });
-  await expect(log.getByText("Today's brief")).toBeVisible();
-  await expect(log.getByText("Recovery", { exact: true })).toBeVisible();
   await expect(log.getByText("Take it easy", { exact: true })).toBeVisible();
+  await expect(log.getByText("opener")).toHaveCount(0);
+  const replies = page.getByRole("list", { name: "Suggested replies" });
+  await shot(page, "11-coach-opener");
+  await replies.getByRole("button", { name: "Today's brief" }).click();
+
+  await expect(log.getByText("Today's brief")).toBeVisible();
+  await expect(log.getByText("Recovery", { exact: true }).first()).toBeVisible();
+  await expect(log.getByText("Take it easy", { exact: true })).toHaveCount(2);
   await expect(page).toHaveURL(/\/coach\?c=[\w-]+$/);
   const input = page.getByRole("textbox", { name: "Ask Coach", exact: true });
   const back = page.getByRole("link", { name: "Back", exact: true });
@@ -226,14 +228,14 @@ test("coach: an admin turns it on, the P button opens it, set-up, a question wit
   await shot(page, "13-coach-answer-dark");
 
   await page.reload();
-  await expect(page.getByText("Take it easy", { exact: true })).toBeVisible();
+  await expect(page.getByText("Take it easy", { exact: true }).first()).toBeVisible();
   await page.getByRole("link", { name: /^Chats/ }).click();
   await expect(page).toHaveURL(/\/coach\/chats$/);
   const chats = page.getByRole("navigation", { name: "Chats" });
   await expect(chats.getByRole("region", { name: "Today" }).getByRole("link", { name: "Today's brief" })).toBeVisible();
   await shot(page, "14-coach-chats-phone");
   await chats.getByRole("link", { name: "Today's brief", exact: true }).click();
-  await expect(log.getByText("Take it easy", { exact: true })).toBeVisible();
+  await expect(log.getByText("Take it easy", { exact: true }).first()).toBeVisible();
   await page.getByRole("link", { name: "Back", exact: true }).click();
   await expect(page).toHaveURL(/\/$/);
   await page.getByRole("navigation", { name: "Primary", exact: true }).getByRole("link", { name: "Health", exact: true }).click();
@@ -241,7 +243,7 @@ test("coach: an admin turns it on, the P button opens it, set-up, a question wit
   await page.getByRole("link", { name: "Open Coach" }).click();
   await page.getByRole("link", { name: /^Chats/ }).click();
   await chats.getByRole("link", { name: "Today's brief", exact: true }).click();
-  await expect(log.getByText("Take it easy", { exact: true })).toBeVisible();
+  await expect(log.getByText("Take it easy", { exact: true }).first()).toBeVisible();
   await page.getByRole("link", { name: "Back", exact: true }).click();
   await expect(page).toHaveURL(/\/health$/);
   await page.getByRole("link", { name: "Open Coach" }).click();
@@ -256,8 +258,9 @@ test("coach: an admin turns it on, the P button opens it, set-up, a question wit
 
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/coach");
-  await page.getByRole("button", { name: "How can I improve tonight's sleep?" }).click();
-  await expect(page.getByText("Take it easy", { exact: true })).toBeVisible();
+  // No chat today any more: the coach opens again, then its chips.
+  await page.getByRole("list", { name: "Suggested replies" }).getByRole("button", { name: "How can I improve tonight's sleep?" }).click();
+  await expect(page.getByText("Take it easy", { exact: true })).toHaveCount(2);
   await expect(page.getByRole("navigation", { name: "Chats" }).getByRole("link", { name: "How can I improve tonight's sleep?" })).toBeVisible();
   await shot(page, "15-coach-laptop");
   await page.setViewportSize({ width: 390, height: 844 });

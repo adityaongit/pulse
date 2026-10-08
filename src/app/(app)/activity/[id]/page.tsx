@@ -14,11 +14,13 @@ import { StatusChip, ValueUnit } from "@/components/metrics/primitives"
 import { DetailShell } from "@/components/shells/DetailShell"
 import { SectionShell } from "@/components/shells/SectionShell"
 import { Card } from "@/components/ui/card"
+import { coachReady } from "@/server/coach/store"
 import { getActivity } from "@/server/queries/activity"
 import { todayOf, userCtx } from "@/server/queries/common"
 import type { ActivityVM } from "@/server/queries/types"
 import { CAPTION, hrSeries, statProps } from "../../_lib/view"
 import { ActivityMenu } from "./ActivityMenu"
+import { CoachGlance } from "./CoachGlance"
 import { WorkoutBanner } from "./WorkoutBanner"
 
 export const metadata = { title: "Activity", description: "Activity strain, heart rate, zones and recovery after the workout." }
@@ -27,7 +29,7 @@ export const metadata = { title: "Activity", description: "Activity strain, hear
 export default async function ActivityPage({ params }: PageProps<"/activity/[id]">) {
   const { id } = await params
   const ctx = await userCtx()
-  const vm = await getActivity(decodeURIComponent(id), ctx)
+  const [vm, coach] = await Promise.all([getActivity(decodeURIComponent(id), ctx), coachReady(ctx.db, ctx.userId)])
   if (!vm) notFound()
   const { timeZone } = ctx
   const today = todayOf(ctx)
@@ -99,7 +101,8 @@ export default async function ActivityPage({ params }: PageProps<"/activity/[id]
           </SectionShell>
         ),
       ].filter(Boolean)}
-      footer={vm.insight && <InsightCard body={vm.insight} />}
+      // With the coach set up, its pill takes the insight's place (activity-01, spec §11 R44); without it, the templated insight.
+      footer={coach ? <CoachGlance id={vm.id} question={`Tell me about my ${vm.name.toLowerCase()} on ${dayLabel(vm.day, today).toLowerCase()}.`} /> : vm.insight && <InsightCard body={vm.insight} />}
     />
   )
 }

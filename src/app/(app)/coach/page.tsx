@@ -4,9 +4,10 @@ import { notFound } from "next/navigation"
 import { providerOptions } from "@/server/coach/options"
 import { coachAccess, coachSetup, groupChats, listChats, loadChat } from "@/server/coach/store"
 import { userCtx } from "@/server/queries/common"
+import { APP_VERSION } from "@/server/queries/settings"
 import { DetailShell } from "@/components/shells/DetailShell"
 import { coachSuggestions } from "@/server/coach/suggestions"
-import { Coach, CoachBarActions } from "./Coach"
+import { Coach, CoachBarActions, CoachGlyph } from "./Coach"
 import { CoachViewport } from "@/components/shells/CoachViewport"
 import { Consent, ProviderForm } from "./CoachSetup"
 
@@ -47,14 +48,19 @@ export default async function CoachPage({ searchParams }: { searchParams: Promis
   const id = saved ? c! : randomUUID()
   const suggestions = await coachSuggestions(ctx)
   const groups = groupChats(chats, now, timeZone)
+  // The coach speaks first in the day's first chat only, so opening the coach doesn't add a chat each time.
+  const opener = !saved && !q && brief !== "1" && !groups.some((g) => g.label === "Today")
   const chatCount = groups.reduce((n, g) => n + g.chats.length, 0)
   return (
     <CoachViewport>
       <DetailShell
         contained
         title="Coach"
+        subtitle={`Beta v${APP_VERSION}`}
+        align="start"
+        titleIcon={<CoachGlyph />}
         action={<CoachBarActions chatCount={chatCount} chatOpen={(saved?.length ?? 0) > 0} />}
-        primary={<Coach key={id} id={id} initial={saved ?? []} groups={groups} next={next} prefill={brief === "1" && !saved ? "Today's brief" : (q ?? "").slice(0, 500)} auto={brief === "1" && !saved} suggestions={suggestions} />}
+        primary={<Coach key={id} id={id} initial={saved ?? []} groups={groups} next={next} prefill={brief === "1" && !saved ? "Today's brief" : (q ?? "").slice(0, 500)} auto={brief === "1" && !saved} opener={opener} suggestions={suggestions} />}
       />
     </CoachViewport>
   )

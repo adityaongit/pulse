@@ -46,6 +46,13 @@ export async function setCoachAllowed(db: Db, userId: number, allowed: boolean):
 /** What the browser may know about the user's setup: never the key itself. */
 export type CoachSetup = { provider: string | null; model: string | null; last4: string | null; consent: boolean; instructions: string | null; briefMinute: number | null };
 
+/** Access, consent and a provider: the coach can answer without a set-up step. */
+export async function coachReady(db: Db, userId: number): Promise<boolean> {
+  if (!(await coachAccess(db, userId))) return false;
+  const s = await coachSetup(db, userId);
+  return s.consent && s.provider !== null;
+}
+
 export async function coachSetup(db: Db, userId: number): Promise<CoachSetup> {
   const [r] = await db.select().from(coachSettings).where(eq(coachSettings.userId, userId));
   return { provider: r?.provider ?? null, model: r?.model ?? null, last4: r?.keyLast4 ?? null, consent: r?.consentAt != null, instructions: r?.customInstructions ?? null, briefMinute: r?.briefMinute ?? null };
@@ -161,11 +168,14 @@ export async function loadChat(db: Db, userId: number, id: string): Promise<UIMe
   return r ? (r.messages as UIMessage[]) : null;
 }
 
+/** The coach's own opening turn (coach-02): saved with the chat, never shown or used as its title. */
+export const isOpener = (m: UIMessage) => m.role === "user" && (m.metadata as { coachOpener?: unknown } | undefined)?.coachOpener === true
+
 /** The first thing the user asked, cut to 60 characters. */
 export function titleOf(messages: UIMessage[]): string {
-  const first = messages.find((m) => m.role === "user");
+  const first = messages.find((m) => m.role === "user" && !isOpener(m));
   const text = first?.parts.map((p) => (p.type === "text" ? p.text : "")).join(" ").trim().replace(/\s+/g, " ") ?? "";
-  return (text.length > 60 ? `${text.slice(0, 59)}…` : text) || "New chat";
+  return (text.length > 60 ? `${text.slice(0, 59)}…` : text) || (messages.some(isOpener) ? "Today with Coach" : "New chat");
 }
 
 export async function saveChat(db: Db, userId: number, id: string, messages: UIMessage[]): Promise<void> {

@@ -136,12 +136,12 @@ Build steps are listed in [activity-and-journal.md §3a](activity-and-journal.md
 | 29 | Team screen and chat | Out of scope (no community) |
 | 30 | Build Your Community | Out of scope (no community) |
 | 31 | Coach as a bottom sheet | No change: the owner kept the full page (R36) |
-| 32 | Step 10: header with the ring glyph, version pill and history icon | Open |
-| 33 | Step 10: "+" and the reference composer; the microphone behind a flag | Open |
-| 34 | Step 10: the coach speaks first | Open |
-| 35 | Step 10: copy as a clipboard icon; thumbs up and down behind a flag | Open |
-| 36 | Step 10: one scrolling row of reply chips, follow-ups after a reply | Open |
-| 37 | Step 10: "Analyzing…" pill on workouts (with activity gap 12) | Open |
+| 32 | Step 10: header with the ring glyph, version pill and history icon | Done (R44) |
+| 33 | Step 10: "+" and the reference composer; the microphone behind a flag | Done (R44); the microphone is hidden (`FEATURES.coachVoice`) |
+| 34 | Step 10: the coach speaks first | Done (R44) |
+| 35 | Step 10: copy as a clipboard icon; thumbs up and down behind a flag | Done (R44); thumbs are hidden (`FEATURES.coachFeedback`) |
+| 36 | Step 10: one scrolling row of reply chips, follow-ups after a reply | Done (R44) |
+| 37 | Step 10: "Analyzing…" pill on workouts (with activity gap 12) | Done (R44) |
 | 38 | Translucent sheet look | No change: the owner kept the full page (R36) |
 
 ## 4. Already matches (do not redo)
