@@ -117,6 +117,9 @@ list of what's wrong.
 | `DATA_SOURCE` | no (`demo`) | `demo`: generated data for one shared demo user; `google`: real data, accounts, each user connects Google |
 | `POSTGRES_PASSWORD` | with compose | The database password; compose builds `DATABASE_URL` from it |
 | `DATABASE_URL` | outside compose | Defaults to `postgres://pulse:pulse@localhost:5432/pulse` (compose.dev.yaml) |
+| `DATABASE_SSL_CA` | no | The database's CA certificate (PEM or base64), for a server signed by its own CA such as Aiven; the URL's `ssl*` parameters are then ignored |
+| `DB_POOL_MAX` | no (10; 2 on Vercel) | Connections in the database pool |
+| `CRON_SECRET` | on Vercel | The secret `/api/cron` checks; it refuses every request without it ([docs/vercel.md](vercel.md)) |
 | `BETTER_AUTH_SECRET` | in production | Signs sessions; `openssl rand -base64 32` |
 | `ADMIN_EMAILS` | with Google | Comma-separated owner emails: they open the admin panel; on a server with no accounts, they sign up without an invite |
 | `SIGNUP` | no (`invite`) | The starting sign-up mode (`invite`, `open` or `closed`) until an admin changes it in the panel |
