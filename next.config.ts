@@ -7,6 +7,8 @@ const BUILD_ID = process.env.GIT_SHA || Date.now().toString(36);
 const nextConfig: NextConfig = {
   env: { NEXT_PUBLIC_BUILD_ID: BUILD_ID },
   output: "standalone",
+  // Migrations are read from disk at boot (instrumentation.ts), so serverless bundles need the folder traced in.
+  outputFileTracingIncludes: { "/**": ["./drizzle/**/*"] },
   // Client cache for visited pages (Next 16 keeps dynamic pages for 0 s by default, so every tab switch re-rendered
   // on the server behind a skeleton). A sync's router.refresh() clears it, so data is never older than the last sync.
   experimental: {

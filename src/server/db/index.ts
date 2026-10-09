@@ -6,7 +6,7 @@ import { sql, type SQL } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { migrate as pgMigrate } from "drizzle-orm/node-postgres/migrator";
 import pg from "pg";
-import { getConfig } from "../config";
+import { type Config, getConfig } from "../config";
 import * as schema from "./schema";
 
 export type Schema = typeof schema;
@@ -21,10 +21,28 @@ export const MIGRATIONS = path.join(process.cwd(), "drizzle");
 
 const g = globalThis as typeof globalThis & { __pulseDb?: Db; __pulsePool?: pg.Pool };
 
+/**
+ * The pool's settings. With DATABASE_SSL_CA, TLS is verified against that CA and the URL's ssl* parameters are
+ * dropped: pg lets the URL's parameters win over the `ssl` option, and `sslmode=require` would check the server
+ * against the public CAs only (Aiven signs with its own). On Vercel, idle connections close sooner, since a frozen
+ * instance holds them against the plan's connection limit.
+ */
+export function poolOptions(cfg: Pick<Config, "databaseUrl" | "databaseSslCa" | "dbPoolMax">, vercel = !!process.env.VERCEL): pg.PoolConfig {
+  let connectionString = cfg.databaseUrl;
+  let ssl: pg.PoolConfig["ssl"];
+  if (cfg.databaseSslCa) {
+    const url = new URL(connectionString);
+    for (const k of [...url.searchParams.keys()]) if (k.startsWith("ssl") || k === "uselibpqcompat") url.searchParams.delete(k);
+    connectionString = url.toString();
+    ssl = { ca: cfg.databaseSslCa, rejectUnauthorized: true };
+  }
+  return { connectionString, ssl, max: cfg.dbPoolMax, ...(vercel ? { idleTimeoutMillis: 5_000 } : {}) };
+}
+
 /** The app database: a pool on DATABASE_URL, created on first use. */
 export function getDb(): Db {
   if (g.__pulseDb) return g.__pulseDb;
-  const pool = (g.__pulsePool ??= new pg.Pool({ connectionString: getConfig().databaseUrl, max: 10 }));
+  const pool = (g.__pulsePool ??= new pg.Pool(poolOptions(getConfig())));
   return (g.__pulseDb = drizzle(pool, { schema }) as unknown as Db);
 }
 
