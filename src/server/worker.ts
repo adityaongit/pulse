@@ -169,14 +169,17 @@ export function createWorker({ name, source, recompute, users, lock = (_, fn) =>
 export type Worker = ReturnType<typeof createWorker>;
 
 /**
- * Runs `fn` holding an advisory lock on (LOCK_KEY, userId). On a pool, a dedicated client holds a transaction-level
- * lock for the run: a transaction keeps one server connection even behind a transaction-mode pooler (Neon on
- * Vercel), where a session lock and its unlock could land on different connections. PGlite (tests) is one session.
+ * Runs `fn` holding an advisory lock on (LOCK_KEY, userId). On a pool, a connection of its own (not one of the
+ * pool's, which `fn` needs: a pool of 1 or 2, as on Vercel, would otherwise wait on itself) holds a
+ * transaction-level lock for the run: a transaction keeps one server connection even behind a transaction-mode
+ * pooler (Neon on Vercel), where a session lock and its unlock could land on different connections. PGlite (tests)
+ * is one session.
  */
 export async function withUserLock(db: Db, userId: number, fn: () => Promise<void>): Promise<boolean> {
   const pool = (db as unknown as { $client?: unknown }).$client;
   if (pool instanceof pg.Pool) {
-    const client = await pool.connect();
+    const client = new pg.Client(pool.options);
+    await client.connect();
     try {
       await client.query("begin");
       const r = await client.query<{ ok: boolean }>("select pg_try_advisory_xact_lock($1, $2) as ok", [LOCK_KEY, userId]);
@@ -184,7 +187,7 @@ export async function withUserLock(db: Db, userId: number, fn: () => Promise<voi
       return r.rows[0]?.ok ?? false;
     } finally {
       await client.query("rollback").catch(() => {}); // ends the transaction, releasing the lock; it wrote nothing
-      client.release();
+      await client.end().catch(() => {});
     }
   }
   const got = await row<{ ok: boolean }>(db, sql`select pg_try_advisory_lock(${LOCK_KEY}, ${userId}) as ok`);

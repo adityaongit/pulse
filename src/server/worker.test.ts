@@ -33,6 +33,29 @@ describe("createWorker", () => {
     expect(pull).toHaveBeenCalledTimes(2);
   });
 
+  it("intervalMs 0 (serverless): start() runs no loop, runCycle() runs one cycle and schedules nothing", async () => {
+    const pull = vi.fn(async () => ({ changed: true }));
+    const worker = createWorker({ name: "test", source: { pull }, recompute: async () => {}, users: async () => [U], intervalMs: 0, log });
+    worker.start();
+    await tick(60 * MIN);
+    expect(pull).not.toHaveBeenCalled();
+    await worker.runCycle();
+    expect(pull).toHaveBeenCalledTimes(1);
+    await tick(60 * MIN);
+    expect(pull).toHaveBeenCalledTimes(1);
+  });
+
+  it("requestSync returns the run it starts, so a serverless caller can wait on it", async () => {
+    const { worker, pull } = setup();
+    worker.start();
+    await tick();
+    expect(worker.requestSync({ userId: U })).toBeUndefined(); // fresh: gated
+    const run = worker.requestSync({ userId: U, force: true });
+    expect(run).toBeInstanceOf(Promise);
+    await run;
+    expect(pull).toHaveBeenCalledTimes(2);
+  });
+
   it("passes the source's changed flag to recompute", async () => {
     const { worker, recompute } = setup(vi.fn(async () => ({ changed: false })));
     worker.start();
