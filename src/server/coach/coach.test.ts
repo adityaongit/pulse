@@ -144,8 +144,9 @@ describe("tools over seeded data", () => {
 });
 
 describe("editable wording (admin dashboard)", () => {
-  it("every tool and parameter in code has wording in texts.ts, and nothing extra", () => {
-    const tools = coachTools(ctxFor(undefined as never));
+  it("every tool and parameter in code (both profiles' tool sets) has wording in texts.ts, and nothing extra", () => {
+    const female = ctxFor(undefined as never);
+    const tools = { ...coachTools(ctxFor(undefined as never)), ...coachTools({ ...female, profile: { ...female.profile, sex: "female" } }) };
     expect(Object.keys(TOOL_DOCS).sort()).toEqual(Object.keys(tools).sort());
     for (const [name, t] of Object.entries(tools)) {
       const shape = (t.inputSchema as unknown as { shape: Record<string, unknown> }).shape;

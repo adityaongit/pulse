@@ -4,7 +4,7 @@ import * as React from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useChat } from "@ai-sdk/react"
-import { DefaultChatTransport, type UIMessage } from "ai"
+import { DefaultChatTransport, lastAssistantMessageIsCompleteWithApprovalResponses, type UIMessage } from "ai"
 import { Activity, ArrowUp, Check, ChevronRight, Copy, Dumbbell, History, Moon, NotebookPen, PanelLeftClose, PanelLeftOpen, Pencil, RotateCcw, Settings2, Square, type LucideIcon } from "lucide-react"
 import { cn } from "@/lib/utils"
 import type { dayDigest } from "@/server/coach/tools"
@@ -22,6 +22,8 @@ import { Prose } from "./Prose"
 
 import type { CoachSuggestion } from "@/core/algorithms/coachSuggestions"
 import { Evidence } from "./Evidence"
+import { LogConfirm, type LogPart } from "./LogConfirm"
+import { isLogTool } from "@/lib/log"
 
 type DayDigest = Awaited<ReturnType<typeof dayDigest>>
 type Num = { value: number | null; reason?: string | null }
@@ -108,10 +110,13 @@ function Caption({ live, children }: { live?: boolean; children: React.ReactNode
 
 type Part = UIMessage["parts"][number]
 
-function PartView({ part }: { part: Part }) {
+type Answer = (id: string, approved: boolean) => void
+
+function PartView({ part, onAnswer }: { part: Part; onAnswer?: Answer }) {
   if (part.type === "text") return <Prose text={part.text} />
   if (!part.type.startsWith("tool-")) return null
   const name = part.type.slice(5)
+  if (isLogTool(name)) return <LogConfirm name={name} part={part as LogPart} onAnswer={onAnswer} />
   const tool = part as Part & { state: string; output?: unknown }
   if (tool.state === "output-error") return <Caption>Couldn’t read that part of your data.</Caption>
   if (tool.state !== "output-available") return <Caption live>{RUNNING[name] ?? "Looking at your data…"}</Caption>
@@ -125,6 +130,13 @@ const plain = (m: UIMessage) =>
     .map((p) => (p.type === "text" ? p.text.replace(/\*\*/g, "") : ""))
     .join("\n\n")
     .trim()
+
+/** The user's answers to the log confirmations on a message, as the server takes them: ids and yes/no only. */
+const answersOf = (m: UIMessage) =>
+  m.parts.flatMap((p) => {
+    const a = (p as { state?: string; approval?: { id: string; approved?: boolean; isAutomatic?: boolean } })
+    return a.state === "approval-responded" && a.approval && !a.approval.isAutomatic ? [{ id: a.approval.id, approved: a.approval.approved === true }] : []
+  })
 
 const ACTION = "relative text-muted-foreground hover:text-foreground pointer-coarse:size-10"
 /** Shown on hover or focus of its message with a mouse; always on touch screens, which have no hover. */
@@ -208,12 +220,12 @@ function UserMessage({ m, busy, onEdit }: { m: UIMessage; busy: boolean; onEdit:
   )
 }
 
-function AssistantMessage({ m, done, onRegenerate }: { m: UIMessage; done: boolean; onRegenerate?: () => void }) {
+function AssistantMessage({ m, done, onRegenerate, onAnswer }: { m: UIMessage; done: boolean; onRegenerate?: () => void; onAnswer?: Answer }) {
   const text = plain(m)
   return (
     <div className="min-w-0 space-y-3">
       {m.parts.map((p, i) => (
-        <PartView key={i} part={p} />
+        <PartView key={i} part={p} onAnswer={onAnswer} />
       ))}
       {done && (text || onRegenerate) && (
         <div className="-ml-2 flex items-center">
@@ -269,15 +281,20 @@ export function Coach({ id, initial, groups, next, prefill, auto, suggestions }:
   const [error, setError] = React.useState<string | null>(null)
   const area = React.useRef<HTMLTextAreaElement>(null)
   const transcript = React.useRef<HTMLDivElement>(null)
-  const { messages, sendMessage, regenerate, status, stop } = useChat({
+  const { messages, sendMessage, regenerate, status, stop, addToolApprovalResponse } = useChat({
     id,
     messages: initial,
     throttle: 50,
     transport: new DefaultChatTransport({
       api: "/api/coach",
-      // Send only the newest message: the server replays its saved history.
-      prepareSendMessagesRequest: ({ messages, id, trigger, messageId }) => ({ body: { id, message: messages.at(-1), trigger, messageId } }),
+      // Send only the newest message, or only the answers to its log confirmations: the server replays its saved history.
+      prepareSendMessagesRequest: ({ messages, id, trigger, messageId }) => {
+        const last = messages.at(-1)
+        if (trigger === "submit-message" && last?.role === "assistant") return { body: { id, approvals: answersOf(last) } }
+        return { body: { id, message: last, trigger, messageId } }
+      },
     }),
+    sendAutomaticallyWhen: lastAssistantMessageIsCompleteWithApprovalResponses,
     onError: (e) => setError(ERRORS[/\b(limit|key|provider)\b/.exec(e.message)?.[1] ?? ""] ?? "Couldn’t get an answer. Try again."),
     onFinish: ({ message }) => {
       // Announce completed answers once; saved chats must not be read again on load.
@@ -354,6 +371,10 @@ export function Coach({ id, initial, groups, next, prefill, auto, suggestions }:
     void regenerate(messageId ? { messageId } : undefined)
   }
   const lastAnswer = messages.at(-1)?.role === "assistant" ? messages.at(-1)!.id : null
+  const answer: Answer = (approvalId, approved) => {
+    setError(null)
+    void addToolApprovalResponse({ id: approvalId, approved })
+  }
 
   const listOpen = usePanelOpen()
   const PANEL_BTN = "rounded-full text-muted-foreground hover:bg-foreground/8 hover:text-foreground"
@@ -431,7 +452,7 @@ export function Coach({ id, initial, groups, next, prefill, auto, suggestions }:
                 m.role === "user" ? (
                   <UserMessage key={m.id} m={m} busy={busy} onEdit={(text) => edit(m.id, text)} />
                 ) : (
-                  <AssistantMessage key={m.id} m={m} done={!busy || i < messages.length - 1} onRegenerate={!busy && m.id === lastAnswer ? () => again(m.id) : undefined} />
+                  <AssistantMessage key={m.id} m={m} done={!busy || i < messages.length - 1} onRegenerate={!busy && m.id === lastAnswer ? () => again(m.id) : undefined} onAnswer={!busy && m.id === lastAnswer ? answer : undefined} />
                 ),
               )}
               {status === "submitted" && <Caption live>Thinking…</Caption>}

@@ -52,6 +52,8 @@ per person in **People › Manage**; owners always have it.
 - To offer a model you run yourself (for example Ollama), set `COACH_LOCAL_URL` and `COACH_LOCAL_MODEL` in `.env`.
   It is offered as "This server's model", with no key needed.
 - Changing `BETTER_AUTH_SECRET` makes stored keys unreadable, and everyone has to add their key again.
+- The coach can log water, food, weight, mood and symptoms (and cycle entries on female profiles) when asked. Each
+  entry waits for the person to tap Log, and goes to Google Health as if they had used the log sheet.
 - In **AI coach**, you can edit the coach's instructions and its tool descriptions. Every save is a new version, with
   history, restore and reset to the default.
 

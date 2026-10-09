@@ -1,5 +1,5 @@
-// A scripted model for tests and e2e (COACH_MOCK=1, never in production): the first step calls get_day, the next
-// answers in text. Deterministic, so the e2e can assert on the tool card and the reply.
+// A scripted model for tests and e2e (COACH_MOCK=1, never in production): the first step calls get_day (log_water
+// when asked to log), the next answers in text. Deterministic, so the e2e can assert on the tool card and the reply.
 import { simulateReadableStream } from "ai";
 import { MockLanguageModelV4 } from "ai/test";
 
@@ -23,9 +23,9 @@ export function mockModel() {
       const current = prompt.slice(prompt.findLastIndex((m) => m.role === "user"));
       const question = JSON.stringify(current[0]?.content ?? "").toLowerCase();
       const used = new Set(current.flatMap((m) => m.role === "tool" ? m.content.flatMap((p) => p.type === "tool-result" ? [p.toolName] : []) : []));
-      const plan = question.includes("brief") ? ["get_day", "get_sleep", "get_health", "get_activities"] : question.includes("trend") || question.includes("hrv") ? ["get_trend"] : question.includes("habit") ? ["get_journal_impacts"] : question.includes("sleep") ? ["get_sleep"] : ["get_day"];
+      const plan = /\blog\b/.test(question) ? ["log_water"] : question.includes("brief") ? ["get_day", "get_sleep", "get_health", "get_activities"] : question.includes("trend") || question.includes("hrv") ? ["get_trend"] : question.includes("habit") ? ["get_journal_impacts"] : question.includes("sleep") ? ["get_sleep"] : ["get_day"];
       const next = plan.find((name) => !used.has(name));
-      const input = next === "get_trend" ? JSON.stringify({ metric: question.includes("hrv") ? "hrv" : "recovery" }) : next === "get_activities" ? JSON.stringify({ days: 14 }) : next === "get_journal_impacts" ? JSON.stringify({ outcome: "recovery" }) : "{}";
+      const input = next === "get_trend" ? JSON.stringify({ metric: question.includes("hrv") ? "hrv" : "recovery" }) : next === "get_activities" ? JSON.stringify({ days: 14 }) : next === "get_journal_impacts" ? JSON.stringify({ outcome: "recovery" }) : next === "log_water" ? JSON.stringify({ ml: 500 }) : "{}";
       const call = [
         { type: "tool-call" as const, toolCallId: `call-${prompt.length}`, toolName: next ?? "get_day", input },
         { type: "finish" as const, finishReason: { unified: "tool-calls" as const, raw: undefined }, usage },

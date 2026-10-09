@@ -64,6 +64,11 @@ export const KIND_LABEL: Record<LogKind, string> = {
 }
 export const isCycleKind = (k: LogKind) => k === "period" || k === "ovulation"
 
+/** The coach's log tools (src/server/coach/logTools.ts), one per kind; each waits for the user's approval. */
+export const LOG_TOOLS = ["log_water", "log_food", "log_weight", "log_mood", "log_symptoms", "log_period", "log_ovulation"] as const
+export type LogToolName = (typeof LOG_TOOLS)[number]
+export const isLogTool = (name: string): name is LogToolName => (LOG_TOOLS as readonly string[]).includes(name)
+
 export const WATER_STEPS = [250, 500] as const
 
 export const MEALS = [

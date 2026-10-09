@@ -1,17 +1,24 @@
-// POST /api/coach: who gets through, and a full turn with the scripted model (a tool call, then text), saved per user.
-import { beforeEach, expect, it, vi } from "vitest";
+// POST /api/coach: who gets through, a full turn with the scripted model (a tool call, then text), saved per user, and
+// the log tools' confirmation round trip.
+import { eq } from "drizzle-orm";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { parseConfig, type Config } from "@/server/config";
+import { MOVED_ON } from "@/server/coach/approvals";
 import { MOCK_REPLY } from "@/server/coach/mock";
 import { listChats, loadChat, saveProvider, setCoachMode, setConsent } from "@/server/coach/store";
 import type { Db } from "@/server/db";
-import { profile, user } from "@/server/db/schema";
+import { loggedEntries, oauthTokens, profile, user } from "@/server/db/schema";
+import { scopeUrl } from "@/lib/log";
 import { addUser, freshDb, TZ, USER } from "@/server/testing";
 import { POST } from "./route";
 
-const h = vi.hoisted(() => ({ cfg: undefined as unknown, user: null as unknown, db: undefined as unknown }));
+const h = vi.hoisted(() => ({ cfg: undefined as unknown, user: null as unknown, db: undefined as unknown, create: vi.fn() }));
 vi.mock("@/server/config", async (orig) => ({ ...(await orig<object>()), getConfig: () => h.cfg as Config }));
 vi.mock("@/server/auth", async (orig) => ({ ...(await orig<object>()), requestUser: async () => h.user }));
 vi.mock("@/server/db", async (orig) => ({ ...(await orig<object>()), getDb: () => h.db as Db }));
+vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
+vi.mock("@/server/worker", () => ({ requestSync: vi.fn() }));
+vi.mock("@/server/sources/google/client", () => ({ createGoogleClient: () => ({ create: h.create, batchDelete: vi.fn() }) }));
 
 const as = (userId: number) => (h.user = { userId, email: "x@pulse.test", name: "X", username: null, image: null });
 const body = (id: string, text = "How am I today?") => ({ id, message: { id: `u-${Math.random()}`, role: "user", parts: [{ type: "text", text }] } });
@@ -136,4 +143,81 @@ it("regenerate replaces the answer; a message id the chat doesn't have, or a mis
   expect(await turn({ id: "chat-regen-1", message: say("u2", "x"), trigger: "submit-message", messageId: "u1" })).toBe(400);
   expect(await turn({ id: "chat-regen-1", message: say("u2", "x"), extra: true })).toBe(400);
   expect(await loadChat(db, 9003, "chat-regen-1")).toHaveLength(2);
+});
+
+describe("log tools wait for the user's answer", () => {
+  /** A user whose Google grant allows logging water, with Google's writer stubbed. */
+  const ready2 = async (id: number) => {
+    await ready(id);
+    await db.insert(oauthTokens).values({ userId: id, accessToken: "a", refreshToken: "r", expiresAt: 0, scope: scopeUrl("hydration-log"), updatedAt: 0 });
+    h.create.mockReset().mockResolvedValue(`users/${id}/dataTypes/hydration-log/dataPoints/1`);
+  };
+  const entries = (userId: number) => db.select().from(loggedEntries).where(eq(loggedEntries.userId, userId));
+  type Tool = { type: string; state: string; approval?: { id: string; approved?: boolean; reason?: string }; output?: unknown };
+  const logPart = async (userId: number, chat: string) => (await loadChat(db, userId, chat))!.at(-1)!.parts.find((p) => p.type === "tool-log_water") as Tool;
+  const asked = async (userId: number, chat: string) => {
+    expect(await turn({ id: chat, message: say("u1", "Please log 500 ml of water") })).toBe(200);
+    await vi.waitFor(async () => expect((await logPart(userId, chat))?.state).toBe("approval-requested"));
+    return (await logPart(userId, chat)).approval!.id;
+  };
+
+  it("asks first, logs only after the user approves, and answers in the same message", async () => {
+    await ready2(9004);
+    const approval = await asked(9004, "chat-log-1");
+    expect(await entries(9004)).toEqual([]);
+
+    expect(await turn({ id: "chat-log-1", approvals: [{ id: approval, approved: true }] })).toBe(200);
+    await vi.waitFor(async () => expect((await logPart(9004, "chat-log-1")).state).toBe("output-available"));
+    expect((await logPart(9004, "chat-log-1")).output).toEqual({ logged: true });
+    expect((await entries(9004)).map((e) => [e.type, e.data, e.googleName])).toEqual([["hydration-log", { ml: 500 }, "users/9004/dataTypes/hydration-log/dataPoints/1"]]);
+    const chat = (await loadChat(db, 9004, "chat-log-1"))!;
+    expect(chat).toHaveLength(2);
+    await vi.waitFor(async () => expect(textOf((await loadChat(db, 9004, "chat-log-1"))!.at(-1)!)).toContain(MOCK_REPLY));
+  });
+
+  it("a denial logs nothing, and an answer can't be replayed", async () => {
+    await ready2(9005);
+    const approval = await asked(9005, "chat-log-2");
+    expect(await turn({ id: "chat-log-2", approvals: [{ id: approval, approved: false }] })).toBe(200);
+    await vi.waitFor(async () => expect((await logPart(9005, "chat-log-2")).state).toBe("output-denied"));
+    expect(await entries(9005)).toEqual([]);
+    expect(h.create).not.toHaveBeenCalled();
+    expect(await turn({ id: "chat-log-2", approvals: [{ id: approval, approved: true }] })).toBe(400);
+    expect(await entries(9005)).toEqual([]);
+  });
+
+  it("the same answer sent twice at once (a double tap, a second tab) logs once", async () => {
+    await ready2(9009);
+    const approval = await asked(9009, "chat-log-5");
+    const answer = { id: "chat-log-5", approvals: [{ id: approval, approved: true }] };
+    const codes = (await Promise.all([turn(answer), turn(answer)])).sort();
+    expect(codes).toEqual([200, 409]);
+    await vi.waitFor(async () => expect((await logPart(9009, "chat-log-5")).state).toBe("output-available"));
+    expect(await entries(9009)).toHaveLength(1);
+    expect(h.create).toHaveBeenCalledTimes(1);
+  });
+
+  it("only the chat's own open confirmation can be answered: not a made-up id, nor another user's chat", async () => {
+    await ready2(9006);
+    const approval = await asked(9006, "chat-log-3");
+    expect(await turn({ id: "chat-log-3", approvals: [{ id: "made-up", approved: true }] })).toBe(400);
+    expect(await turn({ id: "chat-log-3", approvals: [{ id: approval, approved: true }, { id: approval, approved: false }] })).toBe(400);
+    expect(await turn({ id: "chat-log-3", approvals: [{ id: approval, approved: true }], message: say("u2", "x") })).toBe(400);
+    await ready2(9007);
+    expect(await turn({ id: "chat-log-3", approvals: [{ id: approval, approved: true }] })).toBe(400);
+    expect(await entries(9006)).toEqual([]);
+    expect(await entries(9007)).toEqual([]);
+    expect((await logPart(9006, "chat-log-3")).state).toBe("approval-requested");
+  });
+
+  it("writing again instead of answering declines the open confirmation", async () => {
+    await ready2(9008);
+    await asked(9008, "chat-log-4");
+    expect(await turn({ id: "chat-log-4", message: say("u2", "How am I today?") })).toBe(200);
+    await vi.waitFor(async () => expect(await loadChat(db, 9008, "chat-log-4")).toHaveLength(4));
+    const [, first] = (await loadChat(db, 9008, "chat-log-4"))!;
+    const part = first.parts.find((p) => p.type === "tool-log_water") as Tool;
+    expect(part).toMatchObject({ state: "output-denied", approval: { approved: false, reason: MOVED_ON } });
+    expect(await entries(9008)).toEqual([]);
+  });
 });

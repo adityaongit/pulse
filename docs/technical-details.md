@@ -68,8 +68,11 @@ flowchart LR
   Q["Question in /coach"] --> R["POST /api/coach<br/>session, access, consent,<br/>10 requests a minute"]
   R --> K["The person's key<br/>(decrypted in memory)"]
   K --> P["Their provider"]
-  P -- "tool calls" --> T["Read-only tools over<br/>Pulse's own screens<br/>(only this person's data)"]
+  P -- "tool calls" --> T["Read tools over<br/>Pulse's own screens<br/>(only this person's data)"]
   T --> P
+  P -- "log calls" --> C["Confirmation card<br/>(Log / Don't log)"]
+  C -- "approval ids, yes/no" --> R
+  R -- "approved" --> L["logging.ts, as the log sheets<br/>(Google Health + logged_entries)"]
   P -- "answer, streamed" --> Q
   R -- "chat saved" --> DB[("coach_chats")]
 ```
@@ -85,6 +88,11 @@ flowchart LR
   summaries carry preferences and earlier decisions, and measurements are fetched again.
 - **No user-supplied server addresses**, since the server makes the request and a user-chosen URL could reach your
   internal network. Only `COACH_LOCAL_URL` (set by the admin) points at a self-hosted model.
+- **Logging:** asked to log water, food, weight, mood, symptoms, a period or an ovulation test (the last two on
+  female profiles only), the coach proposes the entry and the turn stops at a confirmation card. Only Log writes it,
+  through the same code as the log sheets. The browser sends back approval ids and yes/no; the tool and its input come
+  from the chat the server saved, so nothing the browser sends can change what is written. Writing a new message
+  instead of answering declines the open card.
 - **Streaming:** Pulse sends `X-Accel-Buffering: no`, which nginx honours by default.
 
 ### Checking coach answers

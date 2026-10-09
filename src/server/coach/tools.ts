@@ -1,6 +1,7 @@
-// The coach's tools: read-only, bound to the signed-in user's QueryCtx by closure (the model never names a user),
-// each a compact digest of an existing screen query. A metric without a value carries its reason code instead, so
-// the model can say "calibrating" rather than guess. No chart series, ids or raw payloads.
+// The coach's tools, bound to the signed-in user's QueryCtx by closure (the model never names a user). The read tools
+// are each a compact digest of an existing screen query; a metric without a value carries its reason code instead, so
+// the model can say "calibrating" rather than guess. No chart series, ids or raw payloads. The log tools (logTools.ts)
+// write only after the user approves each call.
 import { tool, type InferToolOutput } from "ai";
 import { z } from "zod";
 import { trainingGuidance } from "@/core/algorithms/coaching";
@@ -20,6 +21,7 @@ import { getStrain } from "../queries/strain";
 import { getStress } from "../queries/health";
 import { TREND_METRICS, type TrendMetricKey } from "../queries/trends";
 import { addDays, daysBetween } from "../time";
+import { logTools } from "./logTools";
 import { defaultTexts, type Texts } from "./texts";
 
 const round = (v: number, dp = 0) => Math.round(v * 10 ** dp) / 10 ** dp;
@@ -219,6 +221,7 @@ export function coachTools(ctx: QueryCtx, t: Texts = defaultTexts) {
         return { age, sex: p.sex, maxHr: p.maxHr, timeZone: ctx.timeZone, firstDayWithData: await firstDay(ctx), today: todayOf(ctx), weekAgo: addDays(todayOf(ctx), -7) };
       },
     }),
+    ...logTools(ctx, t),
   };
 }
 

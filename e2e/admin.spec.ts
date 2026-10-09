@@ -270,6 +270,33 @@ test("coach: an admin turns it on, the P button opens it, set-up, a question wit
   await expect(page.getByRole("link", { name: "JSON" }).last()).toHaveAttribute("href", "/export/coach");
 });
 
+test("coach logging: a log request waits for the user's tap, and a decline logs nothing", async ({ page }) => {
+  await signIn(page);
+  await page.goto("/coach");
+  const input = page.getByRole("textbox", { name: "Ask Coach", exact: true });
+  const card = page.getByRole("group", { name: "Log Water?" });
+
+  await input.fill("Please log 500 ml of water");
+  await input.press("Enter");
+  await expect(card).toContainText("500 ml");
+  await expect(card).toContainText("Now");
+  await shot(page, "17-coach-log-confirm");
+  await card.getByRole("button", { name: "Don’t log" }).click();
+  await expect(page.getByText("Not logged: Water · 500 ml")).toBeVisible();
+  await expect(page.getByText("Take it easy", { exact: true })).toBeVisible();
+
+  // The owner has no Google grant here, so an approved log comes back with the sheets' reconnect message.
+  await input.fill("Please log 500 ml of water");
+  await input.press("Enter");
+  await card.getByRole("button", { name: "Log", exact: true }).click();
+  await expect(page.getByText(/Not logged: reconnect Google in Settings/)).toBeVisible();
+  await shot(page, "18-coach-log-result");
+  await page.reload();
+  await expect(page.getByText("Not logged: Water · 500 ml")).toBeVisible();
+  await expect(page.getByText(/Not logged: reconnect Google in Settings/)).toBeVisible();
+  await expect(page.getByRole("button", { name: "Log", exact: true })).toHaveCount(0);
+});
+
 test("coach wording: an admin edits a tool description, it is versioned, and reset brings the default back", async ({ page }) => {
   await signIn(page);
   await page.goto("/admin/coach?item=get_day");
