@@ -1,6 +1,7 @@
 // Exports the parity fixtures F1 to F6 for pulse-mobile (docs/plans/2026-10-10-003, "Parity contract"), once per
 // SCORING_VERSION:
-//   pnpm tsx scripts/export-mobile-fixtures.mts <outDir>
+//   pnpm dlx tsx@4.23.15 scripts/export-mobile-fixtures.mts <outDir>
+// (tsx is only a transitive dependency here, so `pnpm tsx` finds no binary in a fresh install.)
 // F1 mapper rows, F2 the 180-day demo seed as input rows, F3 every score row of the pinned demo database (hashes
 // checked against golden.test.ts's GOLDEN), F4 incremental.test.ts's late night for day 200 (checked against a full
 // fold), F5 time.ts across time zones and DST, F6 the view models at a fixed now. Any check that fails throws.
@@ -37,7 +38,7 @@ type Row = Record<string, unknown>;
 const without = (r: Row, key: string) => Object.fromEntries(Object.entries(r).filter(([k]) => k !== key));
 
 const outDir = process.argv[2];
-if (!outDir) throw new Error("usage: pnpm tsx scripts/export-mobile-fixtures.mts <outDir>");
+if (!outDir) throw new Error("usage: pnpm dlx tsx@4.23.15 scripts/export-mobile-fixtures.mts <outDir>");
 fs.mkdirSync(outDir, { recursive: true });
 
 const git = (...args: string[]) => execFileSync("git", args, { encoding: "utf8" }).trim();
