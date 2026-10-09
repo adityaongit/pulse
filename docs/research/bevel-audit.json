@@ -1,0 +1,3510 @@
+{
+  "audit_date": "2026-10-06",
+  "ipa": {
+    "path": "/Users/adityajindal/Downloads/Bevel__AI_Health_Coach_3.1.7_1787165001.ipa",
+    "bytes": 532162261,
+    "sha256": "329886dda54e712799b3e913e6f717a1c4e6ddec921cf3f482e4329b02679af7",
+    "bundle_id": "com.supersethealth.superset",
+    "version": "3.1.7",
+    "build": "2728",
+    "minimum_os": "18.0",
+    "sdk": "26.5",
+    "main_uuid": "481D40FB-A9DF-3306-8F29-139B32C123C8",
+    "modified": true
+  },
+  "mach_o_images": [
+    {
+      "path": "Payload/Superset.app/Superset",
+      "bytes": 113099984,
+      "sha256": "78c1c99c815163517c69a0bec10bd97b415e4b3b3c0d642132c13a43b366c083",
+      "magic": "cffaedfe",
+      "cpu_type": 16777228,
+      "cpu_subtype": 0,
+      "encryption": [
+        {
+          "cryptoff": 48541696,
+          "cryptsize": 4096,
+          "cryptid": 0
+        }
+      ],
+      "patch_dependencies": [
+        "@rpath/BevelAIHealthCoachPatch.dylib",
+        "@rpath/blatantsPatch.dylib"
+      ]
+    },
+    {
+      "path": "Payload/Superset.app/Frameworks/BevelAIHealthCoachPatch.dylib",
+      "bytes": 8932064,
+      "sha256": "e5f14354d2b146f6110e19a66da82d39ae283bcb8b39ec5d7cec969e5379d3d1",
+      "magic": "cffaedfe",
+      "cpu_type": 16777228,
+      "cpu_subtype": 0,
+      "encryption": [
+        {
+          "cryptoff": 16384,
+          "cryptsize": 8290304,
+          "cryptid": 0
+        }
+      ],
+      "patch_dependencies": []
+    },
+    {
+      "path": "Payload/Superset.app/Frameworks/blatantsPatch.dylib",
+      "bytes": 70848,
+      "sha256": "4fb1f1d688a795bd3fb63aec01cf238ed48834fb95733cdaa280ee0618401f5a",
+      "magic": "cffaedfe",
+      "cpu_type": 16777228,
+      "cpu_subtype": 0,
+      "encryption": [
+        {
+          "cryptoff": 16384,
+          "cryptsize": 16384,
+          "cryptid": 0
+        }
+      ],
+      "patch_dependencies": []
+    },
+    {
+      "path": "Payload/Superset.app/Frameworks/FirebaseAnalytics.framework/FirebaseAnalytics",
+      "bytes": 16960,
+      "sha256": "abf3fefba6e14b60b2796a79c06ad61c1c02a9c44a8bd06c79fca2859ad45002",
+      "magic": "cffaedfe",
+      "cpu_type": 16777228,
+      "cpu_subtype": 0,
+      "encryption": [
+        {
+          "cryptoff": 16384,
+          "cryptsize": 0,
+          "cryptid": 0
+        }
+      ],
+      "patch_dependencies": []
+    },
+    {
+      "path": "Payload/Superset.app/Frameworks/GoogleAdsOnDeviceConversion.framework/GoogleAdsOnDeviceConversion",
+      "bytes": 16976,
+      "sha256": "8c20799d001b203bb63e0e5aef852615322c07aad3d753071eee9b44b585dae2",
+      "magic": "cffaedfe",
+      "cpu_type": 16777228,
+      "cpu_subtype": 0,
+      "encryption": [
+        {
+          "cryptoff": 16384,
+          "cryptsize": 0,
+          "cryptid": 0
+        }
+      ],
+      "patch_dependencies": []
+    },
+    {
+      "path": "Payload/Superset.app/Frameworks/GoogleAppMeasurementIdentitySupport.framework/GoogleAppMeasurementIdentitySupport",
+      "bytes": 16992,
+      "sha256": "0b049603a0a648ece16ea47f40048894ba9f90d8767358a22c5c439ded49ce14",
+      "magic": "cffaedfe",
+      "cpu_type": 16777228,
+      "cpu_subtype": 0,
+      "encryption": [
+        {
+          "cryptoff": 16384,
+          "cryptsize": 0,
+          "cryptid": 0
+        }
+      ],
+      "patch_dependencies": []
+    },
+    {
+      "path": "Payload/Superset.app/Frameworks/RiveRuntime.framework/RiveRuntime",
+      "bytes": 5274480,
+      "sha256": "d3ad093309710524bd4dd89e3aa8c719bba228cdd42c5e299d1027a24228f2cb",
+      "magic": "cffaedfe",
+      "cpu_type": 16777228,
+      "cpu_subtype": 0,
+      "encryption": [
+        {
+          "cryptoff": 16384,
+          "cryptsize": 3866624,
+          "cryptid": 0
+        }
+      ],
+      "patch_dependencies": []
+    },
+    {
+      "path": "Payload/Superset.app/Frameworks/GoogleAppMeasurement.framework/GoogleAppMeasurement",
+      "bytes": 16976,
+      "sha256": "1942da90c507040af7b5587b2d20f043cde163b1aad0f620e3304317dcd13679",
+      "magic": "cffaedfe",
+      "cpu_type": 16777228,
+      "cpu_subtype": 0,
+      "encryption": [
+        {
+          "cryptoff": 16384,
+          "cryptsize": 0,
+          "cryptid": 0
+        }
+      ],
+      "patch_dependencies": []
+    },
+    {
+      "path": "Payload/Superset.app/Frameworks/Singular.framework/Singular",
+      "bytes": 16896,
+      "sha256": "85144b195de823d4a7a6bee0ef8f443b21c3f22c6a97775df493ec6f4454c9fd",
+      "magic": "cffaedfe",
+      "cpu_type": 16777228,
+      "cpu_subtype": 0,
+      "encryption": [
+        {
+          "cryptoff": 16384,
+          "cryptsize": 0,
+          "cryptid": 0
+        }
+      ],
+      "patch_dependencies": []
+    },
+    {
+      "path": "Payload/Superset.app/Frameworks/Sentry.framework/Sentry",
+      "bytes": 16944,
+      "sha256": "296455ea4b6756095c8a3e1869768cb0a0d6c0dbd9b0fb4dba3dac0a19bca566",
+      "magic": "cffaedfe",
+      "cpu_type": 16777228,
+      "cpu_subtype": 0,
+      "encryption": [
+        {
+          "cryptoff": 16384,
+          "cryptsize": 0,
+          "cryptid": 0
+        }
+      ],
+      "patch_dependencies": []
+    },
+    {
+      "path": "Payload/Superset.app/Extensions/SupersetCaptureExtension.appex/SupersetCaptureExtension",
+      "bytes": 29260256,
+      "sha256": "68c1f3c666a0ab3b595951cbf8882e2d5c01ce9548696382c3979c8c0ccf1c0e",
+      "magic": "cffaedfe",
+      "cpu_type": 16777228,
+      "cpu_subtype": 0,
+      "encryption": [
+        {
+          "cryptoff": 8417280,
+          "cryptsize": 4096,
+          "cryptid": 0
+        }
+      ],
+      "patch_dependencies": [
+        "@rpath/blatantsPatch.dylib"
+      ]
+    },
+    {
+      "path": "Payload/Superset.app/PlugIns/SupersetWidgetExtension.appex/SupersetWidgetExtension",
+      "bytes": 26508752,
+      "sha256": "d7b51e7dd3bc22a641ea4eeb27782aaf418e8ae7be8a1a5c715b170003a4f13f",
+      "magic": "cffaedfe",
+      "cpu_type": 16777228,
+      "cpu_subtype": 0,
+      "encryption": [
+        {
+          "cryptoff": 18305024,
+          "cryptsize": 4096,
+          "cryptid": 0
+        }
+      ],
+      "patch_dependencies": [
+        "@rpath/blatantsPatch.dylib"
+      ]
+    }
+  ],
+  "original_evidence_zip_sha256": "8bec7fd7e1310f264d4be7bec6ac7cc9c18b745fb417295ed0d1d2bf9e1352ab",
+  "identity_and_metadata_verification": {
+    "current_export_root_end": 6,
+    "original_export_node_start": 2307,
+    "roots": [
+      3157882
+    ],
+    "exports": 108353,
+    "address_name_differences": 0,
+    "demangle_differences": 0,
+    "metadata_count": 14064,
+    "metadata_matches_archive": true,
+    "trie_file_offset": 107917432,
+    "trie_size": 3158208
+  },
+  "assembly_verification": [
+    {
+      "file": "0x10008685c.asm",
+      "instructions": 77,
+      "first": "0x1000867d0",
+      "last": "0x100086900",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "0x10010353c.asm",
+      "instructions": 409,
+      "first": "0x10010353c",
+      "last": "0x100103b9c",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "0x103c44810.asm",
+      "instructions": 20,
+      "first": "0x103c44810",
+      "last": "0x103c4485c",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "age-delta-factor-aggregate.asm",
+      "instructions": 66,
+      "first": "0x103c4c224",
+      "last": "0x103c4c328",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "age-projection.asm",
+      "instructions": 325,
+      "first": "0x103c41968",
+      "last": "0x103c41e78",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "bioage-bodyfat-reference.asm",
+      "instructions": 56,
+      "first": "0x103c46d88",
+      "last": "0x103c46e64",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "bioage-combine.asm",
+      "instructions": 97,
+      "first": "0x103c41698",
+      "last": "0x103c41818",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "bioage-neutral-rhr.asm",
+      "instructions": 47,
+      "first": "0x103c46abc",
+      "last": "0x103c46b74",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "bioage-neutral-vo2.asm",
+      "instructions": 48,
+      "first": "0x103c46c20",
+      "last": "0x103c46cdc",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "bioage-sanitize.asm",
+      "instructions": 157,
+      "first": "0x1038cd3b8",
+      "last": "0x1038cd628",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "bioage-service-combine.asm",
+      "instructions": 82,
+      "first": "0x100591b6c",
+      "last": "0x100591cb0",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "blood-confidence-details.asm",
+      "instructions": 520,
+      "first": "0x103c43d64",
+      "last": "0x103c44580",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "blood-confidence.asm",
+      "instructions": 156,
+      "first": "0x103c435f0",
+      "last": "0x103c4385c",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "blood-coverage-filter-closure.asm",
+      "instructions": 1,
+      "first": "0x103c44860",
+      "last": "0x103c44860",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "blood-coverage.asm",
+      "instructions": 82,
+      "first": "0x103c4443c",
+      "last": "0x103c44580",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "blood-freshness-mean.asm",
+      "instructions": 214,
+      "first": "0x103c43d64",
+      "last": "0x103c440b8",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "blood-imputation.asm",
+      "instructions": 163,
+      "first": "0x103c44c7c",
+      "last": "0x103c44f04",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "blood-recency-actual-predicate.asm",
+      "instructions": 15,
+      "first": "0x103c447d4",
+      "last": "0x103c4480c",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "blood-recency-filter-closure.asm",
+      "instructions": 1,
+      "first": "0x103c44580",
+      "last": "0x103c44580",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "blood-recency-predicate.asm",
+      "instructions": 243,
+      "first": "0x103c438cc",
+      "last": "0x103c43c94",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "blood-recent-entry.asm",
+      "instructions": 14,
+      "first": "0x103c436dc",
+      "last": "0x103c43710",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "blood-recent-filter.asm",
+      "instructions": 103,
+      "first": "0x103c440bc",
+      "last": "0x103c44254",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "blood-recent-wrapper.asm",
+      "instructions": 121,
+      "first": "0x103c44258",
+      "last": "0x103c44438",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "blood-usable.asm",
+      "instructions": 130,
+      "first": "0x103c45024",
+      "last": "0x103c45228",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "bodyfat-reference-init.asm",
+      "instructions": 65,
+      "first": "0x103c468f0",
+      "last": "0x103c469f0",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "cumulative.asm",
+      "instructions": 6919,
+      "first": "0x1015ec8e4",
+      "last": "0x1015f34fc",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "date-days-between-foundation.asm",
+      "instructions": 110,
+      "first": "0x1030cf508",
+      "last": "0x1030cf6bc",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "date-days-between.asm",
+      "instructions": 155,
+      "first": "0x1030f8fb8",
+      "last": "0x1030f9220",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "energy-update.asm",
+      "instructions": 346,
+      "first": "0x101543698",
+      "last": "0x101543bfc",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "energy.asm",
+      "instructions": 17033,
+      "first": "0x101534000",
+      "last": "0x101544a20",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "food-overall-score.asm",
+      "instructions": 1016,
+      "first": "0x100102190",
+      "last": "0x10010316c",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "food-quality-config.asm",
+      "instructions": 644,
+      "first": "0x1000aa3a0",
+      "last": "0x1000aadac",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "food-quality-total.asm",
+      "instructions": 315,
+      "first": "0x1000a76a0",
+      "last": "0x1000a7b88",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "food-quality.asm",
+      "instructions": 8192,
+      "first": "0x1000a6000",
+      "last": "0x1000adffc",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "glucose-dispatch.asm",
+      "instructions": 356,
+      "first": "0x100101c00",
+      "last": "0x10010218c",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "glucose-features.asm",
+      "instructions": 520,
+      "first": "0x1000975e0",
+      "last": "0x100097dfc",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "glucose-kernel.asm",
+      "instructions": 436,
+      "first": "0x1001014d8",
+      "last": "0x100101ba4",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "glucose-normalization.asm",
+      "instructions": 91,
+      "first": "0x10010136c",
+      "last": "0x1001014d4",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "glucose-window.asm",
+      "instructions": 118,
+      "first": "0x100101194",
+      "last": "0x100101368",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "hazard-alcohol.asm",
+      "instructions": 166,
+      "first": "0x103c47054",
+      "last": "0x103c472e8",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "hazard-lean-mass.asm",
+      "instructions": 251,
+      "first": "0x103c49af8",
+      "last": "0x103c49ee0",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "hazard-nutrition.asm",
+      "instructions": 169,
+      "first": "0x103c472ec",
+      "last": "0x103c4758c",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "hazard-rhr.asm",
+      "instructions": 221,
+      "first": "0x103c4a050",
+      "last": "0x103c4a3c0",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "hazard-sleep-consistency.asm",
+      "instructions": 225,
+      "first": "0x103c4a46c",
+      "last": "0x103c4a7ec",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "hazard-sleep-duration.asm",
+      "instructions": 222,
+      "first": "0x103c4a8c8",
+      "last": "0x103c4ac3c",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "hazard-smoking.asm",
+      "instructions": 247,
+      "first": "0x103c47644",
+      "last": "0x103c47a1c",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "hazard-steps.asm",
+      "instructions": 250,
+      "first": "0x103c4adf0",
+      "last": "0x103c4b1d4",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "hazard-strength.asm",
+      "instructions": 219,
+      "first": "0x103c4b2a4",
+      "last": "0x103c4b60c",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "hazard-to-age.asm",
+      "instructions": 7,
+      "first": "0x103c4649c",
+      "last": "0x103c464b4",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "hazard-vo2.asm",
+      "instructions": 224,
+      "first": "0x103c4b610",
+      "last": "0x103c4b98c",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "hazard-zone23.asm",
+      "instructions": 219,
+      "first": "0x103c4ba38",
+      "last": "0x103c4bda0",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "hazard-zone45.asm",
+      "instructions": 219,
+      "first": "0x103c4bda4",
+      "last": "0x103c4c10c",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "hr-zone-weight.asm",
+      "instructions": 101,
+      "first": "0x1015daf94",
+      "last": "0x1015db124",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "lifestyle-confidence.asm",
+      "instructions": 63,
+      "first": "0x103c44864",
+      "last": "0x103c4495c",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "lifestyle-hazard-dispatch.asm",
+      "instructions": 47,
+      "first": "0x103c49638",
+      "last": "0x103c496f0",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "load-target-kernel.asm",
+      "instructions": 803,
+      "first": "0x1015efbc4",
+      "last": "0x1015f084c",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "main-scoring.asm",
+      "instructions": 45315,
+      "first": "0x1015b0ba4",
+      "last": "0x1015dcfac",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "mass-unit-selector.asm",
+      "instructions": 8,
+      "first": "0x104e6c6a0",
+      "last": "0x104e6c6bc",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "muscular-freshness-kernel.asm",
+      "instructions": 1236,
+      "first": "0x100082200",
+      "last": "0x10008354c",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "muscular-freshness.asm",
+      "instructions": 18266,
+      "first": "0x100075000",
+      "last": "0x100086d64",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "muscular-strain-estimation.asm",
+      "instructions": 735,
+      "first": "0x1015aeea8",
+      "last": "0x1015afa20",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "muscular-strain-set.asm",
+      "instructions": 685,
+      "first": "0x1015ae3f0",
+      "last": "0x1015aeea0",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "nutrition-aggregate.asm",
+      "instructions": 6032,
+      "first": "0x10009e128",
+      "last": "0x1000a3f64",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "nutrition-core.asm",
+      "instructions": 9290,
+      "first": "0x100095000",
+      "last": "0x10009e124",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "nutrition-day-combine.asm",
+      "instructions": 1396,
+      "first": "0x10009b000",
+      "last": "0x10009c5cc",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "nutrition-dispatch.asm",
+      "instructions": 4604,
+      "first": "0x10008f1a4",
+      "last": "0x100093990",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "nutrition-metrics-daily.asm",
+      "instructions": 1266,
+      "first": "0x1016ba9e4",
+      "last": "0x1016bbda8",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "nutrition-overall.asm",
+      "instructions": 501,
+      "first": "0x10009cc00",
+      "last": "0x10009d3d0",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "nutrition-scoring.asm",
+      "instructions": 1435,
+      "first": "0x100093994",
+      "last": "0x100094ffc",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "pheno-contribution.asm",
+      "instructions": 109,
+      "first": "0x103c44ac8",
+      "last": "0x103c44c78",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "phenoage-core.asm",
+      "instructions": 388,
+      "first": "0x103c45300",
+      "last": "0x103c4590c",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "phenoage-init.asm",
+      "instructions": 73,
+      "first": "0x103c4522c",
+      "last": "0x103c4534c",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "phenoage-input-conversion.asm",
+      "instructions": 235,
+      "first": "0x103c4532c",
+      "last": "0x103c456d4",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "phenoage-regression-and-defaults.asm",
+      "instructions": 108,
+      "first": "0x103c456d8",
+      "last": "0x103c45884",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "phenoage.asm",
+      "instructions": 526,
+      "first": "0x103c44ac8",
+      "last": "0x103c452fc",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "physio-confidence.asm",
+      "instructions": 100,
+      "first": "0x103c45984",
+      "last": "0x103c45b10",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "physio-hazard-dispatch.asm",
+      "instructions": 69,
+      "first": "0x103c4c110",
+      "last": "0x103c4c220",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "physio-model-dispatch.asm",
+      "instructions": 37,
+      "first": "0x103c46f00",
+      "last": "0x103c46f90",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "quality-config-filter.asm",
+      "instructions": 130,
+      "first": "0x100103334",
+      "last": "0x100103538",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "quality-filter-closure.asm",
+      "instructions": 13,
+      "first": "0x100104ab0",
+      "last": "0x100104ae0",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "quality-filter-predicate.asm",
+      "instructions": 113,
+      "first": "0x100103170",
+      "last": "0x100103330",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "recovery.asm",
+      "instructions": 2861,
+      "first": "0x1015b0ba4",
+      "last": "0x1015b3854",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "rhr-reference-init.asm",
+      "instructions": 61,
+      "first": "0x103c466b0",
+      "last": "0x103c467a0",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "score-helpers.asm",
+      "instructions": 3226,
+      "first": "0x1015baf78",
+      "last": "0x1015be1dc",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "sleep-bank-actual-kernel.asm",
+      "instructions": 548,
+      "first": "0x1015cd324",
+      "last": "0x1015cdbb0",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "sleep-bank-kernel.asm",
+      "instructions": 3046,
+      "first": "0x1015cdbb4",
+      "last": "0x1015d0b48",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "sleep-components.asm",
+      "instructions": 152,
+      "first": "0x1015d0f14",
+      "last": "0x1015d1170",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "sleep-debt.asm",
+      "instructions": 154,
+      "first": "0x1015d11dc",
+      "last": "0x1015d1440",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "sleep-history-bank.asm",
+      "instructions": 2126,
+      "first": "0x1015be838",
+      "last": "0x1015c096c",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "sleep-needed-core.asm",
+      "instructions": 92,
+      "first": "0x1015c09d0",
+      "last": "0x1015c0b3c",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "sleep-needed.asm",
+      "instructions": 220,
+      "first": "0x1015c09d0",
+      "last": "0x1015c0d3c",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "sleep-stage-targets.asm",
+      "instructions": 255,
+      "first": "0x1015be43c",
+      "last": "0x1015be834",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "strain-cardio-entry.asm",
+      "instructions": 78,
+      "first": "0x1015db128",
+      "last": "0x1015db25c",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "strain-passive.asm",
+      "instructions": 110,
+      "first": "0x1015dc480",
+      "last": "0x1015dc634",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "strain-unit-entry.asm",
+      "instructions": 31,
+      "first": "0x1015dc7d4",
+      "last": "0x1015dc84c",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "strain-unit-helpers.asm",
+      "instructions": 1449,
+      "first": "0x1015daf94",
+      "last": "0x1015dc634",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "strain.asm",
+      "instructions": 606,
+      "first": "0x1015dc638",
+      "last": "0x1015dcfac",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "strength-1rm.asm",
+      "instructions": 52,
+      "first": "0x103e45580",
+      "last": "0x103e4564c",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "strength-effective-weight.asm",
+      "instructions": 144,
+      "first": "0x103e45340",
+      "last": "0x103e4557c",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "strength-rpe.asm",
+      "instructions": 93,
+      "first": "0x103e45650",
+      "last": "0x103e457c0",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "strength-velocity-rpe.asm",
+      "instructions": 93,
+      "first": "0x103e457c4",
+      "last": "0x103e45934",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "stress-heart-rate-transform.asm",
+      "instructions": 52,
+      "first": "0x1015e486c",
+      "last": "0x1015e4938",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "stress-hrv-normalize.asm",
+      "instructions": 39,
+      "first": "0x1015e5140",
+      "last": "0x1015e51d8",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "stress-score-core.asm",
+      "instructions": 140,
+      "first": "0x1015e3ff0",
+      "last": "0x1015e421c",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "stress-score-mix.asm",
+      "instructions": 44,
+      "first": "0x1015e4df0",
+      "last": "0x1015e4e9c",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "stress.asm",
+      "instructions": 10041,
+      "first": "0x1015dcfb0",
+      "last": "0x1015e6c90",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "tdee-inputs.asm",
+      "instructions": 935,
+      "first": "0x10198f484",
+      "last": "0x10199031c",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "tdee.asm",
+      "instructions": 2048,
+      "first": "0x100111000",
+      "last": "0x100112ffc",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "vo2-reference-init.asm",
+      "instructions": 79,
+      "first": "0x103c467ac",
+      "last": "0x103c468e4",
+      "mismatches": 0,
+      "examples": []
+    },
+    {
+      "file": "workout-rhr-baseline.asm",
+      "instructions": 517,
+      "first": "0x1014ed2d8",
+      "last": "0x1014edae8",
+      "mismatches": 0,
+      "examples": []
+    }
+  ],
+  "direct_call_verification": {
+    "target_keys": 98904,
+    "call_sites": 2142419,
+    "matches_archive": true
+  },
+  "table_checks": [
+    {
+      "table": "muscle_decay",
+      "address": "0x104ec1fe8",
+      "file_offset": "0x4ec1fe8",
+      "format": "22 little-endian Float64",
+      "matches_json": true
+    },
+    {
+      "table": "muscle_capacity",
+      "address": "0x104ec2098",
+      "file_offset": "0x4ec2098",
+      "format": "22 little-endian Float64",
+      "matches_json": true
+    },
+    {
+      "table": "phenoage_coefficients",
+      "address": "0x106219e10",
+      "file_offset": "0x6219e10",
+      "record_bytes": 32,
+      "matches_coefficients_and_log_flags": true,
+      "records": [
+        {
+          "address": "0x106219e10",
+          "marker_tag": 0,
+          "unit_tag": 6,
+          "coefficient": -0.0336,
+          "natural_log": false
+        },
+        {
+          "address": "0x106219e30",
+          "marker_tag": 1,
+          "unit_tag": 11,
+          "coefficient": 0.0095,
+          "natural_log": false
+        },
+        {
+          "address": "0x106219e50",
+          "marker_tag": 2,
+          "unit_tag": 10,
+          "coefficient": 0.1953,
+          "natural_log": false
+        },
+        {
+          "address": "0x106219e70",
+          "marker_tag": 8,
+          "unit_tag": 1,
+          "coefficient": 0.0954,
+          "natural_log": true
+        },
+        {
+          "address": "0x106219e90",
+          "marker_tag": 4,
+          "unit_tag": 24,
+          "coefficient": -0.012,
+          "natural_log": false
+        },
+        {
+          "address": "0x106219eb0",
+          "marker_tag": 5,
+          "unit_tag": 22,
+          "coefficient": 0.0268,
+          "natural_log": false
+        },
+        {
+          "address": "0x106219ed0",
+          "marker_tag": 6,
+          "unit_tag": 24,
+          "coefficient": 0.3306,
+          "natural_log": false
+        },
+        {
+          "address": "0x106219ef0",
+          "marker_tag": 3,
+          "unit_tag": 16,
+          "coefficient": 0.0019,
+          "natural_log": false
+        },
+        {
+          "address": "0x106219f10",
+          "marker_tag": 7,
+          "unit_tag": 20,
+          "coefficient": 0.0554,
+          "natural_log": false
+        }
+      ],
+      "unit_labels": "Original unit dispatch interpretation retained; full source conversions remain partial."
+    },
+    {
+      "table": "blood_coverage_weights",
+      "address": "0x1051300d8",
+      "format": "9 Float64",
+      "matches_json": true
+    },
+    {
+      "table": "strain_weight_pairs",
+      "address": "0x104f94698",
+      "format": "8 Float32",
+      "matches_json": true
+    }
+  ],
+  "equation_recomputations": {
+    "notice": "Equation evaluations only. No Bevel runtime reference outputs; these do not validate parity.",
+    "recovery_neutral_z_sleep_100": 65.0,
+    "recovery_all_main_components_100": 100.0,
+    "temperature_penalty_z_1": -2.990059574734861,
+    "oxygen_penalty_deficit_5_percentage_points": -23.561944901923447,
+    "strain_steps_7000_units_20000": 64.40264939859077,
+    "strain_nonnegative_asymptote": 128.8052987971815,
+    "sleep_duration_component_at_80_percent": 0.5120000000000001,
+    "stress_hrv_z0": 42.857142857142854,
+    "stress_hr_score50_hrv_z0": 47.14285714285714,
+    "atl_zero_to_load100": 25,
+    "ctl_zero_to_load100": 4.651162790697675,
+    "pulse_atl_zero_to_load100": 13.312210024981841,
+    "pulse_ctl_zero_to_load100": 2.3528313347756735,
+    "freshness_fatigue_equal_capacity": 36.787944117144235,
+    "sleep_bank_last_slot_surplus1hour": 60,
+    "sleep_bank_first_slot_surplus1hour": 9.917933293295192,
+    "sleep_bank_seven_surplus1hour": 203.14936660791372,
+    "tdee_bmr_70kg_175cm_age30_sex_tag0": 1648.75,
+    "tdee_bmr_70kg_175cm_age30_sex_tag1": 1482.75,
+    "tdee_macro_term_100g_protein_200g_carbs_60g_fat": 172.2,
+    "tdee_bmr_missing": 2500,
+    "sleep_consistency_two_identical_days": 100,
+    "sleep_consistency_two_8hour_sleeps_shifted1hour": 91.66666666666667,
+    "same_agreement_phillips_raw_sri": 83.33333333333334,
+    "age_hazard1": 0.0,
+    "food_quality_zero_contributions": 50,
+    "food_glucose_baseline_feature": 50,
+    "heart_rate_recovery_synthetic_cases": [
+      {
+        "points_seconds_hr": [
+          [
+            0,
+            120
+          ],
+          [
+            30,
+            100
+          ]
+        ],
+        "active_workout_end_seconds": 100,
+        "expected_negated_delta": 20
+      },
+      {
+        "points_seconds_hr": [
+          [
+            0,
+            120
+          ],
+          [
+            120,
+            90
+          ],
+          [
+            121,
+            89
+          ]
+        ],
+        "active_workout_end_seconds": 0,
+        "expected_negated_delta": 30
+      },
+      {
+        "points_seconds_hr": [
+          [
+            0,
+            100
+          ],
+          [
+            30,
+            110
+          ],
+          [
+            60,
+            120
+          ]
+        ],
+        "active_workout_end_seconds": 30,
+        "expected_negated_delta": -10
+      },
+      {
+        "points_seconds_hr": [
+          [
+            10,
+            100
+          ],
+          [
+            20,
+            90
+          ]
+        ],
+        "active_workout_end_seconds": 0,
+        "expected_negated_delta": null
+      }
+    ]
+  },
+  "counts": {
+    "distinct_score_families_found": 18,
+    "pulse_counterparts": 12,
+    "mapped_air_core_candidates": 11,
+    "partial_air_composite_candidates": 1,
+    "current_counterpart_benchmark_targets": 12,
+    "new_air_compatible_algorithms_proven_end_to_end": 0,
+    "new_cardio_only_algorithm_leads": 2,
+    "additional_input_families": 4,
+    "runtime_validated_replicas": 0,
+    "production_replacements_supported": 0
+  },
+  "counting_rules": [
+    "One family per distinct score, balance, load, energy estimate or recommendation output; daily/workout aliases and presentation variants deduplicated.",
+    "Includes separately displayed Sleep Bank, Consistency, Needed, Target Strain and HR Recovery, plus Daily Nutrition and Muscular Load. This intentionally replaces the arbitrary earlier 11-headline grouping.",
+    "ATL/CTL/TRIMP/cardio optimal ranges belong to Cardio Load. Age groups, PhenoAge, factor impacts, confidence and projection belong to Biological Age. Stress contexts are one Stress family.",
+    "Food Quality, Food Glucose and overall Daily Nutrition are separate outputs. Per-muscle and overall freshness are one family. Cardio Focus is a workout contribution/dimension summary, excluded from score-family count.",
+    "Raw measurements, macro balance breakdown, strength helpers, journal regression/results and cycle predictions remain inventoried but excluded from scalar score/balance/recommendation count.",
+    "11 mapped-core candidates means input plausibility for cardio/sleep/HR fallback branches plus profile/settings, not full Air pipeline proof. Biological Age adds one partial composite, making 12 counterpart benchmark targets.",
+    "Two new cardio-only leads are Muscular Load and Freshness; their source conversion/eligibility is untraced. They are neither proven new Air-compatible algorithms nor established impossible.",
+    "Four additional-input families are Food Glucose, Food Quality, Daily Nutrition and personalized TDEE. TDEE has numeric fallback branches; fallback availability does not establish personalized parity. Biological Age and full strength models have extra data gaps outside their Air branches.",
+    "Counts describe discovered outputs, not exhaustive app completeness. No runtime input/output validation exists.",
+    "Imported Oura readiness, EPOC/TRIMP series, setting enums, errors, calibration states and cached record fields are inputs or internal models, not extra Bevel score families."
+  ],
+  "inventory_additions": [
+    "AggregateStatistics.average",
+    "AggregateStatistics.stdDev",
+    "AggregateStatistics.count",
+    "AggregateStatistics.histogram",
+    "BaselineConfiguration.calculationConfiguration",
+    "BaselineConfiguration.baselineDays",
+    "BaselineConfiguration.computeHistogram",
+    "CalculationConfiguration.aggregationMethod",
+    "CalculationConfiguration.windowType",
+    "CalculationConfiguration.useEndTime",
+    "CalculationConfiguration.contexts",
+    "CalculationConfiguration.forceIncludeMindfulness",
+    "ValueWithBaseline.value",
+    "ValueWithBaseline.baselineAverage",
+    "ValueWithBaseline.baselineStd",
+    "ValueWithBaseline.zScore",
+    "HrvMethod.appleHealth",
+    "HrvMethod.bevelRMSSD",
+    "StressScoreInput.averageHR",
+    "StressScoreInput.mostRecentHRV",
+    "StressScoreInput.averageHRV",
+    "StressScoreInput.context",
+    "StressActivityInputs.functionalDay",
+    "StressActivityInputs.dayActivities",
+    "StressActivityInputs.stagingContext",
+    "StressActivityInputs.stressContext",
+    "StressDataPoint.timestamp",
+    "StressDataPoint.value",
+    "StressDataPoint.hrvValue",
+    "StressDataPoint.ahrValue",
+    "StressDataPoint.level",
+    "StressDataPoint.stage",
+    "SleepStageSegment.sleepStage",
+    "SleepStageSegment.startTime",
+    "SleepStageSegment.endTime",
+    "SleepStageSegment.source",
+    "SleepStageSegment.activityScore",
+    "SleepStage.asleepUnspecified",
+    "SleepStage.awake",
+    "SleepStage.core",
+    "SleepStage.deep",
+    "SleepStage.rem",
+    "SleepStage.inBed",
+    "SleepGoalCalculationMethod.manual",
+    "SleepGoalCalculationMethod.automatic",
+    "DynamicSleepGoalCalculationError.insufficientData",
+    "DynamicSleepGoalCalculationResult.sufficientData",
+    "DynamicSleepGoalCalculationResult.insufficientData",
+    "DynamicSleepGoalCalculationResult.failed",
+    "DerivedAgeScore.weekStart",
+    "DerivedAgeScore.chronologicalAge",
+    "DerivedAgeScore.bloodEstimate",
+    "DerivedAgeScore.bioEstimate",
+    "DerivedAgeScore.presentBloodBiomarkerCount",
+    "DerivedAgeScore.calculatedAt",
+    "FoodNutritionScores.qualityScores",
+    "FoodNutritionScores.glucoseScores",
+    "PendingOrAvailableNutritionScore.pending",
+    "PendingOrAvailableNutritionScore.score",
+    "DayScoreCalorieConfiguration.dayCalorieGoal",
+    "DayScoreCalorieConfiguration.dayScoreCalorieThreshold",
+    "HeartRateRecoveryDetails.hrr",
+    "HeartRateRecoveryDetails.recoveryStartHeartRate",
+    "HeartRateRecoveryDetails.recoveryEndHeartRate",
+    "HeartRateRecoveryDetails.points",
+    "HeartRateRecoveryResult.data",
+    "HeartRateRecoveryResult.noData",
+    "HeartRateRecoveryResult.zoneFourNotReached",
+    "HeartRateRecoveryDataPoint.startTimestamp",
+    "HeartRateRecoveryDataPoint.endTimestamp",
+    "HeartRateRecoveryDataPoint.identifyingTimestamp",
+    "HeartRateRecoveryDataPoint.value",
+    "HeartRateRecoveryDataPoint.status",
+    "HeartRateRecoveryDataPoint.containsWorkouts",
+    "HealthDataBaselines.baselines",
+    "HealthDataBaselines.aggregates",
+    "HealthDataBaselines.missingBaselines",
+    "HealthDataBaselines.baselineConfiguration",
+    "HealthDataBaselines.calculationOptionsModel",
+    "HealthDataBaselines.aggregateCacheWriter",
+    "HealthDataBaselines.userDefaultsService",
+    "HealthDataBaselines.memoryCacheService",
+    "HealthDataBaselines.aggregateFetcher",
+    "GoogleHealthBackfillJobTypeResponse.heartRate",
+    "GoogleHealthBackfillJobTypeResponse.heartRateVariability",
+    "GoogleHealthBackfillJobTypeResponse.oxygenSaturation",
+    "GoogleHealthBackfillJobTypeResponse.activeEnergyBurned",
+    "GoogleHealthBackfillJobTypeResponse.basalEnergyBurned",
+    "GoogleHealthBackfillJobTypeResponse.steps",
+    "GoogleHealthBackfillJobTypeResponse.weight",
+    "GoogleHealthBackfillJobTypeResponse.bodyFat",
+    "GoogleHealthBackfillJobTypeResponse.bloodGlucose",
+    "GoogleHealthBackfillJobTypeResponse.coreBodyTemperature",
+    "GoogleHealthBackfillJobTypeResponse.dailyRestingHeartRate",
+    "GoogleHealthBackfillJobTypeResponse.dailyRespiratoryRate",
+    "GoogleHealthBackfillJobTypeResponse.dailyVO2Max",
+    "GoogleHealthBackfillJobTypeResponse.dailySleepTemperatureDerivations",
+    "GoogleHealthBackfillJobTypeResponse.dailyTotalCalories",
+    "GoogleHealthBackfillJobTypeResponse.dailyActiveEnergyBurned",
+    "GoogleHealthBackfillJobTypeResponse.sleep",
+    "GoogleHealthBackfillJobTypeResponse.exercise",
+    "GoogleHealthSampleSyncType.heartRate",
+    "GoogleHealthSampleSyncType.heartRateMinuteAggregate",
+    "GoogleHealthSampleSyncType.heartRateVariability",
+    "GoogleHealthSampleSyncType.steps",
+    "GoogleHealthSampleSyncType.spo2Percentage",
+    "GoogleHealthSampleSyncType.activeEnergy",
+    "GoogleHealthSampleSyncType.restingEnergy",
+    "GoogleHealthSampleSyncType.bodyWeightKg",
+    "GoogleHealthSampleSyncType.bodyFatPercentage",
+    "GoogleHealthSampleSyncType.bloodGlucoseMgDl",
+    "GoogleHealthSampleSyncType.bodyTemperatureFahrenheit",
+    "IntegrationHealthSampleResponse.sourceId",
+    "IntegrationHealthSampleResponse.sampleType",
+    "IntegrationHealthSampleResponse.startDate",
+    "IntegrationHealthSampleResponse.endDate",
+    "IntegrationHealthSampleResponse.value",
+    "IntegrationHealthSampleResponse.platform",
+    "IntegrationDailyHealthSampleResponse.sourceId",
+    "IntegrationDailyHealthSampleResponse.sampleType",
+    "IntegrationDailyHealthSampleResponse.date",
+    "IntegrationDailyHealthSampleResponse.value",
+    "IntegrationDailyHealthSampleResponse.platform",
+    "IntegrationHealthSample.id",
+    "IntegrationHealthSample.sourceId",
+    "IntegrationHealthSample.sourceType",
+    "IntegrationHealthSample.sampleType",
+    "IntegrationHealthSample.unit",
+    "IntegrationHealthSample.startDate",
+    "IntegrationHealthSample.endDate",
+    "IntegrationHealthSample.value",
+    "IntegrationHealthSample.platform",
+    "IntegrationHealthSampleType.steps",
+    "IntegrationHealthSampleType.activeEnergy",
+    "IntegrationHealthSampleType.restingEnergy",
+    "IntegrationHealthSampleType.totalEnergy",
+    "IntegrationHealthSampleType.restingHeartRate",
+    "IntegrationHealthSampleType.spo2Percentage",
+    "IntegrationHealthSampleType.heartRate",
+    "IntegrationHealthSampleType.heartRateMinuteAggregate",
+    "IntegrationHealthSampleType.heartRateVariability",
+    "IntegrationHealthSampleType.respiratoryRate",
+    "IntegrationHealthSampleType.vo2Max",
+    "IntegrationHealthSampleType.temperatureDeviationFahrenheit",
+    "IntegrationHealthSampleType.bloodPressureSystolic",
+    "IntegrationHealthSampleType.bloodPressureDiastolic",
+    "IntegrationHealthSampleType.bodyWeightKg",
+    "IntegrationHealthSampleType.bodyFatPercentage",
+    "IntegrationHealthSampleType.bloodGlucoseMgDl",
+    "IntegrationHealthSampleType.bodyTemperatureFahrenheit",
+    "IntegrationHealthSampleType.wristTemperatureFahrenheit",
+    "IntegrationHealthSampleUnitType.bpm",
+    "IntegrationHealthSampleUnitType.count",
+    "IntegrationHealthSampleUnitType.kCal",
+    "IntegrationHealthSampleUnitType.percentDecimal",
+    "IntegrationHealthSampleUnitType.mlOverKgMin",
+    "IntegrationHealthSampleUnitType.ms",
+    "IntegrationHealthSampleUnitType.breathsPerMinute",
+    "IntegrationHealthSampleUnitType.fahrenheit",
+    "IntegrationHealthSampleUnitType.mmHg",
+    "IntegrationHealthSampleUnitType.kgs",
+    "IntegrationHealthSampleUnitType.mgPerDl",
+    "IntegrationHealthSampleSourceType.oura",
+    "IntegrationHealthSampleSourceType.googleHealth",
+    "IntegrationSleepSessionResponse.id",
+    "IntegrationSleepSessionResponse.type",
+    "IntegrationSleepSessionResponse.startTime",
+    "IntegrationSleepSessionResponse.endTime",
+    "IntegrationSleepSessionResponse.stages",
+    "IntegrationSleepSessionResponse.deletedAt",
+    "IntegrationSleepSessionResponse.platform",
+    "IntegrationSleepStageSegmentResponse.sleepStage",
+    "IntegrationSleepStageSegmentResponse.startTime",
+    "IntegrationSleepStageSegmentResponse.endTime",
+    "IntegrationWorkoutSessionResponse.id",
+    "IntegrationWorkoutSessionResponse.activityType",
+    "IntegrationWorkoutSessionResponse.startDate",
+    "IntegrationWorkoutSessionResponse.endDate",
+    "IntegrationWorkoutSessionResponse.activeCalories",
+    "IntegrationWorkoutSessionResponse.restingCalories",
+    "IntegrationWorkoutSessionResponse.distanceInMeters",
+    "IntegrationWorkoutSessionResponse.averageHeartRate",
+    "IntegrationWorkoutSessionResponse.title",
+    "IntegrationWorkoutSessionResponse.activeDurationSeconds",
+    "IntegrationWorkoutSessionResponse.elevationGainInMeters",
+    "IntegrationWorkoutSessionResponse.elevationLossInMeters",
+    "IntegrationWorkoutSessionResponse.averageSpeedMetersPerSecond",
+    "IntegrationWorkoutSessionResponse.averagePaceSecondsPerMeter",
+    "IntegrationWorkoutSessionResponse.averagePowerWatts",
+    "IntegrationWorkoutSessionResponse.resolvedWorkoutEffort",
+    "IntegrationWorkoutSessionResponse.pauses",
+    "IntegrationWorkoutSessionResponse.splits",
+    "IntegrationWorkoutSessionResponse.locations",
+    "IntegrationWorkoutSessionResponse.deletedAt",
+    "IntegrationWorkoutSessionResponse.platform",
+    "GoogleHealthSamplesSyncService.$defaultActor",
+    "GoogleHealthSamplesSyncService.serverClient",
+    "GoogleHealthSamplesSyncService.healthSampleGRDBDataStore",
+    "GoogleHealthSamplesSyncService.cursorRepository",
+    "GoogleHealthSamplesSyncService.coalescingTask",
+    "GoogleHealthDailySyncService.$defaultActor",
+    "GoogleHealthDailySyncService.serverClient",
+    "GoogleHealthDailySyncService.dailyHealthSampleGRDBDataStore",
+    "GoogleHealthDailySyncService.cursorRepository",
+    "GoogleHealthDailySyncService.coalescingTask",
+    "GoogleHealthSleepSyncService.$defaultActor",
+    "GoogleHealthSleepSyncService.serverClient",
+    "GoogleHealthSleepSyncService.sleepService",
+    "GoogleHealthSleepSyncService.cursorRepository",
+    "GoogleHealthSleepSyncService.coalescingTask",
+    "GoogleHealthWorkoutsSyncService.$defaultActor",
+    "GoogleHealthWorkoutsSyncService.serverClient",
+    "GoogleHealthWorkoutsSyncService.workoutService",
+    "GoogleHealthWorkoutsSyncService.cursorRepository",
+    "GoogleHealthWorkoutsSyncService.coalescingTask",
+    "GoogleHealthSyncService.$defaultActor",
+    "GoogleHealthSyncService.samplesSyncService",
+    "GoogleHealthSyncService.dailySyncService",
+    "GoogleHealthSyncService.workoutsSyncService",
+    "GoogleHealthSyncService.sleepSyncService",
+    "GoogleHealthSyncService.cursorRepository",
+    "GoogleHealthSyncService.integrationMetadataRepository",
+    "GoogleHealthSyncService.healthSampleGRDBDataStore",
+    "GoogleHealthSyncService.dailyHealthSampleGRDBDataStore",
+    "GoogleHealthSyncService.sleepGRDBDataStore",
+    "GoogleHealthSyncService.workoutGRDBDataStore",
+    "GoogleHealthSyncService.sleepService",
+    "GoogleHealthSyncService.workoutService",
+    "GoogleHealthSyncService.fileCacheSnapshotService",
+    "GoogleHealthSyncService.incrementalSyncTask",
+    "GoogleHealthSyncService.syncMutex",
+    "GoogleHealthDuplicateSourceService.userDefaultsService",
+    "MuscularLoadDebugDay.date",
+    "MuscularLoadDebugDay.dataSource",
+    "MuscularLoadDebugDay.totalWorkoutCount",
+    "MuscularLoadDebugDay.selectedDateWorkoutCount",
+    "MuscularLoadDebugDay.displayLoadHistory",
+    "MuscularLoadDebugDay.displayedMuscularLoad",
+    "MuscularLoadDebugDay.dailyMuscularLoadRaw",
+    "MuscularLoadDebugDay.strengthMuscularLoadRaw",
+    "MuscularLoadDebugDay.sourceCardioStrainUnitsRaw",
+    "MuscularLoadDebugDay.cardioDerivedMuscularLoadRaw",
+    "MuscularLoadDebugDay.muscularATL",
+    "MuscularLoadDebugDay.muscularCTL",
+    "MuscularLoadDebugDay.muscularLoadRatio",
+    "MuscularLoadDebugDay.muscularLoadStatus",
+    "MuscularLoadDebugDay.muscularCalibrationConfidence",
+    "MuscularLoadDebugDay.muscularCTLMaturity",
+    "MuscularLoadDebugDay.muscularTrainingDensity",
+    "MuscularLoadDebugDay.muscularRecency",
+    "MuscularLoadDebugDay.cardioLoadHistory",
+    "MuscularLoadDebugDay.muscleFreshnessHistory",
+    "MuscularLoadDebugDay.cardioDerivedMuscleLoads",
+    "MuscularLoadDebugDay.muscleFreshness",
+    "MuscularLoadDebugDay.workouts",
+    "MuscularLoadDebugStatus.calibrating",
+    "MuscularLoadDebugStatus.maintaining",
+    "MuscularLoadDebugStatus.peaking",
+    "MuscularLoadDebugStatus.detraining",
+    "MuscularLoadDebugStatus.productive",
+    "MuscularLoadDebugStatus.fatigued",
+    "MuscularLoadDebugStatus.overtraining",
+    "CardioLoadData.status",
+    "MuscularLoadData.status",
+    "CategoryFreshness.category",
+    "CategoryFreshness.freshnessPercent",
+    "CategoryFreshness.status",
+    "MuscularFreshnessMetrics.muscleLoads",
+    "GlucoseScoreState.waitingForData",
+    "GlucoseScoreState.baselinesCalibrating",
+    "GlucoseScoreState.complete",
+    "GlucoseDataPoint.timestamp",
+    "GlucoseDataPoint.valueInMgDl",
+    "NutritionScoreCategory.low",
+    "NutritionScoreCategory.fair",
+    "NutritionScoreCategory.optimal",
+    "TDEECalculator.healthKitManager",
+    "TDEECalculator.userAttributesProvider",
+    "TDEECalculator.userDefaultsService",
+    "SpO2Sample.timestamp",
+    "SpO2Sample.valuePercent",
+    "SpO2Sample.metadata",
+    "SpO2SampleMetadata.sampleUUID",
+    "SpO2SampleMetadata.sourceBundleIdentifier",
+    "SpO2SampleMetadata.sourceName",
+    "SpO2SampleMetadata.productType",
+    "SpO2SampleMetadata.isUserEntered",
+    "SpO2SampleMetadata.additionalMetadataJson",
+    "BioAgeScoreData.scores",
+    "BioAgeScoreData.chronologicalAge",
+    "BioAgeScoreData.isCalibrating",
+    "BloodPressureCalculationService.userDefaultsService",
+    "BloodPressureCalculationService.selectedGuidelineAssociationSubject",
+    "OuraReadinessSummary.contributors",
+    "OuraReadinessSummary.score",
+    "OuraReadinessSummary.temperature_deviation",
+    "OuraReadinessSummary.temperature_trend_deviation",
+    "FoodScoreApportionEntry.category",
+    "FoodScoreApportionEntry.percentage",
+    "FoodScoreApportionEntry.basis",
+    "FoodScoreApportionBasis.calories",
+    "FoodScoreApportionBasis.weight",
+    "FoodScoreApportionBasis.binary",
+    "OuraReadinessSummaryData.contributors",
+    "OuraReadinessSummaryData.score",
+    "OuraReadinessSummaryData.temperatureDeviation",
+    "OuraReadinessSummaryData.temperatureTrendDeviation",
+    "TemperatureBaselineDefaultCalculator.userAttributesProvider",
+    "EnergyDayContext.day",
+    "EnergyDayContext.functionalDay",
+    "EnergyDayContext.dayActivities",
+    "GenerateDayPrototypeDataAndStressResult.stressMapping",
+    "GenerateDayPrototypeDataAndStressResult.prototypeData",
+    "GenerateDayPrototypeDataAndStressResult.cacheError",
+    "GetEnergyHistoryResult.energyHistory",
+    "GetEnergyHistoryResult.cacheError",
+    "ScoreCalculationError.noDataError",
+    "ScoreCalculationError.dateError",
+    "ScoreCalculationError.queryError",
+    "SamplesAggregationMethod.daily",
+    "SamplesAggregationMethod.combined",
+    "StressContextHistory.sleepStages",
+    "StressContextHistory.workouts",
+    "StressContextHistory.exercise",
+    "StressContextHistory.mindfulness",
+    "LiveEnergyBankState.energyBankForDay",
+    "LiveEnergyBankState.solidData",
+    "LiveEnergyBankState.energyBankDerivedData",
+    "LiveEnergyBankState.functionalDay",
+    "LiveEnergyBankState.prototypeData",
+    "LiveEnergyBankState.chartStart",
+    "LiveEnergyBankState.chartEnd",
+    "LiveEnergyBankState.loadingStatus",
+    "LiveEnergyBankState.calibrationState",
+    "HealthDataRHRCalculation.healthKit",
+    "HealthDataRHRCalculation.garmin",
+    "HealthDataRHRCalculation.oura",
+    "HealthDataRHRCalculation.googleHealth",
+    "IntegrationRHRCalculation.bevel",
+    "HealthKitRHRCalculation.bevel",
+    "HealthKitRHRCalculation.appleHealth",
+    "SleepScoreComponentResult.score",
+    "SleepScoreComponentResult.percentOfTarget",
+    "SleepScoreComponentResult.status",
+    "SleepContributorStatus.excellent",
+    "SleepContributorStatus.good",
+    "SleepContributorStatus.fair",
+    "SleepContributorStatus.poor",
+    "SleepContributorStatus.noData",
+    "SleepLatencyStatus.fast",
+    "SleepLatencyStatus.normal",
+    "SleepLatencyStatus.late",
+    "WorkoutWindowScoreBuildResult.scores",
+    "WorkoutWindowScoreBuildResult.cardioLoad",
+    "WorkoutWindowScoreBuildResult.trimp",
+    "WorkoutWindowScoreBuildResult.heartRateSegments",
+    "WorkoutOverlayScoresBuildDependencies.startTime",
+    "WorkoutOverlayScoresBuildDependencies.endTime",
+    "WorkoutOverlayScoresBuildDependencies.biologicalSex",
+    "WorkoutOverlayScoresBuildDependencies.activeDuration",
+    "WorkoutOverlayScoresBuildDependencies.totalDistanceMiles",
+    "WorkoutOverlayScoresBuildDependencies.workoutDistances",
+    "WorkoutOverlayScoresBuildDependencies.averagePower",
+    "WorkoutOverlayScoresBuildDependencies.elevationAscendedFeet",
+    "WorkoutOverlayScoresBuildDependencies.elevationDescendedFeet",
+    "WorkoutOverlayScoresBuildDependencies.activityType",
+    "WorkoutOverlayScoresBuildDependencies.pauses",
+    "WorkoutOverlayScoresBuildDependencies.zoneSettings",
+    "WorkoutOverlayScoresBuildDependencies.baselineRestingHR",
+    "WorkoutOverlayScoresBuildDependencies.workoutEffort",
+    "WorkoutOverlayScoresBuildDependencies.strengthSessions",
+    "WorkoutOverlayScoresBuildDependencies.workoutHeartRates",
+    "WorkoutScoreCalculationResult.summaryScores",
+    "WorkoutScoreCalculationResult.scorePayload",
+    "WorkoutScoreCalculationResult.legacySummaryOverlayScores",
+    "HealthMetricCalculationResult.metrics",
+    "HealthMetricCalculationResult.activityContext",
+    "CaloriesDisplay.total",
+    "CaloriesDisplay.active",
+    "MetricContext.entireSleep",
+    "MetricContext.remDeepSleep",
+    "MetricContext.mindfulnessOnly",
+    "MetricContext.sleepAndMindfulness",
+    "MetricContext.entireDay",
+    "RhrMethod.appleHealth",
+    "RhrMethod.bevel",
+    "TemperatureSource.wrist",
+    "TemperatureSource.body",
+    "CalculationsOptions.hrvMethod",
+    "CalculationsOptions.rhrMethod",
+    "CalculationsOptions.hrvContext",
+    "CalculationsOptions.rhrContext",
+    "CalculationsOptions.caloriesDisplay",
+    "CalculationsOptions.temperatureSource",
+    "CalculationsOptions.sp02Window",
+    "CalculationsOptions.rrWindow",
+    "DerivedAgeScoreRecord.weekStart",
+    "DerivedAgeScoreRecord.chronologicalAge",
+    "DerivedAgeScoreRecord.bloodAge",
+    "DerivedAgeScoreRecord.bloodConfidence",
+    "DerivedAgeScoreRecord.bioAge",
+    "DerivedAgeScoreRecord.bioConfidence",
+    "DerivedAgeScoreRecord.presentBloodBiomarkerCount",
+    "DerivedAgeScoreRecord.calculatedAt",
+    "WorkoutScoreOwner.workoutSourceId",
+    "WorkoutScoreOwner.workoutSourceType",
+    "WorkoutScoreOwner.algorithmVersion",
+    "WorkoutScoreOwner.scope",
+    "WorkoutSummaryScoreRecordData.metrics",
+    "WorkoutSummaryScoreRecordData.strideLengthAverageMeters",
+    "WorkoutSummaryScoreRecordData.strideLengthMinimumMeters",
+    "WorkoutSummaryScoreRecordData.strideLengthMaximumMeters",
+    "WorkoutSummaryScoreRecordData.verticalOscillationAverageCentimeters",
+    "WorkoutSummaryScoreRecordData.verticalOscillationMinimumCentimeters",
+    "WorkoutSummaryScoreRecordData.verticalOscillationMaximumCentimeters",
+    "WorkoutSummaryScoreRecordData.groundContactAverageMilliseconds",
+    "WorkoutSummaryScoreRecordData.groundContactMinimumMilliseconds",
+    "WorkoutSummaryScoreRecordData.groundContactMaximumMilliseconds",
+    "WorkoutSummaryScoreRecordData.strainScore",
+    "WorkoutSummaryScoreRecordData.trimp",
+    "WorkoutSummaryScoreRecordData.muscularLoad",
+    "WorkoutSummaryScoreRecordData.heartRateRecovery",
+    "WorkoutSummaryScoreRecordData.heartRateRecoveryStart",
+    "WorkoutSummaryScoreRecordData.heartRateRecoveryEnd",
+    "WorkoutSummaryScoreRecordData.rpe",
+    "WorkoutSummaryScoreRecordData.cardioFocusPresent",
+    "WorkoutSummaryScoreRecordData.cardioLoad",
+    "SyncedSpO2Record.timestamp",
+    "SyncedSpO2Record.valuePercent",
+    "SyncedSpO2Record.sampleUUID",
+    "SyncedSpO2Record.sourceBundleIdentifier",
+    "SyncedSpO2Record.sourceName",
+    "SyncedSpO2Record.productType",
+    "SyncedSpO2Record.isUserEntered",
+    "SyncedSpO2Record.additionalMetadataJson",
+    "AggregatedDataState.data",
+    "AggregatedDataState.algorithmVersion",
+    "AggregatedDataState.lastUpdatedAt",
+    "DailyScores.recoveryScore",
+    "DailyScores.sleepScore",
+    "DailyScores.strainScore",
+    "DailyScores.strainZScore",
+    "DailyScores.targetStrainBounds",
+    "SleepDebugDataDownloadType.sleepStages",
+    "SleepDebugDataDownloadType.sleepingHeartBeats",
+    "SleepDebugDataDownloadType.sleepingHeartRate",
+    "SleepDebugDataDownloadType.sleepingHRV",
+    "SleepDebugDataDownloadType.sleepingRespiration",
+    "SleepDebugDataDownloadType.sleepGoal",
+    "MuscleFreshnessStatus.calibrating",
+    "MuscleFreshnessStatus.recovered",
+    "MuscleFreshnessStatus.fatigued",
+    "MuscleFreshnessStatus.depleted",
+    "ScoreThresholdType.lowThreshold",
+    "ScoreThresholdType.highThreshold",
+    "ScoreBoundaryInclusion.inclusive",
+    "ScoreBoundaryInclusion.exclusive",
+    "ScoreInterval.lowerBound",
+    "ScoreInterval.lowerBoundInclusion",
+    "ScoreInterval.upperBound",
+    "ScoreInterval.upperBoundInclusion",
+    "EnergyUnit.kcal",
+    "EnergyUnit.kj",
+    "GlucoseUnit.mgDl",
+    "GlucoseUnit.mmolL",
+    "HealthMetricUnit.percentage",
+    "HealthMetricUnit.grams",
+    "HealthMetricUnit.durationInMinutes",
+    "HealthMetricUnit.minutesFromMidnight",
+    "HealthMetricUnit.seconds",
+    "HealthMetricUnit.milliseconds",
+    "HealthMetricUnit.score",
+    "HealthMetricUnit.beatsPerMinute",
+    "HealthMetricUnit.respirationsPerMinute",
+    "HealthMetricUnit.calories",
+    "HealthMetricUnit.fahrenheit",
+    "HealthMetricUnit.miles",
+    "HealthMetricUnit.feet",
+    "HealthMetricUnit.milesPerHour",
+    "HealthMetricUnit.secondsPerMile",
+    "HealthMetricUnit.count",
+    "HealthMetricUnit.pounds",
+    "HealthMetricUnit.reps",
+    "HealthMetricUnit.decibels",
+    "HealthMetricUnit.none",
+    "HealthMetricUnit.watts",
+    "HealthMetricUnit.yards",
+    "HealthMetricUnit.milligramsPerDeciliter",
+    "HealthMetricUnit.millimetersOfMercury",
+    "CurrentStressStatus.score",
+    "CurrentStressStatus.highestScore",
+    "CurrentStressStatus.lowestScore",
+    "CurrentStressStatus.averageScore",
+    "CurrentStressStatus.currentHRV",
+    "CurrentStressStatus.currentAHR",
+    "CurrentStressStatus.hrvLastUpdatedAt",
+    "CurrentStressStatus.hrLastUpdatedAt",
+    "StressScore.score",
+    "StressScore.level",
+    "StressScoreLevel.high",
+    "StressScoreLevel.mediumHigh",
+    "StressScoreLevel.medium",
+    "StressScoreLevel.lowMedium",
+    "StressScoreLevel.low",
+    "StressScoreLevel.undefined",
+    "SmokingHazardRatioContext.endOfWindow",
+    "SmokingHazardRatioContext.cigDurationYears",
+    "SmokingHazardRatioContext.cigQuitDate",
+    "SmokingHazardRatioContext.avgCigsPerDay",
+    "SmokingHazardRatioContext.vapingDurationYears",
+    "SmokingHazardRatioContext.vapingQuitDate",
+    "SmokingHazardRatioContext.avgVapingIntensity",
+    "LifestyleHazardRatioContext.nutrition",
+    "LifestyleHazardRatioContext.alcohol",
+    "LifestyleHazardRatioContext.smoking",
+    "PhysioHazardRatioContext.sleepDuration",
+    "PhysioHazardRatioContext.sleepConsistency",
+    "PhysioHazardRatioContext.steps",
+    "PhysioHazardRatioContext.zone2to3",
+    "PhysioHazardRatioContext.zone4to5",
+    "PhysioHazardRatioContext.strengthTraining",
+    "PhysioHazardRatioContext.restingHeartRate",
+    "PhysioHazardRatioContext.vo2Max",
+    "PhysioHazardRatioContext.leanBodyMass",
+    "CalculationOutcome.succeeded",
+    "CalculationOutcome.pending",
+    "CalculationOutcome.failed",
+    "BioAgeScoreConfidence.max",
+    "BioAgeScoreConfidence.high",
+    "BioAgeScoreConfidence.medium",
+    "BioAgeScoreConfidence.low",
+    "BioAgeScoreConfidence.missingData",
+    "MuscularFreshnessStatus.calibrating",
+    "MuscularFreshnessStatus.recovered",
+    "MuscularFreshnessStatus.fatigued",
+    "MuscularFreshnessStatus.depleted",
+    "LoadMetrics.trimp",
+    "LoadMetrics.epoc",
+    "LoadMetrics.cardioFocusImpact",
+    "LoadMetrics.cardioLoadImpact",
+    "WorkoutSummaryScoreState.calculated",
+    "WorkoutSummaryScoreState.legacy",
+    "WorkoutSummaryScoreState.recordedOnly",
+    "WorkoutOverlayScores.strainScore",
+    "WorkoutOverlayScores.trimp",
+    "WorkoutOverlayScores.muscularStrainUnits",
+    "WorkoutOverlayScores.cardioStrainUnits",
+    "WorkoutOverlayScores.heartRateRecovery",
+    "WorkoutOverlayScores.hrDetails",
+    "WorkoutOverlayScores.resolvedWorkoutEffort",
+    "WorkoutOverlayScores.strainZones",
+    "WorkoutOverlayScores.cardioFocus",
+    "WorkoutOverlayScores.distanceWorkoutMetrics"
+  ],
+  "new_model_descriptors": [
+    {
+      "name": "AggregateStatistics",
+      "descriptor": "0x1052311c8",
+      "kind": 17,
+      "accessor": "0x10158c070",
+      "fields": [
+        "average",
+        "stdDev",
+        "count",
+        "histogram"
+      ]
+    },
+    {
+      "name": "BaselineConfiguration",
+      "descriptor": "0x105246bb8",
+      "kind": 17,
+      "accessor": "0x101e232b0",
+      "fields": [
+        "calculationConfiguration",
+        "baselineDays",
+        "computeHistogram"
+      ]
+    },
+    {
+      "name": "CalculationConfiguration",
+      "descriptor": "0x105246bf0",
+      "kind": 17,
+      "accessor": "0x101e23efc",
+      "fields": [
+        "aggregationMethod",
+        "windowType",
+        "useEndTime",
+        "contexts",
+        "forceIncludeMindfulness"
+      ]
+    },
+    {
+      "name": "ValueWithBaseline",
+      "descriptor": "0x105233980",
+      "kind": 17,
+      "accessor": "0x10171b4c8",
+      "fields": [
+        "value",
+        "baselineAverage",
+        "baselineStd",
+        "zScore"
+      ]
+    },
+    {
+      "name": "HrvMethod",
+      "descriptor": "0x10523680c",
+      "kind": 18,
+      "accessor": "0x101913034",
+      "fields": [
+        "appleHealth",
+        "bevelRMSSD"
+      ]
+    },
+    {
+      "name": "StressScoreInput",
+      "descriptor": "0x105231688",
+      "kind": 17,
+      "accessor": "0x1015e6c94",
+      "fields": [
+        "averageHR",
+        "mostRecentHRV",
+        "averageHRV",
+        "context"
+      ]
+    },
+    {
+      "name": "StressActivityInputs",
+      "descriptor": "0x1052309f4",
+      "kind": 17,
+      "accessor": "0x10155fbec",
+      "fields": [
+        "functionalDay",
+        "dayActivities",
+        "stagingContext",
+        "stressContext"
+      ]
+    },
+    {
+      "name": "StressDataPoint",
+      "descriptor": "0x10523817c",
+      "kind": 17,
+      "accessor": "0x1019470ec",
+      "fields": [
+        "timestamp",
+        "value",
+        "hrvValue",
+        "ahrValue",
+        "level",
+        "stage"
+      ]
+    },
+    {
+      "name": "SleepStageSegment",
+      "descriptor": "0x1052332c8",
+      "kind": 17,
+      "accessor": "0x10170dfec",
+      "fields": [
+        "sleepStage",
+        "startTime",
+        "endTime",
+        "source",
+        "activityScore"
+      ]
+    },
+    {
+      "name": "SleepStage",
+      "descriptor": "0x105233a48",
+      "kind": 18,
+      "accessor": "0x101724650",
+      "fields": [
+        "asleepUnspecified",
+        "awake",
+        "core",
+        "deep",
+        "rem",
+        "inBed"
+      ]
+    },
+    {
+      "name": "SleepGoalCalculationMethod",
+      "descriptor": "0x105237bfc",
+      "kind": 18,
+      "accessor": "0x10193910c",
+      "fields": [
+        "manual",
+        "automatic"
+      ]
+    },
+    {
+      "name": "DynamicSleepGoalCalculationError",
+      "descriptor": "0x105244a48",
+      "kind": 18,
+      "accessor": "0x101d74134",
+      "fields": [
+        "insufficientData"
+      ]
+    },
+    {
+      "name": "DynamicSleepGoalCalculationResult",
+      "descriptor": "0x105244a64",
+      "kind": 18,
+      "accessor": "0x101d79a70",
+      "fields": [
+        "sufficientData",
+        "insufficientData",
+        "failed"
+      ]
+    },
+    {
+      "name": "DerivedAgeScore",
+      "descriptor": "0x105208fc0",
+      "kind": 17,
+      "accessor": "0x10054d46c",
+      "fields": [
+        "weekStart",
+        "chronologicalAge",
+        "bloodEstimate",
+        "bioEstimate",
+        "presentBloodBiomarkerCount",
+        "calculatedAt"
+      ]
+    },
+    {
+      "name": "FoodNutritionScores",
+      "descriptor": "0x1051fe8e0",
+      "kind": 17,
+      "accessor": "0x10009faa8",
+      "fields": [
+        "qualityScores",
+        "glucoseScores"
+      ]
+    },
+    {
+      "name": "PendingOrAvailableNutritionScore",
+      "descriptor": "0x1051fe830",
+      "kind": 18,
+      "accessor": "0x10009d3d4",
+      "fields": [
+        "pending",
+        "score"
+      ]
+    },
+    {
+      "name": "DayScoreCalorieConfiguration",
+      "descriptor": "0x1051ff590",
+      "kind": 17,
+      "accessor": "0x100104ae4",
+      "fields": [
+        "dayCalorieGoal",
+        "dayScoreCalorieThreshold"
+      ]
+    },
+    {
+      "name": "HeartRateRecoveryDetails",
+      "descriptor": "0x1052b4cc8",
+      "kind": 17,
+      "accessor": "0x103ec0188",
+      "fields": [
+        "hrr",
+        "recoveryStartHeartRate",
+        "recoveryEndHeartRate",
+        "points"
+      ]
+    },
+    {
+      "name": "HeartRateRecoveryResult",
+      "descriptor": "0x1052b4ce4",
+      "kind": 18,
+      "accessor": "0x103ec0428",
+      "fields": [
+        "data",
+        "noData",
+        "zoneFourNotReached"
+      ]
+    },
+    {
+      "name": "HeartRateRecoveryDataPoint",
+      "descriptor": "0x10521fba8",
+      "kind": 17,
+      "accessor": "0x100e25510",
+      "fields": [
+        "startTimestamp",
+        "endTimestamp",
+        "identifyingTimestamp",
+        "value",
+        "status",
+        "containsWorkouts"
+      ]
+    },
+    {
+      "name": "HealthDataBaselines",
+      "descriptor": "0x105231084",
+      "kind": 16,
+      "accessor": "0x10158bf80",
+      "fields": [
+        "baselines",
+        "aggregates",
+        "missingBaselines",
+        "baselineConfiguration",
+        "calculationOptionsModel",
+        "aggregateCacheWriter",
+        "userDefaultsService",
+        "memoryCacheService",
+        "aggregateFetcher"
+      ]
+    },
+    {
+      "name": "GoogleHealthBackfillJobTypeResponse",
+      "descriptor": "0x10520c008",
+      "kind": 18,
+      "accessor": "0x10064025c",
+      "fields": [
+        "heartRate",
+        "heartRateVariability",
+        "oxygenSaturation",
+        "activeEnergyBurned",
+        "basalEnergyBurned",
+        "steps",
+        "weight",
+        "bodyFat",
+        "bloodGlucose",
+        "coreBodyTemperature",
+        "dailyRestingHeartRate",
+        "dailyRespiratoryRate",
+        "dailyVO2Max",
+        "dailySleepTemperatureDerivations",
+        "dailyTotalCalories",
+        "dailyActiveEnergyBurned",
+        "sleep",
+        "exercise"
+      ]
+    },
+    {
+      "name": "GoogleHealthSampleSyncType",
+      "descriptor": "0x10522c3e0",
+      "kind": 18,
+      "accessor": "0x1013a77cc",
+      "fields": [
+        "heartRate",
+        "heartRateMinuteAggregate",
+        "heartRateVariability",
+        "steps",
+        "spo2Percentage",
+        "activeEnergy",
+        "restingEnergy",
+        "bodyWeightKg",
+        "bodyFatPercentage",
+        "bloodGlucoseMgDl",
+        "bodyTemperatureFahrenheit"
+      ]
+    },
+    {
+      "name": "IntegrationHealthSampleResponse",
+      "descriptor": "0x10520bc44",
+      "kind": 17,
+      "accessor": "0x100639e44",
+      "fields": [
+        "sourceId",
+        "sampleType",
+        "startDate",
+        "endDate",
+        "value",
+        "platform"
+      ]
+    },
+    {
+      "name": "IntegrationDailyHealthSampleResponse",
+      "descriptor": "0x10520bfd0",
+      "kind": 17,
+      "accessor": "0x1006400fc",
+      "fields": [
+        "sourceId",
+        "sampleType",
+        "date",
+        "value",
+        "platform"
+      ]
+    },
+    {
+      "name": "IntegrationHealthSample",
+      "descriptor": "0x10522e7d0",
+      "kind": 17,
+      "accessor": "0x10146ca98",
+      "fields": [
+        "id",
+        "sourceId",
+        "sourceType",
+        "sampleType",
+        "unit",
+        "startDate",
+        "endDate",
+        "value",
+        "platform"
+      ]
+    },
+    {
+      "name": "IntegrationHealthSampleType",
+      "descriptor": "0x10522e838",
+      "kind": 18,
+      "accessor": "0x10146eaf0",
+      "fields": [
+        "steps",
+        "activeEnergy",
+        "restingEnergy",
+        "totalEnergy",
+        "restingHeartRate",
+        "spo2Percentage",
+        "heartRate",
+        "heartRateMinuteAggregate",
+        "heartRateVariability",
+        "respiratoryRate",
+        "vo2Max",
+        "temperatureDeviationFahrenheit",
+        "bloodPressureSystolic",
+        "bloodPressureDiastolic",
+        "bodyWeightKg",
+        "bodyFatPercentage",
+        "bloodGlucoseMgDl",
+        "bodyTemperatureFahrenheit",
+        "wristTemperatureFahrenheit"
+      ]
+    },
+    {
+      "name": "IntegrationHealthSampleUnitType",
+      "descriptor": "0x10522e854",
+      "kind": 18,
+      "accessor": "0x10146ef24",
+      "fields": [
+        "bpm",
+        "count",
+        "kCal",
+        "percentDecimal",
+        "mlOverKgMin",
+        "ms",
+        "breathsPerMinute",
+        "fahrenheit",
+        "mmHg",
+        "kgs",
+        "mgPerDl"
+      ]
+    },
+    {
+      "name": "IntegrationHealthSampleSourceType",
+      "descriptor": "0x10522e81c",
+      "kind": 18,
+      "accessor": "0x10146e260",
+      "fields": [
+        "oura",
+        "googleHealth"
+      ]
+    },
+    {
+      "name": "IntegrationSleepSessionResponse",
+      "descriptor": "0x10520bc94",
+      "kind": 17,
+      "accessor": "0x10063a808",
+      "fields": [
+        "id",
+        "type",
+        "startTime",
+        "endTime",
+        "stages",
+        "deletedAt",
+        "platform"
+      ]
+    },
+    {
+      "name": "IntegrationSleepStageSegmentResponse",
+      "descriptor": "0x10520bcbc",
+      "kind": 17,
+      "accessor": "0x10063ad28",
+      "fields": [
+        "sleepStage",
+        "startTime",
+        "endTime"
+      ]
+    },
+    {
+      "name": "IntegrationWorkoutSessionResponse",
+      "descriptor": "0x10520bd34",
+      "kind": 17,
+      "accessor": "0x1006388f8",
+      "fields": [
+        "id",
+        "activityType",
+        "startDate",
+        "endDate",
+        "activeCalories",
+        "restingCalories",
+        "distanceInMeters",
+        "averageHeartRate",
+        "title",
+        "activeDurationSeconds",
+        "elevationGainInMeters",
+        "elevationLossInMeters",
+        "averageSpeedMetersPerSecond",
+        "averagePaceSecondsPerMeter",
+        "averagePowerWatts",
+        "resolvedWorkoutEffort",
+        "pauses",
+        "splits",
+        "locations",
+        "deletedAt",
+        "platform"
+      ]
+    },
+    {
+      "name": "GoogleHealthSamplesSyncService",
+      "descriptor": "0x10522c370",
+      "kind": 16,
+      "accessor": "0x1013a74f0",
+      "fields": [
+        "$defaultActor",
+        "serverClient",
+        "healthSampleGRDBDataStore",
+        "cursorRepository",
+        "coalescingTask"
+      ]
+    },
+    {
+      "name": "GoogleHealthDailySyncService",
+      "descriptor": "0x10522c324",
+      "kind": 16,
+      "accessor": "0x1013a4388",
+      "fields": [
+        "$defaultActor",
+        "serverClient",
+        "dailyHealthSampleGRDBDataStore",
+        "cursorRepository",
+        "coalescingTask"
+      ]
+    },
+    {
+      "name": "GoogleHealthSleepSyncService",
+      "descriptor": "0x10522c3fc",
+      "kind": 16,
+      "accessor": "0x1013aaa68",
+      "fields": [
+        "$defaultActor",
+        "serverClient",
+        "sleepService",
+        "cursorRepository",
+        "coalescingTask"
+      ]
+    },
+    {
+      "name": "GoogleHealthWorkoutsSyncService",
+      "descriptor": "0x10522c470",
+      "kind": 16,
+      "accessor": "0x1013ad780",
+      "fields": [
+        "$defaultActor",
+        "serverClient",
+        "workoutService",
+        "cursorRepository",
+        "coalescingTask"
+      ]
+    },
+    {
+      "name": "GoogleHealthSyncService",
+      "descriptor": "0x10522c550",
+      "kind": 16,
+      "accessor": "0x1013b7164",
+      "fields": [
+        "$defaultActor",
+        "samplesSyncService",
+        "dailySyncService",
+        "workoutsSyncService",
+        "sleepSyncService",
+        "cursorRepository",
+        "integrationMetadataRepository",
+        "healthSampleGRDBDataStore",
+        "dailyHealthSampleGRDBDataStore",
+        "sleepGRDBDataStore",
+        "workoutGRDBDataStore",
+        "sleepService",
+        "workoutService",
+        "fileCacheSnapshotService",
+        "incrementalSyncTask",
+        "syncMutex"
+      ]
+    },
+    {
+      "name": "GoogleHealthDuplicateSourceService",
+      "descriptor": "0x10522c610",
+      "kind": 16,
+      "accessor": "0x1013b7ff0",
+      "fields": [
+        "userDefaultsService"
+      ]
+    },
+    {
+      "name": "MuscularLoadDebugDay",
+      "descriptor": "0x10526b2bc",
+      "kind": 17,
+      "accessor": "0x102c3c8b0",
+      "fields": [
+        "date",
+        "dataSource",
+        "totalWorkoutCount",
+        "selectedDateWorkoutCount",
+        "displayLoadHistory",
+        "displayedMuscularLoad",
+        "dailyMuscularLoadRaw",
+        "strengthMuscularLoadRaw",
+        "sourceCardioStrainUnitsRaw",
+        "cardioDerivedMuscularLoadRaw",
+        "muscularATL",
+        "muscularCTL",
+        "muscularLoadRatio",
+        "muscularLoadStatus",
+        "muscularCalibrationConfidence",
+        "muscularCTLMaturity",
+        "muscularTrainingDensity",
+        "muscularRecency",
+        "cardioLoadHistory",
+        "muscleFreshnessHistory",
+        "cardioDerivedMuscleLoads",
+        "muscleFreshness",
+        "workouts"
+      ]
+    },
+    {
+      "name": "MuscularLoadDebugStatus",
+      "descriptor": "0x10526b454",
+      "kind": 18,
+      "accessor": "0x102c656d0",
+      "fields": [
+        "calibrating",
+        "maintaining",
+        "peaking",
+        "detraining",
+        "productive",
+        "fatigued",
+        "overtraining"
+      ]
+    },
+    {
+      "name": "CardioLoadData",
+      "descriptor": "0x1051fd3ec",
+      "kind": 17,
+      "accessor": "0x10000e060",
+      "fields": [
+        "atl",
+        "bufferRangeStart",
+        "optimalATLRangeStart",
+        "optimalATLRangeEnd",
+        "bufferRangeEnd",
+        "calibrationConfidence",
+        "ctlMaturity",
+        "trainingDensity",
+        "recency",
+        "dailyTrimp",
+        "status"
+      ]
+    },
+    {
+      "name": "MuscularLoadData",
+      "descriptor": "0x1051fe6a8",
+      "kind": 17,
+      "accessor": "0x10008dd8c",
+      "fields": [
+        "atl",
+        "displayLoad",
+        "optimalRangeStart",
+        "optimalRangeEnd",
+        "calibrationConfidence",
+        "ctlMaturity",
+        "trainingDensity",
+        "recency",
+        "dailyRaw",
+        "ratio",
+        "status"
+      ]
+    },
+    {
+      "name": "CategoryFreshness",
+      "descriptor": "0x1051fe4ac",
+      "kind": 17,
+      "accessor": "0x100087618",
+      "fields": [
+        "category",
+        "freshnessPercent",
+        "status"
+      ]
+    },
+    {
+      "name": "MuscularFreshnessMetrics",
+      "descriptor": "0x1051fe528",
+      "kind": 17,
+      "accessor": "0x100087f68",
+      "fields": [
+        "muscleLoads"
+      ]
+    },
+    {
+      "name": "GlucoseScoreState",
+      "descriptor": "0x1051fe768",
+      "kind": 18,
+      "accessor": "0x10009c5d0",
+      "fields": [
+        "waitingForData",
+        "baselinesCalibrating",
+        "complete"
+      ]
+    },
+    {
+      "name": "GlucoseDataPoint",
+      "descriptor": "0x1051fec48",
+      "kind": 17,
+      "accessor": "0x1000aeee8",
+      "fields": [
+        "timestamp",
+        "valueInMgDl"
+      ]
+    },
+    {
+      "name": "NutritionScoreCategory",
+      "descriptor": "0x1051ff574",
+      "kind": 18,
+      "accessor": "0x100101184",
+      "fields": [
+        "low",
+        "fair",
+        "optimal"
+      ]
+    },
+    {
+      "name": "TDEECalculator",
+      "descriptor": "0x1051ff840",
+      "kind": 16,
+      "accessor": "0x100112f34",
+      "fields": [
+        "healthKitManager",
+        "userAttributesProvider",
+        "userDefaultsService"
+      ]
+    },
+    {
+      "name": "SpO2Sample",
+      "descriptor": "0x1052035cc",
+      "kind": 17,
+      "accessor": "0x100322ce4",
+      "fields": [
+        "timestamp",
+        "valuePercent",
+        "metadata"
+      ]
+    },
+    {
+      "name": "SpO2SampleMetadata",
+      "descriptor": "0x1052035f4",
+      "kind": 17,
+      "accessor": "0x1003225ec",
+      "fields": [
+        "sampleUUID",
+        "sourceBundleIdentifier",
+        "sourceName",
+        "productType",
+        "isUserEntered",
+        "additionalMetadataJson"
+      ]
+    },
+    {
+      "name": "BioAgeScoreData",
+      "descriptor": "0x1052098f4",
+      "kind": 17,
+      "accessor": "0x100589f90",
+      "fields": [
+        "scores",
+        "chronologicalAge",
+        "isCalibrating"
+      ]
+    },
+    {
+      "name": "BloodPressureCalculationService",
+      "descriptor": "0x1052099f8",
+      "kind": 16,
+      "accessor": "0x100595a94",
+      "fields": [
+        "userDefaultsService",
+        "selectedGuidelineAssociationSubject"
+      ]
+    },
+    {
+      "name": "OuraReadinessSummary",
+      "descriptor": "0x10520ca3c",
+      "kind": 17,
+      "accessor": "0x100666c28",
+      "fields": [
+        "contributors",
+        "score",
+        "temperature_deviation",
+        "temperature_trend_deviation"
+      ]
+    },
+    {
+      "name": "FoodScoreApportionEntry",
+      "descriptor": "0x10520d2d0",
+      "kind": 17,
+      "accessor": "0x10067a768",
+      "fields": [
+        "category",
+        "percentage",
+        "basis"
+      ]
+    },
+    {
+      "name": "FoodScoreApportionBasis",
+      "descriptor": "0x10520d444",
+      "kind": 18,
+      "accessor": "0x10067c0c0",
+      "fields": [
+        "calories",
+        "weight",
+        "binary"
+      ]
+    },
+    {
+      "name": "OuraReadinessSummaryData",
+      "descriptor": "0x10522cb28",
+      "kind": 17,
+      "accessor": "0x1013d7de8",
+      "fields": [
+        "contributors",
+        "score",
+        "temperatureDeviation",
+        "temperatureTrendDeviation"
+      ]
+    },
+    {
+      "name": "TemperatureBaselineDefaultCalculator",
+      "descriptor": "0x10522f020",
+      "kind": 16,
+      "accessor": "0x10149ddd8",
+      "fields": [
+        "userAttributesProvider"
+      ]
+    },
+    {
+      "name": "EnergyDayContext",
+      "descriptor": "0x105230710",
+      "kind": 17,
+      "accessor": "0x1015357b8",
+      "fields": [
+        "day",
+        "functionalDay",
+        "dayActivities"
+      ]
+    },
+    {
+      "name": "GenerateDayPrototypeDataAndStressResult",
+      "descriptor": "0x105230738",
+      "kind": 17,
+      "accessor": "0x10154525c",
+      "fields": [
+        "stressMapping",
+        "prototypeData",
+        "cacheError"
+      ]
+    },
+    {
+      "name": "GetEnergyHistoryResult",
+      "descriptor": "0x105230754",
+      "kind": 17,
+      "accessor": "0x10154526c",
+      "fields": [
+        "energyHistory",
+        "cacheError"
+      ]
+    },
+    {
+      "name": "ScoreCalculationError",
+      "descriptor": "0x1052315bc",
+      "kind": 18,
+      "accessor": "0x1015b489c",
+      "fields": [
+        "noDataError",
+        "dateError",
+        "queryError"
+      ]
+    },
+    {
+      "name": "SamplesAggregationMethod",
+      "descriptor": "0x1052315d8",
+      "kind": 18,
+      "accessor": "0x1015be18c",
+      "fields": [
+        "daily",
+        "combined"
+      ]
+    },
+    {
+      "name": "StressContextHistory",
+      "descriptor": "0x1052316b0",
+      "kind": 17,
+      "accessor": "0x1015e8228",
+      "fields": [
+        "sleepStages",
+        "workouts",
+        "exercise",
+        "mindfulness"
+      ]
+    },
+    {
+      "name": "LiveEnergyBankState",
+      "descriptor": "0x105231d6c",
+      "kind": 17,
+      "accessor": "0x10164eaa8",
+      "fields": [
+        "energyBankForDay",
+        "solidData",
+        "energyBankDerivedData",
+        "functionalDay",
+        "prototypeData",
+        "chartStart",
+        "chartEnd",
+        "loadingStatus",
+        "calibrationState"
+      ]
+    },
+    {
+      "name": "HealthDataRHRCalculation",
+      "descriptor": "0x105231e38",
+      "kind": 17,
+      "accessor": "0x101655f44",
+      "fields": [
+        "healthKit",
+        "garmin",
+        "oura",
+        "googleHealth"
+      ]
+    },
+    {
+      "name": "IntegrationRHRCalculation",
+      "descriptor": "0x105231e54",
+      "kind": 18,
+      "accessor": "0x101655f54",
+      "fields": [
+        "bevel"
+      ]
+    },
+    {
+      "name": "HealthKitRHRCalculation",
+      "descriptor": "0x105231e70",
+      "kind": 18,
+      "accessor": "0x101655f64",
+      "fields": [
+        "bevel",
+        "appleHealth"
+      ]
+    },
+    {
+      "name": "SleepScoreComponentResult",
+      "descriptor": "0x105233ac4",
+      "kind": 17,
+      "accessor": "0x101725168",
+      "fields": [
+        "score",
+        "percentOfTarget",
+        "status"
+      ]
+    },
+    {
+      "name": "SleepContributorStatus",
+      "descriptor": "0x105233d78",
+      "kind": 18,
+      "accessor": "0x10172785c",
+      "fields": [
+        "excellent",
+        "good",
+        "fair",
+        "poor",
+        "noData"
+      ]
+    },
+    {
+      "name": "SleepLatencyStatus",
+      "descriptor": "0x105233ddc",
+      "kind": 18,
+      "accessor": "0x101728298",
+      "fields": [
+        "fast",
+        "normal",
+        "late"
+      ]
+    },
+    {
+      "name": "WorkoutWindowScoreBuildResult",
+      "descriptor": "0x105234508",
+      "kind": 17,
+      "accessor": "0x1017806f8",
+      "fields": [
+        "scores",
+        "cardioLoad",
+        "trimp",
+        "heartRateSegments"
+      ]
+    },
+    {
+      "name": "WorkoutOverlayScoresBuildDependencies",
+      "descriptor": "0x105234a38",
+      "kind": 17,
+      "accessor": "0x1017c376c",
+      "fields": [
+        "startTime",
+        "endTime",
+        "biologicalSex",
+        "activeDuration",
+        "totalDistanceMiles",
+        "workoutDistances",
+        "averagePower",
+        "elevationAscendedFeet",
+        "elevationDescendedFeet",
+        "activityType",
+        "pauses",
+        "zoneSettings",
+        "baselineRestingHR",
+        "workoutEffort",
+        "strengthSessions",
+        "workoutHeartRates"
+      ]
+    },
+    {
+      "name": "WorkoutScoreCalculationResult",
+      "descriptor": "0x105234ae4",
+      "kind": 17,
+      "accessor": "0x1017d4370",
+      "fields": [
+        "summaryScores",
+        "scorePayload",
+        "legacySummaryOverlayScores"
+      ]
+    },
+    {
+      "name": "HealthMetricCalculationResult",
+      "descriptor": "0x105234b90",
+      "kind": 17,
+      "accessor": "0x1017e010c",
+      "fields": [
+        "metrics",
+        "activityContext"
+      ]
+    },
+    {
+      "name": "CaloriesDisplay",
+      "descriptor": "0x1052367d4",
+      "kind": 18,
+      "accessor": "0x101912760",
+      "fields": [
+        "total",
+        "active"
+      ]
+    },
+    {
+      "name": "MetricContext",
+      "descriptor": "0x105236828",
+      "kind": 18,
+      "accessor": "0x101913b80",
+      "fields": [
+        "entireSleep",
+        "remDeepSleep",
+        "mindfulnessOnly",
+        "sleepAndMindfulness",
+        "entireDay"
+      ]
+    },
+    {
+      "name": "RhrMethod",
+      "descriptor": "0x105236860",
+      "kind": 18,
+      "accessor": "0x101914684",
+      "fields": [
+        "appleHealth",
+        "bevel"
+      ]
+    },
+    {
+      "name": "TemperatureSource",
+      "descriptor": "0x10523687c",
+      "kind": 18,
+      "accessor": "0x101914898",
+      "fields": [
+        "wrist",
+        "body"
+      ]
+    },
+    {
+      "name": "CalculationsOptions",
+      "descriptor": "0x105236898",
+      "kind": 17,
+      "accessor": "0x101914c34",
+      "fields": [
+        "hrvMethod",
+        "rhrMethod",
+        "hrvContext",
+        "rhrContext",
+        "caloriesDisplay",
+        "temperatureSource",
+        "sp02Window",
+        "rrWindow"
+      ]
+    },
+    {
+      "name": "DerivedAgeScoreRecord",
+      "descriptor": "0x10523f9b8",
+      "kind": 17,
+      "accessor": "0x101bd7920",
+      "fields": [
+        "weekStart",
+        "chronologicalAge",
+        "bloodAge",
+        "bloodConfidence",
+        "bioAge",
+        "bioConfidence",
+        "presentBloodBiomarkerCount",
+        "calculatedAt"
+      ]
+    },
+    {
+      "name": "WorkoutScoreOwner",
+      "descriptor": "0x1052426bc",
+      "kind": 17,
+      "accessor": "0x101c762f0",
+      "fields": [
+        "workoutSourceId",
+        "workoutSourceType",
+        "algorithmVersion",
+        "scope"
+      ]
+    },
+    {
+      "name": "WorkoutSummaryScoreRecordData",
+      "descriptor": "0x10524286c",
+      "kind": 17,
+      "accessor": "0x101c7c26c",
+      "fields": [
+        "metrics",
+        "strideLengthAverageMeters",
+        "strideLengthMinimumMeters",
+        "strideLengthMaximumMeters",
+        "verticalOscillationAverageCentimeters",
+        "verticalOscillationMinimumCentimeters",
+        "verticalOscillationMaximumCentimeters",
+        "groundContactAverageMilliseconds",
+        "groundContactMinimumMilliseconds",
+        "groundContactMaximumMilliseconds",
+        "strainScore",
+        "trimp",
+        "muscularLoad",
+        "heartRateRecovery",
+        "heartRateRecoveryStart",
+        "heartRateRecoveryEnd",
+        "rpe",
+        "cardioFocusPresent",
+        "cardioLoad"
+      ]
+    },
+    {
+      "name": "SyncedSpO2Record",
+      "descriptor": "0x105242b8c",
+      "kind": 17,
+      "accessor": "0x101c8b318",
+      "fields": [
+        "timestamp",
+        "valuePercent",
+        "sampleUUID",
+        "sourceBundleIdentifier",
+        "sourceName",
+        "productType",
+        "isUserEntered",
+        "additionalMetadataJson"
+      ]
+    },
+    {
+      "name": "AggregatedDataState",
+      "descriptor": "0x1052462fc",
+      "kind": 17,
+      "accessor": "0x101dfc274",
+      "fields": [
+        "data",
+        "algorithmVersion",
+        "lastUpdatedAt"
+      ]
+    },
+    {
+      "name": "DailyScores",
+      "descriptor": "0x10524b3fc",
+      "kind": 17,
+      "accessor": "0x101f82c94",
+      "fields": [
+        "recoveryScore",
+        "sleepScore",
+        "strainScore",
+        "strainZScore",
+        "targetStrainBounds"
+      ]
+    },
+    {
+      "name": "SleepDebugDataDownloadType",
+      "descriptor": "0x10526a030",
+      "kind": 18,
+      "accessor": "0x102b9f164",
+      "fields": [
+        "sleepStages",
+        "sleepingHeartBeats",
+        "sleepingHeartRate",
+        "sleepingHRV",
+        "sleepingRespiration",
+        "sleepGoal"
+      ]
+    },
+    {
+      "name": "MuscleFreshnessStatus",
+      "descriptor": "0x10526b34c",
+      "kind": 18,
+      "accessor": "0x102c3dc5c",
+      "fields": [
+        "calibrating",
+        "recovered",
+        "fatigued",
+        "depleted"
+      ]
+    },
+    {
+      "name": "ScoreThresholdType",
+      "descriptor": "0x105277a14",
+      "kind": 17,
+      "accessor": "0x1030f5280",
+      "fields": [
+        "lowThreshold",
+        "highThreshold"
+      ]
+    },
+    {
+      "name": "ScoreBoundaryInclusion",
+      "descriptor": "0x105277b80",
+      "kind": 18,
+      "accessor": "0x1030f7e70",
+      "fields": [
+        "inclusive",
+        "exclusive"
+      ]
+    },
+    {
+      "name": "ScoreInterval",
+      "descriptor": "0x105277b9c",
+      "kind": 17,
+      "accessor": "0x1030f7e94",
+      "fields": [
+        "lowerBound",
+        "lowerBoundInclusion",
+        "upperBound",
+        "upperBoundInclusion"
+      ]
+    },
+    {
+      "name": "EnergyUnit",
+      "descriptor": "0x105278290",
+      "kind": 18,
+      "accessor": "0x1031119b0",
+      "fields": [
+        "kcal",
+        "kj"
+      ]
+    },
+    {
+      "name": "GlucoseUnit",
+      "descriptor": "0x1052782ac",
+      "kind": 18,
+      "accessor": "0x1031123b8",
+      "fields": [
+        "mgDl",
+        "mmolL"
+      ]
+    },
+    {
+      "name": "HealthMetricUnit",
+      "descriptor": "0x10529f878",
+      "kind": 18,
+      "accessor": "0x1038c5228",
+      "fields": [
+        "percentage",
+        "grams",
+        "durationInMinutes",
+        "minutesFromMidnight",
+        "seconds",
+        "milliseconds",
+        "score",
+        "beatsPerMinute",
+        "respirationsPerMinute",
+        "calories",
+        "fahrenheit",
+        "miles",
+        "feet",
+        "milesPerHour",
+        "secondsPerMile",
+        "count",
+        "pounds",
+        "reps",
+        "decibels",
+        "none",
+        "watts",
+        "yards",
+        "milligramsPerDeciliter",
+        "millimetersOfMercury"
+      ]
+    },
+    {
+      "name": "CurrentStressStatus",
+      "descriptor": "0x10529f904",
+      "kind": 17,
+      "accessor": "0x1038c9ce4",
+      "fields": [
+        "score",
+        "highestScore",
+        "lowestScore",
+        "averageScore",
+        "currentHRV",
+        "currentAHR",
+        "hrvLastUpdatedAt",
+        "hrLastUpdatedAt"
+      ]
+    },
+    {
+      "name": "StressScore",
+      "descriptor": "0x10529f92c",
+      "kind": 17,
+      "accessor": "0x1038cc07c",
+      "fields": [
+        "score",
+        "level"
+      ]
+    },
+    {
+      "name": "StressScoreLevel",
+      "descriptor": "0x10529f948",
+      "kind": 18,
+      "accessor": "0x1038cc08c",
+      "fields": [
+        "high",
+        "mediumHigh",
+        "medium",
+        "lowMedium",
+        "low",
+        "undefined"
+      ]
+    },
+    {
+      "name": "SmokingHazardRatioContext",
+      "descriptor": "0x1052aeeb8",
+      "kind": 17,
+      "accessor": "0x103c495e4",
+      "fields": [
+        "endOfWindow",
+        "cigDurationYears",
+        "cigQuitDate",
+        "avgCigsPerDay",
+        "vapingDurationYears",
+        "vapingQuitDate",
+        "avgVapingIntensity"
+      ]
+    },
+    {
+      "name": "LifestyleHazardRatioContext",
+      "descriptor": "0x1052aeef0",
+      "kind": 18,
+      "accessor": "0x103c499e8",
+      "fields": [
+        "nutrition",
+        "alcohol",
+        "smoking"
+      ]
+    },
+    {
+      "name": "PhysioHazardRatioContext",
+      "descriptor": "0x1052aef44",
+      "kind": 18,
+      "accessor": "0x103c4c7c8",
+      "fields": [
+        "sleepDuration",
+        "sleepConsistency",
+        "steps",
+        "zone2to3",
+        "zone4to5",
+        "strengthTraining",
+        "restingHeartRate",
+        "vo2Max",
+        "leanBodyMass"
+      ]
+    },
+    {
+      "name": "CalculationOutcome",
+      "descriptor": "0x1052b1384",
+      "kind": 18,
+      "accessor": "0x103d1eda4",
+      "fields": [
+        "succeeded",
+        "pending",
+        "failed"
+      ]
+    },
+    {
+      "name": "BioAgeScoreConfidence",
+      "descriptor": "0x1052b3528",
+      "kind": 18,
+      "accessor": "0x103e028a4",
+      "fields": [
+        "max",
+        "high",
+        "medium",
+        "low",
+        "missingData"
+      ]
+    },
+    {
+      "name": "MuscularFreshnessStatus",
+      "descriptor": "0x1052b40d4",
+      "kind": 18,
+      "accessor": "0x103e434bc",
+      "fields": [
+        "calibrating",
+        "recovered",
+        "fatigued",
+        "depleted"
+      ]
+    },
+    {
+      "name": "LoadMetrics",
+      "descriptor": "0x1052b4da8",
+      "kind": 17,
+      "accessor": "0x103ec0bd8",
+      "fields": [
+        "trimp",
+        "epoc",
+        "cardioFocusImpact",
+        "cardioLoadImpact"
+      ]
+    },
+    {
+      "name": "WorkoutSummaryScoreState",
+      "descriptor": "0x1052b5858",
+      "kind": 18,
+      "accessor": "0x103eebcb8",
+      "fields": [
+        "calculated",
+        "legacy",
+        "recordedOnly"
+      ]
+    },
+    {
+      "name": "WorkoutOverlayScores",
+      "descriptor": "0x1052b5a20",
+      "kind": 17,
+      "accessor": "0x103ef6c64",
+      "fields": [
+        "strainScore",
+        "trimp",
+        "muscularStrainUnits",
+        "cardioStrainUnits",
+        "heartRateRecovery",
+        "hrDetails",
+        "resolvedWorkoutEffort",
+        "strainZones",
+        "cardioFocus",
+        "distanceWorkoutMetrics"
+      ]
+    }
+  ],
+  "fitbit_path": {
+    "support_string": {
+      "address": "0x1058bb5d0",
+      "meaning": "Google Health supports devices such as Fitbit"
+    },
+    "air_guide": {
+      "address": "0x105a13300",
+      "text": "Tap Fitbit Air, then Share heart rate.",
+      "caller": "0x104b17850"
+    },
+    "backend_methods": [
+      "googleHealthSamplesByType",
+      "googleHealthDaily",
+      "googleHealthSleep",
+      "googleHealthWorkouts",
+      "googleHealthBackfill"
+    ],
+    "sample_mapper": {
+      "address": "0x1013a2050",
+      "rmssd_match": "0x1013a2284-0x1013a22b4",
+      "daily_mapper": "0x1013a2518",
+      "hrv_alias": "hrvRmssd",
+      "internal_type_tag": 8,
+      "unit_tag": 5,
+      "unit": "ms",
+      "unit_table": "0x104f82e40",
+      "unknown_type": "skipped"
+    },
+    "server_boundary": "IPA receives normalized IntegrationHealthSampleResponse values from Bevel server. Google raw-field conversion, backend filtering and estimates are not in these response models.",
+    "current_pulse_difference": "Pulse requests nightly daily-heart-rate-variability, not heart-rate-variability samples. It also omits sample SpO2 and sleep short awakenings/out-of-bed intervals."
+  },
+  "limitations": [
+    "No runtime execution or reference input/output pairs",
+    "No pristine App Store build or hash comparison",
+    "Patch hook effects uncharacterized; no claim patches only affect entitlement",
+    "Original BL index excludes tail calls, BLR, async/ObjC dispatch. Follow-up adds direct B and selected materialized async edges; full indirect graph remains partial.",
+    "Original assembly annotations use heuristic register tracking and patched symbol labels; verified instruction bytes, not every annotation",
+    "Export names contain 3982 non-Swift labels incorrectly prefixed with $s by original recovery utility",
+    "Extensions contain duplicate calculators, but independent extension arithmetic audit remains open",
+    "No complete source-to-presentation pipeline reconstructed",
+    "No live Google account or Air payload sampled",
+    "Current public Google/Bevel pages may postdate this IPA"
+  ],
+  "validation": {
+    "app_source_changes": false,
+    "json_parse": "passed",
+    "original_metadata_rows": "635 metadata fields/cases in the original 655-entry ledger match. The other 20 entries are manually named derived kernels, without registry descriptors.",
+    "original_assembly_files": 110,
+    "original_assembly_instructions": 165078,
+    "instruction_mismatches": 0,
+    "runtime_pairs": 0,
+    "tools_used": [
+      "Python standard library",
+      "Mach-O load commands/export trie/Swift metadata parsers",
+      "Xcode llvm-objdump",
+      "swift-demangle",
+      "nm",
+      "otool",
+      "git CLI",
+      "Google and Bevel primary documentation"
+    ],
+    "not_run": [
+      "iOS app runtime",
+      "Bevel server requests",
+      "Pulse app tests: research-only changes"
+    ],
+    "current_inventory_status_counts": {
+      "kernel": 55,
+      "registered": 1095,
+      "partial": 45,
+      "located": 13
+    },
+    "current_inventory_entries": 1208,
+    "current_metadata_rows_verified": 1188,
+    "manually_named_derived_entries": 20,
+    "swift_registry_count": 172,
+    "ledger_group_count": 173,
+    "unique_inventory_ids": "passed",
+    "canonical_family_counts": "passed",
+    "pulse_source_paths": "passed",
+    "local_markdown_links": "passed",
+    "evidence_references": "passed",
+    "documentation_dash_and_whitespace_check": "passed",
+    "evidence_member_hashes": "passed",
+    "reproduction_script_syntax": "passed",
+    "final_ipa_hash_recheck": "passed",
+    "final_archive_crc_and_all_member_hashes": "passed",
+    "all_local_links_and_source_paths": "passed",
+    "canonical_family_partitions": "passed",
+    "documentation_copy_checks": "passed",
+    "deep_synthetic_transcription_checks": 19,
+    "deep_runtime_pairs": 0,
+    "deep_validation": {
+      "result": "passed",
+      "metadata_rows": 1188,
+      "manual_rows": 20,
+      "score_families": 18,
+      "pulse_counterparts": 12,
+      "synthetic_checks": 19,
+      "runtime_pairs": 0,
+      "all_previous_and_new_evidence_hashes": "passed",
+      "archive_crc": "passed",
+      "json_metadata_counts_links_source_paths_copy": "passed",
+      "final_ipa_hash": "329886dda54e712799b3e913e6f717a1c4e6ddec921cf3f482e4329b02679af7"
+    }
+  },
+  "heart_rate_recovery": {
+    "selector": "0x1017cdb20",
+    "selector_end": "0x1017ce068",
+    "service": "0x1017cd18c",
+    "window_seconds": 120,
+    "window_constant_evidence": "0x1017cd56c-0x1017cd57c supplies Float64 120.0 to selector",
+    "formula": "For chronological finite input points, select minimum(HR[j]-HR[k]) over earlier k<j with time[j]-time[k]<=120 seconds and time[k]<=activeWorkoutEnd. Service converts delta to Float32 then negates it.",
+    "implementation": "Sliding maximum-HR deque for eligible earlier points; minimum delta across later points. Helper does not sort input.",
+    "comparison_evidence": "0x1017cdd80-0x1017cdd98 evicts window-ineligible starts; 0x1017cdda0-0x1017cdda4 skips inserting points after activeWorkoutEnd; 0x1017cde68-0x1017cde90 selects strictly smaller delta; 0x1017cd8e0-0x1017cd8e4 converts and negates.",
+    "null_behavior": "Selector returns nil for fewer than two points, window <= 0, or no eligible pair. Full service eligibility and errors remain partial.",
+    "clipping": "No numeric drop clipping observed in these local functions; increasing HR can yield negative recovery.",
+    "time_semantics": "No local requirement that the later point is after activeWorkoutEnd. Upstream supplied interval is essential; this is not proven to be a fixed two-minute post-workout measurement.",
+    "source_name_evidence": "findMaxHRRecoveryInWindow(activeWorkoutEnd:hrRecoverySamples:) string 0x105927910 referenced at 0x1017cd854; HeartRateRecoveryService.swift string 0x1059278e0.",
+    "evidence": [
+      "audit/assembly/hrr-selection.asm",
+      "audit/assembly/hrr-service.asm"
+    ],
+    "unresolved": [
+      "Upstream sample window and chronological ordering",
+      "Zone-four eligibility and activeWorkoutEnd derivation",
+      "HR point source, unit conversion and cadence",
+      "Tie/NaN behavior across full pipeline",
+      "Daily/workout aggregation and presentation"
+    ],
+    "runtime_validation": "none"
+  },
+  "supplemented_evidence_archive": {
+    "file": "bevel-evidence.zip",
+    "sha256": "e6e9f58d0e33ea375be724716d4f658cc71f854d068f45fed9e4291ddc8c8d6b",
+    "bytes": 14368970,
+    "original_member_count": 118,
+    "added_member_count": 196,
+    "added_assembly_files": 153,
+    "original_members_unchanged": true,
+    "crc_integrity": "passed",
+    "member_manifest": "audit/manifest.json",
+    "deep_followup_member_count": 138,
+    "deep_followup_manifest": "audit/deep/manifest.json",
+    "deep_previous_archive_sha256": "2bbc62e0d9b6dbbb2b8a4e8cc3f4ba5aaa71b66aeaaa4ea9f441c50f1ab77c71",
+    "total_member_count": 314
+  },
+  "final_discovery_pass": {
+    "new_registries": 63,
+    "new_fields": 289,
+    "evidence": "audit/final-discovery-models.json",
+    "screening_evidence": "audit/remaining-candidate-models.json",
+    "remaining_candidates_note": "Broad name-based screen includes UI, SDK, persistence, imported vendor models and helper types. It is a navigation queue, not a metric count."
+  },
+  "patch_string_screen": [
+    {
+      "image": "BevelAIHealthCoachPatch.dylib",
+      "sha256": "e5f14354d2b146f6110e19a66da82d39ae283bcb8b39ec5d7cec969e5379d3d1",
+      "selected_hits": [
+        "9SubscriptionVerifier_Validatev",
+        "EntitlementGuard_Verifyv",
+        "EntitlementResolver",
+        "HookSurface_Enumeratev",
+        "PurchaseHistory_Syncv",
+        "__Z20PurchaseHistory_Syncv",
+        "__Z21HookSurface_Enumeratev",
+        "__Z23EntitlementGuard_Verifyv",
+        "__Z29SubscriptionVerifier_Validatev",
+        "bridgeEntitlementToPolicyLayer",
+        "persistEntitlementSnapshot:",
+        "resolveEntitlementPayload:",
+        "validateSubscriptionToken:"
+      ],
+      "scope": "ASCII string screen only. No direct score calculator name found by this pattern. Absence does not rule out obfuscated/dynamic hooks or changed outputs."
+    },
+    {
+      "image": "blatantsPatch.dylib",
+      "sha256": "4fb1f1d688a795bd3fb63aec01cf238ed48834fb95733cdaa280ee0618401f5a",
+      "selected_hits": [
+        "CKEntitlements",
+        "entitlements",
+        "initWithEntitlementsDict:"
+      ],
+      "scope": "ASCII string screen only. No direct score calculator name found by this pattern. Absence does not rule out obfuscated/dynamic hooks or changed outputs."
+    }
+  ],
+  "deep_followup": {
+    "date": "2026-10-06",
+    "scope": "Default baselines, population statistics, sample selection, automatic goal, Energy input/clip, Target Strain kernel and patch initialization screen",
+    "new_score_families": 0,
+    "runtime_pairs": 0,
+    "synthetic_checks": 19,
+    "findings_files": [
+      "audit/deep/findings.json",
+      "audit/deep/extra-findings.json"
+    ],
+    "manifest": "audit/deep/manifest.json",
+    "remaining_local_work": "All-family ledger in bevel-metrics.md section20. Remaining local producers may be recoverable; no server-only/absent-code classification based on failed direct call search.",
+    "archive_files_added": 138,
+    "original_previous_members_preserved": true
+  }
+}

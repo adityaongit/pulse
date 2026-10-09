@@ -1,0 +1,1131 @@
+{
+  "phenoage": [
+    {
+      "marker": "albumin",
+      "unit": "gL",
+      "coefficient": -0.0336,
+      "natural_log": false
+    },
+    {
+      "marker": "creatinine",
+      "unit": "umolL",
+      "coefficient": 0.0095,
+      "natural_log": false
+    },
+    {
+      "marker": "glucose",
+      "unit": "mmolL",
+      "coefficient": 0.1953,
+      "natural_log": false
+    },
+    {
+      "marker": "hsCRP",
+      "unit": "mgdL",
+      "coefficient": 0.0954,
+      "natural_log": true
+    },
+    {
+      "marker": "lymphocytesPercent",
+      "unit": "percent",
+      "coefficient": -0.012,
+      "natural_log": false
+    },
+    {
+      "marker": "meanCorpuscularVolume",
+      "unit": "fL",
+      "coefficient": 0.0268,
+      "natural_log": false
+    },
+    {
+      "marker": "redCellDistributionWidth",
+      "unit": "percent",
+      "coefficient": 0.3306,
+      "natural_log": false
+    },
+    {
+      "marker": "alkalinePhosphatase",
+      "unit": "uL",
+      "coefficient": 0.0019,
+      "natural_log": false
+    },
+    {
+      "marker": "whiteBloodCellCount",
+      "unit": "x10_9L",
+      "coefficient": 0.0554,
+      "natural_log": false
+    }
+  ],
+  "stress_curve": [
+    [
+      0.0,
+      0.0
+    ],
+    [
+      0.1,
+      3.0
+    ],
+    [
+      0.4,
+      18.0
+    ],
+    [
+      0.5,
+      30.0
+    ],
+    [
+      0.75,
+      45.0
+    ],
+    [
+      0.9,
+      60.0
+    ],
+    [
+      0.97,
+      85.0
+    ],
+    [
+      1.0,
+      100.0
+    ]
+  ],
+  "sleep_weights": [
+    0.35,
+    0.2,
+    0.2,
+    0.1,
+    0.075,
+    0.075
+  ],
+  "sleep_exponents": [
+    3.0,
+    2.0,
+    2.0,
+    3.0,
+    15.0,
+    10.0
+  ],
+  "strain_weight_pairs": [
+    [
+      3.0,
+      4.0
+    ],
+    [
+      4.0,
+      7.0
+    ],
+    [
+      7.0,
+      12.0
+    ],
+    [
+      12.0,
+      20.0
+    ]
+  ],
+  "muscular_freshness": {
+    "decay_address": "0x104ec1fe8",
+    "capacity_address": "0x104ec2098",
+    "muscles": [
+      {
+        "muscle": "abductors",
+        "decay": 0.58,
+        "default_capacity": 4500.0
+      },
+      {
+        "muscle": "abs",
+        "decay": 0.62,
+        "default_capacity": 4200.0
+      },
+      {
+        "muscle": "adductors",
+        "decay": 0.6,
+        "default_capacity": 4300.0
+      },
+      {
+        "muscle": "biceps",
+        "decay": 0.78,
+        "default_capacity": 2600.0
+      },
+      {
+        "muscle": "calves",
+        "decay": 0.52,
+        "default_capacity": 4200.0
+      },
+      {
+        "muscle": "chest",
+        "decay": 0.78,
+        "default_capacity": 4500.0
+      },
+      {
+        "muscle": "core",
+        "decay": 0.62,
+        "default_capacity": 4500.0
+      },
+      {
+        "muscle": "forearm",
+        "decay": 0.66,
+        "default_capacity": 2800.0
+      },
+      {
+        "muscle": "glutes",
+        "decay": 0.56,
+        "default_capacity": 6000.0
+      },
+      {
+        "muscle": "hamstrings",
+        "decay": 0.6,
+        "default_capacity": 4500.0
+      },
+      {
+        "muscle": "hipFlexors",
+        "decay": 0.56,
+        "default_capacity": 3800.0
+      },
+      {
+        "muscle": "lats",
+        "decay": 0.7,
+        "default_capacity": 4500.0
+      },
+      {
+        "muscle": "lowerBack",
+        "decay": 0.7,
+        "default_capacity": 4200.0
+      },
+      {
+        "muscle": "middleBack",
+        "decay": 0.62,
+        "default_capacity": 4500.0
+      },
+      {
+        "muscle": "neck",
+        "decay": 0.68,
+        "default_capacity": 2200.0
+      },
+      {
+        "muscle": "obliques",
+        "decay": 0.62,
+        "default_capacity": 4200.0
+      },
+      {
+        "muscle": "quads",
+        "decay": 0.5,
+        "default_capacity": 5500.0
+      },
+      {
+        "muscle": "rotatorCuff",
+        "decay": 0.7,
+        "default_capacity": 2200.0
+      },
+      {
+        "muscle": "shoulder",
+        "decay": 0.68,
+        "default_capacity": 3200.0
+      },
+      {
+        "muscle": "traps",
+        "decay": 0.62,
+        "default_capacity": 4500.0
+      },
+      {
+        "muscle": "triceps",
+        "decay": 0.78,
+        "default_capacity": 2600.0
+      },
+      {
+        "muscle": "upperBack",
+        "decay": 0.62,
+        "default_capacity": 4500.0
+      }
+    ]
+  },
+  "food_quality": {
+    "configuration_address": "0x1000aa3a0",
+    "contributors": [
+      {
+        "contributor": "vegetables",
+        "lower": 0,
+        "upper": 0.1,
+        "weight": 10,
+        "basis": "caloric_fraction"
+      },
+      {
+        "contributor": "fruit",
+        "lower": 0,
+        "upper": 0.06,
+        "weight": 10,
+        "basis": "caloric_fraction"
+      },
+      {
+        "contributor": "wholeGrains",
+        "lower": 0,
+        "upper": 0.05,
+        "weight": 10,
+        "basis": "caloric_fraction"
+      },
+      {
+        "contributor": "nutsSeedsLegumes",
+        "lower": 0,
+        "upper": 0.06,
+        "weight": 10,
+        "basis": "caloric_fraction"
+      },
+      {
+        "contributor": "fishSeafood",
+        "lower": 0,
+        "upper": 0.03,
+        "weight": 10,
+        "basis": "caloric_fraction_or_binary"
+      },
+      {
+        "contributor": "healthyOilUse",
+        "lower": 0,
+        "upper": 0.07,
+        "weight": 10,
+        "basis": "caloric_fraction"
+      },
+      {
+        "contributor": "redMeat",
+        "lower": 0,
+        "upper": 0.09,
+        "weight": -5,
+        "basis": "caloric_fraction"
+      },
+      {
+        "contributor": "processedMeat",
+        "lower": 0,
+        "upper": 0.05,
+        "weight": -10,
+        "basis": "caloric_fraction"
+      },
+      {
+        "contributor": "excessSugar",
+        "lower": 0.05,
+        "upper": 0.1,
+        "weight": -10,
+        "basis": "added_sugar_caloric_fraction"
+      },
+      {
+        "contributor": "excessSodium",
+        "lower": 1.5,
+        "upper": 2.3,
+        "weight": -5,
+        "basis": "grams",
+        "unit_verified": true,
+        "unit": "grams"
+      },
+      {
+        "contributor": "alcohol",
+        "lower": 0,
+        "upper": 14,
+        "weight": -10,
+        "basis": "grams",
+        "unit_verified": true,
+        "unit": "grams"
+      }
+    ],
+    "mass_unit_status": "Verified grams: objc stub 0x104e6c6a0, selector reference 0x1063e9210, selector string 0x105cacfc7.",
+    "aggregate": {
+      "calculator": "0x10010353c",
+      "formula": "clamp(50+sum(maxPositiveWeight for excluded positive contributors)+sum(scores outside exclusion set),1,100)",
+      "exclusion_set_setting_assignment": "partially traced"
+    }
+  },
+  "blood_coverage_weights": {
+    "address": "0x1051300d8",
+    "entries": [
+      {
+        "marker": "albumin",
+        "weight": 1.4447999999999999
+      },
+      {
+        "marker": "creatinine",
+        "weight": 0.6839999999999999
+      },
+      {
+        "marker": "glucose",
+        "weight": 0.99603
+      },
+      {
+        "marker": "alkalinePhosphatase",
+        "weight": 0.133
+      },
+      {
+        "marker": "lymphocytesPercent",
+        "weight": 0.36
+      },
+      {
+        "marker": "meanCorpuscularVolume",
+        "weight": 2.412
+      },
+      {
+        "marker": "redCellDistributionWidth",
+        "weight": 4.2978000000000005
+      },
+      {
+        "marker": "whiteBloodCellCount",
+        "weight": 0.3601
+      },
+      {
+        "marker": "hsCRP",
+        "weight": 0.15354037684621316
+      }
+    ],
+    "recency": {
+      "predicate": "0x103c447d4",
+      "rule": "calendar sample age < 366 days; signed comparison admits future dates",
+      "conversion_checked_by_coverage": false
+    }
+  },
+  "age_hazard_curves": {
+    "status": "Static arithmetic verified; upstream history, exercise time units and overlap unresolved.",
+    "factors": [
+      {
+        "factor": "sleepDuration",
+        "formula": "exp(0.05*(x-7.5)*(x-9))",
+        "lower": 0.9802,
+        "upper": 1.24608,
+        "calculator": "0x103c4a8c8"
+      },
+      {
+        "factor": "sleepConsistency",
+        "formula": "exp((70-x)*(0.007 if x>70 else 0.015))",
+        "lower": 0.74082,
+        "upper": 1.16183,
+        "calculator": "0x103c4a46c"
+      },
+      {
+        "factor": "steps",
+        "formula": "(clamp(x,1,cap)/target)^(-0.26)",
+        "lower": 0.90484,
+        "upper": 1.24608,
+        "calculator": "0x103c4adf0"
+      },
+      {
+        "factor": "zone2to3Time",
+        "formula": "0.75+0.46*exp(-x/246)",
+        "lower": 0.74082,
+        "upper": 1.10517,
+        "calculator": "0x103c4ba38"
+      },
+      {
+        "factor": "zone4to5Time",
+        "formula": "0.95123+0.08041*exp(-x/20)",
+        "lower": 0.95123,
+        "upper": 1.03045,
+        "calculator": "0x103c4bda4"
+      },
+      {
+        "factor": "strengthTraining",
+        "formula": "0.827+0.3348*exp(-x/15.14)",
+        "lower": 0.84366,
+        "upper": 1.10517,
+        "calculator": "0x103c4b2a4"
+      },
+      {
+        "factor": "restingHeartRate",
+        "formula": "exp(0.012*(x-referenceRHR))",
+        "lower": 0.63763,
+        "upper": 1.2214,
+        "calculator": "0x103c4a050"
+      },
+      {
+        "factor": "vo2Max",
+        "formula": "max(0.3,exp(0.038*(referenceVO2-x)))",
+        "lower": 0.60653,
+        "upper": 1.28403,
+        "calculator": "0x103c4b610"
+      },
+      {
+        "factor": "leanBodyMass",
+        "formula": "See body-composition rule in research doc",
+        "lower": 0.95123,
+        "upper": 1.49182,
+        "calculator": "0x103c49af8"
+      },
+      {
+        "factor": "nutritionScore",
+        "formula": "0.96^((x-50)*1.1/10)",
+        "lower": 0.79,
+        "upper": 1.27,
+        "calculator": "0x103c472ec"
+      },
+      {
+        "factor": "alcohol",
+        "formula": "max(1,1+slope*(drinksPerWeek-threshold))",
+        "lower": 1,
+        "upper": 1.28,
+        "calculator": "0x103c47054"
+      },
+      {
+        "factor": "smoking",
+        "formula": "1+cigExcess+vapeExcess",
+        "lower": 1,
+        "upper": 1.65,
+        "calculator": "0x103c47644"
+      }
+    ]
+  },
+  "age_reference_tables": {
+    "range_rule": "lower <= age < upper; fallback outside all ranges",
+    "rhr": {
+      "calculator": "0x103c46abc",
+      "columns": [
+        "lower_age",
+        "upper_age",
+        "male",
+        "female"
+      ],
+      "rows": [
+        [
+          0,
+          26,
+          61,
+          65
+        ],
+        [
+          26,
+          36,
+          61,
+          64
+        ],
+        [
+          36,
+          46,
+          62,
+          64
+        ],
+        [
+          46,
+          56,
+          63,
+          65
+        ],
+        [
+          56,
+          66,
+          61,
+          64
+        ]
+      ],
+      "fallback": [
+        62,
+        64
+      ]
+    },
+    "vo2": {
+      "calculator": "0x103c46c20",
+      "columns": [
+        "lower_age",
+        "upper_age",
+        "male",
+        "female"
+      ],
+      "rows": [
+        [
+          0,
+          20,
+          48,
+          37.6
+        ],
+        [
+          20,
+          30,
+          48,
+          37.6
+        ],
+        [
+          30,
+          40,
+          42.4,
+          30.2
+        ],
+        [
+          40,
+          50,
+          37.8,
+          26.7
+        ],
+        [
+          50,
+          60,
+          32.6,
+          23.4
+        ],
+        [
+          60,
+          70,
+          28.2,
+          20
+        ],
+        [
+          70,
+          80,
+          24.4,
+          18.3
+        ]
+      ],
+      "fallback": [
+        24.4,
+        18.3
+      ]
+    },
+    "body_fat": {
+      "calculator": "0x103c46d88",
+      "columns": [
+        "lower_age",
+        "upper_age",
+        "male_mean",
+        "male_sd",
+        "female_mean",
+        "female_sd"
+      ],
+      "rows": [
+        [
+          0,
+          20,
+          17,
+          7.78,
+          30,
+          6.82
+        ],
+        [
+          20,
+          40,
+          21.2,
+          6.82,
+          32.5,
+          7.71
+        ],
+        [
+          40,
+          60,
+          25.2,
+          5.19,
+          36.4,
+          6.45
+        ],
+        [
+          60,
+          80,
+          27.3,
+          5.26,
+          38.9,
+          5.41
+        ]
+      ],
+      "fallback": [
+        27.3,
+        4.89,
+        36.9,
+        5.56
+      ]
+    }
+  },
+  "sleep_bank": {
+    "calculator": "0x1015cd324",
+    "formula": "sum(((sleepSeconds[i]-goalHours*3600)/60)*exp(0.3*(i-6))) for nonzero slots",
+    "missing_slot_alignment": "unresolved",
+    "range_clip": "none in helper"
+  },
+  "sleep_consistency": {
+    "calculator": "0x1015cdbb4",
+    "minute_bins": 1440,
+    "formula": "100*sum(k*(k-1)+(N-k)*(N-k-1))/(N*(N-1)*1440)",
+    "minimum_days": 2,
+    "day_eligibility": "unresolved"
+  },
+  "audit": {
+    "date": "2026-10-06",
+    "report": "bevel-audit.json",
+    "runtime_validation": "none",
+    "table_checks": [
+      {
+        "table": "muscle_decay",
+        "address": "0x104ec1fe8",
+        "file_offset": "0x4ec1fe8",
+        "format": "22 little-endian Float64",
+        "matches_json": true
+      },
+      {
+        "table": "muscle_capacity",
+        "address": "0x104ec2098",
+        "file_offset": "0x4ec2098",
+        "format": "22 little-endian Float64",
+        "matches_json": true
+      },
+      {
+        "table": "phenoage_coefficients",
+        "address": "0x106219e10",
+        "file_offset": "0x6219e10",
+        "record_bytes": 32,
+        "matches_coefficients_and_log_flags": true,
+        "records": [
+          {
+            "address": "0x106219e10",
+            "marker_tag": 0,
+            "unit_tag": 6,
+            "coefficient": -0.0336,
+            "natural_log": false
+          },
+          {
+            "address": "0x106219e30",
+            "marker_tag": 1,
+            "unit_tag": 11,
+            "coefficient": 0.0095,
+            "natural_log": false
+          },
+          {
+            "address": "0x106219e50",
+            "marker_tag": 2,
+            "unit_tag": 10,
+            "coefficient": 0.1953,
+            "natural_log": false
+          },
+          {
+            "address": "0x106219e70",
+            "marker_tag": 8,
+            "unit_tag": 1,
+            "coefficient": 0.0954,
+            "natural_log": true
+          },
+          {
+            "address": "0x106219e90",
+            "marker_tag": 4,
+            "unit_tag": 24,
+            "coefficient": -0.012,
+            "natural_log": false
+          },
+          {
+            "address": "0x106219eb0",
+            "marker_tag": 5,
+            "unit_tag": 22,
+            "coefficient": 0.0268,
+            "natural_log": false
+          },
+          {
+            "address": "0x106219ed0",
+            "marker_tag": 6,
+            "unit_tag": 24,
+            "coefficient": 0.3306,
+            "natural_log": false
+          },
+          {
+            "address": "0x106219ef0",
+            "marker_tag": 3,
+            "unit_tag": 16,
+            "coefficient": 0.0019,
+            "natural_log": false
+          },
+          {
+            "address": "0x106219f10",
+            "marker_tag": 7,
+            "unit_tag": 20,
+            "coefficient": 0.0554,
+            "natural_log": false
+          }
+        ],
+        "unit_labels": "Original unit dispatch interpretation retained; full source conversions remain partial."
+      },
+      {
+        "table": "blood_coverage_weights",
+        "address": "0x1051300d8",
+        "format": "9 Float64",
+        "matches_json": true
+      },
+      {
+        "table": "strain_weight_pairs",
+        "address": "0x104f94698",
+        "format": "8 Float32",
+        "matches_json": true
+      }
+    ],
+    "precision": "Decimal formulas are readable approximations; preserve Float32/Float64 operations and native math/rounding when building a replica."
+  },
+  "tdee": {
+    "bmr_calculator": "0x10198fd0c",
+    "bmr_formula": "10*weightKg+6.25*heightCm-5*integerAge+(-161 if sexTag==1 else 5)",
+    "sex_tag_interpretation": "Tag 1 is consistent with BiologicalSex.female; upstream profile type/defaults still need tracing.",
+    "third_term_calculator": "0x1019901c4",
+    "third_term_formula": ".25*(4*proteinGrams)+.07*(4*carbohydrateGrams)+.03*(9*fatGrams)",
+    "macro_keys": {
+      "12": "proteinConsumedDisplay",
+      "13": "carbohydratesConsumedDisplay",
+      "14": "fatConsumedDisplay"
+    },
+    "key_evidence": "HealthQuantityType descriptor 0x105277e88 field order and keys in the helper; trace dictionary producer to confirm end-to-end semantics.",
+    "macro_energy_precision": "Convert mean grams to Float32 and multiply by 4/4/9 in Float32, then promote to Float64 before .25/.07/.03.",
+    "constants": [
+      {
+        "address": "0x104fb29e8",
+        "format": "2 Float32",
+        "values": [
+          4,
+          9
+        ]
+      },
+      {
+        "address": "0x104fb29f0",
+        "format": "2 Float64",
+        "values": [
+          0.07,
+          0.03
+        ]
+      }
+    ],
+    "mean_helper": "0x101990000",
+    "mean_rule": "Skip nonfinite and exactly zero values; return nil if accepted/supplied < .8 or none accepted; otherwise arithmetic mean. Negative finite nonzero values not excluded by this helper.",
+    "rounding": "FRINTA, nearest with ties away from zero.",
+    "unresolved": [
+      "Profile/weight construction",
+      "Outer history range",
+      "Calendar-day energy sums/source selection",
+      "Full enum/source dispatch",
+      "Production display parity"
+    ],
+    "output_unit": "kilocalories, selector stub 0x104e74040 -> selref 0x1063eb078 -> string 0x105cb86a6, consumed at 0x100112b24 after Float32 result persistence.",
+    "unit_evidence": "audit/assembly/tdee-kcal-selector.asm; assembly/tdee.asm"
+  },
+  "heart_rate_recovery": {
+    "selector": "0x1017cdb20",
+    "selector_end": "0x1017ce068",
+    "service": "0x1017cd18c",
+    "window_seconds": 120,
+    "window_constant_evidence": "0x1017cd56c-0x1017cd57c supplies Float64 120.0 to selector",
+    "formula": "For chronological finite input points, select minimum(HR[j]-HR[k]) over earlier k<j with time[j]-time[k]<=120 seconds and time[k]<=activeWorkoutEnd. Service converts delta to Float32 then negates it.",
+    "implementation": "Sliding maximum-HR deque for eligible earlier points; minimum delta across later points. Helper does not sort input.",
+    "comparison_evidence": "0x1017cdd80-0x1017cdd98 evicts window-ineligible starts; 0x1017cdda0-0x1017cdda4 skips inserting points after activeWorkoutEnd; 0x1017cde68-0x1017cde90 selects strictly smaller delta; 0x1017cd8e0-0x1017cd8e4 converts and negates.",
+    "null_behavior": "Selector returns nil for fewer than two points, window <= 0, or no eligible pair. Full service eligibility and errors remain partial.",
+    "clipping": "No numeric drop clipping observed in these local functions; increasing HR can yield negative recovery.",
+    "time_semantics": "No local requirement that the later point is after activeWorkoutEnd. Upstream supplied interval is essential; this is not proven to be a fixed two-minute post-workout measurement.",
+    "source_name_evidence": "findMaxHRRecoveryInWindow(activeWorkoutEnd:hrRecoverySamples:) string 0x105927910 referenced at 0x1017cd854; HeartRateRecoveryService.swift string 0x1059278e0.",
+    "evidence": [
+      "audit/assembly/hrr-selection.asm",
+      "audit/assembly/hrr-service.asm"
+    ],
+    "unresolved": [
+      "Upstream sample window and chronological ordering",
+      "Zone-four eligibility and activeWorkoutEnd derivation",
+      "HR point source, unit conversion and cadence",
+      "Tie/NaN behavior across full pipeline",
+      "Daily/workout aggregation and presentation"
+    ],
+    "runtime_validation": "none"
+  },
+  "baseline_configuration": {
+    "scope": "Recovered default factory/configuration and consumer branches. Day inclusion, source precedence, histogram bins, overrides and all upstream filters remain partial.",
+    "configuration_factory_va": "0x101e23994",
+    "default_map_constructor_va": "0x10158c980",
+    "statistics_va": "0x10183bdc0",
+    "per_window_consumer_va": "0x1015bab50",
+    "statistics": {
+      "mean": "Float32 sum / count, nil omitted",
+      "standard_deviation": "Float32 sqrt(sum((x-mean)^2)/count), population divisor",
+      "empty": "nil mean, SD and count",
+      "daily": "Per supplied functional day, selected sample arithmetic mean; aggregate equally weighted nonempty daily means. Per-day errors are skipped.",
+      "combined": "One selected sample array from the first supplied functional-day/window argument, then population statistics. Accepted window is defined upstream.",
+      "not_established": "No EWMA, Winsorization or outlier test in this helper. This does not exclude upstream filtering."
+    },
+    "settings_context_table": [
+      {
+        "tag": 0,
+        "metric_context": "entireSleep",
+        "window_tag": 1,
+        "window": "sleepSession",
+        "allowed_sample_context_groups": [
+          [
+            "otherSleep",
+            "remAndDeepSleep"
+          ]
+        ],
+        "force_include_mindfulness": false
+      },
+      {
+        "tag": 1,
+        "metric_context": "remDeepSleep",
+        "window_tag": 1,
+        "window": "sleepSession",
+        "allowed_sample_context_groups": [
+          [
+            "remAndDeepSleep"
+          ]
+        ],
+        "force_include_mindfulness": false
+      },
+      {
+        "tag": 2,
+        "metric_context": "mindfulnessOnly",
+        "window_tag": 0,
+        "window": "midnightToMidnight",
+        "allowed_sample_context_groups": [
+          [
+            "mindfulness"
+          ]
+        ],
+        "force_include_mindfulness": false
+      },
+      {
+        "tag": 3,
+        "metric_context": "sleepAndMindfulness",
+        "window_tag": 2,
+        "window": "sleepStartToSleepStart",
+        "allowed_sample_context_groups": [
+          [
+            "otherSleep",
+            "remAndDeepSleep"
+          ]
+        ],
+        "force_include_mindfulness": true
+      },
+      {
+        "tag": 4,
+        "metric_context": "entireDay",
+        "window_tag": 2,
+        "window": "sleepStartToSleepStart",
+        "allowed_sample_context_groups": [
+          [
+            "otherSleep",
+            "remAndDeepSleep",
+            "workout",
+            "mindfulness",
+            "awake",
+            "exercise"
+          ]
+        ],
+        "force_include_mindfulness": false
+      }
+    ],
+    "defaults": [
+      {
+        "metric": "averageHeartRateVariability",
+        "days": 60,
+        "aggregation": "combined",
+        "window": "midnightToMidnight",
+        "histogram": false
+      },
+      {
+        "metric": "restingHeartRateVariability",
+        "days": 60,
+        "aggregation": "daily",
+        "window": "depends on hrvContext",
+        "histogram": false
+      },
+      {
+        "metric": "respiratoryRate",
+        "days": 60,
+        "aggregation": "combined",
+        "window": "rrWindow byte ==1: midnightToMidnight; otherwise sleepSession",
+        "histogram": false
+      },
+      {
+        "metric": "restingHeartRate",
+        "days": 60,
+        "aggregation": "combined",
+        "window": "depends on rhrContext",
+        "histogram": false
+      },
+      {
+        "metric": "inactiveHeartRate",
+        "days": 60,
+        "aggregation": "combined",
+        "window": "midnightToMidnight",
+        "contexts": [
+          [
+            "awake"
+          ]
+        ],
+        "histogram": true
+      },
+      {
+        "metric": "wristTemperature",
+        "days": 30,
+        "aggregation": "daily",
+        "window": "midnightToMidnight",
+        "useEndTime": true,
+        "histogram": false
+      },
+      {
+        "metric": "bodyTemperature",
+        "days": 30,
+        "aggregation": "daily",
+        "window": "sleepStartToSleepStart",
+        "useEndTime": true,
+        "histogram": false
+      },
+      {
+        "metric": "spO2",
+        "days": 60,
+        "aggregation": "daily",
+        "window": "sp02Window byte ==1: midnightToMidnight; otherwise sleepSession",
+        "histogram": false
+      },
+      {
+        "metric": "foodGlucoseAUC/Peak/Delta",
+        "days": 60,
+        "aggregation": "combined",
+        "window": "midnightToMidnight",
+        "histogram": false
+      }
+    ],
+    "sleepingHeartRate": {
+      "factory": "combined, sleepStartToSleepStart, contexts [[otherSleep,remAndDeepSleep]]",
+      "default_map": "Excluded from default enum list. Do not invent a default baselineDays for it."
+    },
+    "evidence": [
+      "audit/deep/baseline-map-constructor.asm",
+      "audit/deep/baseline-config-dispatch.asm",
+      "audit/deep/baseline-per-window-builder.asm",
+      "audit/deep/aggregate-statistics-kernel.asm",
+      "audit/deep/raw-configuration-bytes.json",
+      "audit/deep/model-descriptors.json"
+    ],
+    "sample_selection": {
+      "status": "Time/context/value consumer recovered; full upstream sample construction and functional window still partial.",
+      "sample_selector_va": "0x1015b9928",
+      "window_builder_va": "0x1015b9fbc",
+      "sample_with_stage_descriptor": "0x105232480",
+      "sample_descriptor": "0x105277e38",
+      "time_selection": "Binary lower-bound searches compare selected sample date >= start and >= end. They select [start,end) on input sorted by that date. useEndTime chooses endDate instead of startDate, using quantity metadata slots +0x28 or +0x24. Sorting by selected date is assumed here, not checked.",
+      "contexts": "Optional context groups: None keeps time-filtered slice; supplied groups tested in order, retaining samples whose stage matches a member of the group, stopping at first nonempty result or last group. Empty groups produce empty result.",
+      "forced_mindfulness": "When forceIncludeMindfulness true, scan the ORIGINAL supplied array for stage mindfulness(3), then append those samples to the selected result. This branch is outside the time slice. 0x1017e4674 -> 0x1017e88b4 performs array copy/append, with no duplicate or date test in that helper. Availability beyond requested time interval depends on original array contents.",
+      "value_mapping": "Consumer reads HealthQuantitySample.doubleValue and narrows Float64 to Float32 at 0x1015ba98c-0x1015ba9b8. No log, unit conversion, finite/range rejection at that point. Earlier integration/sample producers can still transform values.",
+      "evidence": [
+        "audit/deep/baseline-sample-selection.asm",
+        "audit/deep/fn-0x1015b9fbc.asm",
+        "audit/deep/baseline-mindfulness-union.asm",
+        "audit/deep/baseline-context-append-consumer.asm",
+        "audit/deep/quantity-sample-metadata.asm"
+      ]
+    }
+  },
+  "dynamic_sleep_goal": {
+    "scope": "Local estimator arithmetic and result gate recovered, full producer ordering/settings/fallback partial. Not a new standalone family.",
+    "entry_va": "0x101d78fbc",
+    "continuation_va": "0x101d79054",
+    "input_model": "[(primarySleep: SleepSession?, recovery: RecoveryMetrics?)]",
+    "eligibility": "Skip absent primarySleep, absent recovery or absent recovery score. Total Float32 secondsInSleepStage for all six stage tags except awake(1), including inBed(5) if supplied. Upstream construction must prove whether inBed is populated.",
+    "selection": "First at most 90 eligible pairs in supplied order; sort by recovery score descending; take floor(Float64(count)*0.15), then Float32 mean duration.",
+    "rounding": "Float32 nearest integral seconds, ties away from zero via 0x1030d5a84, then +30 and integer division into hours/minutes for positive durations. Nonfinite conversion returns failed; overflow trap branches also exist.",
+    "confidence": "Separately count supplied nonmissing recovery scores >=67 over original input, without requiring primarySleep. Finite inputs: sufficientData if eligible prefix count>=90 and high-recovery count>=15; otherwise insufficientData. Zero high-recovery count returns failed.",
+    "zero_selection": "No selected durations leads to failed through nonfinite mean/conversion path.",
+    "not_established": [
+      "Input order or calendar span",
+      "Tie behavior across equal recovery values",
+      "Settings constructor and display fallback",
+      "Recovery preprocessing used for goal calibration, including potential sleep dependency",
+      "inBed presence or double-count prevention upstream"
+    ],
+    "evidence": [
+      "audit/deep/dynamic-goal-calculation.asm",
+      "audit/deep/dynamic-goal-top-sort.asm",
+      "audit/deep/dynamic-goal-sort-comparator.asm",
+      "audit/deep/dynamic-goal-number-conversion.asm",
+      "audit/deep/dynamic-goal-duration-selection.asm",
+      "audit/deep/model-descriptors.json"
+    ]
+  },
+  "energy_update_surroundings": {
+    "scope": "Continuation/input-stage path and finite range recovered. Seed, gap and persistence not fully reproduced.",
+    "path": [
+      {
+        "va": "0x10153f504",
+        "role": "window/source builder, 360-second interval constant present"
+      },
+      {
+        "va": "0x10154062c",
+        "role": "HR interpolation builder; branch averages two available neighbors with 0.5"
+      },
+      {
+        "va": "0x1015e493c",
+        "role": "normalized/raw stress builder called from Energy input builder"
+      },
+      {
+        "va": "0x1015e457c",
+        "role": "separate stress representation builder"
+      },
+      {
+        "va": "0x101538478",
+        "role": "point assembly of HR and stress arrays"
+      },
+      {
+        "va": "0x10154152c",
+        "role": "async input-builder entry"
+      },
+      {
+        "va": "0x101543618",
+        "role": "resumes input builder; stores point array at frame+0x9f0"
+      },
+      {
+        "va": "0x101543678",
+        "role": "materializes update continuation 0x101543698, then swift_task_switch"
+      }
+    ],
+    "finite_update_clip": {
+      "min": 1,
+      "max": 100,
+      "register_initialization": "0x1015437f0 sets s13=1; 0x1015437f4 sets s14=100",
+      "branch": "0x101543c74-0x101543c84 adds delta and uses FCSEL to clip",
+      "nonfinite": "FCMP/FCSEL branch behavior must be preserved; mathematical clamp describes finite values only."
+    },
+    "prototype": "0x101541440 constructs empty debug arrays for Stress, HeartRate and NormalizedHeartRate. It is not evidence of fabricated scored measurements.",
+    "async_relative_descriptor": {
+      "va": "0x104f93330",
+      "target": "0x10158cd6c",
+      "argument": "30 at 0x1015432a0; downstream Calendar date-by-adding at 0x10158d318",
+      "limitation": "Do not call this a recovered energy seed or automatically interpret 30 as goal-history days without finishing producer data flow."
+    },
+    "evidence": [
+      "audit/deep/energy-input-builder.asm",
+      "audit/deep/energy-hr-interpolation.asm",
+      "audit/deep/energy-point-assembly.asm",
+      "audit/deep/energy-prototype-source.asm",
+      "audit/deep/energy-continuation-and-clamp.asm",
+      "audit/deep/energy-sleep-goal-history-query.asm"
+    ]
+  },
+  "target_strain": {
+    "status": "High arithmetic confidence; full history/source/calibration/presentation path partial.",
+    "history_fold_va": "0x1016e233c",
+    "range_kernel_va": "0x1016e2394",
+    "caller_va": "0x1015eff24-0x1015eff48",
+    "output_model_descriptor": "0x10523181c",
+    "output_metadata_va": "0x1060b94a0",
+    "field_offsets": {
+      "atl": 0,
+      "ctl": 4,
+      "targetStrain": 8,
+      "workoutImpacts": 24,
+      "dailyTrimp": 32,
+      "muscularLoad": 40,
+      "muscularFreshness": 56
+    },
+    "history_fold": "Seed B from first supplied Float32? value or 0; visit entries in supplied order, B=.75*B+.25*(value or 0), including first entry again. Empty array returns 0. Nil causes decay, not omission.",
+    "range": {
+      "R": "Current-day optional scalar from recoveryMetrics argument x4 at async entry 0x1015ec374, passed via frame+0x298 and helper x4. Caller/function-string association establishes recovery role; exact upstream recovery selection still partial.",
+      "center": "If R present, B*(1+Float32(0.6)*(R-50)/100); if absent, B and R=50 for width.",
+      "lower": "clamp(center - 5 - 5*(R/100),20,120)",
+      "upper": "clamp(center + 10 + 20*(R/100),40,120)",
+      "precision": "History and center operations Float32; ratio R/100 Float32, widened to Float64 for offsets [5,20]; offsets narrowed then Float32 added; vector comparisons clip each bound. No input recovery clipping in this kernel.",
+      "nonfinite": "Vector comparisons do not sanitize NaN. Finite math clamp is only a finite-input description."
+    },
+    "history_builder": {
+      "seed_window": "0x1015eecc0 subtracts 14 days at 0x1015eefe4, generates calendar dates and looks up optional history values. Endpoint/calendar inclusion remains partial.",
+      "rolling": "Caller keeps a rolling optional history, computes range before appending the current-day value. Count>=15 removal branch at 0x1015efe80 is visible; complete checkpoint lifecycle still partial."
+    },
+    "not_established": [
+      "Final source/history date ordering and generated-date inclusivity",
+      "Checkpoint replay/reset and missing-calendar days",
+      "Full upstream recovery and daily strain selection",
+      "Presentation rounding and target reach notifications",
+      "Nonfinite/overflow behavior outside kernel"
+    ],
+    "evidence": [
+      "audit/deep/target-strain-history-summary.asm",
+      "audit/deep/target-strain-recovery-kernel.asm",
+      "audit/deep/cumulative-load-aggregation.asm",
+      "audit/deep/checkpoint-seed-window.asm",
+      "audit/deep/checkpoint-input-frame-region.asm",
+      "audit/deep/target-strain-table-bytes.json"
+    ]
+  }
+}
