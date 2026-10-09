@@ -26,6 +26,14 @@ describe("parseConfig", () => {
     expect(parseConfig({ DATABASE_SSL_CA: Buffer.from(pem).toString("base64") }).databaseSslCa).toBe(pem);
   });
 
+  it("APP_URL defaults to the Vercel production domain, on production deployments only; APP_URL wins", () => {
+    const vercel = { VERCEL: "1", VERCEL_PROJECT_PRODUCTION_URL: "pulse-x.vercel.app" };
+    expect(parseConfig({ ...vercel, VERCEL_ENV: "production" }).appUrl).toBe("https://pulse-x.vercel.app");
+    expect(parseConfig({ ...google, ...vercel, DATA_SOURCE: "google", VERCEL_ENV: "production" }).google?.appUrl).toBe("https://pulse-x.vercel.app");
+    expect(parseConfig({ ...vercel, VERCEL_ENV: "preview" }).appUrl).toBeNull();
+    expect(parseConfig({ ...vercel, VERCEL_ENV: "production", APP_URL: "https://pulse.example.com/" }).appUrl).toBe("https://pulse.example.com");
+  });
+
   it("Google mode exposes the client, with no APP_URL by default", () => {
     const c = parseConfig({ ...google, DATA_SOURCE: "google" });
     expect(c.google).toEqual({ clientId: "id", clientSecret: "secret", appUrl: null });

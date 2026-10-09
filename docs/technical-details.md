@@ -129,7 +129,7 @@ list of what's wrong.
 | `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT` | no | Turns on notifications ("Recovery ready", "Pulse can't sync", and the coach's optional "Your brief is ready"). Make the keys with `npx web-push generate-vapid-keys`; the subject is `mailto:you@example.com`. Set all three or none |
 | `ANDROID_PACKAGE_NAME`, `ANDROID_CERT_SHA256` | no | Your Android APK's package and signing key fingerprints, served as `/.well-known/assetlinks.json` so the APK opens without a URL bar ([docs/pwa.md](pwa.md#android-apk-with-pwabuilder)). Set both or neither |
 | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | with Google | The OAuth client |
-| `APP_URL` | no (recommended behind a proxy) | The public URL; it pins the OAuth redirect and is the trusted origin for sign-in ([below](#app_url)) |
+| `APP_URL` | no (recommended behind a proxy) | The public URL; it pins the OAuth redirect and is the trusted origin for sign-in ([below](#app_url)). On a Vercel production deployment it defaults to the project's production domain |
 | `AVATAR_URL` | no | A default avatar photo; a user's Google photo or upload wins |
 
 Each user's time zone is set in onboarding and Settings › Profile, not in the environment.

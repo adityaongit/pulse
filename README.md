@@ -42,6 +42,10 @@ PWABuilder. Notifications, the offline page, launch screens and how to rebrand t
 
 Pulse runs as one Docker container with its database in a volume, behind a tunnel or HTTPS reverse proxy. The [setup guide](docs/setup.md) covers Google Cloud, Docker, HTTPS over Tailscale and troubleshooting; [other setups](docs/other-setups.md) covers Cloudflare Tunnel and reverse proxies; the [admin guide](docs/admin.md) covers invites, the coach, updates and backups.
 
+It also runs on Vercel's free Hobby plan with a free Postgres from Neon or Aiven ([Vercel guide](docs/vercel.md)):
+
+[![Deploy with Neon](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FtheMajesticUser%2Fpulse-mj&project-name=pulse&repository-name=pulse&env=BETTER_AUTH_SECRET%2CCRON_SECRET%2CADMIN_EMAILS%2CDATA_SOURCE%2CGOOGLE_CLIENT_ID%2CGOOGLE_CLIENT_SECRET&envDescription=Secrets%3A%20openssl%20rand%20-base64%2032%20%28auth%29%20and%20openssl%20rand%20-hex%2032%20%28cron%29.%20ADMIN_EMAILS%3A%20your%20email.%20DATA_SOURCE%3A%20google%20%28or%20demo%2C%20with%20-%20for%20the%20Google%20values%29.&envLink=https%3A%2F%2Fgithub.com%2FtheMajesticUser%2Fpulse-mj%2Fblob%2Fmain%2Fdocs%2Fvercel.md%233-environment-variables&products=%5B%7B%22type%22%3A%22integration%22%2C%22group%22%3A%22postgres%22%7D%5D)
+
 ## Commands
 
 | Command | What it does |

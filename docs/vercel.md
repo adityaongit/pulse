@@ -6,6 +6,31 @@ Docker setup in [setup.md](setup.md); the Google OAuth steps are the same.
 > Pulse is licensed under PolyForm Noncommercial 1.0.0 ([LICENSE](../LICENSE)). A deployment like this one is for
 > personal, noncommercial use.
 
+## One-click deploy
+
+Before you click, create the Google OAuth client ([step 2](#2-create-the-google-oauth-client)) with the redirect URI
+`https://pulse.vercel.app/oauth/callback`, swapping `pulse` for your project name (step 2 explains what to do if Vercel
+picks a different domain). For demo data only, skip it.
+
+| | |
+|---|---|
+| [![Deploy with Neon](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FtheMajesticUser%2Fpulse-mj&project-name=pulse&repository-name=pulse&env=BETTER_AUTH_SECRET%2CCRON_SECRET%2CADMIN_EMAILS%2CDATA_SOURCE%2CGOOGLE_CLIENT_ID%2CGOOGLE_CLIENT_SECRET&envDescription=Secrets%3A%20openssl%20rand%20-base64%2032%20%28auth%29%20and%20openssl%20rand%20-hex%2032%20%28cron%29.%20ADMIN_EMAILS%3A%20your%20email.%20DATA_SOURCE%3A%20google%20%28or%20demo%2C%20with%20-%20for%20the%20Google%20values%29.&envLink=https%3A%2F%2Fgithub.com%2FtheMajesticUser%2Fpulse-mj%2Fblob%2Fmain%2Fdocs%2Fvercel.md%233-environment-variables&products=%5B%7B%22type%22%3A%22integration%22%2C%22group%22%3A%22postgres%22%7D%5D) | **Neon.** Vercel creates the database for you: in the **Storage** step, pick **Neon**, which sets `DATABASE_URL`. |
+| [![Deploy with Aiven](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FtheMajesticUser%2Fpulse-mj&project-name=pulse&repository-name=pulse&env=DATABASE_URL%2CDATABASE_SSL_CA%2CBETTER_AUTH_SECRET%2CCRON_SECRET%2CADMIN_EMAILS%2CDATA_SOURCE%2CGOOGLE_CLIENT_ID%2CGOOGLE_CLIENT_SECRET&envDescription=DATABASE_URL%3A%20the%20Aiven%20service%20URI.%20DATABASE_SSL_CA%3A%20base64%20of%20Aiven%27s%20ca.pem.%20Secrets%3A%20openssl%20rand%20-base64%2032%20%28auth%29%20and%20openssl%20rand%20-hex%2032%20%28cron%29.%20ADMIN_EMAILS%3A%20your%20email.%20DATA_SOURCE%3A%20google%20%28or%20demo%2C%20with%20-%20for%20the%20Google%20values%29.&envLink=https%3A%2F%2Fgithub.com%2FtheMajesticUser%2Fpulse-mj%2Fblob%2Fmain%2Fdocs%2Fvercel.md%233-environment-variables) | **Aiven or any Postgres.** Create the database first ([step 1](#aiven)) and paste its `DATABASE_URL` and `DATABASE_SSL_CA`. |
+
+Each button copies this repository into a new repository in your GitHub account, links it to a new Vercel project,
+and asks for the variables in [step 3](#3-environment-variables):
+
+- `BETTER_AUTH_SECRET`: `openssl rand -base64 32`
+- `CRON_SECRET`: `openssl rand -hex 32`
+- `ADMIN_EMAILS`: your email
+- `DATA_SOURCE`: `google`, or `demo` for generated data
+- `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`: from step 2. With `DATA_SOURCE=demo`, enter `-` for both.
+
+`APP_URL` isn't asked for: on a production deployment, Pulse uses the project's production domain. After the deploy,
+continue with [step 4.4](#4-import-the-project) and [set up the pinger](#5-sync-every-15-minutes-with-cron-joborg).
+
+Prefer to deploy your own fork, so you can pull Pulse's updates into it? Import it as in steps 1–4 instead.
+
 ## How Pulse runs on Vercel
 
 On Docker, one long-lived process runs the sync worker on a 15-minute timer. Vercel freezes a function between
@@ -70,8 +95,9 @@ URI:
 https://<your-project>.vercel.app/oauth/callback
 ```
 
-The host is your production domain on Vercel (or your custom domain). It must match `APP_URL` exactly. You can import
-the project first (step 4) to find out the domain, then come back and add the redirect URI.
+The host is your production domain on Vercel (or your custom domain). It must match `APP_URL`, or, without
+`APP_URL`, the production domain shown on the project's page in Vercel. If you don't know the domain yet, import the
+project first (step 4), then add the redirect URI. Changing the redirect URI later needs no redeploy.
 
 For demo data only (`DATA_SOURCE=demo`), skip this step.
 
@@ -86,22 +112,24 @@ Set these in Vercel under **Project › Settings › Environment Variables**, fo
 | `DB_POOL_MAX` | no (2 on Vercel) | Connections per function instance. Use `1` or `2` on a free database |
 | `BETTER_AUTH_SECRET` | yes | `openssl rand -base64 32` |
 | `CRON_SECRET` | yes | `openssl rand -hex 32`. Vercel Cron sends it automatically; give it to cron-job.org too |
-| `APP_URL` | yes | `https://<your-project>.vercel.app` (or your custom domain), with no trailing slash |
+| `APP_URL` | no | Your custom domain, such as `https://pulse.example.com`. Unset: the project's production domain (`VERCEL_PROJECT_PRODUCTION_URL`) |
 | `ADMIN_EMAILS` | yes | Your email. On a server with no accounts, this address can sign up without an invite |
 | `DATA_SOURCE` | yes | `google` for your own data, or `demo` for generated data |
 | `GOOGLE_CLIENT_ID` | with `google` | From step 2 |
 | `GOOGLE_CLIENT_SECRET` | with `google` | From step 2 |
-| `ENABLE_EXPERIMENTAL_COREPACK` | recommended | `1`, so Vercel builds with the pnpm version in `package.json` (`packageManager`) |
 
 The optional variables in [technical-details.md](technical-details.md#environment-reference) (`SIGNUP`,
-`SUPPORT_EMAIL`, the `VAPID_*` notification keys, `COACH_LOCAL_*`) work the same way on Vercel. `VERCEL` is set by
-Vercel itself; don't add it.
+`SUPPORT_EMAIL`, the `VAPID_*` notification keys, `COACH_LOCAL_*`) work the same way on Vercel. `VERCEL`, `VERCEL_ENV`
+and `VERCEL_PROJECT_PRODUCTION_URL` are set by Vercel itself; don't add them.
+
+`vercel.json` installs dependencies with the pnpm version Pulse pins (`npx pnpm@11.17.0 install`), so the build
+doesn't depend on which pnpm Vercel picks. Use Node.js 22 or newer (the default for new Vercel projects).
 
 ## 4. Import the project
 
 1. Push your fork of Pulse to GitHub.
 2. In Vercel, click **Add New › Project** and import the repository. Vercel detects Next.js. Leave the root directory,
-   build command and output settings at their defaults.
+   build command and output settings at their defaults (`vercel.json` sets the install command).
 3. Add the variables from step 3 before the first deploy, then click **Deploy**.
 4. When the deploy is done, open `https://<your-project>.vercel.app/healthz`. `{"ok":true}` means the app booted and
    the migrations ran. If it fails, open the deployment's **Logs**: an invalid setting is reported as

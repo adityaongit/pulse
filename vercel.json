@@ -1,3 +1,5 @@
 {
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "installCommand": "npx --yes pnpm@11.17.0 install --frozen-lockfile",
   "crons": [{ "path": "/api/cron", "schedule": "30 0 * * *" }]
 }

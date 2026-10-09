@@ -91,13 +91,17 @@ export function parseConfig(env: Record<string, string | undefined>) {
     throw new ConfigError(`Invalid configuration:\n${lines.join("\n")}`);
   }
   const e = r.data;
+  // On a Vercel production deployment with no APP_URL: its production domain (set by Vercel), so a one-click deploy
+  // signs in and connects Google without knowing its URL up front. Previews keep the request's own host.
+  const vercelUrl = env.VERCEL_ENV === "production" && env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${env.VERCEL_PROJECT_PRODUCTION_URL}` : undefined;
+  const appUrl = (e.APP_URL ?? vercelUrl)?.replace(/\/$/, "") ?? null;
   return {
     dataSource: e.DATA_SOURCE,
     databaseUrl: e.DATABASE_URL ?? "postgres://pulse:pulse@localhost:5432/pulse",
     databaseSslCa: e.DATABASE_SSL_CA ? pem(e.DATABASE_SSL_CA) : null,
     dbPoolMax: e.DB_POOL_MAX ?? (env.VERCEL ? 2 : 10),
     authSecret: e.BETTER_AUTH_SECRET ?? null,
-    appUrl: e.APP_URL?.replace(/\/$/, "") ?? null,
+    appUrl,
     /** The starting sign-up mode; the admin panel's choice (server_settings) wins once made. */
     signup: e.DISABLE_SIGNUP ? ("closed" as const) : e.SIGNUP,
     adminEmails: e.ADMIN_EMAILS ?? [],
@@ -113,7 +117,7 @@ export function parseConfig(env: Record<string, string | undefined>) {
           clientId: e.GOOGLE_CLIENT_ID!,
           clientSecret: e.GOOGLE_CLIENT_SECRET!,
           /** Pins the OAuth redirect host (behind a proxy). Unset: the host the request came in on. */
-          appUrl: e.APP_URL?.replace(/\/$/, "") ?? null,
+          appUrl,
         }
       : null,
   };
