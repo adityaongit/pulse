@@ -8,3 +8,5 @@ minimumReleaseAgeExclude:
 # The home server's link can be slow (the next and swc tarballs are big); pnpm's 60 s default aborted the image build.
 fetchTimeout: 600000
 fetchRetries: 5
+patchedDependencies:
+  recharts@3.10.1: patches/recharts@3.10.1.patch

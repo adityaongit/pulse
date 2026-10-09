@@ -1,6 +1,6 @@
 import { act, render } from "@testing-library/react"
 import { afterEach, describe, expect, it, vi } from "vitest"
-import { ShellStatusProvider, STATUS_POLL_MS, useShellCalendar, useShellStatus, type ShellStatus } from "./ShellStatus"
+import { ShellStatusProvider, STATUS_POLL_MS, useShellCalendar, useShellRecheck, useShellStatus, type ShellStatus } from "./ShellStatus"
 
 const refresh = vi.fn()
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh }) }))
@@ -101,5 +101,45 @@ describe("ShellStatusProvider polling", () => {
     render(<ShellStatusProvider live value={base}>{null}</ShellStatusProvider>)
     await act(() => vi.advanceTimersByTimeAsync(STATUS_POLL_MS * 3))
     expect(fetchMock).not.toHaveBeenCalled()
+  })
+})
+
+describe("ShellStatusProvider recheck", () => {
+  afterEach(() => {
+    vi.unstubAllGlobals()
+    refresh.mockReset()
+  })
+
+  function mount(answer: ShellStatus) {
+    vi.stubGlobal("fetch", vi.fn(async () => Response.json(answer)))
+    let recheck!: () => Promise<void>
+    function Grab() {
+      recheck = useShellRecheck()
+      return null
+    }
+    render(
+      <ShellStatusProvider live value={base}>
+        <Grab />
+      </ShellStatusProvider>
+    )
+    return recheck
+  }
+
+  it("refreshes when newer scores landed while the app was away", async () => {
+    const recheck = mount({ ...base, sync: { state: "ok", lastSuccessAt: 2 } })
+    await act(() => recheck())
+    expect(refresh).toHaveBeenCalledTimes(1)
+  })
+
+  it("refreshes on a new day", async () => {
+    const recheck = mount({ ...base, today: "2026-10-04" })
+    await act(() => recheck())
+    expect(refresh).toHaveBeenCalledTimes(1)
+  })
+
+  it("does nothing when the server has nothing new", async () => {
+    const recheck = mount(base)
+    await act(() => recheck())
+    expect(refresh).not.toHaveBeenCalled()
   })
 })

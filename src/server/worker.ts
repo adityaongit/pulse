@@ -7,6 +7,7 @@ import { getConfig } from "./config";
 import { type Db, getDb, row, sql } from "./db";
 import { oauthTokens } from "./db/schema";
 import { ensureDefaultTags } from "./journalTags";
+import { bucketOf, compactHr } from "./samples";
 import { recomputeIfNeeded } from "./pipeline";
 import { notifyBrief, notifyRecovery, notifySyncProblem } from "./push";
 import { GoogleError } from "./sources/google/oauth";
@@ -15,6 +16,15 @@ import { ensureDemoUser, seedSource } from "./sources/seed/generate";
 import type { Source } from "./sources/types";
 
 const INTERVAL_MS = 15 * 60_000;
+/** Raw heart rate is kept this many days before compaction to per-minute means (sync re-lists sessions 30 days back). */
+const RAW_HR_DAYS = 30;
+/**
+ * Users synced at once in a scheduled cycle. Each user's client paces its own requests (client.ts), so N users
+ * make at most N × 4 requests a second against Google's 1,000 QPS project quota. Sequential, one user took
+ * 8.5 s or more (34 requests at 250 ms) and a cycle covered about 100 users per 15 minutes.
+ * ponytail: a fixed number; a shared token bucket if Google ever answers 429 across users.
+ */
+const CYCLE_CONCURRENCY = 4;
 const FRESH_MS = 5 * 60_000;
 /** At most one live heart-rate pull per user this often, however many tabs poll. */
 const LIVE_MS = 60_000;
@@ -43,20 +53,22 @@ export function createWorker({ name, source, recompute, users, lock = (_, fn) =>
   let started = false;
   let timer: ReturnType<typeof setTimeout> | undefined;
   /** `liveAt`: the last live heart-rate pull's start; `live`: that pull while it runs. `liveStopped`: a 429 or a lost grant, cleared by the next full run. */
-  const states = new Map<number, UserState & { again: boolean; liveAt: number | null; live: Promise<void> | null; liveStopped: boolean }>();
+  /** `again`: a run queued behind the current one; `againPull`: that run pulls from the source too. */
+  const states = new Map<number, UserState & { again: boolean; againPull: boolean; liveAt: number | null; live: Promise<void> | null; liveStopped: boolean }>();
   const stateOf = (userId: number) => {
     let s = states.get(userId);
-    if (!s) states.set(userId, (s = { running: false, lastRunAt: null, lastSuccessAt: null, lastError: null, again: false, liveAt: null, live: null, liveStopped: false }));
+    if (!s) states.set(userId, (s = { running: false, lastRunAt: null, lastSuccessAt: null, lastError: null, again: false, againPull: false, liveAt: null, live: null, liveStopped: false }));
     return s;
   };
 
-  async function runUser(userId: number): Promise<void> {
+  /** `pull` false: recompute from what is stored (a journal check-in), no source round trips. */
+  async function runUser(userId: number, pull = true): Promise<void> {
     const s = stateOf(userId);
     s.running = true;
     await s.live; // a live pull holds the lock for a second; let it finish rather than skip the run
     try {
       const got = await lock(userId, async () => {
-        const { changed } = await source.pull(userId);
+        const { changed } = pull ? await source.pull(userId) : { changed: false };
         await recompute(userId, changed);
       });
       if (got) {
@@ -72,15 +84,21 @@ export function createWorker({ name, source, recompute, users, lock = (_, fn) =>
       s.liveStopped = false;
     }
     if (s.again) {
+      const again = s.againPull;
       s.again = false;
-      await runUser(userId);
+      s.againPull = false;
+      await runUser(userId, again);
     }
   }
 
   async function cycle() {
     clearTimeout(timer);
     try {
-      for (const userId of await users()) if (!stateOf(userId).running) await runUser(userId);
+      const queue = (await users()).filter((userId) => !stateOf(userId).running);
+      const next = async () => {
+        for (let userId = queue.shift(); userId !== undefined; userId = queue.shift()) await runUser(userId);
+      };
+      await Promise.all(Array.from({ length: CYCLE_CONCURRENCY }, next));
     } catch (err) {
       log.error(`[worker] listing users failed: ${err instanceof Error ? err.message : String(err)}`);
     } finally {
@@ -99,16 +117,21 @@ export function createWorker({ name, source, recompute, users, lock = (_, fn) =>
      * Runs the user now unless their run is in progress or their last one finished under 5 minutes ago.
      * Gated on the last finished run, not the last success, so a failing source isn't retried on every page load.
      * `force` (a new Google grant, a journal write) skips that gate, and mid-run queues one more run right after.
+     * `pull: false` (a journal write) recomputes the stored data without a source pull: a check-in changes no
+     * source data, and a full pull is 34 or more Google requests.
      */
-    requestSync({ userId, force = false }: { userId: number; force?: boolean }) {
+    requestSync({ userId, force = false, pull = true }: { userId: number; force?: boolean; pull?: boolean }) {
       if (!started) return;
       const s = stateOf(userId);
       if (s.running) {
-        s.again ||= force;
+        if (force) {
+          s.again = true;
+          s.againPull ||= pull;
+        }
         return;
       }
       if (!force && s.lastRunAt !== null && Date.now() - s.lastRunAt < FRESH_MS) return;
-      void runUser(userId);
+      void runUser(userId, pull);
     },
     /**
      * The live heart-rate pull, resolved when it is done or skipped: skipped while the user's full run is going (or
@@ -214,6 +237,7 @@ export function startWorker() {
     source,
     recompute: async (userId, changed) => {
       await recomputeIfNeeded(userId, changed);
+      await compactHr(getDb(), userId, bucketOf(Date.now() / 1000) - RAW_HR_DAYS);
       await notifyRecovery(getDb(), userId);
       await notifyBrief(getDb(), userId);
     },
@@ -227,7 +251,7 @@ export function startWorker() {
  * Fire-and-forget from page loads, so a morning visit doesn't wait for the next scheduled run.
  * `force` skips the 5-minute gate: for writes the next scores depend on (a new grant, a journal check-in).
  */
-export function requestSync(opts: { userId: number; force?: boolean }) {
+export function requestSync(opts: { userId: number; force?: boolean; pull?: boolean }) {
   g.__pulseWorker?.requestSync(opts);
 }
 
