@@ -159,8 +159,28 @@ A query string ends up in request logs (Vercel's and the pinger's), so prefer a 
 
 The secret is compared in constant time.
 
+## Trying the demo first, then switching to Google
+
+You can deploy with only `DATA_SOURCE=demo`, `BETTER_AUTH_SECRET` and `CRON_SECRET`, then connect Neon from the
+project's **Storage** tab. Name its variable prefix `DATABASE` (so it creates `DATABASE_URL`) and turn off its database
+branches. The login page's demo button then creates the demo account.
+
+The demo account counts as an account, and an `ADMIN_EMAILS` address can sign up only on a server with no accounts.
+So before switching to `DATA_SOURCE=google`, empty the database (Neon's SQL Editor):
+
+```sql
+DROP SCHEMA public CASCADE;
+CREATE SCHEMA public;
+DROP SCHEMA IF EXISTS drizzle CASCADE;
+```
+
+Then set the Google variables, redeploy (the migrations recreate the tables at boot) and sign up with your
+`ADMIN_EMAILS` address straight away.
+
 ## Troubleshooting
 
+- **"This email is reserved for an admin of this server"** at sign-up: the server already has an account (often the
+  demo account). See [above](#trying-the-demo-first-then-switching-to-google).
 - **`self-signed certificate in certificate chain`**: on Aiven, set `DATABASE_SSL_CA` to the service's CA
   certificate.
 - **`remaining connection slots are reserved` or `too many clients`**: lower `DB_POOL_MAX` to 1. On Neon, use the
