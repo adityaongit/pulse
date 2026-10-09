@@ -53,9 +53,9 @@ export async function saveJournalEntry(input: z.input<typeof Entry>): Promise<Ac
   }
   // Stage 2 reads the journal (impact, Insights, Monitor context) but a check-in is no source change, so
   // mark the day dirty (persistent, survives a restart; stage 1 redoes only that day, to the same result)
-  // and kick the worker past its 5-minute gate. Fire-and-forget: the action doesn't wait on the recompute.
+  // and kick the worker past its 5-minute gate, without a Google pull. Fire-and-forget: the action doesn't wait.
   await db.insert(intradayDirty).values({ userId, day }).onConflictDoNothing();
-  requestSync({ userId, force: true });
+  requestSync({ userId, force: true, pull: false });
   revalidatePath("/journal");
   revalidatePath("/");
   return { ok: true, data: undefined };

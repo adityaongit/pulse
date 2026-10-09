@@ -80,7 +80,7 @@ describe("saveJournalEntry", () => {
     await saveJournalEntry({ day: "2026-09-30", tag: "alcohol", value: null });
     expect(await db.select().from(intradayDirty)).toEqual([{ userId: USER, day: "2026-09-30" }]);
     expect(await needsRecompute(db, USER)).toBe(true);
-    expect(h.requestSync.mock.calls).toEqual([[{ userId: USER, force: true }], [{ userId: USER, force: true }]]);
+    expect(h.requestSync.mock.calls).toEqual([[{ userId: USER, force: true, pull: false }], [{ userId: USER, force: true, pull: false }]]);
   });
 
   it("rejects a future day", async () => {

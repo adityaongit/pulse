@@ -8,9 +8,9 @@ import { useOnline } from "@/hooks/use-online"
 import { haptic } from "@/lib/haptics"
 import { flushQueue } from "@/lib/offline-queue"
 import { syncNow, useSyncing } from "@/lib/sync-activity"
-import { useShellStatus } from "./ShellStatus"
+import { useShellRecheck, useShellStatus } from "./ShellStatus"
 
-/** Away this long, coming back refreshes the screen: an installed app stays alive for days. */
+/** Away this long, coming back asks the server for news (ShellStatusProvider.recheck): an installed app stays alive for days. */
 const STALE_MS = 5 * 60_000
 /** Pull distance (px of finger travel is halved) that starts a sync, and the most the indicator follows. */
 const TRIGGER = 64
@@ -27,7 +27,8 @@ function inScrolledBox(el: EventTarget | null) {
 
 /**
  * The app's lifecycle, as an installed app expects it (mounted in AppShell, so signed-in screens only):
- * - back in the foreground after a while: refresh the screen, check for a new build, clear the app badge;
+ * - back in the foreground after a while: ask the server for news (a refresh only when scores changed or a new day
+ *   began, since every screen renders from stored scores), check for a new build, clear the app badge;
  * - connection back: send check-in answers saved offline;
  * - pull down at the top of a screen: sync (the browser's own pull-to-refresh is off, `overscroll-behavior: none`).
  */
@@ -36,6 +37,7 @@ export function AppLifecycle() {
   const online = useOnline()
   const syncing = useSyncing()
   const { userId } = useShellStatus()
+  const recheck = useShellRecheck()
   const [pull, setPull] = React.useState(0)
 
   React.useEffect(() => {
@@ -54,7 +56,7 @@ export function AppLifecycle() {
       navigator.clearAppBadge?.().catch(() => {})
       flush()
       if (hiddenAt && Date.now() - hiddenAt > STALE_MS) {
-        router.refresh()
+        void recheck()
         navigator.serviceWorker?.getRegistration().then((r) => r?.update())
       }
     }
@@ -65,7 +67,7 @@ export function AppLifecycle() {
       document.removeEventListener("visibilitychange", onVisible)
       removeEventListener("online", flush)
     }
-  }, [router, userId])
+  }, [router, userId, recheck])
 
   React.useEffect(() => {
     if (!online || !matchMedia("(pointer: coarse)").matches) return

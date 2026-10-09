@@ -2,7 +2,7 @@
 import { and, eq } from "drizzle-orm";
 import { describe, expect, it } from "vitest";
 import { type Db, rows, sql } from "../db";
-import { dailyMetrics, sleepSegments, sleepSessions } from "../db/schema";
+import { dailyMetrics, foldCheckpoints, intradayDirty, sleepSegments, sleepSessions } from "../db/schema";
 import { lastRun, recompute, type RecoveryRow } from ".";
 import { seedPull } from "../sources/seed/generate";
 import { localMidnight } from "../time";
@@ -28,6 +28,36 @@ describe("recovery updates", () => {
 });
 
 describe("incremental equals full on 220 days", () => {
+  it("a change older than the checkpoint replays everything; nothing changed replays only the tail", async () => {
+    const db = await seeded([NOW]); // the seed's own run folded the whole history and wrote the checkpoint at day 148
+    await recompute(db, OPTS);
+    expect(lastRun.stage2Days).toBe(31); // from the day after the checkpoint to the newest (day 179)
+    await db.insert(intradayDirty).values({ userId: USER, day: dayAt(100) });
+    await recompute(db, OPTS);
+    expect(lastRun.stage2Days).toBe(180);
+  });
+
+  it("a change before the checkpoint rewrites it, so the next tail replay still equals a from-scratch run", async () => {
+    const late = await seeded([NOW]);
+    const m = dailyMetrics;
+    const change = async (db: Db) => {
+      await db.update(m).set({ hrvMs: 99 }).where(and(eq(m.userId, USER), eq(m.day, dayAt(100))));
+      await db.insert(intradayDirty).values({ userId: USER, day: dayAt(100) });
+    };
+    const full = await copyDb(late);
+    await change(late);
+    await recompute(late, OPTS); // full fold, new checkpoint
+    await late.insert(intradayDirty).values({ userId: USER, day: dayAt(179) });
+    await recompute(late, OPTS); // tail, from the rewritten checkpoint
+    expect(lastRun.stage2Days).toBe(31);
+    await change(full);
+    await full.delete(foldCheckpoints).where(eq(foldCheckpoints.userId, USER));
+    await recompute(full, OPTS);
+    expect(await dump(late, "daily_scores", "1, 2")).toBe(await dump(full, "daily_scores", "1, 2"));
+    expect(await dump(late, "reports", "1, 2")).toBe(await dump(full, "reports", "1, 2"));
+  });
+
+
   it("a late night for day 200 then an incremental recompute matches a from-scratch recompute byte for byte", async () => {
     const base = await seeded([NOW - 40 * DAY_S, NOW], { compute: false });
     const metricDays = await base.select({ day: dailyMetrics.day }).from(dailyMetrics).where(eq(dailyMetrics.userId, USER)).orderBy(dailyMetrics.day);
@@ -62,6 +92,10 @@ describe("incremental equals full on 220 days", () => {
     // Only the days the night touches rerun stage 1: the morning it ended, and the evening before if it started then.
     const startedBefore = session.startTs < localMidnight(day, TZ);
     expect(lastRun.stage1Days).toEqual(startedBefore ? [at(199), day] : [day]);
+    // Stage 2 replayed from the checkpoint (day 188, 31 days before the newest) rather than from day 0.
+    expect(lastRun.stage2Days).toBe(220 - 189);
+    const ck = await rows<{ day: string }>(late, sql`select day from fold_checkpoints where user_id = ${USER}`);
+    expect(ck).toEqual([{ day: at(188) }]);
 
     await recompute(full, OPTS);
     expect(await dump(late, "daily_scores", "1, 2")).toBe(await dump(full, "daily_scores", "1, 2"));
