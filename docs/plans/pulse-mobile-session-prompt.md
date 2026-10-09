@@ -11,23 +11,44 @@ Goal: start `pulse-mobile`, the React Native (Expo) version of Pulse where every
 `~/personal/pulse/docs/plans/2026-10-08-007-backend-architecture-plan.md` section 2 (contracts) and 2.5 (hard to port).
 
 ## Ground rules
-- This session does Phase 0 only, by hand, no subagents. Stop and report at the end of Phase 0; Phase 1 starts in the
-  next session with the stream agents, after I approve the model/effort table.
 - Git identity adityaongit, git CLI only, never gh. Conventional commits, signed off. Do not commit until I say so.
 - Report before changing: when a decision is not in the plan, list the options and ask. Measure before fixing.
 - No local e2e or device automation; I run the app on my phone myself when you ask me to.
 - I am learning React Native. Explain each Expo and React Native choice in one or two lines when you make it, and
   keep a running `docs/learning.md` in the new repo with those notes.
 
-## Phase 0, in order (from the plan)
-1. Scaffold: Expo SDK 54+, TypeScript strict, Expo Router, NativeWind, ESLint, Vitest, EAS config, pnpm. One screen
-   that boots, opens expo-sqlite and runs an empty drizzle migration. `pnpm typecheck && pnpm lint && pnpm test` green.
-2. Copy `src/core` and `src/lib` from pulse unchanged; port `src/server/time.ts`; add `scripts/sync-core.sh`.
-3. Fixtures: write the export script in the pulse repo (`scripts/export-mobile-fixtures.mts`, a branch there) that
-   writes F1 to F6 from the plan's parity contract into `pulse-mobile/fixtures/`. Run it. Add the F5 time test and run it
-   under Node; tell me how to run it under Hermes on my phone.
-4. `src/data/schema.ts` and the repository interfaces (signatures and row types only) from the plan's data model.
-5. `AGENTS.md` for the new repo, from the plan's rules.
-6. Google console steps for the Android and iOS OAuth clients, as a checklist for me (I do the console).
+## How to work: fan out
+- You are the orchestrator. Do the scaffold (task 1) yourself, then fan out tasks 2 to 6 to subagents running in
+  parallel, one agent per task, each in its own git worktree of `pulse-mobile` on a branch named after the task.
+- Before launching, show me the agent table (task, model, effort, files it owns) and wait for my go. Models: Sonnet
+  by default; Opus only where parity arithmetic is at stake (the fixture export and the time port); Haiku for
+  mechanical checks.
+- Every brief must contain: the task's scope and done-when from this prompt and the plan, the files it owns, the
+  files it must not touch (the other tasks' files, and `src/data/schema.ts` once task 4 owns it), the fixture or test
+  it must pass, "do not spawn agents, forks or workflows", "leave no background process running", and "stop and
+  report when done; do not widen scope". Write the briefs so an agent with no other context can do the task.
+- While agents run, check `ListAgents` and `ps` for stray processes. When all report, merge their branches yourself,
+  resolve conflicts in shared files yourself, run `pnpm typecheck && pnpm lint && pnpm test`, and report.
 
-Then stop: a summary of what exists, what I must do by hand, and the proposed Phase 1 agent table.
+## Phase 0 tasks
+1. **Scaffold (you):** Expo SDK 54+, TypeScript strict, Expo Router, NativeWind, ESLint, Vitest, EAS config, pnpm.
+   One screen that boots, opens expo-sqlite and runs an empty drizzle migration. `pnpm typecheck && pnpm lint &&
+   pnpm test` green. Commit this as the base the agents branch from (I will say when).
+2. **Core copy and time port (agent, Opus):** copy `src/core` and `src/lib` from pulse unchanged; port
+   `src/server/time.ts`; add `scripts/sync-core.sh`; the F5 time test runs under Node and the agent writes how to run
+   it under Hermes on my phone.
+3. **Fixtures (agent, Opus):** write `scripts/export-mobile-fixtures.mts` in the pulse repo (on a branch there, in a
+   worktree of `~/personal/pulse`) that writes F1 to F6 from the plan's parity contract into `pulse-mobile/fixtures/`,
+   run it, and add the loader plus a test that F3's hashes equal pulse's `golden.test.ts` values for the current
+   `SCORING_VERSION`.
+4. **Schema and repository interfaces (agent, Sonnet):** `src/data/schema.ts` (drizzle SQLite) and the repository
+   interfaces (signatures and row types only, empty bodies) from the plan's data model; a test that the migration
+   applies to an empty database.
+5. **AGENTS.md and docs (agent, Sonnet):** `AGENTS.md` for the new repo from the plan's rules and the pulse one;
+   `docs/learning.md` seeded with the stack choices; `README.md`.
+6. **Google console checklist (agent, Haiku):** the steps for the Android and iOS OAuth clients in the existing
+   Google Cloud project (package name, SHA-1 from the EAS keystore, bundle id, the same scopes as
+   `src/server/sources/google/oauth.ts` SCOPES), as `docs/google-console.md` for me to do by hand.
+
+Then stop: a summary of what exists, what I must do by hand, and the proposed Phase 1 agent table (streams A to D
+from the plan, with models and effort).
