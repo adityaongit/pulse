@@ -162,6 +162,8 @@ export const rawPayloads = pgTable(
 /**
  * Band heart rate, one row per user and UTC day (`bucket` = floor(ts / 86400)): second-of-day offsets and bpm, sorted
  * by offset. UTC buckets, so a time-zone change never re-buckets stored samples. Read and merged by src/server/samples.ts.
+ * `minute`: the day was compacted to one mean per minute (compactHr); a raw Fitbit day is about 37,000 samples and
+ * 160 KB, a compacted one at most 1,440 and about 8 KB.
  */
 export const hrDays = pgTable(
   "hr_days",
@@ -170,6 +172,7 @@ export const hrDays = pgTable(
     bucket: integer("bucket").notNull(),
     offsets: integer("offsets").array().notNull(),
     values: smallint("values").array().notNull(),
+    minute: boolean("minute").notNull().default(false),
   },
   (t) => [primaryKey({ columns: [t.userId, t.bucket] })],
 );
@@ -392,6 +395,20 @@ export const dailyScores = pgTable(
   (t) => [primaryKey({ columns: [t.userId, t.day] })],
 );
 
+/**
+ * Stage 2's fold state after `day` (src/server/pipeline/stage2.ts): one row per user, so a run replays only the days
+ * after it instead of the whole history. Dropped by the version, profile or first-day checks when it no longer applies.
+ */
+export const foldCheckpoints = pgTable("fold_checkpoints", {
+  userId: userId().primaryKey(),
+  day: day("day").notNull(),
+  scoringVersion: integer("scoring_version").notNull(),
+  /** The scoring options the fold saw (time zone, birth date, sex, height, max HR) and the history's first day. */
+  inputsKey: text("inputs_key").notNull(),
+  /** JSON text, not jsonb: jsonb reorders object keys, and journal impact's memo key hashes the fold's objects as written. */
+  fold: text("fold").notNull(),
+});
+
 /** Per-minute series per day; `kind` e.g. "hr", "stress", "energy_bank", "load". */
 export const intradaySeries = pgTable(
   "intraday_series",
@@ -550,6 +567,6 @@ export const pushSubscriptions = pgTable(
 /** Tables holding a user's synced Google data and what was computed from it (cleared on a Google account switch). */
 export const SYNCED_TABLES = [
   syncState, rawPayloads, hrDays, stepsDays, dailyMetrics, sleepSegments, sleepSessions, exercises, dailyValues,
-  healthRecords, intradayDirty, dailyScores, intradaySeries, reports,
+  healthRecords, intradayDirty, dailyScores, intradaySeries, reports, foldCheckpoints,
 ] as const;
 

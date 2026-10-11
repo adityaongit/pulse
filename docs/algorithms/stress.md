@@ -23,7 +23,7 @@ flowchart TB
   OUT -->|yes| Z[z = mean HR − reference, ÷ σ]
   BL[foldDaytimeBaseline over prior days' aggregates] --> U{Baseline usable?}
   U -->|yes| PS[σ = baselines.sigma]
-  U -->|no| FS[σ = fixed 21.6 bpm, provisional]
+  U -->|no| FS[σ = fixed 7.65 bpm, provisional]
   PS --> Z
   FS --> Z
   Z --> L[stress = 3 / 1 + e^−1.5·z − 1.5]
@@ -93,7 +93,7 @@ With a trusted baseline of 70 bpm and σ = 4 bpm:
 | 77.8 | 1.96 | 2.00 | high starts |
 | 82 | 3 | **2.71** | high |
 
-During the fallback, with the reference still 70 and σ = 21.64 bpm, 82 bpm gives z = 0.55 and stress = **0.59**.
+During the fallback, with the reference still 70 and σ = 7.65 bpm, 82 bpm gives z = 1.57 and stress = **1.58** (medium).
 
 **On the seed** (last 21 days of `data/demo.db`): the personal reference sits at about 71 bpm, with σ at the 3.76 bpm floor. A weekday with scripted desk stress has about 330–490 low, 0–120 medium and 30–65 high minutes, with an average of 0.4–0.9. A weekend day has under 10 high minutes. The short-sleep week averages 1.4–1.9. The illness peak, when daytime HR is up 6–8 bpm all day, averages 2.7, with almost every scored minute high.
 

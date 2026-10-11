@@ -1,0 +1,2645 @@
+{
+  "updated": "2026-10-06",
+  "scope": "All currently recorded unresolved items for 18 audited families, shared dependencies, completeness work and runtime parity. Not a claim that the IPA has no undiscovered logic. No app implementation changes authorized by this checklist.",
+  "ipa_sha256": "329886dda54e712799b3e913e6f717a1c4e6ddec921cf3f482e4329b02679af7",
+  "counts": {
+    "shared_tasks": 16,
+    "metric_specific_tasks": 66,
+    "runtime_shared_tasks": 4,
+    "runtime_family_tasks": 18,
+    "total_tasks": 104,
+    "families": 18,
+    "reference_case_entries": 96
+  },
+  "status_rules": {
+    "formula": "recovered arithmetic and branches",
+    "inputs": "required records available or correctly derivable, with known units/source/cadence",
+    "surrounding_logic": "preprocessing, history, settings, state and presentation recovered",
+    "runtime_parity": "same-build same-input reference outputs compared",
+    "completion": "Static completeness requires first three axes. Missing runtime pairs alone does not make a fully recovered static algorithm partial."
+  },
+  "task_counting": "One checklist row per existing grouped unresolved item, shared work item or per-family fixture suite. These are grouped tasks, not 104 independent blockers or score families. Cross-cutting dependencies can close several rows.",
+  "tasks": [
+    {
+      "id": "G01",
+      "key": "source_selection",
+      "group": "shared",
+      "family_id": null,
+      "kind": "static_recovery",
+      "priority": "P0",
+      "status": "todo",
+      "task": "Recover source priority, device/source metadata use, duplicate rejection and sample versus daily/minute aggregate selection.",
+      "source": "bevel-metrics.md sections18-20; bevel-audit.json limitations",
+      "evidence": [],
+      "final_status": "RESOLVED",
+      "resolved_in": "bevel/ingestion.md#g01-source-selection"
+    },
+    {
+      "id": "G02",
+      "key": "google_boundary",
+      "group": "shared",
+      "family_id": null,
+      "kind": "data_verification",
+      "priority": "P0",
+      "status": "todo",
+      "task": "Identify which conversions occur locally and which occur before Bevel server DTOs. Compare matching normalized records where server behavior is unavailable in the IPA.",
+      "source": "bevel-metrics.md sections18-20; bevel-audit.json limitations",
+      "evidence": [],
+      "final_status": "RESOLVED",
+      "resolved_in": "bevel/ingestion.md#g02-local-versus-server-conversions"
+    },
+    {
+      "id": "G03",
+      "key": "units_methods",
+      "group": "shared",
+      "family_id": null,
+      "kind": "static_recovery",
+      "priority": "P0",
+      "status": "todo",
+      "task": "Verify upstream RMSSD/SDNN/log-HRV method selection, HR/RHR units, SpO2 fraction/percent, Celsius/Fahrenheit, durations and unit conversions. Recovered downstream Float32 narrowing does not prove upstream equivalence.",
+      "source": "bevel-metrics.md sections18-20; bevel-audit.json limitations",
+      "evidence": [],
+      "final_status": "RESOLVED",
+      "resolved_in": "bevel/ingestion.md#g03-units-and-methods"
+    },
+    {
+      "id": "G04",
+      "key": "functional_windows",
+      "group": "shared",
+      "family_id": null,
+      "kind": "static_recovery",
+      "priority": "P0",
+      "status": "todo",
+      "task": "Finish functional-day and baseline window generation, timezone/DST behavior, timestamp ordering and calendar endpoints. Confirm selected dates across daily versus combined aggregation.",
+      "source": "bevel-metrics.md sections18-20; bevel-audit.json limitations",
+      "evidence": [],
+      "final_status": "RESOLVED",
+      "resolved_in": "bevel/shared-machinery.md#g04-functional-days-and-windows"
+    },
+    {
+      "id": "G05",
+      "key": "baseline_history",
+      "group": "shared",
+      "family_id": null,
+      "kind": "static_recovery",
+      "priority": "P0",
+      "status": "todo",
+      "task": "Trace actual baseline histories, supplied combined-window span, overrides, calibration, validity gates, upstream outlier/nonfinite rejection and histogram keys/bins/quantiles. Default configuration and population SD are already recovered.",
+      "source": "bevel-metrics.md sections18-20; bevel-audit.json limitations",
+      "evidence": [],
+      "final_status": "RESOLVED",
+      "resolved_in": "bevel/shared-machinery.md#g05-baselines"
+    },
+    {
+      "id": "G06",
+      "key": "settings",
+      "group": "shared",
+      "family_id": null,
+      "kind": "static_recovery",
+      "priority": "P0",
+      "status": "todo",
+      "task": "Recover default and overridden calculation settings, profile age/sex/temperature choices, context selections and method transitions. Verify any remotely supplied values.",
+      "source": "bevel-metrics.md sections18-20; bevel-audit.json limitations",
+      "evidence": [],
+      "final_status": "RESOLVED",
+      "resolved_in": "bevel/shared-machinery.md#g06-settings-and-defaults"
+    },
+    {
+      "id": "G07",
+      "key": "states",
+      "group": "shared",
+      "family_id": null,
+      "kind": "static_recovery",
+      "priority": "P0",
+      "status": "todo",
+      "task": "Finish per-metric null/error/pending/calibrating/stale/provisional gates and caller fallbacks. Preserve unavailable output versus valid zero.",
+      "source": "bevel-metrics.md sections18-20; bevel-audit.json limitations",
+      "evidence": [],
+      "final_status": "RESOLVED",
+      "resolved_in": "bevel/shared-machinery.md#g07-null-calibration-and-error-gates"
+    },
+    {
+      "id": "G08",
+      "key": "replay",
+      "group": "shared",
+      "family_id": null,
+      "kind": "static_recovery",
+      "priority": "P1",
+      "status": "todo",
+      "task": "Trace historical replay, late data, profile/settings changes, checkpoints, persisted state and algorithmVersion/cached/legacy branches. Establish whether Bevel revises prior days.",
+      "source": "bevel-metrics.md sections18-20; bevel-audit.json limitations",
+      "evidence": [],
+      "final_status": "RESOLVED",
+      "resolved_in": "bevel/shared-machinery.md#g08-replay-caches-and-late-data"
+    },
+    {
+      "id": "G09",
+      "key": "presentation",
+      "group": "shared",
+      "family_id": null,
+      "kind": "static_recovery",
+      "priority": "P1",
+      "status": "todo",
+      "task": "Trace native output to UI: rounding, scale conversions, chart clipping, daily/workout aliases, aggregation and notifications. Do not infer native range from display alone.",
+      "source": "bevel-metrics.md sections18-20; bevel-audit.json limitations",
+      "evidence": [],
+      "final_status": "RESOLVED",
+      "resolved_in": "bevel/shared-machinery.md#g09-presentation-layer"
+    },
+    {
+      "id": "G10",
+      "key": "air_observations",
+      "group": "shared",
+      "family_id": null,
+      "kind": "data_verification",
+      "priority": "P0",
+      "status": "todo",
+      "task": "Verify actual Air-origin records, field presence, cadence, gaps and retention from an authorized account. Separate Air sensing from scale, meals, CGM, blood tests and other integrations.",
+      "source": "bevel-metrics.md sections18-20; bevel-audit.json limitations",
+      "evidence": [],
+      "final_status": "NOT IN IPA (proven)",
+      "resolved_in": "bevel/ingestion.md#g10-air-observations"
+    },
+    {
+      "id": "G11",
+      "key": "connector_retention",
+      "group": "shared",
+      "family_id": null,
+      "kind": "connector_gap",
+      "priority": "P0",
+      "status": "todo",
+      "task": "Recheck and catalogue known Pulse omissions: sample HRV, sample SpO2, short awakenings and discarded provenance/context. Determine required connector retention or derivations per family, without changing connector code in this audit.",
+      "source": "bevel-metrics.md sections18-20; bevel-audit.json limitations",
+      "evidence": [],
+      "final_status": "RESOLVED",
+      "resolved_in": "bevel/pulse-gaps.md#connector-status-google"
+    },
+    {
+      "id": "G12",
+      "key": "derived_dependencies",
+      "group": "shared",
+      "family_id": null,
+      "kind": "static_recovery",
+      "priority": "P0",
+      "status": "todo",
+      "task": "Build each family's dependency graph. Verify that every derived input is generated by the recovered path, with required units/history/state, before treating its inputs as complete.",
+      "source": "bevel-metrics.md sections18-20; bevel-audit.json limitations",
+      "evidence": [],
+      "final_status": "RESOLVED",
+      "resolved_in": "bevel/shared-machinery.md#g12-dependency-graph"
+    },
+    {
+      "id": "G13",
+      "key": "patches",
+      "group": "shared",
+      "family_id": null,
+      "kind": "build_verification",
+      "priority": "P1",
+      "status": "todo",
+      "task": "Resolve both added dylibs' initializer and hook targets/effects. Obtain a pristine matching build for comparison if available; names suggesting entitlement logic do not prove score code is untouched.",
+      "source": "bevel-metrics.md sections18-20; bevel-audit.json limitations",
+      "evidence": [],
+      "final_status": "RESOLVED",
+      "resolved_in": "bevel/patches.md#g13-the-two-injected-dylibs"
+    },
+    {
+      "id": "G14",
+      "key": "evidence_labels",
+      "group": "shared",
+      "family_id": null,
+      "kind": "static_recovery",
+      "priority": "P1",
+      "status": "todo",
+      "task": "Audit remaining heuristic annotations, rewritten symbol labels and indirect/async/ObjC dispatch. Use exact bytes, relative pointers, callers and metadata as provenance rather than scratch filenames.",
+      "source": "bevel-metrics.md sections18-20; bevel-audit.json limitations",
+      "evidence": [],
+      "final_status": "RESOLVED",
+      "resolved_in": "bevel/patches.md#g14-provenance-of-annotations-and-labels"
+    },
+    {
+      "id": "G15",
+      "key": "scope_discovery",
+      "group": "shared",
+      "family_id": null,
+      "kind": "scope_discovery",
+      "priority": "P2",
+      "status": "todo",
+      "task": "Finish widget/capture calculator comparison and classify remaining registered vitals, glucose variability/fasting glucose, macro balance, EPOC, pace/power/cadence/swim/running dynamics, cycle prediction, journal regression, cardio focus, strength effective weight/RPE/1RM and health trends. Resolve producers and presentation before adding score families.",
+      "source": "bevel-metrics.md sections18-20; bevel-audit.json limitations",
+      "evidence": [],
+      "final_status": "RESOLVED",
+      "resolved_in": "bevel/other-calculators.md#status-of-the-g15-groups"
+    },
+    {
+      "id": "G16",
+      "key": "resources_remote",
+      "group": "shared",
+      "family_id": null,
+      "kind": "scope_discovery",
+      "priority": "P2",
+      "status": "todo",
+      "task": "Inspect relevant opaque assets/resources and remote configuration/model consumers. No named bundled model/table found is not proof that none influences outputs. Separate current web documentation from build-locked evidence.",
+      "source": "bevel-metrics.md sections18-20; bevel-audit.json limitations",
+      "evidence": [],
+      "final_status": "RESOLVED",
+      "resolved_in": "bevel/patches.md#g16-resources-opaque-blobs-and-remote-configuration"
+    },
+    {
+      "id": "M01.01",
+      "group": "metric",
+      "family_id": "recovery",
+      "kind": "static_recovery",
+      "priority": "P0",
+      "status": "todo",
+      "task": "Google RMSSD source/window versus nightly aggregate",
+      "source": "bevel-metric-inventory.json score_families.recovery.unresolved[0]",
+      "evidence": [
+        "assembly/recovery.asm @ 0x1015b0ba4",
+        "audit/selected-models.json: AggregateStatistics, BaselineConfiguration, CalculationConfiguration",
+        "audit/final-discovery-models.json: source/context, state, cache and result models",
+        "audit/deep/baseline-map-constructor.asm",
+        "audit/deep/baseline-config-dispatch.asm",
+        "audit/deep/baseline-per-window-builder.asm",
+        "audit/deep/aggregate-statistics-kernel.asm",
+        "audit/deep/raw-configuration-bytes.json",
+        "audit/deep/model-descriptors.json",
+        "audit/deep/baseline-sample-selection.asm",
+        "audit/deep/fn-0x1015b9fbc.asm",
+        "audit/deep/baseline-mindfulness-union.asm",
+        "audit/deep/baseline-context-append-consumer.asm",
+        "audit/deep/quantity-sample-metadata.asm"
+      ],
+      "reference_cases": [
+        "matched 28+ day HRV/RHR history plus first-day/cold-start",
+        "each optional missing independently",
+        "zero variance",
+        "oxygen 0.97 versus 97 conversion",
+        "high/low temperature, ignore-sleep settings"
+      ],
+      "final_status": "RESOLVED",
+      "resolved_in": "bevel/recovery-stress-energy.md#recovery"
+    },
+    {
+      "id": "M01.02",
+      "group": "metric",
+      "family_id": "recovery",
+      "kind": "static_recovery",
+      "priority": "P0",
+      "status": "todo",
+      "task": "baseline inclusion and outlier rules",
+      "source": "bevel-metric-inventory.json score_families.recovery.unresolved[1]",
+      "evidence": [
+        "assembly/recovery.asm @ 0x1015b0ba4",
+        "audit/selected-models.json: AggregateStatistics, BaselineConfiguration, CalculationConfiguration",
+        "audit/final-discovery-models.json: source/context, state, cache and result models",
+        "audit/deep/baseline-map-constructor.asm",
+        "audit/deep/baseline-config-dispatch.asm",
+        "audit/deep/baseline-per-window-builder.asm",
+        "audit/deep/aggregate-statistics-kernel.asm",
+        "audit/deep/raw-configuration-bytes.json",
+        "audit/deep/model-descriptors.json",
+        "audit/deep/baseline-sample-selection.asm",
+        "audit/deep/fn-0x1015b9fbc.asm",
+        "audit/deep/baseline-mindfulness-union.asm",
+        "audit/deep/baseline-context-append-consumer.asm",
+        "audit/deep/quantity-sample-metadata.asm"
+      ],
+      "reference_cases": [
+        "matched 28+ day HRV/RHR history plus first-day/cold-start",
+        "each optional missing independently",
+        "zero variance",
+        "oxygen 0.97 versus 97 conversion",
+        "high/low temperature, ignore-sleep settings"
+      ],
+      "final_status": "RESOLVED",
+      "resolved_in": "bevel/recovery-stress-energy.md#recovery"
+    },
+    {
+      "id": "M01.03",
+      "group": "metric",
+      "family_id": "recovery",
+      "kind": "static_recovery",
+      "priority": "P0",
+      "status": "todo",
+      "task": "caller gating and presentation",
+      "source": "bevel-metric-inventory.json score_families.recovery.unresolved[2]",
+      "evidence": [
+        "assembly/recovery.asm @ 0x1015b0ba4",
+        "audit/selected-models.json: AggregateStatistics, BaselineConfiguration, CalculationConfiguration",
+        "audit/final-discovery-models.json: source/context, state, cache and result models",
+        "audit/deep/baseline-map-constructor.asm",
+        "audit/deep/baseline-config-dispatch.asm",
+        "audit/deep/baseline-per-window-builder.asm",
+        "audit/deep/aggregate-statistics-kernel.asm",
+        "audit/deep/raw-configuration-bytes.json",
+        "audit/deep/model-descriptors.json",
+        "audit/deep/baseline-sample-selection.asm",
+        "audit/deep/fn-0x1015b9fbc.asm",
+        "audit/deep/baseline-mindfulness-union.asm",
+        "audit/deep/baseline-context-append-consumer.asm",
+        "audit/deep/quantity-sample-metadata.asm"
+      ],
+      "reference_cases": [
+        "matched 28+ day HRV/RHR history plus first-day/cold-start",
+        "each optional missing independently",
+        "zero variance",
+        "oxygen 0.97 versus 97 conversion",
+        "high/low temperature, ignore-sleep settings"
+      ],
+      "final_status": "RESOLVED",
+      "resolved_in": "bevel/recovery-stress-energy.md#recovery"
+    },
+    {
+      "id": "M02.01",
+      "group": "metric",
+      "family_id": "strain",
+      "kind": "static_and_data_verification",
+      "priority": "P0",
+      "status": "todo",
+      "task": "Air source selection and HR cadence",
+      "source": "bevel-metric-inventory.json score_families.strain.unresolved[0]",
+      "evidence": [
+        "assembly/strain.asm @ 0x1015dc638",
+        "assembly/strain-unit-helpers.asm @ 0x1015daf94",
+        "assembly/strain-cardio-entry.asm"
+      ],
+      "reference_cases": [
+        "zone boundary HRs and equal bounds",
+        "same HR samples inside/outside workout",
+        "sparse HR, duplicate sources, gaps",
+        "zero/extreme steps and units",
+        "strength-free day"
+      ],
+      "final_status": "RESOLVED",
+      "resolved_in": "bevel/strain-load.md#daily-strain"
+    },
+    {
+      "id": "M02.02",
+      "group": "metric",
+      "family_id": "strain",
+      "kind": "static_recovery",
+      "priority": "P0",
+      "status": "todo",
+      "task": "workout versus passive allocation",
+      "source": "bevel-metric-inventory.json score_families.strain.unresolved[1]",
+      "evidence": [
+        "assembly/strain.asm @ 0x1015dc638",
+        "assembly/strain-unit-helpers.asm @ 0x1015daf94",
+        "assembly/strain-cardio-entry.asm"
+      ],
+      "reference_cases": [
+        "zone boundary HRs and equal bounds",
+        "same HR samples inside/outside workout",
+        "sparse HR, duplicate sources, gaps",
+        "zero/extreme steps and units",
+        "strength-free day"
+      ],
+      "final_status": "RESOLVED",
+      "resolved_in": "bevel/strain-load.md#daily-strain"
+    },
+    {
+      "id": "M02.03",
+      "group": "metric",
+      "family_id": "strain",
+      "kind": "static_recovery",
+      "priority": "P0",
+      "status": "todo",
+      "task": "muscular units and final display mapping",
+      "source": "bevel-metric-inventory.json score_families.strain.unresolved[2]",
+      "evidence": [
+        "assembly/strain.asm @ 0x1015dc638",
+        "assembly/strain-unit-helpers.asm @ 0x1015daf94",
+        "assembly/strain-cardio-entry.asm"
+      ],
+      "reference_cases": [
+        "zone boundary HRs and equal bounds",
+        "same HR samples inside/outside workout",
+        "sparse HR, duplicate sources, gaps",
+        "zero/extreme steps and units",
+        "strength-free day"
+      ],
+      "final_status": "RESOLVED",
+      "resolved_in": "bevel/strain-load.md#presentation-of-strain"
+    },
+    {
+      "id": "M03.01",
+      "group": "metric",
+      "family_id": "sleep_score",
+      "kind": "static_recovery",
+      "priority": "P0",
+      "status": "todo",
+      "task": "stage overlap/short awakenings",
+      "source": "bevel-metric-inventory.json score_families.sleep_score.unresolved[0]",
+      "evidence": [
+        "assembly/sleep-debt.asm @ 0x1015d11dc",
+        "assembly/sleep-stage-targets.asm @ 0x1015be43c",
+        "audit/assembly/sleep-component-builder.asm @ 0x1015c3938",
+        "audit/final-discovery-models.json: source/context, state, cache and result models"
+      ],
+      "reference_cases": [
+        "each component independently missing",
+        "main sleep, nap, split night",
+        "short awakenings and absent stages",
+        "age 29/30/39/40/69/70 and each sex case",
+        "sleep-needed zero and duration 80% target"
+      ],
+      "final_status": "RESOLVED",
+      "resolved_in": "bevel/sleep.md#sleep-score"
+    },
+    {
+      "id": "M03.02",
+      "group": "metric",
+      "family_id": "sleep_score",
+      "kind": "static_recovery",
+      "priority": "P0",
+      "status": "todo",
+      "task": "efficiency/continuity producers",
+      "source": "bevel-metric-inventory.json score_families.sleep_score.unresolved[1]",
+      "evidence": [
+        "assembly/sleep-debt.asm @ 0x1015d11dc",
+        "assembly/sleep-stage-targets.asm @ 0x1015be43c",
+        "audit/assembly/sleep-component-builder.asm @ 0x1015c3938",
+        "audit/final-discovery-models.json: source/context, state, cache and result models"
+      ],
+      "reference_cases": [
+        "each component independently missing",
+        "main sleep, nap, split night",
+        "short awakenings and absent stages",
+        "age 29/30/39/40/69/70 and each sex case",
+        "sleep-needed zero and duration 80% target"
+      ],
+      "final_status": "RESOLVED",
+      "resolved_in": "bevel/sleep.md#sleep-score"
+    },
+    {
+      "id": "M03.03",
+      "group": "metric",
+      "family_id": "sleep_score",
+      "kind": "static_recovery",
+      "priority": "P0",
+      "status": "todo",
+      "task": "HR dip baseline/window",
+      "source": "bevel-metric-inventory.json score_families.sleep_score.unresolved[2]",
+      "evidence": [
+        "assembly/sleep-debt.asm @ 0x1015d11dc",
+        "assembly/sleep-stage-targets.asm @ 0x1015be43c",
+        "audit/assembly/sleep-component-builder.asm @ 0x1015c3938",
+        "audit/final-discovery-models.json: source/context, state, cache and result models"
+      ],
+      "reference_cases": [
+        "each component independently missing",
+        "main sleep, nap, split night",
+        "short awakenings and absent stages",
+        "age 29/30/39/40/69/70 and each sex case",
+        "sleep-needed zero and duration 80% target"
+      ],
+      "final_status": "RESOLVED",
+      "resolved_in": "bevel/sleep.md#sleep-score"
+    },
+    {
+      "id": "M03.04",
+      "group": "metric",
+      "family_id": "sleep_score",
+      "kind": "static_recovery",
+      "priority": "P0",
+      "status": "todo",
+      "task": "unknown sex/age behavior at callers",
+      "source": "bevel-metric-inventory.json score_families.sleep_score.unresolved[3]",
+      "evidence": [
+        "assembly/sleep-debt.asm @ 0x1015d11dc",
+        "assembly/sleep-stage-targets.asm @ 0x1015be43c",
+        "audit/assembly/sleep-component-builder.asm @ 0x1015c3938",
+        "audit/final-discovery-models.json: source/context, state, cache and result models"
+      ],
+      "reference_cases": [
+        "each component independently missing",
+        "main sleep, nap, split night",
+        "short awakenings and absent stages",
+        "age 29/30/39/40/69/70 and each sex case",
+        "sleep-needed zero and duration 80% target"
+      ],
+      "final_status": "RESOLVED",
+      "resolved_in": "bevel/sleep.md#sleep-score"
+    },
+    {
+      "id": "M04.01",
+      "group": "metric",
+      "family_id": "stress",
+      "kind": "connector_gap",
+      "priority": "P0",
+      "status": "todo",
+      "task": "Google HRV sample fetch absent in Pulse",
+      "source": "bevel-metric-inventory.json score_families.stress.unresolved[0]",
+      "evidence": [
+        "assembly/stress.asm @ 0x1015e4e54",
+        "audit/selected-models.json: StressScoreInput, StressDataPoint",
+        "audit/final-discovery-models.json: source/context, state, cache and result models",
+        "audit/deep/baseline-map-constructor.asm",
+        "audit/deep/baseline-config-dispatch.asm",
+        "audit/deep/baseline-per-window-builder.asm",
+        "audit/deep/aggregate-statistics-kernel.asm",
+        "audit/deep/raw-configuration-bytes.json",
+        "audit/deep/model-descriptors.json",
+        "audit/deep/baseline-sample-selection.asm",
+        "audit/deep/fn-0x1015b9fbc.asm",
+        "audit/deep/baseline-mindfulness-union.asm",
+        "audit/deep/baseline-context-append-consumer.asm",
+        "audit/deep/quantity-sample-metadata.asm"
+      ],
+      "reference_cases": [
+        "same HR with/without HRV",
+        "HR CDF below/at/between/above keys",
+        "z=-4,0,3 and zero SD",
+        "sleep/awake/exercise context",
+        "stale nighttime HRV during daytime"
+      ],
+      "final_status": "RESOLVED",
+      "resolved_in": "bevel/recovery-stress-energy.md#stress"
+    },
+    {
+      "id": "M04.02",
+      "group": "metric",
+      "family_id": "stress",
+      "kind": "static_recovery",
+      "priority": "P0",
+      "status": "todo",
+      "task": "HR-only branch plausible with mapped HR. Full baseline/context and smoothing unresolved.",
+      "source": "bevel-metric-inventory.json score_families.stress.unresolved[1]",
+      "evidence": [
+        "assembly/stress.asm @ 0x1015e4e54",
+        "audit/selected-models.json: StressScoreInput, StressDataPoint",
+        "audit/final-discovery-models.json: source/context, state, cache and result models",
+        "audit/deep/baseline-map-constructor.asm",
+        "audit/deep/baseline-config-dispatch.asm",
+        "audit/deep/baseline-per-window-builder.asm",
+        "audit/deep/aggregate-statistics-kernel.asm",
+        "audit/deep/raw-configuration-bytes.json",
+        "audit/deep/model-descriptors.json",
+        "audit/deep/baseline-sample-selection.asm",
+        "audit/deep/fn-0x1015b9fbc.asm",
+        "audit/deep/baseline-mindfulness-union.asm",
+        "audit/deep/baseline-context-append-consumer.asm",
+        "audit/deep/quantity-sample-metadata.asm"
+      ],
+      "reference_cases": [
+        "same HR with/without HRV",
+        "HR CDF below/at/between/above keys",
+        "z=-4,0,3 and zero SD",
+        "sleep/awake/exercise context",
+        "stale nighttime HRV during daytime"
+      ],
+      "final_status": "RESOLVED",
+      "resolved_in": "bevel/recovery-stress-energy.md#stress"
+    },
+    {
+      "id": "M05.01",
+      "group": "metric",
+      "family_id": "energy_bank",
+      "kind": "static_recovery",
+      "priority": "P1",
+      "status": "todo",
+      "task": "initial seed and full state updates",
+      "source": "bevel-metric-inventory.json score_families.energy_bank.unresolved[0]",
+      "evidence": [
+        "assembly/energy.asm",
+        "assembly/energy-update.asm",
+        "audit/final-discovery-models.json: source/context, state, cache and result models",
+        "audit/deep/energy-input-builder.asm",
+        "audit/deep/energy-hr-interpolation.asm",
+        "audit/deep/energy-point-assembly.asm",
+        "audit/deep/energy-prototype-source.asm",
+        "audit/deep/energy-continuation-and-clamp.asm",
+        "audit/deep/energy-sleep-goal-history-query.asm"
+      ],
+      "reference_cases": [
+        "multi-day charge/drain trajectory with identical starting state",
+        "sleep/nap/mindful/awake segments",
+        "stress missing and at 100 boundary",
+        "energy 0/40/60/100",
+        "travel/DST and long sample gaps",
+        "Delta crossing lower 1 and upper 100, empty point array, known initial state",
+        "Neighbor interpolation with both, one or no HR values; long gaps"
+      ],
+      "final_status": "RESOLVED",
+      "resolved_in": "bevel/recovery-stress-energy.md#energy-bank"
+    },
+    {
+      "id": "M05.02",
+      "group": "metric",
+      "family_id": "energy_bank",
+      "kind": "static_recovery",
+      "priority": "P1",
+      "status": "todo",
+      "task": "gap and day rollover",
+      "source": "bevel-metric-inventory.json score_families.energy_bank.unresolved[1]",
+      "evidence": [
+        "assembly/energy.asm",
+        "assembly/energy-update.asm",
+        "audit/final-discovery-models.json: source/context, state, cache and result models",
+        "audit/deep/energy-input-builder.asm",
+        "audit/deep/energy-hr-interpolation.asm",
+        "audit/deep/energy-point-assembly.asm",
+        "audit/deep/energy-prototype-source.asm",
+        "audit/deep/energy-continuation-and-clamp.asm",
+        "audit/deep/energy-sleep-goal-history-query.asm"
+      ],
+      "reference_cases": [
+        "multi-day charge/drain trajectory with identical starting state",
+        "sleep/nap/mindful/awake segments",
+        "stress missing and at 100 boundary",
+        "energy 0/40/60/100",
+        "travel/DST and long sample gaps",
+        "Delta crossing lower 1 and upper 100, empty point array, known initial state",
+        "Neighbor interpolation with both, one or no HR values; long gaps"
+      ],
+      "final_status": "RESOLVED",
+      "resolved_in": "bevel/recovery-stress-energy.md#energy-bank"
+    },
+    {
+      "id": "M05.03",
+      "group": "metric",
+      "family_id": "energy_bank",
+      "kind": "static_recovery",
+      "priority": "P1",
+      "status": "todo",
+      "task": "upstream raw/display stress construction and missing/gap interpolation rules",
+      "source": "bevel-metric-inventory.json score_families.energy_bank.unresolved[2]",
+      "evidence": [
+        "assembly/energy.asm",
+        "assembly/energy-update.asm",
+        "audit/final-discovery-models.json: source/context, state, cache and result models",
+        "audit/deep/energy-input-builder.asm",
+        "audit/deep/energy-hr-interpolation.asm",
+        "audit/deep/energy-point-assembly.asm",
+        "audit/deep/energy-prototype-source.asm",
+        "audit/deep/energy-continuation-and-clamp.asm",
+        "audit/deep/energy-sleep-goal-history-query.asm"
+      ],
+      "reference_cases": [
+        "multi-day charge/drain trajectory with identical starting state",
+        "sleep/nap/mindful/awake segments",
+        "stress missing and at 100 boundary",
+        "energy 0/40/60/100",
+        "travel/DST and long sample gaps",
+        "Delta crossing lower 1 and upper 100, empty point array, known initial state",
+        "Neighbor interpolation with both, one or no HR values; long gaps"
+      ],
+      "final_status": "RESOLVED",
+      "resolved_in": "bevel/recovery-stress-energy.md#energy-bank"
+    },
+    {
+      "id": "M05.04",
+      "group": "metric",
+      "family_id": "energy_bank",
+      "kind": "static_recovery",
+      "priority": "P1",
+      "status": "todo",
+      "task": "missing mindfulness context",
+      "source": "bevel-metric-inventory.json score_families.energy_bank.unresolved[3]",
+      "evidence": [
+        "assembly/energy.asm",
+        "assembly/energy-update.asm",
+        "audit/final-discovery-models.json: source/context, state, cache and result models",
+        "audit/deep/energy-input-builder.asm",
+        "audit/deep/energy-hr-interpolation.asm",
+        "audit/deep/energy-point-assembly.asm",
+        "audit/deep/energy-prototype-source.asm",
+        "audit/deep/energy-continuation-and-clamp.asm",
+        "audit/deep/energy-sleep-goal-history-query.asm"
+      ],
+      "reference_cases": [
+        "multi-day charge/drain trajectory with identical starting state",
+        "sleep/nap/mindful/awake segments",
+        "stress missing and at 100 boundary",
+        "energy 0/40/60/100",
+        "travel/DST and long sample gaps",
+        "Delta crossing lower 1 and upper 100, empty point array, known initial state",
+        "Neighbor interpolation with both, one or no HR values; long gaps"
+      ],
+      "final_status": "RESOLVED",
+      "resolved_in": "bevel/recovery-stress-energy.md#energy-bank"
+    },
+    {
+      "id": "M05.05",
+      "group": "metric",
+      "family_id": "energy_bank",
+      "kind": "static_recovery",
+      "priority": "P1",
+      "status": "todo",
+      "task": "persistence/calibration transitions",
+      "source": "bevel-metric-inventory.json score_families.energy_bank.unresolved[4]",
+      "evidence": [
+        "assembly/energy.asm",
+        "assembly/energy-update.asm",
+        "audit/final-discovery-models.json: source/context, state, cache and result models",
+        "audit/deep/energy-input-builder.asm",
+        "audit/deep/energy-hr-interpolation.asm",
+        "audit/deep/energy-point-assembly.asm",
+        "audit/deep/energy-prototype-source.asm",
+        "audit/deep/energy-continuation-and-clamp.asm",
+        "audit/deep/energy-sleep-goal-history-query.asm"
+      ],
+      "reference_cases": [
+        "multi-day charge/drain trajectory with identical starting state",
+        "sleep/nap/mindful/awake segments",
+        "stress missing and at 100 boundary",
+        "energy 0/40/60/100",
+        "travel/DST and long sample gaps",
+        "Delta crossing lower 1 and upper 100, empty point array, known initial state",
+        "Neighbor interpolation with both, one or no HR values; long gaps"
+      ],
+      "final_status": "RESOLVED",
+      "resolved_in": "bevel/recovery-stress-energy.md#energy-bank"
+    },
+    {
+      "id": "M06.01",
+      "group": "metric",
+      "family_id": "biological_age",
+      "kind": "static_recovery",
+      "priority": "P1",
+      "status": "todo",
+      "task": "Air-only factor selection/renormalization",
+      "source": "bevel-metric-inventory.json score_families.biological_age.unresolved[0]",
+      "evidence": [
+        "assembly/bioage-combine.asm",
+        "assembly/bioage-service-combine.asm",
+        "assembly/hazard-to-age.asm",
+        "assembly/phenoage.asm",
+        "assembly/hazard-*.asm",
+        "audit/selected-models.json: DerivedAgeScore",
+        "audit/final-discovery-models.json: source/context, state, cache and result models"
+      ],
+      "reference_cases": [
+        "same week with optional groups absent",
+        "partial physiology subsets",
+        "age/sex bucket boundaries",
+        "confidence 0,19/20,20/20 days",
+        "blood ages 90/91/180/181/272/273/365/366 and future",
+        "unit conversions and CRP log",
+        "same input at weekly update boundary"
+      ],
+      "final_status": "RESOLVED",
+      "resolved_in": "bevel/biological-age-muscular.md#physiological-factors"
+    },
+    {
+      "id": "M06.02",
+      "group": "metric",
+      "family_id": "biological_age",
+      "kind": "static_recovery",
+      "priority": "P1",
+      "status": "todo",
+      "task": "weekly history and overlap",
+      "source": "bevel-metric-inventory.json score_families.biological_age.unresolved[1]",
+      "evidence": [
+        "assembly/bioage-combine.asm",
+        "assembly/bioage-service-combine.asm",
+        "assembly/hazard-to-age.asm",
+        "assembly/phenoage.asm",
+        "assembly/hazard-*.asm",
+        "audit/selected-models.json: DerivedAgeScore",
+        "audit/final-discovery-models.json: source/context, state, cache and result models"
+      ],
+      "reference_cases": [
+        "same week with optional groups absent",
+        "partial physiology subsets",
+        "age/sex bucket boundaries",
+        "confidence 0,19/20,20/20 days",
+        "blood ages 90/91/180/181/272/273/365/366 and future",
+        "unit conversions and CRP log",
+        "same input at weekly update boundary"
+      ],
+      "final_status": "RESOLVED",
+      "resolved_in": "bevel/biological-age-muscular.md#weekly-history-windows-and-overlap"
+    },
+    {
+      "id": "M06.03",
+      "group": "metric",
+      "family_id": "biological_age",
+      "kind": "static_recovery",
+      "priority": "P1",
+      "status": "todo",
+      "task": "VO2 availability",
+      "source": "bevel-metric-inventory.json score_families.biological_age.unresolved[2]",
+      "evidence": [
+        "assembly/bioage-combine.asm",
+        "assembly/bioage-service-combine.asm",
+        "assembly/hazard-to-age.asm",
+        "assembly/phenoage.asm",
+        "assembly/hazard-*.asm",
+        "audit/selected-models.json: DerivedAgeScore",
+        "audit/final-discovery-models.json: source/context, state, cache and result models"
+      ],
+      "reference_cases": [
+        "same week with optional groups absent",
+        "partial physiology subsets",
+        "age/sex bucket boundaries",
+        "confidence 0,19/20,20/20 days",
+        "blood ages 90/91/180/181/272/273/365/366 and future",
+        "unit conversions and CRP log",
+        "same input at weekly update boundary"
+      ],
+      "final_status": "NOT IN IPA (proven)",
+      "resolved_in": "bevel/biological-age-muscular.md#vo2-availability"
+    },
+    {
+      "id": "M06.04",
+      "group": "metric",
+      "family_id": "biological_age",
+      "kind": "static_recovery",
+      "priority": "P1",
+      "status": "todo",
+      "task": "body composition and journal defaults",
+      "source": "bevel-metric-inventory.json score_families.biological_age.unresolved[3]",
+      "evidence": [
+        "assembly/bioage-combine.asm",
+        "assembly/bioage-service-combine.asm",
+        "assembly/hazard-to-age.asm",
+        "assembly/phenoage.asm",
+        "assembly/hazard-*.asm",
+        "audit/selected-models.json: DerivedAgeScore",
+        "audit/final-discovery-models.json: source/context, state, cache and result models"
+      ],
+      "reference_cases": [
+        "same week with optional groups absent",
+        "partial physiology subsets",
+        "age/sex bucket boundaries",
+        "confidence 0,19/20,20/20 days",
+        "blood ages 90/91/180/181/272/273/365/366 and future",
+        "unit conversions and CRP log",
+        "same input at weekly update boundary"
+      ],
+      "final_status": "RESOLVED",
+      "resolved_in": "bevel/biological-age-muscular.md#lifestyle-factors"
+    },
+    {
+      "id": "M07.01",
+      "group": "metric",
+      "family_id": "cardio_load",
+      "kind": "static_recovery",
+      "priority": "P1",
+      "status": "todo",
+      "task": "TRIMP producer",
+      "source": "bevel-metric-inventory.json score_families.cardio_load.unresolved[0]",
+      "evidence": [
+        "assembly/cumulative.asm @ 0x1015f06f4",
+        "metadata CardioLoadData @ 0x1051fd3ec",
+        "audit/final-discovery-models.json: source/context, state, cache and result models",
+        "audit/deep/cumulative-checkpoint-producer.asm",
+        "audit/deep/cumulative-load-aggregation.asm"
+      ],
+      "reference_cases": [
+        "zero versus missing day",
+        "one isolated workout followed by 42+ days",
+        "first/7th/14th/42nd usable day",
+        "same TRIMP with changed recent density"
+      ],
+      "final_status": "RESOLVED",
+      "resolved_in": "bevel/strain-load.md#workout-level-units-and-trimp"
+    },
+    {
+      "id": "M07.02",
+      "group": "metric",
+      "family_id": "cardio_load",
+      "kind": "static_recovery",
+      "priority": "P1",
+      "status": "todo",
+      "task": "initialization and missing dates",
+      "source": "bevel-metric-inventory.json score_families.cardio_load.unresolved[1]",
+      "evidence": [
+        "assembly/cumulative.asm @ 0x1015f06f4",
+        "metadata CardioLoadData @ 0x1051fd3ec",
+        "audit/final-discovery-models.json: source/context, state, cache and result models",
+        "audit/deep/cumulative-checkpoint-producer.asm",
+        "audit/deep/cumulative-load-aggregation.asm"
+      ],
+      "reference_cases": [
+        "zero versus missing day",
+        "one isolated workout followed by 42+ days",
+        "first/7th/14th/42nd usable day",
+        "same TRIMP with changed recent density"
+      ],
+      "final_status": "RESOLVED",
+      "resolved_in": "bevel/strain-load.md#cardio-load"
+    },
+    {
+      "id": "M07.03",
+      "group": "metric",
+      "family_id": "cardio_load",
+      "kind": "static_recovery",
+      "priority": "P1",
+      "status": "todo",
+      "task": "optimal-range/calibration rules",
+      "source": "bevel-metric-inventory.json score_families.cardio_load.unresolved[2]",
+      "evidence": [
+        "assembly/cumulative.asm @ 0x1015f06f4",
+        "metadata CardioLoadData @ 0x1051fd3ec",
+        "audit/final-discovery-models.json: source/context, state, cache and result models",
+        "audit/deep/cumulative-checkpoint-producer.asm",
+        "audit/deep/cumulative-load-aggregation.asm"
+      ],
+      "reference_cases": [
+        "zero versus missing day",
+        "one isolated workout followed by 42+ days",
+        "first/7th/14th/42nd usable day",
+        "same TRIMP with changed recent density"
+      ],
+      "final_status": "RESOLVED",
+      "resolved_in": "bevel/strain-load.md#cardio-load"
+    },
+    {
+      "id": "M08.01",
+      "group": "metric",
+      "family_id": "muscular_load",
+      "kind": "static_recovery",
+      "priority": "P1",
+      "status": "todo",
+      "task": "cardio-to-muscular conversion",
+      "source": "bevel-metric-inventory.json score_families.muscular_load.unresolved[0]",
+      "evidence": [
+        "metadata MuscularLoadData @ 0x1051fe6a8",
+        "metadata MuscularLoadMetrics @ 0x1051fe644",
+        "audit/selected-models.json: MuscularLoadDebugDay",
+        "audit/deep/cumulative-checkpoint-producer.asm",
+        "audit/deep/cumulative-load-aggregation.asm"
+      ],
+      "reference_cases": [
+        "cardio-only history with no lifting logs",
+        "identical cardio plus one logged strength session",
+        "no-data/calibrating history",
+        "muscle allocation and load ranges"
+      ],
+      "final_status": "RESOLVED",
+      "resolved_in": "bevel/biological-age-muscular.md#muscular-load"
+    },
+    {
+      "id": "M08.02",
+      "group": "metric",
+      "family_id": "muscular_load",
+      "kind": "static_recovery",
+      "priority": "P1",
+      "status": "todo",
+      "task": "full producer/display/status path",
+      "source": "bevel-metric-inventory.json score_families.muscular_load.unresolved[1]",
+      "evidence": [
+        "metadata MuscularLoadData @ 0x1051fe6a8",
+        "metadata MuscularLoadMetrics @ 0x1051fe644",
+        "audit/selected-models.json: MuscularLoadDebugDay",
+        "audit/deep/cumulative-checkpoint-producer.asm",
+        "audit/deep/cumulative-load-aggregation.asm"
+      ],
+      "reference_cases": [
+        "cardio-only history with no lifting logs",
+        "identical cardio plus one logged strength session",
+        "no-data/calibrating history",
+        "muscle allocation and load ranges"
+      ],
+      "final_status": "RESOLVED",
+      "resolved_in": "bevel/biological-age-muscular.md#muscular-load"
+    },
+    {
+      "id": "M08.03",
+      "group": "metric",
+      "family_id": "muscular_load",
+      "kind": "static_recovery",
+      "priority": "P1",
+      "status": "todo",
+      "task": "optional lifting-data branch",
+      "source": "bevel-metric-inventory.json score_families.muscular_load.unresolved[2]",
+      "evidence": [
+        "metadata MuscularLoadData @ 0x1051fe6a8",
+        "metadata MuscularLoadMetrics @ 0x1051fe644",
+        "audit/selected-models.json: MuscularLoadDebugDay",
+        "audit/deep/cumulative-checkpoint-producer.asm",
+        "audit/deep/cumulative-load-aggregation.asm"
+      ],
+      "reference_cases": [
+        "cardio-only history with no lifting logs",
+        "identical cardio plus one logged strength session",
+        "no-data/calibrating history",
+        "muscle allocation and load ranges"
+      ],
+      "final_status": "RESOLVED",
+      "resolved_in": "bevel/biological-age-muscular.md#muscular-load"
+    },
+    {
+      "id": "M09.01",
+      "group": "metric",
+      "family_id": "muscular_freshness",
+      "kind": "static_recovery",
+      "priority": "P1",
+      "status": "todo",
+      "task": "cardio-to-muscle mapping",
+      "source": "bevel-metric-inventory.json score_families.muscular_freshness.unresolved[0]",
+      "evidence": [
+        "assembly/muscular-freshness-kernel.asm @ 0x100082418-0x100082538",
+        "tables 0x104ec1fe8 and 0x104ec2098"
+      ],
+      "reference_cases": [
+        "no strength data plus cardio only",
+        "entirely empty inputs and chart visibility",
+        "one muscle/22 muscles, prior fatigue missing",
+        "75/35 thresholds and personalized capacity below 1"
+      ],
+      "final_status": "RESOLVED",
+      "resolved_in": "bevel/biological-age-muscular.md#muscular-freshness"
+    },
+    {
+      "id": "M09.02",
+      "group": "metric",
+      "family_id": "muscular_freshness",
+      "kind": "static_recovery",
+      "priority": "P1",
+      "status": "todo",
+      "task": "caller eligibility",
+      "source": "bevel-metric-inventory.json score_families.muscular_freshness.unresolved[1]",
+      "evidence": [
+        "assembly/muscular-freshness-kernel.asm @ 0x100082418-0x100082538",
+        "tables 0x104ec1fe8 and 0x104ec2098"
+      ],
+      "reference_cases": [
+        "no strength data plus cardio only",
+        "entirely empty inputs and chart visibility",
+        "one muscle/22 muscles, prior fatigue missing",
+        "75/35 thresholds and personalized capacity below 1"
+      ],
+      "final_status": "RESOLVED",
+      "resolved_in": "bevel/biological-age-muscular.md#muscular-freshness"
+    },
+    {
+      "id": "M09.03",
+      "group": "metric",
+      "family_id": "muscular_freshness",
+      "kind": "static_recovery",
+      "priority": "P1",
+      "status": "todo",
+      "task": "personal capacity and calibration",
+      "source": "bevel-metric-inventory.json score_families.muscular_freshness.unresolved[2]",
+      "evidence": [
+        "assembly/muscular-freshness-kernel.asm @ 0x100082418-0x100082538",
+        "tables 0x104ec1fe8 and 0x104ec2098"
+      ],
+      "reference_cases": [
+        "no strength data plus cardio only",
+        "entirely empty inputs and chart visibility",
+        "one muscle/22 muscles, prior fatigue missing",
+        "75/35 thresholds and personalized capacity below 1"
+      ],
+      "final_status": "RESOLVED",
+      "resolved_in": "bevel/biological-age-muscular.md#muscular-freshness"
+    },
+    {
+      "id": "M09.04",
+      "group": "metric",
+      "family_id": "muscular_freshness",
+      "kind": "connector_gap",
+      "priority": "P1",
+      "status": "todo",
+      "task": "full lifting behavior requires reps/weight/RPE not mapped by Pulse",
+      "source": "bevel-metric-inventory.json score_families.muscular_freshness.unresolved[3]",
+      "evidence": [
+        "assembly/muscular-freshness-kernel.asm @ 0x100082418-0x100082538",
+        "tables 0x104ec1fe8 and 0x104ec2098"
+      ],
+      "reference_cases": [
+        "no strength data plus cardio only",
+        "entirely empty inputs and chart visibility",
+        "one muscle/22 muscles, prior fatigue missing",
+        "75/35 thresholds and personalized capacity below 1"
+      ],
+      "final_status": "RESOLVED",
+      "resolved_in": "bevel/biological-age-muscular.md#muscular-freshness"
+    },
+    {
+      "id": "M10.01",
+      "group": "metric",
+      "family_id": "food_glucose",
+      "kind": "connector_gap",
+      "priority": "P1",
+      "status": "todo",
+      "task": "timestamped glucose and meals absent in current map",
+      "source": "bevel-metric-inventory.json score_families.food_glucose.unresolved[0]",
+      "evidence": [
+        "assembly/glucose-*.asm",
+        "metadata PendingOrAvailableNutritionScore @ 0x1051fe830",
+        "audit/final-discovery-models.json: source/context, state, cache and result models",
+        "audit/deep/baseline-map-constructor.asm",
+        "audit/deep/baseline-config-dispatch.asm",
+        "audit/deep/baseline-per-window-builder.asm",
+        "audit/deep/aggregate-statistics-kernel.asm",
+        "audit/deep/raw-configuration-bytes.json",
+        "audit/deep/model-descriptors.json",
+        "audit/deep/baseline-sample-selection.asm",
+        "audit/deep/fn-0x1015b9fbc.asm",
+        "audit/deep/baseline-mindfulness-union.asm",
+        "audit/deep/baseline-context-append-consumer.asm",
+        "audit/deep/quantity-sample-metadata.asm"
+      ],
+      "reference_cases": [
+        "known glucose curve and two-hour boundaries",
+        "single sample/gaps/zero quantile",
+        "19/20 observations",
+        "equivalent mg/dL and mmol/L",
+        "late arriving glucose and overlapping meals"
+      ],
+      "final_status": "RESOLVED",
+      "resolved_in": "bevel/nutrition-tdee.md#food-glucose"
+    },
+    {
+      "id": "M10.02",
+      "group": "metric",
+      "family_id": "food_glucose",
+      "kind": "static_recovery",
+      "priority": "P1",
+      "status": "todo",
+      "task": "CGM/provider conversion",
+      "source": "bevel-metric-inventory.json score_families.food_glucose.unresolved[1]",
+      "evidence": [
+        "assembly/glucose-*.asm",
+        "metadata PendingOrAvailableNutritionScore @ 0x1051fe830",
+        "audit/final-discovery-models.json: source/context, state, cache and result models",
+        "audit/deep/baseline-map-constructor.asm",
+        "audit/deep/baseline-config-dispatch.asm",
+        "audit/deep/baseline-per-window-builder.asm",
+        "audit/deep/aggregate-statistics-kernel.asm",
+        "audit/deep/raw-configuration-bytes.json",
+        "audit/deep/model-descriptors.json",
+        "audit/deep/baseline-sample-selection.asm",
+        "audit/deep/fn-0x1015b9fbc.asm",
+        "audit/deep/baseline-mindfulness-union.asm",
+        "audit/deep/baseline-context-append-consumer.asm",
+        "audit/deep/quantity-sample-metadata.asm"
+      ],
+      "reference_cases": [
+        "known glucose curve and two-hour boundaries",
+        "single sample/gaps/zero quantile",
+        "19/20 observations",
+        "equivalent mg/dL and mmol/L",
+        "late arriving glucose and overlapping meals"
+      ],
+      "final_status": "RESOLVED",
+      "resolved_in": "bevel/nutrition-tdee.md#food-glucose"
+    },
+    {
+      "id": "M10.03",
+      "group": "metric",
+      "family_id": "food_glucose",
+      "kind": "static_recovery",
+      "priority": "P1",
+      "status": "todo",
+      "task": "zero q95 and delayed completion",
+      "source": "bevel-metric-inventory.json score_families.food_glucose.unresolved[2]",
+      "evidence": [
+        "assembly/glucose-*.asm",
+        "metadata PendingOrAvailableNutritionScore @ 0x1051fe830",
+        "audit/final-discovery-models.json: source/context, state, cache and result models",
+        "audit/deep/baseline-map-constructor.asm",
+        "audit/deep/baseline-config-dispatch.asm",
+        "audit/deep/baseline-per-window-builder.asm",
+        "audit/deep/aggregate-statistics-kernel.asm",
+        "audit/deep/raw-configuration-bytes.json",
+        "audit/deep/model-descriptors.json",
+        "audit/deep/baseline-sample-selection.asm",
+        "audit/deep/fn-0x1015b9fbc.asm",
+        "audit/deep/baseline-mindfulness-union.asm",
+        "audit/deep/baseline-context-append-consumer.asm",
+        "audit/deep/quantity-sample-metadata.asm"
+      ],
+      "reference_cases": [
+        "known glucose curve and two-hour boundaries",
+        "single sample/gaps/zero quantile",
+        "19/20 observations",
+        "equivalent mg/dL and mmol/L",
+        "late arriving glucose and overlapping meals"
+      ],
+      "final_status": "RESOLVED",
+      "resolved_in": "bevel/nutrition-tdee.md#food-glucose"
+    },
+    {
+      "id": "M10.04",
+      "group": "metric",
+      "family_id": "food_glucose",
+      "kind": "static_recovery",
+      "priority": "P1",
+      "status": "todo",
+      "task": "daily attribution",
+      "source": "bevel-metric-inventory.json score_families.food_glucose.unresolved[3]",
+      "evidence": [
+        "assembly/glucose-*.asm",
+        "metadata PendingOrAvailableNutritionScore @ 0x1051fe830",
+        "audit/final-discovery-models.json: source/context, state, cache and result models",
+        "audit/deep/baseline-map-constructor.asm",
+        "audit/deep/baseline-config-dispatch.asm",
+        "audit/deep/baseline-per-window-builder.asm",
+        "audit/deep/aggregate-statistics-kernel.asm",
+        "audit/deep/raw-configuration-bytes.json",
+        "audit/deep/model-descriptors.json",
+        "audit/deep/baseline-sample-selection.asm",
+        "audit/deep/fn-0x1015b9fbc.asm",
+        "audit/deep/baseline-mindfulness-union.asm",
+        "audit/deep/baseline-context-append-consumer.asm",
+        "audit/deep/quantity-sample-metadata.asm"
+      ],
+      "reference_cases": [
+        "known glucose curve and two-hour boundaries",
+        "single sample/gaps/zero quantile",
+        "19/20 observations",
+        "equivalent mg/dL and mmol/L",
+        "late arriving glucose and overlapping meals"
+      ],
+      "final_status": "RESOLVED",
+      "resolved_in": "bevel/nutrition-tdee.md#food-glucose"
+    },
+    {
+      "id": "M11.01",
+      "group": "metric",
+      "family_id": "food_quality",
+      "kind": "connector_gap",
+      "priority": "P1",
+      "status": "todo",
+      "task": "food category/sugar/sodium/alcohol detail not retained",
+      "source": "bevel-metric-inventory.json score_families.food_quality.unresolved[0]",
+      "evidence": [
+        "assembly/food-quality-config.asm @ 0x1000aa3a0",
+        "assembly/food-quality.asm",
+        "assembly/0x10010353c.asm",
+        "assembly/mass-unit-selector.asm"
+      ],
+      "reference_cases": [
+        "each of 11 contributor thresholds",
+        "all disabled/only negative disabled",
+        "zero calories and missing nutrient",
+        "fish binary versus fractional path",
+        "mg versus grams sodium"
+      ],
+      "final_status": "RESOLVED",
+      "resolved_in": "bevel/nutrition-tdee.md#food-quality"
+    },
+    {
+      "id": "M11.02",
+      "group": "metric",
+      "family_id": "food_quality",
+      "kind": "static_recovery",
+      "priority": "P1",
+      "status": "todo",
+      "task": "filter published-property assignment",
+      "source": "bevel-metric-inventory.json score_families.food_quality.unresolved[1]",
+      "evidence": [
+        "assembly/food-quality-config.asm @ 0x1000aa3a0",
+        "assembly/food-quality.asm",
+        "assembly/0x10010353c.asm",
+        "assembly/mass-unit-selector.asm"
+      ],
+      "reference_cases": [
+        "each of 11 contributor thresholds",
+        "all disabled/only negative disabled",
+        "zero calories and missing nutrient",
+        "fish binary versus fractional path",
+        "mg versus grams sodium"
+      ],
+      "final_status": "RESOLVED",
+      "resolved_in": "bevel/nutrition-tdee.md#food-quality"
+    },
+    {
+      "id": "M11.03",
+      "group": "metric",
+      "family_id": "food_quality",
+      "kind": "static_recovery",
+      "priority": "P1",
+      "status": "todo",
+      "task": "zero intake and category overlap",
+      "source": "bevel-metric-inventory.json score_families.food_quality.unresolved[2]",
+      "evidence": [
+        "assembly/food-quality-config.asm @ 0x1000aa3a0",
+        "assembly/food-quality.asm",
+        "assembly/0x10010353c.asm",
+        "assembly/mass-unit-selector.asm"
+      ],
+      "reference_cases": [
+        "each of 11 contributor thresholds",
+        "all disabled/only negative disabled",
+        "zero calories and missing nutrient",
+        "fish binary versus fractional path",
+        "mg versus grams sodium"
+      ],
+      "final_status": "RESOLVED",
+      "resolved_in": "bevel/nutrition-tdee.md#food-quality"
+    },
+    {
+      "id": "M12.01",
+      "group": "metric",
+      "family_id": "nutrition_score",
+      "kind": "static_recovery",
+      "priority": "P1",
+      "status": "todo",
+      "task": "overall equation",
+      "source": "bevel-metric-inventory.json score_families.nutrition_score.unresolved[0]",
+      "evidence": [
+        "assembly/nutrition-dispatch.asm @ 0x10008f1a4",
+        "metadata DayNutritionScores @ 0x1051fe890",
+        "audit/selected-models.json: DayScoreCalorieConfiguration",
+        "resource BevelBioAge_BevelBioAge.bundle/en.lproj/BiomarkerInfoSections.strings",
+        "audit/final-discovery-models.json: source/context, state, cache and result models"
+      ],
+      "reference_cases": [
+        "quality present/glucose absent and inverse",
+        "low/at/above calorie threshold",
+        "partial macros and late meal logs"
+      ],
+      "final_status": "RESOLVED",
+      "resolved_in": "bevel/nutrition-tdee.md#daily-nutrition-score"
+    },
+    {
+      "id": "M12.02",
+      "group": "metric",
+      "family_id": "nutrition_score",
+      "kind": "static_recovery",
+      "priority": "P1",
+      "status": "todo",
+      "task": "day calorie/food-input gating",
+      "source": "bevel-metric-inventory.json score_families.nutrition_score.unresolved[1]",
+      "evidence": [
+        "assembly/nutrition-dispatch.asm @ 0x10008f1a4",
+        "metadata DayNutritionScores @ 0x1051fe890",
+        "audit/selected-models.json: DayScoreCalorieConfiguration",
+        "resource BevelBioAge_BevelBioAge.bundle/en.lproj/BiomarkerInfoSections.strings",
+        "audit/final-discovery-models.json: source/context, state, cache and result models"
+      ],
+      "reference_cases": [
+        "quality present/glucose absent and inverse",
+        "low/at/above calorie threshold",
+        "partial macros and late meal logs"
+      ],
+      "final_status": "RESOLVED",
+      "resolved_in": "bevel/nutrition-tdee.md#daily-nutrition-score"
+    },
+    {
+      "id": "M12.03",
+      "group": "metric",
+      "family_id": "nutrition_score",
+      "kind": "connector_gap",
+      "priority": "P1",
+      "status": "todo",
+      "task": "required external food logs",
+      "source": "bevel-metric-inventory.json score_families.nutrition_score.unresolved[2]",
+      "evidence": [
+        "assembly/nutrition-dispatch.asm @ 0x10008f1a4",
+        "metadata DayNutritionScores @ 0x1051fe890",
+        "audit/selected-models.json: DayScoreCalorieConfiguration",
+        "resource BevelBioAge_BevelBioAge.bundle/en.lproj/BiomarkerInfoSections.strings",
+        "audit/final-discovery-models.json: source/context, state, cache and result models"
+      ],
+      "reference_cases": [
+        "quality present/glucose absent and inverse",
+        "low/at/above calorie threshold",
+        "partial macros and late meal logs"
+      ],
+      "final_status": "RESOLVED",
+      "resolved_in": "bevel/nutrition-tdee.md#daily-nutrition-score"
+    },
+    {
+      "id": "M13.01",
+      "group": "metric",
+      "family_id": "tdee",
+      "kind": "static_recovery",
+      "priority": "P1",
+      "status": "todo",
+      "task": "outer history and per-day sample sum",
+      "source": "bevel-metric-inventory.json score_families.tdee.unresolved[0]",
+      "evidence": [
+        "assembly/tdee.asm @ 0x1001129a0",
+        "audit/assembly/tdee-third-term-full.asm @ 0x1019901c4",
+        "audit/assembly/tdee-history-mean.asm @ 0x101990000",
+        "audit/assembly/fn-0x10198fd0c.asm",
+        "audit/assembly/tdee-kcal-selector.asm @ 0x104e74040"
+      ],
+      "reference_cases": [
+        "B/E/X missing individually",
+        "0 and nonfinite histories; 79/80% coverage",
+        "known profile including birthday",
+        "protein 100g/carbs200g/fat60g",
+        "half rounding boundary and delayed data"
+      ],
+      "final_status": "RESOLVED",
+      "resolved_in": "bevel/nutrition-tdee.md#tdee"
+    },
+    {
+      "id": "M13.02",
+      "group": "metric",
+      "family_id": "tdee",
+      "kind": "static_recovery",
+      "priority": "P1",
+      "status": "todo",
+      "task": "profile weight source/default",
+      "source": "bevel-metric-inventory.json score_families.tdee.unresolved[1]",
+      "evidence": [
+        "assembly/tdee.asm @ 0x1001129a0",
+        "audit/assembly/tdee-third-term-full.asm @ 0x1019901c4",
+        "audit/assembly/tdee-history-mean.asm @ 0x101990000",
+        "audit/assembly/fn-0x10198fd0c.asm",
+        "audit/assembly/tdee-kcal-selector.asm @ 0x104e74040"
+      ],
+      "reference_cases": [
+        "B/E/X missing individually",
+        "0 and nonfinite histories; 79/80% coverage",
+        "known profile including birthday",
+        "protein 100g/carbs200g/fat60g",
+        "half rounding boundary and delayed data"
+      ],
+      "final_status": "RESOLVED",
+      "resolved_in": "bevel/nutrition-tdee.md#tdee"
+    },
+    {
+      "id": "M13.03",
+      "group": "metric",
+      "family_id": "tdee",
+      "kind": "static_recovery",
+      "priority": "P1",
+      "status": "todo",
+      "task": "enum/source dispatch full semantic verification",
+      "source": "bevel-metric-inventory.json score_families.tdee.unresolved[2]",
+      "evidence": [
+        "assembly/tdee.asm @ 0x1001129a0",
+        "audit/assembly/tdee-third-term-full.asm @ 0x1019901c4",
+        "audit/assembly/tdee-history-mean.asm @ 0x101990000",
+        "audit/assembly/fn-0x10198fd0c.asm",
+        "audit/assembly/tdee-kcal-selector.asm @ 0x104e74040"
+      ],
+      "reference_cases": [
+        "B/E/X missing individually",
+        "0 and nonfinite histories; 79/80% coverage",
+        "known profile including birthday",
+        "protein 100g/carbs200g/fat60g",
+        "half rounding boundary and delayed data"
+      ],
+      "final_status": "RESOLVED",
+      "resolved_in": "bevel/nutrition-tdee.md#tdee"
+    },
+    {
+      "id": "M13.04",
+      "group": "metric",
+      "family_id": "tdee",
+      "kind": "static_recovery",
+      "priority": "P1",
+      "status": "todo",
+      "task": "Air calories versus user/scale weight and food logs",
+      "source": "bevel-metric-inventory.json score_families.tdee.unresolved[3]",
+      "evidence": [
+        "assembly/tdee.asm @ 0x1001129a0",
+        "audit/assembly/tdee-third-term-full.asm @ 0x1019901c4",
+        "audit/assembly/tdee-history-mean.asm @ 0x101990000",
+        "audit/assembly/fn-0x10198fd0c.asm",
+        "audit/assembly/tdee-kcal-selector.asm @ 0x104e74040"
+      ],
+      "reference_cases": [
+        "B/E/X missing individually",
+        "0 and nonfinite histories; 79/80% coverage",
+        "known profile including birthday",
+        "protein 100g/carbs200g/fat60g",
+        "half rounding boundary and delayed data"
+      ],
+      "final_status": "RESOLVED",
+      "resolved_in": "bevel/nutrition-tdee.md#tdee"
+    },
+    {
+      "id": "M14.01",
+      "group": "metric",
+      "family_id": "sleep_bank",
+      "kind": "static_recovery",
+      "priority": "P1",
+      "status": "todo",
+      "task": "slot/day alignment",
+      "source": "bevel-metric-inventory.json score_families.sleep_bank.unresolved[0]",
+      "evidence": [
+        "assembly/sleep-bank-actual-kernel.asm @ 0x1015cd324",
+        "assembly/sleep-history-bank.asm"
+      ],
+      "reference_cases": [
+        "seven identical durations",
+        "one surplus oldest versus newest",
+        "missing middle night",
+        "goal change and naps",
+        "positive bank and debt"
+      ],
+      "final_status": "RESOLVED",
+      "resolved_in": "bevel/sleep.md#sleep-bank"
+    },
+    {
+      "id": "M14.02",
+      "group": "metric",
+      "family_id": "sleep_bank",
+      "kind": "static_recovery",
+      "priority": "P1",
+      "status": "todo",
+      "task": "goal history and naps",
+      "source": "bevel-metric-inventory.json score_families.sleep_bank.unresolved[1]",
+      "evidence": [
+        "assembly/sleep-bank-actual-kernel.asm @ 0x1015cd324",
+        "assembly/sleep-history-bank.asm"
+      ],
+      "reference_cases": [
+        "seven identical durations",
+        "one surplus oldest versus newest",
+        "missing middle night",
+        "goal change and naps",
+        "positive bank and debt"
+      ],
+      "final_status": "RESOLVED",
+      "resolved_in": "bevel/sleep.md#sleep-bank"
+    },
+    {
+      "id": "M14.03",
+      "group": "metric",
+      "family_id": "sleep_bank",
+      "kind": "static_recovery",
+      "priority": "P1",
+      "status": "todo",
+      "task": "missing-night semantics",
+      "source": "bevel-metric-inventory.json score_families.sleep_bank.unresolved[2]",
+      "evidence": [
+        "assembly/sleep-bank-actual-kernel.asm @ 0x1015cd324",
+        "assembly/sleep-history-bank.asm"
+      ],
+      "reference_cases": [
+        "seven identical durations",
+        "one surplus oldest versus newest",
+        "missing middle night",
+        "goal change and naps",
+        "positive bank and debt"
+      ],
+      "final_status": "RESOLVED",
+      "resolved_in": "bevel/sleep.md#sleep-bank"
+    },
+    {
+      "id": "M15.01",
+      "group": "metric",
+      "family_id": "sleep_consistency",
+      "kind": "static_recovery",
+      "priority": "P1",
+      "status": "todo",
+      "task": "eligible bins and included days",
+      "source": "bevel-metric-inventory.json score_families.sleep_consistency.unresolved[0]",
+      "evidence": [
+        "assembly/sleep-bank-kernel.asm @ 0x1015cdbb4, historical filename contains consistency kernel"
+      ],
+      "reference_cases": [
+        "N=0/1/2/7",
+        "identical and shifted schedules",
+        "nonwear day",
+        "23/25-hour day",
+        "split sleep and naps"
+      ],
+      "final_status": "RESOLVED",
+      "resolved_in": "bevel/sleep.md#sleep-consistency"
+    },
+    {
+      "id": "M15.02",
+      "group": "metric",
+      "family_id": "sleep_consistency",
+      "kind": "static_recovery",
+      "priority": "P1",
+      "status": "todo",
+      "task": "timezone/DST",
+      "source": "bevel-metric-inventory.json score_families.sleep_consistency.unresolved[1]",
+      "evidence": [
+        "assembly/sleep-bank-kernel.asm @ 0x1015cdbb4, historical filename contains consistency kernel"
+      ],
+      "reference_cases": [
+        "N=0/1/2/7",
+        "identical and shifted schedules",
+        "nonwear day",
+        "23/25-hour day",
+        "split sleep and naps"
+      ],
+      "final_status": "RESOLVED",
+      "resolved_in": "bevel/sleep.md#sleep-consistency"
+    },
+    {
+      "id": "M15.03",
+      "group": "metric",
+      "family_id": "sleep_consistency",
+      "kind": "static_recovery",
+      "priority": "P1",
+      "status": "todo",
+      "task": "main/naps and all sleep",
+      "source": "bevel-metric-inventory.json score_families.sleep_consistency.unresolved[2]",
+      "evidence": [
+        "assembly/sleep-bank-kernel.asm @ 0x1015cdbb4, historical filename contains consistency kernel"
+      ],
+      "reference_cases": [
+        "N=0/1/2/7",
+        "identical and shifted schedules",
+        "nonwear day",
+        "23/25-hour day",
+        "split sleep and naps"
+      ],
+      "final_status": "RESOLVED",
+      "resolved_in": "bevel/sleep.md#sleep-consistency"
+    },
+    {
+      "id": "M16.01",
+      "group": "metric",
+      "family_id": "sleep_needed",
+      "kind": "static_recovery",
+      "priority": "P0",
+      "status": "todo",
+      "task": "automatic goal producer ordering and history span",
+      "source": "bevel-metric-inventory.json score_families.sleep_needed.unresolved[0]",
+      "evidence": [
+        "assembly/sleep-needed-core.asm @ 0x1015c09d0",
+        "metadata DynamicSleepGoalCalculationResult @ 0x105244a64",
+        "audit/deep/dynamic-goal-calculation.asm",
+        "audit/deep/dynamic-goal-top-sort.asm",
+        "audit/deep/dynamic-goal-sort-comparator.asm",
+        "audit/deep/dynamic-goal-number-conversion.asm",
+        "audit/deep/dynamic-goal-duration-selection.asm",
+        "audit/deep/model-descriptors.json"
+      ],
+      "reference_cases": [
+        "manual versus automatic",
+        "all settings on/off",
+        "positive/negative bank",
+        "no goal history",
+        "strain multiplier below/at/above 1",
+        "90 eligible records select 13, compare 14 versus 15 scores >=67",
+        "Input order and >90 records, equal recovery ties, missing sleep or recovery",
+        "Stage dictionary with inBed plus core/deep/REM, missing stage versus zero",
+        "Mean seconds at rounding boundary 29.5, 30 and 30.5; zero selected records"
+      ],
+      "final_status": "RESOLVED",
+      "resolved_in": "bevel/sleep.md#sleep-needed-and-automatic-goal"
+    },
+    {
+      "id": "M16.02",
+      "group": "metric",
+      "family_id": "sleep_needed",
+      "kind": "static_recovery",
+      "priority": "P0",
+      "status": "todo",
+      "task": "inBed duration presence and deduplication",
+      "source": "bevel-metric-inventory.json score_families.sleep_needed.unresolved[1]",
+      "evidence": [
+        "assembly/sleep-needed-core.asm @ 0x1015c09d0",
+        "metadata DynamicSleepGoalCalculationResult @ 0x105244a64",
+        "audit/deep/dynamic-goal-calculation.asm",
+        "audit/deep/dynamic-goal-top-sort.asm",
+        "audit/deep/dynamic-goal-sort-comparator.asm",
+        "audit/deep/dynamic-goal-number-conversion.asm",
+        "audit/deep/dynamic-goal-duration-selection.asm",
+        "audit/deep/model-descriptors.json"
+      ],
+      "reference_cases": [
+        "manual versus automatic",
+        "all settings on/off",
+        "positive/negative bank",
+        "no goal history",
+        "strain multiplier below/at/above 1",
+        "90 eligible records select 13, compare 14 versus 15 scores >=67",
+        "Input order and >90 records, equal recovery ties, missing sleep or recovery",
+        "Stage dictionary with inBed plus core/deep/REM, missing stage versus zero",
+        "Mean seconds at rounding boundary 29.5, 30 and 30.5; zero selected records"
+      ],
+      "final_status": "RESOLVED",
+      "resolved_in": "bevel/sleep.md#sleep-needed-and-automatic-goal"
+    },
+    {
+      "id": "M16.03",
+      "group": "metric",
+      "family_id": "sleep_needed",
+      "kind": "static_recovery",
+      "priority": "P0",
+      "status": "todo",
+      "task": "manual/automatic settings and fallback",
+      "source": "bevel-metric-inventory.json score_families.sleep_needed.unresolved[2]",
+      "evidence": [
+        "assembly/sleep-needed-core.asm @ 0x1015c09d0",
+        "metadata DynamicSleepGoalCalculationResult @ 0x105244a64",
+        "audit/deep/dynamic-goal-calculation.asm",
+        "audit/deep/dynamic-goal-top-sort.asm",
+        "audit/deep/dynamic-goal-sort-comparator.asm",
+        "audit/deep/dynamic-goal-number-conversion.asm",
+        "audit/deep/dynamic-goal-duration-selection.asm",
+        "audit/deep/model-descriptors.json"
+      ],
+      "reference_cases": [
+        "manual versus automatic",
+        "all settings on/off",
+        "positive/negative bank",
+        "no goal history",
+        "strain multiplier below/at/above 1",
+        "90 eligible records select 13, compare 14 versus 15 scores >=67",
+        "Input order and >90 records, equal recovery ties, missing sleep or recovery",
+        "Stage dictionary with inBed plus core/deep/REM, missing stage versus zero",
+        "Mean seconds at rounding boundary 29.5, 30 and 30.5; zero selected records"
+      ],
+      "final_status": "RESOLVED",
+      "resolved_in": "bevel/sleep.md#sleep-needed-and-automatic-goal"
+    },
+    {
+      "id": "M16.04",
+      "group": "metric",
+      "family_id": "sleep_needed",
+      "kind": "static_recovery",
+      "priority": "P0",
+      "status": "todo",
+      "task": "goal calibration recovery preprocessing",
+      "source": "bevel-metric-inventory.json score_families.sleep_needed.unresolved[3]",
+      "evidence": [
+        "assembly/sleep-needed-core.asm @ 0x1015c09d0",
+        "metadata DynamicSleepGoalCalculationResult @ 0x105244a64",
+        "audit/deep/dynamic-goal-calculation.asm",
+        "audit/deep/dynamic-goal-top-sort.asm",
+        "audit/deep/dynamic-goal-sort-comparator.asm",
+        "audit/deep/dynamic-goal-number-conversion.asm",
+        "audit/deep/dynamic-goal-duration-selection.asm",
+        "audit/deep/model-descriptors.json"
+      ],
+      "reference_cases": [
+        "manual versus automatic",
+        "all settings on/off",
+        "positive/negative bank",
+        "no goal history",
+        "strain multiplier below/at/above 1",
+        "90 eligible records select 13, compare 14 versus 15 scores >=67",
+        "Input order and >90 records, equal recovery ties, missing sleep or recovery",
+        "Stage dictionary with inBed plus core/deep/REM, missing stage versus zero",
+        "Mean seconds at rounding boundary 29.5, 30 and 30.5; zero selected records"
+      ],
+      "final_status": "RESOLVED",
+      "resolved_in": "bevel/sleep.md#sleep-needed-and-automatic-goal"
+    },
+    {
+      "id": "M16.05",
+      "group": "metric",
+      "family_id": "sleep_needed",
+      "kind": "static_recovery",
+      "priority": "P0",
+      "status": "todo",
+      "task": "latency/efficiency and nap handling",
+      "source": "bevel-metric-inventory.json score_families.sleep_needed.unresolved[4]",
+      "evidence": [
+        "assembly/sleep-needed-core.asm @ 0x1015c09d0",
+        "metadata DynamicSleepGoalCalculationResult @ 0x105244a64",
+        "audit/deep/dynamic-goal-calculation.asm",
+        "audit/deep/dynamic-goal-top-sort.asm",
+        "audit/deep/dynamic-goal-sort-comparator.asm",
+        "audit/deep/dynamic-goal-number-conversion.asm",
+        "audit/deep/dynamic-goal-duration-selection.asm",
+        "audit/deep/model-descriptors.json"
+      ],
+      "reference_cases": [
+        "manual versus automatic",
+        "all settings on/off",
+        "positive/negative bank",
+        "no goal history",
+        "strain multiplier below/at/above 1",
+        "90 eligible records select 13, compare 14 versus 15 scores >=67",
+        "Input order and >90 records, equal recovery ties, missing sleep or recovery",
+        "Stage dictionary with inBed plus core/deep/REM, missing stage versus zero",
+        "Mean seconds at rounding boundary 29.5, 30 and 30.5; zero selected records"
+      ],
+      "final_status": "RESOLVED",
+      "resolved_in": "bevel/sleep.md#sleep-needed-and-automatic-goal"
+    },
+    {
+      "id": "M17.01",
+      "group": "metric",
+      "family_id": "target_strain",
+      "kind": "static_recovery",
+      "priority": "P1",
+      "status": "todo",
+      "task": "Final source/history date ordering and generated-date inclusivity",
+      "source": "bevel-metric-inventory.json score_families.target_strain.unresolved[0]",
+      "evidence": [
+        "metadata CumulativeMetrics @ 0x10523181c",
+        "assembly/cumulative.asm",
+        "audit/deep/cumulative-checkpoint-producer.asm",
+        "audit/deep/cumulative-load-aggregation.asm",
+        "audit/deep/target-strain-history-summary.asm",
+        "audit/deep/target-strain-recovery-kernel.asm",
+        "audit/deep/cumulative-load-aggregation.asm",
+        "audit/deep/checkpoint-seed-window.asm",
+        "audit/deep/checkpoint-input-frame-region.asm",
+        "audit/deep/target-strain-table-bytes.json"
+      ],
+      "reference_cases": [
+        "matched recovery low/medium/high with fixed load",
+        "cold start",
+        "ACWR/density/recency changes",
+        "missing recovery and previous-day revision",
+        "Empty history, first nil and internal nil decay, reordered history",
+        "Recovery absent and 0/50/100, lower floors20/40 and upper120",
+        "Seed calendar dates, day-boundary checkpoints and current-day exclusion"
+      ],
+      "final_status": "RESOLVED",
+      "resolved_in": "bevel/strain-load.md#target-strain"
+    },
+    {
+      "id": "M17.02",
+      "group": "metric",
+      "family_id": "target_strain",
+      "kind": "static_recovery",
+      "priority": "P1",
+      "status": "todo",
+      "task": "Checkpoint replay/reset and missing-calendar days",
+      "source": "bevel-metric-inventory.json score_families.target_strain.unresolved[1]",
+      "evidence": [
+        "metadata CumulativeMetrics @ 0x10523181c",
+        "assembly/cumulative.asm",
+        "audit/deep/cumulative-checkpoint-producer.asm",
+        "audit/deep/cumulative-load-aggregation.asm",
+        "audit/deep/target-strain-history-summary.asm",
+        "audit/deep/target-strain-recovery-kernel.asm",
+        "audit/deep/cumulative-load-aggregation.asm",
+        "audit/deep/checkpoint-seed-window.asm",
+        "audit/deep/checkpoint-input-frame-region.asm",
+        "audit/deep/target-strain-table-bytes.json"
+      ],
+      "reference_cases": [
+        "matched recovery low/medium/high with fixed load",
+        "cold start",
+        "ACWR/density/recency changes",
+        "missing recovery and previous-day revision",
+        "Empty history, first nil and internal nil decay, reordered history",
+        "Recovery absent and 0/50/100, lower floors20/40 and upper120",
+        "Seed calendar dates, day-boundary checkpoints and current-day exclusion"
+      ],
+      "final_status": "RESOLVED",
+      "resolved_in": "bevel/strain-load.md#cumulative-metrics-replay"
+    },
+    {
+      "id": "M17.03",
+      "group": "metric",
+      "family_id": "target_strain",
+      "kind": "static_recovery",
+      "priority": "P1",
+      "status": "todo",
+      "task": "Full upstream recovery and daily strain selection",
+      "source": "bevel-metric-inventory.json score_families.target_strain.unresolved[2]",
+      "evidence": [
+        "metadata CumulativeMetrics @ 0x10523181c",
+        "assembly/cumulative.asm",
+        "audit/deep/cumulative-checkpoint-producer.asm",
+        "audit/deep/cumulative-load-aggregation.asm",
+        "audit/deep/target-strain-history-summary.asm",
+        "audit/deep/target-strain-recovery-kernel.asm",
+        "audit/deep/cumulative-load-aggregation.asm",
+        "audit/deep/checkpoint-seed-window.asm",
+        "audit/deep/checkpoint-input-frame-region.asm",
+        "audit/deep/target-strain-table-bytes.json"
+      ],
+      "reference_cases": [
+        "matched recovery low/medium/high with fixed load",
+        "cold start",
+        "ACWR/density/recency changes",
+        "missing recovery and previous-day revision",
+        "Empty history, first nil and internal nil decay, reordered history",
+        "Recovery absent and 0/50/100, lower floors20/40 and upper120",
+        "Seed calendar dates, day-boundary checkpoints and current-day exclusion"
+      ],
+      "final_status": "RESOLVED",
+      "resolved_in": "bevel/strain-load.md#target-strain"
+    },
+    {
+      "id": "M17.04",
+      "group": "metric",
+      "family_id": "target_strain",
+      "kind": "static_recovery",
+      "priority": "P1",
+      "status": "todo",
+      "task": "Presentation rounding and target reach notifications",
+      "source": "bevel-metric-inventory.json score_families.target_strain.unresolved[3]",
+      "evidence": [
+        "metadata CumulativeMetrics @ 0x10523181c",
+        "assembly/cumulative.asm",
+        "audit/deep/cumulative-checkpoint-producer.asm",
+        "audit/deep/cumulative-load-aggregation.asm",
+        "audit/deep/target-strain-history-summary.asm",
+        "audit/deep/target-strain-recovery-kernel.asm",
+        "audit/deep/cumulative-load-aggregation.asm",
+        "audit/deep/checkpoint-seed-window.asm",
+        "audit/deep/checkpoint-input-frame-region.asm",
+        "audit/deep/target-strain-table-bytes.json"
+      ],
+      "reference_cases": [
+        "matched recovery low/medium/high with fixed load",
+        "cold start",
+        "ACWR/density/recency changes",
+        "missing recovery and previous-day revision",
+        "Empty history, first nil and internal nil decay, reordered history",
+        "Recovery absent and 0/50/100, lower floors20/40 and upper120",
+        "Seed calendar dates, day-boundary checkpoints and current-day exclusion"
+      ],
+      "final_status": "RESOLVED",
+      "resolved_in": "bevel/strain-load.md#target-strain"
+    },
+    {
+      "id": "M17.05",
+      "group": "metric",
+      "family_id": "target_strain",
+      "kind": "static_recovery",
+      "priority": "P1",
+      "status": "todo",
+      "task": "Nonfinite/overflow behavior outside kernel",
+      "source": "bevel-metric-inventory.json score_families.target_strain.unresolved[4]",
+      "evidence": [
+        "metadata CumulativeMetrics @ 0x10523181c",
+        "assembly/cumulative.asm",
+        "audit/deep/cumulative-checkpoint-producer.asm",
+        "audit/deep/cumulative-load-aggregation.asm",
+        "audit/deep/target-strain-history-summary.asm",
+        "audit/deep/target-strain-recovery-kernel.asm",
+        "audit/deep/cumulative-load-aggregation.asm",
+        "audit/deep/checkpoint-seed-window.asm",
+        "audit/deep/checkpoint-input-frame-region.asm",
+        "audit/deep/target-strain-table-bytes.json"
+      ],
+      "reference_cases": [
+        "matched recovery low/medium/high with fixed load",
+        "cold start",
+        "ACWR/density/recency changes",
+        "missing recovery and previous-day revision",
+        "Empty history, first nil and internal nil decay, reordered history",
+        "Recovery absent and 0/50/100, lower floors20/40 and upper120",
+        "Seed calendar dates, day-boundary checkpoints and current-day exclusion"
+      ],
+      "final_status": "RESOLVED",
+      "resolved_in": "bevel/strain-load.md#target-strain"
+    },
+    {
+      "id": "M18.01",
+      "group": "metric",
+      "family_id": "heart_rate_recovery",
+      "kind": "static_recovery",
+      "priority": "P1",
+      "status": "todo",
+      "task": "Upstream sample window and chronological ordering",
+      "source": "bevel-metric-inventory.json score_families.heart_rate_recovery.unresolved[0]",
+      "evidence": [
+        "audit/assembly/hrr-selection.asm",
+        "audit/assembly/hrr-service.asm",
+        "selector string 0x105927910, xref 0x1017cd854",
+        "metadata HeartRateRecoveryDetails @ 0x1052b4cc8",
+        "metadata HeartRateRecoveryResult @ 0x1052b4ce4",
+        "audit/final-discovery-models.json: source/context, state, cache and result models"
+      ],
+      "reference_cases": [
+        "HR below/at/above zone-four gate",
+        "Earlier/later separation just below/at/above 120 seconds",
+        "Pair wholly before versus spanning versus wholly after workout end",
+        "Equal HR and equal best-drop ties",
+        "Unordered, duplicate-time and sparse HR points",
+        "Increasing HR, empty/singleton series and multiple workouts"
+      ],
+      "final_status": "RESOLVED",
+      "resolved_in": "bevel/strain-load.md#heart-rate-recovery"
+    },
+    {
+      "id": "M18.02",
+      "group": "metric",
+      "family_id": "heart_rate_recovery",
+      "kind": "static_recovery",
+      "priority": "P1",
+      "status": "todo",
+      "task": "Zone-four eligibility and activeWorkoutEnd derivation",
+      "source": "bevel-metric-inventory.json score_families.heart_rate_recovery.unresolved[1]",
+      "evidence": [
+        "audit/assembly/hrr-selection.asm",
+        "audit/assembly/hrr-service.asm",
+        "selector string 0x105927910, xref 0x1017cd854",
+        "metadata HeartRateRecoveryDetails @ 0x1052b4cc8",
+        "metadata HeartRateRecoveryResult @ 0x1052b4ce4",
+        "audit/final-discovery-models.json: source/context, state, cache and result models"
+      ],
+      "reference_cases": [
+        "HR below/at/above zone-four gate",
+        "Earlier/later separation just below/at/above 120 seconds",
+        "Pair wholly before versus spanning versus wholly after workout end",
+        "Equal HR and equal best-drop ties",
+        "Unordered, duplicate-time and sparse HR points",
+        "Increasing HR, empty/singleton series and multiple workouts"
+      ],
+      "final_status": "RESOLVED",
+      "resolved_in": "bevel/strain-load.md#heart-rate-recovery"
+    },
+    {
+      "id": "M18.03",
+      "group": "metric",
+      "family_id": "heart_rate_recovery",
+      "kind": "static_recovery",
+      "priority": "P1",
+      "status": "todo",
+      "task": "HR point source, unit conversion and cadence",
+      "source": "bevel-metric-inventory.json score_families.heart_rate_recovery.unresolved[2]",
+      "evidence": [
+        "audit/assembly/hrr-selection.asm",
+        "audit/assembly/hrr-service.asm",
+        "selector string 0x105927910, xref 0x1017cd854",
+        "metadata HeartRateRecoveryDetails @ 0x1052b4cc8",
+        "metadata HeartRateRecoveryResult @ 0x1052b4ce4",
+        "audit/final-discovery-models.json: source/context, state, cache and result models"
+      ],
+      "reference_cases": [
+        "HR below/at/above zone-four gate",
+        "Earlier/later separation just below/at/above 120 seconds",
+        "Pair wholly before versus spanning versus wholly after workout end",
+        "Equal HR and equal best-drop ties",
+        "Unordered, duplicate-time and sparse HR points",
+        "Increasing HR, empty/singleton series and multiple workouts"
+      ],
+      "final_status": "RESOLVED",
+      "resolved_in": "bevel/strain-load.md#heart-rate-recovery"
+    },
+    {
+      "id": "M18.04",
+      "group": "metric",
+      "family_id": "heart_rate_recovery",
+      "kind": "static_recovery",
+      "priority": "P1",
+      "status": "todo",
+      "task": "Tie/NaN behavior across full pipeline",
+      "source": "bevel-metric-inventory.json score_families.heart_rate_recovery.unresolved[3]",
+      "evidence": [
+        "audit/assembly/hrr-selection.asm",
+        "audit/assembly/hrr-service.asm",
+        "selector string 0x105927910, xref 0x1017cd854",
+        "metadata HeartRateRecoveryDetails @ 0x1052b4cc8",
+        "metadata HeartRateRecoveryResult @ 0x1052b4ce4",
+        "audit/final-discovery-models.json: source/context, state, cache and result models"
+      ],
+      "reference_cases": [
+        "HR below/at/above zone-four gate",
+        "Earlier/later separation just below/at/above 120 seconds",
+        "Pair wholly before versus spanning versus wholly after workout end",
+        "Equal HR and equal best-drop ties",
+        "Unordered, duplicate-time and sparse HR points",
+        "Increasing HR, empty/singleton series and multiple workouts"
+      ],
+      "final_status": "RESOLVED",
+      "resolved_in": "bevel/strain-load.md#heart-rate-recovery"
+    },
+    {
+      "id": "M18.05",
+      "group": "metric",
+      "family_id": "heart_rate_recovery",
+      "kind": "static_recovery",
+      "priority": "P1",
+      "status": "todo",
+      "task": "Daily/workout aggregation and presentation",
+      "source": "bevel-metric-inventory.json score_families.heart_rate_recovery.unresolved[4]",
+      "evidence": [
+        "audit/assembly/hrr-selection.asm",
+        "audit/assembly/hrr-service.asm",
+        "selector string 0x105927910, xref 0x1017cd854",
+        "metadata HeartRateRecoveryDetails @ 0x1052b4cc8",
+        "metadata HeartRateRecoveryResult @ 0x1052b4ce4",
+        "audit/final-discovery-models.json: source/context, state, cache and result models"
+      ],
+      "reference_cases": [
+        "HR below/at/above zone-four gate",
+        "Earlier/later separation just below/at/above 120 seconds",
+        "Pair wholly before versus spanning versus wholly after workout end",
+        "Equal HR and equal best-drop ties",
+        "Unordered, duplicate-time and sparse HR points",
+        "Increasing HR, empty/singleton series and multiple workouts"
+      ],
+      "final_status": "RESOLVED",
+      "resolved_in": "bevel/strain-load.md#heart-rate-recovery"
+    },
+    {
+      "id": "V01",
+      "key": "reference_build",
+      "group": "runtime_shared",
+      "family_id": null,
+      "kind": "runtime_parity",
+      "priority": "P1",
+      "status": "todo",
+      "task": "Pin reference build/executable hash, patch status, settings/profile/timezone, source priority, algorithmVersion and history snapshot. Label outputs from another build separately.",
+      "evidence": [],
+      "final_status": "DEFERRED (runtime parity, by user decision)",
+      "resolved_in": "bevel/README.md#runtime-parity-deferred"
+    },
+    {
+      "id": "V02",
+      "key": "reference_intermediates",
+      "group": "runtime_shared",
+      "family_id": null,
+      "kind": "runtime_parity",
+      "priority": "P1",
+      "status": "todo",
+      "task": "Trace debug/export availability, especially SleepDebugDataDownloadType. Collect original records, accepted normalized arrays, baselines, contributors, state/reason codes and unrounded outputs when obtainable. Screenshots alone cannot isolate input differences.",
+      "evidence": [],
+      "final_status": "DEFERRED (runtime parity, by user decision)",
+      "resolved_in": "bevel/README.md#runtime-parity-deferred"
+    },
+    {
+      "id": "V03",
+      "key": "numeric_comparison",
+      "group": "runtime_shared",
+      "family_id": null,
+      "kind": "runtime_parity",
+      "priority": "P1",
+      "status": "todo",
+      "task": "Define tolerances from reference precision before comparing. Verify Float32/Float64 operation order, library math, ties, NaN/infinity/overflow and exact branch/state/day eligibility. Synthetic Python checks are not native execution.",
+      "evidence": [],
+      "final_status": "DEFERRED (runtime parity, by user decision)",
+      "resolved_in": "bevel/README.md#runtime-parity-deferred"
+    },
+    {
+      "id": "V04",
+      "key": "holdout_parity",
+      "group": "runtime_shared",
+      "family_id": null,
+      "kind": "runtime_parity",
+      "priority": "P1",
+      "status": "todo",
+      "task": "Run independent same-input holdout histories, including long stateful trajectories, cold starts, late data and setting changes. Record pass/fail per family; no family currently has runtime reference pairs.",
+      "evidence": [],
+      "final_status": "DEFERRED (runtime parity, by user decision)",
+      "resolved_in": "bevel/README.md#runtime-parity-deferred"
+    },
+    {
+      "id": "F01",
+      "group": "runtime_metric",
+      "family_id": "recovery",
+      "kind": "runtime_parity",
+      "priority": "P1",
+      "status": "todo",
+      "task": "Compare Recovery reference fixtures and intermediates against this build.",
+      "reference_cases": [
+        "matched 28+ day HRV/RHR history plus first-day/cold-start",
+        "each optional missing independently",
+        "zero variance",
+        "oxygen 0.97 versus 97 conversion",
+        "high/low temperature, ignore-sleep settings"
+      ],
+      "evidence": [
+        "assembly/recovery.asm @ 0x1015b0ba4",
+        "audit/selected-models.json: AggregateStatistics, BaselineConfiguration, CalculationConfiguration",
+        "audit/final-discovery-models.json: source/context, state, cache and result models",
+        "audit/deep/baseline-map-constructor.asm",
+        "audit/deep/baseline-config-dispatch.asm",
+        "audit/deep/baseline-per-window-builder.asm",
+        "audit/deep/aggregate-statistics-kernel.asm",
+        "audit/deep/raw-configuration-bytes.json",
+        "audit/deep/model-descriptors.json",
+        "audit/deep/baseline-sample-selection.asm",
+        "audit/deep/fn-0x1015b9fbc.asm",
+        "audit/deep/baseline-mindfulness-union.asm",
+        "audit/deep/baseline-context-append-consumer.asm",
+        "audit/deep/quantity-sample-metadata.asm"
+      ],
+      "final_status": "DEFERRED (runtime parity, by user decision)",
+      "resolved_in": "bevel/README.md#runtime-parity-deferred"
+    },
+    {
+      "id": "F02",
+      "group": "runtime_metric",
+      "family_id": "strain",
+      "kind": "runtime_parity",
+      "priority": "P1",
+      "status": "todo",
+      "task": "Compare Daily Strain reference fixtures and intermediates against this build.",
+      "reference_cases": [
+        "zone boundary HRs and equal bounds",
+        "same HR samples inside/outside workout",
+        "sparse HR, duplicate sources, gaps",
+        "zero/extreme steps and units",
+        "strength-free day"
+      ],
+      "evidence": [
+        "assembly/strain.asm @ 0x1015dc638",
+        "assembly/strain-unit-helpers.asm @ 0x1015daf94",
+        "assembly/strain-cardio-entry.asm"
+      ],
+      "final_status": "DEFERRED (runtime parity, by user decision)",
+      "resolved_in": "bevel/README.md#runtime-parity-deferred"
+    },
+    {
+      "id": "F03",
+      "group": "runtime_metric",
+      "family_id": "sleep_score",
+      "kind": "runtime_parity",
+      "priority": "P1",
+      "status": "todo",
+      "task": "Compare Sleep Score reference fixtures and intermediates against this build.",
+      "reference_cases": [
+        "each component independently missing",
+        "main sleep, nap, split night",
+        "short awakenings and absent stages",
+        "age 29/30/39/40/69/70 and each sex case",
+        "sleep-needed zero and duration 80% target"
+      ],
+      "evidence": [
+        "assembly/sleep-debt.asm @ 0x1015d11dc",
+        "assembly/sleep-stage-targets.asm @ 0x1015be43c",
+        "audit/assembly/sleep-component-builder.asm @ 0x1015c3938",
+        "audit/final-discovery-models.json: source/context, state, cache and result models"
+      ],
+      "final_status": "DEFERRED (runtime parity, by user decision)",
+      "resolved_in": "bevel/README.md#runtime-parity-deferred"
+    },
+    {
+      "id": "F04",
+      "group": "runtime_metric",
+      "family_id": "stress",
+      "kind": "runtime_parity",
+      "priority": "P1",
+      "status": "todo",
+      "task": "Compare Stress reference fixtures and intermediates against this build.",
+      "reference_cases": [
+        "same HR with/without HRV",
+        "HR CDF below/at/between/above keys",
+        "z=-4,0,3 and zero SD",
+        "sleep/awake/exercise context",
+        "stale nighttime HRV during daytime"
+      ],
+      "evidence": [
+        "assembly/stress.asm @ 0x1015e4e54",
+        "audit/selected-models.json: StressScoreInput, StressDataPoint",
+        "audit/final-discovery-models.json: source/context, state, cache and result models",
+        "audit/deep/baseline-map-constructor.asm",
+        "audit/deep/baseline-config-dispatch.asm",
+        "audit/deep/baseline-per-window-builder.asm",
+        "audit/deep/aggregate-statistics-kernel.asm",
+        "audit/deep/raw-configuration-bytes.json",
+        "audit/deep/model-descriptors.json",
+        "audit/deep/baseline-sample-selection.asm",
+        "audit/deep/fn-0x1015b9fbc.asm",
+        "audit/deep/baseline-mindfulness-union.asm",
+        "audit/deep/baseline-context-append-consumer.asm",
+        "audit/deep/quantity-sample-metadata.asm"
+      ],
+      "final_status": "DEFERRED (runtime parity, by user decision)",
+      "resolved_in": "bevel/README.md#runtime-parity-deferred"
+    },
+    {
+      "id": "F05",
+      "group": "runtime_metric",
+      "family_id": "energy_bank",
+      "kind": "runtime_parity",
+      "priority": "P1",
+      "status": "todo",
+      "task": "Compare Energy Bank reference fixtures and intermediates against this build.",
+      "reference_cases": [
+        "multi-day charge/drain trajectory with identical starting state",
+        "sleep/nap/mindful/awake segments",
+        "stress missing and at 100 boundary",
+        "energy 0/40/60/100",
+        "travel/DST and long sample gaps",
+        "Delta crossing lower 1 and upper 100, empty point array, known initial state",
+        "Neighbor interpolation with both, one or no HR values; long gaps"
+      ],
+      "evidence": [
+        "assembly/energy.asm",
+        "assembly/energy-update.asm",
+        "audit/final-discovery-models.json: source/context, state, cache and result models",
+        "audit/deep/energy-input-builder.asm",
+        "audit/deep/energy-hr-interpolation.asm",
+        "audit/deep/energy-point-assembly.asm",
+        "audit/deep/energy-prototype-source.asm",
+        "audit/deep/energy-continuation-and-clamp.asm",
+        "audit/deep/energy-sleep-goal-history-query.asm"
+      ],
+      "final_status": "DEFERRED (runtime parity, by user decision)",
+      "resolved_in": "bevel/README.md#runtime-parity-deferred"
+    },
+    {
+      "id": "F06",
+      "group": "runtime_metric",
+      "family_id": "biological_age",
+      "kind": "runtime_parity",
+      "priority": "P1",
+      "status": "todo",
+      "task": "Compare Biological Age reference fixtures and intermediates against this build.",
+      "reference_cases": [
+        "same week with optional groups absent",
+        "partial physiology subsets",
+        "age/sex bucket boundaries",
+        "confidence 0,19/20,20/20 days",
+        "blood ages 90/91/180/181/272/273/365/366 and future",
+        "unit conversions and CRP log",
+        "same input at weekly update boundary"
+      ],
+      "evidence": [
+        "assembly/bioage-combine.asm",
+        "assembly/bioage-service-combine.asm",
+        "assembly/hazard-to-age.asm",
+        "assembly/phenoage.asm",
+        "assembly/hazard-*.asm",
+        "audit/selected-models.json: DerivedAgeScore",
+        "audit/final-discovery-models.json: source/context, state, cache and result models"
+      ],
+      "final_status": "DEFERRED (runtime parity, by user decision)",
+      "resolved_in": "bevel/README.md#runtime-parity-deferred"
+    },
+    {
+      "id": "F07",
+      "group": "runtime_metric",
+      "family_id": "cardio_load",
+      "kind": "runtime_parity",
+      "priority": "P1",
+      "status": "todo",
+      "task": "Compare Cardio / Training Load reference fixtures and intermediates against this build.",
+      "reference_cases": [
+        "zero versus missing day",
+        "one isolated workout followed by 42+ days",
+        "first/7th/14th/42nd usable day",
+        "same TRIMP with changed recent density"
+      ],
+      "evidence": [
+        "assembly/cumulative.asm @ 0x1015f06f4",
+        "metadata CardioLoadData @ 0x1051fd3ec",
+        "audit/final-discovery-models.json: source/context, state, cache and result models",
+        "audit/deep/cumulative-checkpoint-producer.asm",
+        "audit/deep/cumulative-load-aggregation.asm"
+      ],
+      "final_status": "DEFERRED (runtime parity, by user decision)",
+      "resolved_in": "bevel/README.md#runtime-parity-deferred"
+    },
+    {
+      "id": "F08",
+      "group": "runtime_metric",
+      "family_id": "muscular_load",
+      "kind": "runtime_parity",
+      "priority": "P1",
+      "status": "todo",
+      "task": "Compare Muscular Load reference fixtures and intermediates against this build.",
+      "reference_cases": [
+        "cardio-only history with no lifting logs",
+        "identical cardio plus one logged strength session",
+        "no-data/calibrating history",
+        "muscle allocation and load ranges"
+      ],
+      "evidence": [
+        "metadata MuscularLoadData @ 0x1051fe6a8",
+        "metadata MuscularLoadMetrics @ 0x1051fe644",
+        "audit/selected-models.json: MuscularLoadDebugDay",
+        "audit/deep/cumulative-checkpoint-producer.asm",
+        "audit/deep/cumulative-load-aggregation.asm"
+      ],
+      "final_status": "DEFERRED (runtime parity, by user decision)",
+      "resolved_in": "bevel/README.md#runtime-parity-deferred"
+    },
+    {
+      "id": "F09",
+      "group": "runtime_metric",
+      "family_id": "muscular_freshness",
+      "kind": "runtime_parity",
+      "priority": "P1",
+      "status": "todo",
+      "task": "Compare Muscular Freshness reference fixtures and intermediates against this build.",
+      "reference_cases": [
+        "no strength data plus cardio only",
+        "entirely empty inputs and chart visibility",
+        "one muscle/22 muscles, prior fatigue missing",
+        "75/35 thresholds and personalized capacity below 1"
+      ],
+      "evidence": [
+        "assembly/muscular-freshness-kernel.asm @ 0x100082418-0x100082538",
+        "tables 0x104ec1fe8 and 0x104ec2098"
+      ],
+      "final_status": "DEFERRED (runtime parity, by user decision)",
+      "resolved_in": "bevel/README.md#runtime-parity-deferred"
+    },
+    {
+      "id": "F10",
+      "group": "runtime_metric",
+      "family_id": "food_glucose",
+      "kind": "runtime_parity",
+      "priority": "P1",
+      "status": "todo",
+      "task": "Compare Food Glucose reference fixtures and intermediates against this build.",
+      "reference_cases": [
+        "known glucose curve and two-hour boundaries",
+        "single sample/gaps/zero quantile",
+        "19/20 observations",
+        "equivalent mg/dL and mmol/L",
+        "late arriving glucose and overlapping meals"
+      ],
+      "evidence": [
+        "assembly/glucose-*.asm",
+        "metadata PendingOrAvailableNutritionScore @ 0x1051fe830",
+        "audit/final-discovery-models.json: source/context, state, cache and result models",
+        "audit/deep/baseline-map-constructor.asm",
+        "audit/deep/baseline-config-dispatch.asm",
+        "audit/deep/baseline-per-window-builder.asm",
+        "audit/deep/aggregate-statistics-kernel.asm",
+        "audit/deep/raw-configuration-bytes.json",
+        "audit/deep/model-descriptors.json",
+        "audit/deep/baseline-sample-selection.asm",
+        "audit/deep/fn-0x1015b9fbc.asm",
+        "audit/deep/baseline-mindfulness-union.asm",
+        "audit/deep/baseline-context-append-consumer.asm",
+        "audit/deep/quantity-sample-metadata.asm"
+      ],
+      "final_status": "DEFERRED (runtime parity, by user decision)",
+      "resolved_in": "bevel/README.md#runtime-parity-deferred"
+    },
+    {
+      "id": "F11",
+      "group": "runtime_metric",
+      "family_id": "food_quality",
+      "kind": "runtime_parity",
+      "priority": "P1",
+      "status": "todo",
+      "task": "Compare Food Quality reference fixtures and intermediates against this build.",
+      "reference_cases": [
+        "each of 11 contributor thresholds",
+        "all disabled/only negative disabled",
+        "zero calories and missing nutrient",
+        "fish binary versus fractional path",
+        "mg versus grams sodium"
+      ],
+      "evidence": [
+        "assembly/food-quality-config.asm @ 0x1000aa3a0",
+        "assembly/food-quality.asm",
+        "assembly/0x10010353c.asm",
+        "assembly/mass-unit-selector.asm"
+      ],
+      "final_status": "DEFERRED (runtime parity, by user decision)",
+      "resolved_in": "bevel/README.md#runtime-parity-deferred"
+    },
+    {
+      "id": "F12",
+      "group": "runtime_metric",
+      "family_id": "nutrition_score",
+      "kind": "runtime_parity",
+      "priority": "P1",
+      "status": "todo",
+      "task": "Compare Daily Nutrition Score reference fixtures and intermediates against this build.",
+      "reference_cases": [
+        "quality present/glucose absent and inverse",
+        "low/at/above calorie threshold",
+        "partial macros and late meal logs"
+      ],
+      "evidence": [
+        "assembly/nutrition-dispatch.asm @ 0x10008f1a4",
+        "metadata DayNutritionScores @ 0x1051fe890",
+        "audit/selected-models.json: DayScoreCalorieConfiguration",
+        "resource BevelBioAge_BevelBioAge.bundle/en.lproj/BiomarkerInfoSections.strings",
+        "audit/final-discovery-models.json: source/context, state, cache and result models"
+      ],
+      "final_status": "DEFERRED (runtime parity, by user decision)",
+      "resolved_in": "bevel/README.md#runtime-parity-deferred"
+    },
+    {
+      "id": "F13",
+      "group": "runtime_metric",
+      "family_id": "tdee",
+      "kind": "runtime_parity",
+      "priority": "P1",
+      "status": "todo",
+      "task": "Compare TDEE reference fixtures and intermediates against this build.",
+      "reference_cases": [
+        "B/E/X missing individually",
+        "0 and nonfinite histories; 79/80% coverage",
+        "known profile including birthday",
+        "protein 100g/carbs200g/fat60g",
+        "half rounding boundary and delayed data"
+      ],
+      "evidence": [
+        "assembly/tdee.asm @ 0x1001129a0",
+        "audit/assembly/tdee-third-term-full.asm @ 0x1019901c4",
+        "audit/assembly/tdee-history-mean.asm @ 0x101990000",
+        "audit/assembly/fn-0x10198fd0c.asm",
+        "audit/assembly/tdee-kcal-selector.asm @ 0x104e74040"
+      ],
+      "final_status": "DEFERRED (runtime parity, by user decision)",
+      "resolved_in": "bevel/README.md#runtime-parity-deferred"
+    },
+    {
+      "id": "F14",
+      "group": "runtime_metric",
+      "family_id": "sleep_bank",
+      "kind": "runtime_parity",
+      "priority": "P1",
+      "status": "todo",
+      "task": "Compare Sleep Bank reference fixtures and intermediates against this build.",
+      "reference_cases": [
+        "seven identical durations",
+        "one surplus oldest versus newest",
+        "missing middle night",
+        "goal change and naps",
+        "positive bank and debt"
+      ],
+      "evidence": [
+        "assembly/sleep-bank-actual-kernel.asm @ 0x1015cd324",
+        "assembly/sleep-history-bank.asm"
+      ],
+      "final_status": "DEFERRED (runtime parity, by user decision)",
+      "resolved_in": "bevel/README.md#runtime-parity-deferred"
+    },
+    {
+      "id": "F15",
+      "group": "runtime_metric",
+      "family_id": "sleep_consistency",
+      "kind": "runtime_parity",
+      "priority": "P1",
+      "status": "todo",
+      "task": "Compare Sleep Consistency reference fixtures and intermediates against this build.",
+      "reference_cases": [
+        "N=0/1/2/7",
+        "identical and shifted schedules",
+        "nonwear day",
+        "23/25-hour day",
+        "split sleep and naps"
+      ],
+      "evidence": [
+        "assembly/sleep-bank-kernel.asm @ 0x1015cdbb4, historical filename contains consistency kernel"
+      ],
+      "final_status": "DEFERRED (runtime parity, by user decision)",
+      "resolved_in": "bevel/README.md#runtime-parity-deferred"
+    },
+    {
+      "id": "F16",
+      "group": "runtime_metric",
+      "family_id": "sleep_needed",
+      "kind": "runtime_parity",
+      "priority": "P1",
+      "status": "todo",
+      "task": "Compare Sleep Needed / Goal reference fixtures and intermediates against this build.",
+      "reference_cases": [
+        "manual versus automatic",
+        "all settings on/off",
+        "positive/negative bank",
+        "no goal history",
+        "strain multiplier below/at/above 1",
+        "90 eligible records select 13, compare 14 versus 15 scores >=67",
+        "Input order and >90 records, equal recovery ties, missing sleep or recovery",
+        "Stage dictionary with inBed plus core/deep/REM, missing stage versus zero",
+        "Mean seconds at rounding boundary 29.5, 30 and 30.5; zero selected records"
+      ],
+      "evidence": [
+        "assembly/sleep-needed-core.asm @ 0x1015c09d0",
+        "metadata DynamicSleepGoalCalculationResult @ 0x105244a64",
+        "audit/deep/dynamic-goal-calculation.asm",
+        "audit/deep/dynamic-goal-top-sort.asm",
+        "audit/deep/dynamic-goal-sort-comparator.asm",
+        "audit/deep/dynamic-goal-number-conversion.asm",
+        "audit/deep/dynamic-goal-duration-selection.asm",
+        "audit/deep/model-descriptors.json"
+      ],
+      "final_status": "DEFERRED (runtime parity, by user decision)",
+      "resolved_in": "bevel/README.md#runtime-parity-deferred"
+    },
+    {
+      "id": "F17",
+      "group": "runtime_metric",
+      "family_id": "target_strain",
+      "kind": "runtime_parity",
+      "priority": "P1",
+      "status": "todo",
+      "task": "Compare Target Strain reference fixtures and intermediates against this build.",
+      "reference_cases": [
+        "matched recovery low/medium/high with fixed load",
+        "cold start",
+        "ACWR/density/recency changes",
+        "missing recovery and previous-day revision",
+        "Empty history, first nil and internal nil decay, reordered history",
+        "Recovery absent and 0/50/100, lower floors20/40 and upper120",
+        "Seed calendar dates, day-boundary checkpoints and current-day exclusion"
+      ],
+      "evidence": [
+        "metadata CumulativeMetrics @ 0x10523181c",
+        "assembly/cumulative.asm",
+        "audit/deep/cumulative-checkpoint-producer.asm",
+        "audit/deep/cumulative-load-aggregation.asm",
+        "audit/deep/target-strain-history-summary.asm",
+        "audit/deep/target-strain-recovery-kernel.asm",
+        "audit/deep/cumulative-load-aggregation.asm",
+        "audit/deep/checkpoint-seed-window.asm",
+        "audit/deep/checkpoint-input-frame-region.asm",
+        "audit/deep/target-strain-table-bytes.json"
+      ],
+      "final_status": "DEFERRED (runtime parity, by user decision)",
+      "resolved_in": "bevel/README.md#runtime-parity-deferred"
+    },
+    {
+      "id": "F18",
+      "group": "runtime_metric",
+      "family_id": "heart_rate_recovery",
+      "kind": "runtime_parity",
+      "priority": "P1",
+      "status": "todo",
+      "task": "Compare Heart Rate Recovery reference fixtures and intermediates against this build.",
+      "reference_cases": [
+        "HR below/at/above zone-four gate",
+        "Earlier/later separation just below/at/above 120 seconds",
+        "Pair wholly before versus spanning versus wholly after workout end",
+        "Equal HR and equal best-drop ties",
+        "Unordered, duplicate-time and sparse HR points",
+        "Increasing HR, empty/singleton series and multiple workouts"
+      ],
+      "evidence": [
+        "audit/assembly/hrr-selection.asm",
+        "audit/assembly/hrr-service.asm",
+        "selector string 0x105927910, xref 0x1017cd854",
+        "metadata HeartRateRecoveryDetails @ 0x1052b4cc8",
+        "metadata HeartRateRecoveryResult @ 0x1052b4ce4",
+        "audit/final-discovery-models.json: source/context, state, cache and result models"
+      ],
+      "final_status": "DEFERRED (runtime parity, by user decision)",
+      "resolved_in": "bevel/README.md#runtime-parity-deferred"
+    }
+  ]
+}

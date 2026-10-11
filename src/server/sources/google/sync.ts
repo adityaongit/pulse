@@ -320,8 +320,12 @@ function writer(tz: string, userId: number) {
     return days.get(q) ?? days.set(q, localDay(q * 900, tz)).get(q)!;
   };
 
-  const dailyRows = async (db: Db, rows: DailyRow[]) =>
-    (await upsert(db, dailyMetrics, ["day"], userId, rows.map((r) => ({ ...r, source: "google" })))).length > 0;
+  /** Upserts nightly and daily rows; a changed day is marked dirty (stage 2 replays from the first dirty day). */
+  const dailyRows = async (db: Db, rows: DailyRow[], dirty: Set<string>) => {
+    const written = await upsert(db, dailyMetrics, ["day"], userId, rows.map((r) => ({ ...r, source: "google" })));
+    for (const r of written) dirty.add(r.day as string);
+    return written.length > 0;
+  };
 
   /** Replaces each session's segments where they differ. Returns the sessions whose segments changed. */
   async function segments(db: Db, sessionIds: string[], next: SegmentRow[]): Promise<Set<string>> {
@@ -363,10 +367,10 @@ function writer(tz: string, userId: number) {
     let changed = false;
     switch (job.kind) {
       case "daily":
-        changed = await dailyRows(db, mapDaily(job.type, points, tz));
+        changed = await dailyRows(db, mapDaily(job.type, points, tz), dirty);
         break;
       case "rollup":
-        changed = await dailyRows(db, mapRollup(job.type, points));
+        changed = await dailyRows(db, mapRollup(job.type, points), dirty);
         break;
       // Extras and records feed no score, so they never set `changed` (no recompute for them).
       case "extra":

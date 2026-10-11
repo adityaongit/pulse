@@ -1,0 +1,116 @@
+diff --git a/es6/util/DOMUtils.js b/es6/util/DOMUtils.js
+index 683f911744b18351e1e593da946bd937d8bf93f4..347e758e22cd7639bc9011110db8f03c4529ae52 100644
+--- a/es6/util/DOMUtils.js
++++ b/es6/util/DOMUtils.js
+@@ -63,6 +63,35 @@ var measureTextWithDOM = (text, style) => {
+     };
+   }
+ };
++
++// Pulse patch: measure on a canvas instead of a span in <body>. The span forced a synchronous style recalculation of
++// the whole document on every new label while React was still committing the charts (about 80 forced reflows,
++// 1.9 s of a 2.5 s hydration task on a phone). The canvas uses the same font the span inherited (body), with the
++// style overrides recharts passes, so the numbers match the old measurement.
++var canvasCtx = null;
++var bodyFont = null;
++var measureTextWithCanvas = (text, style) => {
++  try {
++    if (!canvasCtx) canvasCtx = document.createElement("canvas").getContext("2d");
++    if (!canvasCtx) return measureTextWithDOM(text, style);
++    if (!bodyFont) {
++      var cs = getComputedStyle(document.body);
++      bodyFont = { fontStyle: cs.fontStyle, fontWeight: cs.fontWeight, fontSize: cs.fontSize, fontFamily: cs.fontFamily };
++    }
++    var fontSize = style.fontSize || bodyFont.fontSize;
++    if (typeof fontSize === "number") fontSize = fontSize + "px";
++    canvasCtx.font = [style.fontStyle || bodyFont.fontStyle, style.fontWeight || bodyFont.fontWeight, fontSize, style.fontFamily || bodyFont.fontFamily].join(" ");
++    if ("letterSpacing" in canvasCtx) canvasCtx.letterSpacing = style.letterSpacing ? String(style.letterSpacing) : "0px";
++    var s = String(text);
++    if (style.textTransform === "uppercase") s = s.toUpperCase();
++    else if (style.textTransform === "lowercase") s = s.toLowerCase();
++    var m = canvasCtx.measureText(s);
++    var height = (m.fontBoundingBoxAscent || 0) + (m.fontBoundingBoxDescent || 0) || parseFloat(fontSize) * 1.2;
++    return { width: m.width, height: height };
++  } catch (_unused) {
++    return measureTextWithDOM(text, style);
++  }
++};
+ export var getStringSize = function getStringSize(text) {
+   var style = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+   if (text === undefined || text === null || Global.isSsr) {
+@@ -74,7 +103,7 @@ export var getStringSize = function getStringSize(text) {
+ 
+   // If caching is disabled, measure directly
+   if (!currentConfig.enableCache) {
+-    return measureTextWithDOM(text, style);
++    return measureTextWithCanvas(text, style);
+   }
+   var cacheKey = createCacheKey(text, style);
+   var cachedResult = stringCache.get(cacheKey);
+@@ -83,7 +112,7 @@ export var getStringSize = function getStringSize(text) {
+   }
+ 
+   // Measure using DOM
+-  var result = measureTextWithDOM(text, style);
++  var result = measureTextWithCanvas(text, style);
+ 
+   // Store in LRU cache
+   stringCache.set(cacheKey, result);
+diff --git a/lib/util/DOMUtils.js b/lib/util/DOMUtils.js
+index 5d8fd38960fdee94d61e1d62929f1f398dd8a052..ef08c82bfebe7c3d5456b46ec512591c93998eec 100644
+--- a/lib/util/DOMUtils.js
++++ b/lib/util/DOMUtils.js
+@@ -69,6 +69,35 @@ var measureTextWithDOM = (text, style) => {
+     };
+   }
+ };
++
++// Pulse patch: measure on a canvas instead of a span in <body>. The span forced a synchronous style recalculation of
++// the whole document on every new label while React was still committing the charts (about 80 forced reflows,
++// 1.9 s of a 2.5 s hydration task on a phone). The canvas uses the same font the span inherited (body), with the
++// style overrides recharts passes, so the numbers match the old measurement.
++var canvasCtx = null;
++var bodyFont = null;
++var measureTextWithCanvas = (text, style) => {
++  try {
++    if (!canvasCtx) canvasCtx = document.createElement("canvas").getContext("2d");
++    if (!canvasCtx) return measureTextWithDOM(text, style);
++    if (!bodyFont) {
++      var cs = getComputedStyle(document.body);
++      bodyFont = { fontStyle: cs.fontStyle, fontWeight: cs.fontWeight, fontSize: cs.fontSize, fontFamily: cs.fontFamily };
++    }
++    var fontSize = style.fontSize || bodyFont.fontSize;
++    if (typeof fontSize === "number") fontSize = fontSize + "px";
++    canvasCtx.font = [style.fontStyle || bodyFont.fontStyle, style.fontWeight || bodyFont.fontWeight, fontSize, style.fontFamily || bodyFont.fontFamily].join(" ");
++    if ("letterSpacing" in canvasCtx) canvasCtx.letterSpacing = style.letterSpacing ? String(style.letterSpacing) : "0px";
++    var s = String(text);
++    if (style.textTransform === "uppercase") s = s.toUpperCase();
++    else if (style.textTransform === "lowercase") s = s.toLowerCase();
++    var m = canvasCtx.measureText(s);
++    var height = (m.fontBoundingBoxAscent || 0) + (m.fontBoundingBoxDescent || 0) || parseFloat(fontSize) * 1.2;
++    return { width: m.width, height: height };
++  } catch (_unused) {
++    return measureTextWithDOM(text, style);
++  }
++};
+ var getStringSize = exports.getStringSize = function getStringSize(text) {
+   var style = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+   if (text === undefined || text === null || _Global.Global.isSsr) {
+@@ -80,7 +109,7 @@ var getStringSize = exports.getStringSize = function getStringSize(text) {
+ 
+   // If caching is disabled, measure directly
+   if (!currentConfig.enableCache) {
+-    return measureTextWithDOM(text, style);
++    return measureTextWithCanvas(text, style);
+   }
+   var cacheKey = createCacheKey(text, style);
+   var cachedResult = stringCache.get(cacheKey);
+@@ -89,7 +118,7 @@ var getStringSize = exports.getStringSize = function getStringSize(text) {
+   }
+ 
+   // Measure using DOM
+-  var result = measureTextWithDOM(text, style);
++  var result = measureTextWithCanvas(text, style);
+ 
+   // Store in LRU cache
+   stringCache.set(cacheKey, result);

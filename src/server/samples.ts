@@ -1,6 +1,6 @@
 // Band heart rate and per-minute steps, stored as one row per user and UTC day (hr_days, steps_days): parallel
 // arrays of second-of-day offsets and values, sorted by offset. UTC buckets never move when the time zone changes.
-import { and, between, eq } from "drizzle-orm";
+import { and, between, eq, lt } from "drizzle-orm";
 import { type Db, row, sql } from "./db";
 import { hrDays, stepsDays } from "./db/schema";
 
@@ -100,13 +100,48 @@ export async function mergeSamples(
       await db.delete(t).where(and(eq(t.userId, userId), eq(t.bucket, b)));
       continue;
     }
-    const values = { offsets: sorted.map(([ts]) => ts - base), values: sorted.map(([, v]) => v) };
+    const values = { offsets: sorted.map(([ts]) => ts - base), values: sorted.map(([, v]) => v), ...(table === "hr" && { minute: false }) };
     await db
       .insert(t)
       .values({ userId, bucket: b, ...values })
       .onConflictDoUpdate({ target: [t.userId, t.bucket], set: values });
   }
   return changed;
+}
+
+/** Buckets compacted per call: the first pass over a long history is spread across runs, each short under the user's lock. */
+export const COMPACT_BATCH = 30;
+
+/**
+ * Compacts raw heart-rate days before `beforeBucket` to one rounded mean per minute (offset = the minute's first
+ * second), oldest first, at most COMPACT_BATCH rows. Everything shown or scored from older days already works per
+ * minute (night and workout charts, the per-minute series, stage 1's minute means); only a stage-1 rerun of such a
+ * day (a scoring-version bump) sees the compacted samples. Returns the number of rows compacted.
+ */
+export async function compactHr(db: Db, userId: number, beforeBucket: number): Promise<number> {
+  const t = hrDays;
+  const rows = await db
+    .select({ bucket: t.bucket, offsets: t.offsets, values: t.values })
+    .from(t)
+    .where(and(eq(t.userId, userId), eq(t.minute, false), lt(t.bucket, beforeBucket)))
+    .orderBy(t.bucket)
+    .limit(COMPACT_BATCH);
+  for (const r of rows) {
+    const sum = new Map<number, { s: number; n: number }>();
+    for (let i = 0; i < r.offsets.length; i++) {
+      const m = Math.floor(r.offsets[i] / 60);
+      const a = sum.get(m) ?? { s: 0, n: 0 };
+      a.s += r.values[i];
+      a.n++;
+      sum.set(m, a);
+    }
+    const minutes = [...sum].sort((a, z) => a[0] - z[0]);
+    await db
+      .update(t)
+      .set({ offsets: minutes.map(([m]) => m * 60), values: minutes.map(([, a]) => Math.round(a.s / a.n)), minute: true })
+      .where(and(eq(t.userId, userId), eq(t.bucket, r.bucket)));
+  }
+  return rows.length;
 }
 
 /** Writes generated samples (the seed) without reading first: whole buckets, replacing what was there. */

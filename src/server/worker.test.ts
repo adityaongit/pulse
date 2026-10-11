@@ -40,7 +40,7 @@ describe("createWorker", () => {
     expect(recompute).toHaveBeenCalledWith(U, false);
   });
 
-  it("a cycle syncs each user in turn, never two at once", async () => {
+  it("a cycle syncs its users a few at a time, each one once, never the same user twice at once", async () => {
     let active = 0;
     let most = 0;
     const pull = vi.fn<(userId: number) => Promise<{ changed: boolean }>>(async () => {
@@ -49,12 +49,38 @@ describe("createWorker", () => {
       active--;
       return { changed: true };
     });
-    const { worker, recompute } = setup(pull, async () => [1, 2, 3]);
+    const { worker, recompute } = setup(pull, async () => [1, 2, 3, 4, 5, 6]);
     worker.start();
-    await tick(5000);
-    expect(pull.mock.calls.map((c) => c[0])).toEqual([1, 2, 3]);
-    expect(recompute.mock.calls).toEqual([[1, true], [2, true], [3, true]]);
-    expect(most).toBe(1);
+    await tick(0);
+    expect(pull.mock.calls.map((c) => c[0])).toEqual([1, 2, 3, 4]); // the first four start together
+    await tick(1000);
+    expect(pull.mock.calls.map((c) => c[0])).toEqual([1, 2, 3, 4, 5, 6]); // the rest follow as slots free up
+    await tick(2000);
+    expect(recompute.mock.calls.map((c) => c[0]).sort()).toEqual([1, 2, 3, 4, 5, 6]);
+    expect(most).toBe(4);
+  });
+
+  it("requestSync({ force, pull: false }) recomputes without a pull, and a queued run keeps the stronger ask", async () => {
+    const { worker, pull, recompute } = setup();
+    worker.start();
+    await tick();
+    expect(pull).toHaveBeenCalledTimes(1);
+    worker.requestSync({ userId: U, force: true, pull: false });
+    await tick();
+    expect(pull).toHaveBeenCalledTimes(1);
+    expect(recompute).toHaveBeenLastCalledWith(U, false);
+    // During a recompute-only run, a forced pull request queues a run that pulls.
+    const slow = vi.fn<(userId: number) => Promise<{ changed: boolean }>>(async () => {
+      await new Promise((r) => setTimeout(r, 1000));
+      return { changed: true };
+    });
+    const w2 = setup(slow);
+    w2.worker.start();
+    await tick(0); // the first cycle's run is in its 1-second pull
+    w2.worker.requestSync({ userId: U, force: true, pull: false });
+    w2.worker.requestSync({ userId: U, force: true });
+    await tick(3000);
+    expect(slow).toHaveBeenCalledTimes(2);
   });
 
   it("a user whose lock is held elsewhere is skipped, not failed", async () => {

@@ -17,7 +17,7 @@ import { type PipelineOptions, SCORING_VERSION } from "./types";
 export * from "./types";
 
 /** What the last run did, for tests and logs. */
-export const lastRun = { stage1Days: [] as string[], ms: 0, stage1Ms: 0, stage2Ms: 0 };
+export const lastRun = { stage1Days: [] as string[], stage2Days: 0, ms: 0, stage1Ms: 0, stage2Ms: 0 };
 
 /** The worker's hook: recompute when a source changed something, a day is dirty, or the version moved. */
 export async function recomputeIfNeeded(userId: number, changed: boolean): Promise<void> {
@@ -27,7 +27,7 @@ export async function recomputeIfNeeded(userId: number, changed: boolean): Promi
   const profile = await getProfile(db, userId);
   if (!profile) return;
   await recompute(db, { userId, timeZone: profile.timeZone, profile });
-  console.info(`[pipeline] user ${userId} recomputed in ${lastRun.ms} ms (stage 1: ${lastRun.stage1Days.length} days)`);
+  console.info(`[pipeline] user ${userId} recomputed in ${lastRun.ms} ms (stage 1: ${lastRun.stage1Days.length} days, stage 2: ${lastRun.stage2Days} days)`);
 }
 
 /** A dirty day, a row from another scoring version, or a newest daily row not yet scored. One round trip. */
@@ -49,14 +49,14 @@ export async function recompute(db: Db, opts: PipelineOptions) {
   const t0 = performance.now();
   const data = await load(db, opts);
   if (!data) {
-    Object.assign(lastRun, { stage1Days: [], ms: Math.round(performance.now() - t0), stage1Ms: 0, stage2Ms: 0 });
+    Object.assign(lastRun, { stage1Days: [], stage2Days: 0, ms: Math.round(performance.now() - t0), stage1Ms: 0, stage2Ms: 0 });
     return lastRun;
   }
   const t1 = performance.now();
   lastRun.stage1Days = await stage1(db, data, opts);
   const t2 = performance.now();
-  await stage2(db, data, opts);
+  const s2 = await stage2(db, data, opts, lastRun.stage1Days);
   const t3 = performance.now();
-  Object.assign(lastRun, { stage1Ms: Math.round(t2 - t1), stage2Ms: Math.round(t3 - t2), ms: Math.round(t3 - t0) });
+  Object.assign(lastRun, { stage2Days: s2.days, stage1Ms: Math.round(t2 - t1), stage2Ms: Math.round(t3 - t2), ms: Math.round(t3 - t0) });
   return lastRun;
 }
