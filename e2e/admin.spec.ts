@@ -284,6 +284,8 @@ test("coach logging: a log request waits for the user's tap, and a decline logs 
   await card.getByRole("button", { name: "Don’t log" }).click();
   await expect(page.getByText("Not logged: Water · 500 ml")).toBeVisible();
   await expect(page.getByText("Take it easy", { exact: true })).toBeVisible();
+  // The answer is on screen before its stream ends, and Coach drops a send while it streams.
+  await expect(page.getByRole("button", { name: "Send" })).toBeVisible();
 
   // The owner has no Google grant here, so an approved log comes back with the sheets' reconnect message.
   await input.fill("Please log 500 ml of water");
