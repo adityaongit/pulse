@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pulse</title>
+<style>
+  :root { color-scheme: dark light; --bg: #101518; --fg: #f6f8f9; --muted: #9aa7ad; --field: #1d2529; --line: #2c373c; --error: #ff7a7a; }
+  @media (prefers-color-scheme: light) { :root { --bg: #f6f8f9; --fg: #101518; --muted: #5d6a70; --field: #ffffff; --line: #d5dcdf; --error: #c4302b; } }
+  html, body { height: 100%; margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.4 system-ui, -apple-system, sans-serif; -webkit-text-size-adjust: 100%; }
+  main { box-sizing: border-box; min-height: 100%; display: grid; place-content: center; justify-items: center; gap: 12px; padding: max(24px, env(safe-area-inset-top)) 24px max(24px, env(safe-area-inset-bottom)); text-align: center; }
+  svg { width: 56px; height: 56px; }
+  h1 { margin: 8px 0 0; font-size: 20px; }
+  p { margin: 0; max-width: 34ch; color: var(--muted); }
+  form { display: grid; gap: 12px; width: min(340px, calc(100vw - 48px)); margin-top: 8px; }
+  label { text-align: left; font-size: 14px; color: var(--muted); }
+  input { box-sizing: border-box; width: 100%; min-height: 48px; margin-top: 6px; padding: 0 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--field); color: var(--fg); font: inherit; }
+  input:focus { outline: 2px solid #1fa0f0; outline-offset: 1px; }
+  .error { min-height: 1.4em; color: var(--error); font-size: 14px; text-align: left; }
+  button { min-height: 48px; padding: 0 24px; border: 0; border-radius: 999px; background: #00f19f; color: #101518; font: inherit; font-weight: 600; }
+  button[disabled] { opacity: 0.6; }
+  button.quiet { background: transparent; color: var(--fg); border: 1px solid var(--line); }
+</style>
+</head>
+<body>
+<main>
+  <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6.9" y="4.5" width="4.2" height="11" rx="2.1" fill="#00f19f"/><rect x="12.9" y="8.5" width="4.2" height="11" rx="2.1" fill="#1fa0f0"/></svg>
+  <h1>Connect to your Pulse</h1>
+  <p>Pulse is self-hosted. Enter the address of the Pulse server you sign in to.</p>
+  <form id="form" novalidate>
+    <label>Server address
+      <input id="url" name="url" type="url" inputmode="url" autocomplete="url" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="https://pulse.example.com" required>
+    </label>
+    <div id="error" class="error" role="alert" aria-live="polite"></div>
+    <button id="connect" type="submit">Connect</button>
+    <button id="cancel" class="quiet" type="button" hidden>Cancel</button>
+  </form>
+</main>
+<script>
+  // Only a server origin is kept: Pulse is served from the root of its host.
+  function normalize(raw) {
+    const text = raw.trim();
+    if (!text) return { error: "Enter your Pulse server’s address." };
+    let url;
+    try {
+      url = new URL(/^[a-z][a-z0-9+.-]*:\/\//i.test(text) ? text : `https://${text}`);
+    } catch {
+      return { error: "That isn’t a web address." };
+    }
+    if (url.protocol !== "https:") return { error: "Use an https:// address. The app only connects over HTTPS." };
+    return { value: url.origin };
+  }
+
+  // Any HTTP answer counts, including a sign-in redirect from an access proxy in front of Pulse.
+  async function reachable(url) {
+    try {
+      await Capacitor.Plugins.CapacitorHttp.get({ url, connectTimeout: 8000, readTimeout: 8000 });
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  const server = Capacitor.Plugins.PulseServer;
+  const form = document.getElementById("form");
+  const input = document.getElementById("url");
+  const error = document.getElementById("error");
+  const connect = document.getElementById("connect");
+  const cancel = document.getElementById("cancel");
+  let current = null;
+
+  server.get().then(({ url }) => {
+    current = url ?? null;
+    if (!current) return;
+    input.value = current;
+    cancel.hidden = false;
+  });
+
+  cancel.addEventListener("click", () => server.set({ url: current }));
+  input.addEventListener("input", () => (error.textContent = ""));
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const result = normalize(input.value);
+    if (result.error) {
+      error.textContent = result.error;
+      return;
+    }
+    input.value = result.value;
+    connect.disabled = true;
+    connect.textContent = "Checking…";
+    const ok = await reachable(result.value);
+    connect.disabled = false;
+    connect.textContent = "Connect";
+    if (!ok) {
+      error.textContent = "Couldn’t reach that server. Check the address and your connection.";
+      return;
+    }
+    server.set({ url: result.value });
+  });
+</script>
+</body>
+</html>

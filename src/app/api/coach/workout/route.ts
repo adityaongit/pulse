@@ -1,4 +1,4 @@
-// The coach's one-line take on a workout (activity-01's "Analyzing…" pill): POST { id }. Same gate as the chat
+// The coach's one-line take on a workout (activity-weightlifting-detail-top's "Analyzing…" pill): POST { id }. Same gate as the chat
 // (signed in, coach access, a usable model, the per-minute limit); the workout is read for this user only. Never logs
 // the text, the numbers or provider bodies.
 import { generateText } from "ai";

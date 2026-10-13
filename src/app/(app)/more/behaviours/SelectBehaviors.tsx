@@ -25,7 +25,7 @@ const itemsOf = (tags: BehavioursVM["tags"]): Item[] => [
 export const shownOf = (tags: BehavioursVM["tags"]) => new Set(tags.filter((t) => !t.hidden).map((t) => t.tag))
 
 /**
- * Select Behaviors (journal-04..09): search, category tabs, then the chosen behaviours above a "Not selected" rule,
+ * Select Behaviors (journal-behavior-picker-*): search, category tabs, then the chosen behaviours above a "Not selected" rule,
  * each a name, its daily question and a checkbox. The two groups are split as the picker opened, so ticking a row
  * doesn't move it. Nothing is written until the host saves `selected`.
  */
@@ -65,7 +65,7 @@ export function BehaviorPicker({ tags, initial, selected, onChange }: { tags: Be
           className="h-12 rounded-xl bg-foreground/[0.06] pl-11 text-base"
         />
       </div>
-      {/* Category tabs in one scrolling row, the chosen one underlined (journal-04, journal-06). */}
+      {/* Category tabs in one scrolling row, the chosen one underlined (journal-behavior-picker-all-top, journal-behavior-picker-lifestyle-top). */}
       <div className="mt-3 overflow-x-auto overscroll-x-contain [mask-image:linear-gradient(to_right,black_calc(100%-32px),transparent)] [scrollbar-width:none] max-md:-mx-4">
         <ToggleGroup type="single" value={tab} onValueChange={(v) => v && setTab(v as Tab)} aria-label="Category" spacing={0} className="w-max gap-1 pr-8 max-md:px-4">
           {tabs.map((t) => (
@@ -121,7 +121,7 @@ export async function saveSelection(selected: Set<string>): Promise<string | nul
   return r.ok ? null : r.error.startsWith("Too many") ? "That’s more behaviours than Pulse can track. Choose fewer." : "Couldn’t save. Check your connection and try again."
 }
 
-/** The Journal's pencil (journal-04): Select Behaviors over the journal. `onSaved` reloads the journal's questions. */
+/** The Journal's pencil (journal-behavior-picker-all-top): Select Behaviors over the journal. `onSaved` reloads the journal's questions. */
 export function SelectBehaviorsSheet({ open, onOpenChange, onSaved }: { open: boolean; onOpenChange: (open: boolean) => void; onSaved: () => void }) {
   const [tags, setTags] = React.useState<BehavioursVM["tags"] | null>(null)
   const [initial, setInitial] = React.useState<Set<string>>(new Set())

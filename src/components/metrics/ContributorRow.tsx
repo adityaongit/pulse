@@ -113,7 +113,7 @@ function RecoveryRow({ p, value, meta }: { p: Extract<ContributorRowProps, { var
   return <div className={cn("py-3", p.className)}>{body}</div>
 }
 
-/** health-03's bar: ten segments from poor (orange) to good (green); the one holding the 6-month mean is lit. */
+/** health-whoop-age-sleep-factors's bar: ten segments from poor (orange) to good (green); the one holding the 6-month mean is lit. */
 const SEGMENTS = 10
 
 /** A marker's label centred on its triangle, kept inside the bar's ends. */
@@ -130,7 +130,7 @@ function MarkerLabel({ at, children, className }: { at: number; children: React.
 }
 
 /**
- * A Healthspan factor (health-03): the label, then a ten-segment bar from poor to good with its end values, the
+ * A Healthspan factor (health-whoop-age-sleep-factors): the label, then a ten-segment bar from poor to good with its end values, the
  * 6-month mean marked above (white) and the 30-day mean below (grey), and the years it adds or takes off at the right.
  */
 function HealthspanRow({ p, value, meta }: { p: Extract<ContributorRowProps, { variant: "healthspan" }>; value: number | null; meta?: MetricMeta }) {

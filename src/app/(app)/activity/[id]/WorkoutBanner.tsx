@@ -18,7 +18,7 @@ const subscribe = (on: () => void) => {
 }
 
 /**
- * activity-01's "Get More from Your Workouts": what logging exercises adds, closed for good with X (kept on this device).
+ * activity-weightlifting-detail-top's "Get More from Your Workouts": what logging exercises adds, closed for good with X (kept on this device).
  * Shown only with the strength trainer (FEATURES.strengthTrainer).
  */
 export function WorkoutBanner() {

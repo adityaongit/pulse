@@ -32,6 +32,7 @@ Run `pnpm typecheck && pnpm lint && pnpm test` before every commit. Run `pnpm e2
   - `metrics/` and `charts/` hold the kit components.
   - `brand/` holds the wordmark and mark.
 - `src/app/(app)/`: routes. Each page is a Server Component that calls its query and composes shells with kit components.
+- `mobile/`: the Capacitor shell (Android and iOS) that opens a Pulse server chosen at first launch. Its own pnpm root, outside the app's typecheck, lint and Docker build. See `docs/mobile.md`; the web app needs no changes for it.
 - `docs/`:
   - `plans/` is the build plan.
   - `design/` holds `spec.md` (the UI contract), `sticky.md`, `orb.md`, `brand.md`, the audits, and `algorithms/` (one spec per algorithm).

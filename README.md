@@ -38,6 +38,9 @@ Pulse is a PWA: install it from Chrome on Android, Add to Home Screen on iPhone,
 PWABuilder. Notifications, the offline page, launch screens and how to rebrand the icons for a fork are in
 [docs/pwa.md](docs/pwa.md).
 
+There is also a native Android and iOS app (`mobile/`, Capacitor) that connects to any Pulse server you enter on first
+launch: [docs/mobile.md](docs/mobile.md).
+
 ## Deploy
 
 Pulse runs as one Docker container with its database in a volume, behind a tunnel or HTTPS reverse proxy. The [setup guide](docs/setup.md) covers Google Cloud, Docker, HTTPS over Tailscale and troubleshooting; [other setups](docs/other-setups.md) covers Cloudflare Tunnel and reverse proxies; the [admin guide](docs/admin.md) covers invites, the coach, updates and backups.
@@ -63,6 +66,7 @@ It also runs on Vercel's free Hobby plan with a free Postgres from Neon or Aiven
 
 - [Setup guide](docs/setup.md): from the demo to your own data on a server.
 - [Installed app (PWA)](docs/pwa.md): install, notifications, offline, rebranding, Android APK.
+- [Native app (Capacitor)](docs/mobile.md): the Android and iOS shell, building, signing, releases.
 - [Contributing](CONTRIBUTING.md): how changes land (`main` is protected; every change is a pull request).
 - [Security policy](SECURITY.md): report vulnerabilities privately.
 - [Code of Conduct](CODE_OF_CONDUCT.md).

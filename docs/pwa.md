@@ -146,6 +146,9 @@ install.
 
 ## Android APK with PWABuilder
 
+A PWABuilder APK is tied to one server. For one APK that connects to any Pulse server, see the native shell in
+[mobile.md](mobile.md).
+
 PWABuilder wraps the site in a Trusted Web Activity: an Android app that opens your Pulse full screen in Chrome.
 The web app inside is the same deployed site, so code changes reach the APK with every deploy. Only a change to the
 manifest, the icons or the package needs a new APK.

@@ -1,4 +1,4 @@
-// The activity types a person can log or record (activity-07, activity-09): Select Activity's catalogue. Static; the
+// The activity types a person can log or record (activity-add-type-picker, activity-start-type-picker): Select Activity's catalogue. Static; the
 // hidden Add Activity and Start Activity flows read it (FEATURES.logActivity, FEATURES.startActivity).
 import type { ActivityKind } from "@/server/queries/types"
 

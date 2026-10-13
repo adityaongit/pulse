@@ -1,0 +1,4 @@
+# Its own workspace root, so the app's pnpm workspace never picks the shell up (and vice versa).
+packages: []
+allowBuilds:
+  sharp: true

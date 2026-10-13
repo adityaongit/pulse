@@ -16,6 +16,8 @@ const eslintConfig = defineConfig([
     ".claude/**",
     // The marketing site (site/) is a separate Astro project with its own tooling.
     "site/**",
+    // The native app shell (mobile/) is a separate Capacitor project with its own tooling.
+    "mobile/**",
   ]),
 ]);
 

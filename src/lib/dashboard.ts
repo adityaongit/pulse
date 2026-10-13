@@ -27,7 +27,7 @@ const CORE = [
 ] as const
 
 /**
- * The reference app's other rows (dashboard-03..09). Keys match the Trend View each opens where there is one;
+ * The reference app's other rows (dashboard-customize-*, dashboard-tiles-new-metrics*). Keys match the Trend View each opens where there is one;
  * "(weekly)" rows total the 7 days ending on the day and compare with the same 7-day total over the prior 30 days.
  */
 const SCORED = [
@@ -74,7 +74,7 @@ export const DASHBOARD_LABEL = Object.fromEntries(ALL.map((m) => [m.key, m.label
 
 export const isDashboardKey = (k: string): k is DashboardKey => Object.hasOwn(DASHBOARD_LABEL, k)
 
-/** The default list, the reference app's (dashboard-03); installs that never saved a list follow it. */
+/** The default list, the reference app's (dashboard-customize-reorder); installs that never saved a list follow it. */
 export const DASHBOARD_DEFAULT: DashboardKey[] = ["hrv", "sleep", "consistency", "hours", "stress", "rhr", "vo2max", "steps"]
 
 /** The default for an account that has never synced heart rate (phone only, no Fitbit band): what its phone counts. */

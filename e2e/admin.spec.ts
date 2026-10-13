@@ -292,6 +292,8 @@ test("coach logging: a log request waits for the user's tap, and a decline logs 
   await input.press("Enter");
   await card.getByRole("button", { name: "Log", exact: true }).click();
   await expect(page.getByText(/Not logged: reconnect Google in Settings/)).toBeVisible();
+  // The chat is saved when the stream ends; a reload before that reads the copy without this answer.
+  await expect(page.getByRole("button", { name: "Send" })).toBeVisible();
   await shot(page, "18-coach-log-result");
   await page.reload();
   await expect(page.getByText("Not logged: Water · 500 ml")).toBeVisible();

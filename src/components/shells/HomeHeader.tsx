@@ -202,6 +202,10 @@ function morphKeyframes(dials: El, header: El, ringRow: El, band: El, fill: El, 
  * halfway and reverses). The animations run on a ScrollTimeline, off the main thread; without one, one
  * passive rAF-throttled scroll listener drives the same keyframes. Laptop and reduced motion keep the
  * discrete swap: the ring row fades in once the dials have passed under the top row.
+ * 
+ * passive rAF-throttled scroll listener drives the same keyframes. Laptop, reduced motion and the Capacitor
+ * shell (whose WebView can't hold 120 Hz with 19 composited layers at dpr 3.75) keep the discrete swap: the
+ * ring row fades in once the dials have passed under the top row.
  */
 export function HomeHeader({ rings }: { rings?: HeaderRings }) {
   const panel = React.useRef<HTMLDivElement>(null)
@@ -223,7 +227,7 @@ export function HomeHeader({ rings }: { rings?: HeaderRings }) {
     if (!header || !top || !row || !bandEl || !fillEl || !dials || !sentinel) return
 
     const root = document.scrollingElement ?? document.documentElement
-    const morph = !reduced && !wide
+    const morph = !reduced && !wide && !navigator.userAgent.includes("PulseApp")
     const timeline = morph && typeof ScrollTimeline === "function" ? new ScrollTimeline({ source: root }) : null
     let g = { start: 0, end: 0, max: 0 }
     let anims: Animation[] = []

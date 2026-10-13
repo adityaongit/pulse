@@ -26,7 +26,7 @@ export type DayStripProps = {
   indicator: "recovery" | "journal"
   /** The 30 days ending today, extended back to include `d` (U10). Oldest first; no future days. */
   days: DayStripDay[]
-  /** "pill": the Journal's tall rounded days with a short weekday, the selected one ringed (journal-01). */
+  /** "pill": the Journal's tall rounded days with a short weekday, the selected one ringed (journal-daily-questions-today). */
   variant?: "tile" | "pill"
   /** With `onSelect`, the strip picks a day for its owner instead of changing `?d=`. */
   value?: string

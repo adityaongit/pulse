@@ -137,7 +137,7 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
                   <PhoneActivity stats={vm.phone} link={{ d, today }} />
                 </div>
               )}
-              {/* Dials, then the monitor cards, as in the reference app (home-01); the coach card and an alert follow them. */}
+              {/* Dials, then the monitor cards, as in the reference app (home-today-overview-top); the coach card and an alert follow them. */}
               {!vm.phone && (
                 <div className="grid grid-cols-2 gap-3 xl:col-start-2 xl:row-start-1 xl:grid-cols-1 xl:gap-4">
                   <MonitorCard vm={vm} href={at("/health/monitor")} />
@@ -164,7 +164,7 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
             variant="section"
             title="My Day"
             className="xl:flex xl:h-full xl:flex-col"
-            // The action menu for the day on screen: add an activity, complete the journal (the reference app, home-08).
+            // The action menu for the day on screen: add an activity, complete the journal (the reference app, home-plus-menu-open).
             action={<PlusMenu label={vm.isToday ? "Add to today" : `Add to ${formatDay(d, DAY.short)}`} />}
           >
             <div className="flex flex-col gap-3 xl:flex-1 xl:gap-4">
@@ -191,7 +191,7 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
                 ) : (
                   <EmptyState body={vm.isToday ? "No activities yet today. Workouts appear after Fitbit syncs them." : "No activities on this day."} />
                 )}
-                {/* the reference app's "+ Add activity", on past days too, beside "Start activity" today (home-01, home-03).
+                {/* the reference app's "+ Add activity", on past days too, beside "Start activity" today (home-today-overview-top, home-past-day-activities-top).
                     Pulse imports workouts, so Add explains where they come from (§11 R2); Start needs live recording. */}
                 <div className={cn("mt-3 grid gap-3", startActivity && "grid-cols-2")}>
                   <AddActivityTrigger className={CARD_BUTTON}>
@@ -206,7 +206,7 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
                   )}
                 </div>
               </SectionShell>
-              {/* Phone: Tonight's sleep (today only), then My journal, as in the reference app (home-09, home-03); Energy Bank
+              {/* Phone: Tonight's sleep (today only), then My journal, as in the reference app (home-tonights-sleep-card-scrolled, home-past-day-activities-top); Energy Bank
                   is Pulse's own and follows. Laptop: the journal spans the column and the Energy Bank / Tonight's sleep pair
                   shares the row below with equal heights, each footer on the row's bottom line. */}
               <div className="grid grid-cols-1 gap-3 xl:flex-1 xl:grid-cols-2 xl:grid-rows-[auto_1fr] xl:gap-4">
@@ -483,7 +483,7 @@ function StressCard({ vm, href, timeZone }: { vm: HomeVM; href: string; timeZone
   )
 }
 
-/** My Dashboard's Stress Monitor tile: the latest level and the day's line (the reference app, dashboard-02). */
+/** My Dashboard's Stress Monitor tile: the latest level and the day's line (the reference app, dashboard-tiles-list). */
 function StressTile({ vm, href, timeZone }: { vm: HomeVM; href: string; timeZone: string }) {
   const s = vm.stress.value
   const tone = s && STRESS_TONE[s.level]

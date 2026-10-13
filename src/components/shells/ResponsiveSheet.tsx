@@ -117,7 +117,7 @@ export function ResponsiveSheet({ open, onOpenChange, title, description, childr
                 {action}
               </div>
               <div className="min-h-0 flex-1 overflow-y-auto overscroll-none px-4 pb-6 md:px-6">{children}</div>
-              {/* Pinned actions over a fade, so the list scrolls out under them (journal-01, dashboard-03). */}
+              {/* Pinned actions over a fade, so the list scrolls out under them (journal-daily-questions-today, dashboard-customize-reorder). */}
               {footer && <div className="relative before:pointer-events-none before:absolute before:inset-x-0 before:-top-10 before:h-10 before:bg-linear-to-b before:from-transparent before:to-sheet-bottom">{foot}</div>}
             </>
           )}

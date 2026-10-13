@@ -63,7 +63,7 @@ function Chart({ s, variant }: { s: StressSeries; variant: "full" | "spark" }) {
           scale="time"
           domain={[first, last]}
           hide={!full}
-          // The hours, then the time now in bold at the end of the line (dashboard-08), clear of the last hour.
+          // The hours, then the time now in bold at the end of the line (dashboard-tiles-new-metrics), clear of the last hour.
           ticks={full ? (s.now ? [...hourTicks(first, last, 6, tz).filter((t) => last - t >= 5 * 3_600_000), s.now] : hourTicks(first, last, 4, tz)) : undefined}
           tickFormatter={(v: number) => clock(v, tz)}
           tick={full && s.now ? (p: { x?: number | string; y?: number | string; payload?: { value: number } }) => <NowTick {...p} first={first} now={s.now!} tz={tz} /> : undefined}
@@ -106,7 +106,7 @@ function Chart({ s, variant }: { s: StressSeries; variant: "full" | "spark" }) {
           {...anim}
         />
         {full && s.now && <ReferenceLine x={s.now} stroke="var(--chart-cursor)" strokeDasharray="4 4" ifOverflow="hidden" />}
-        {/* The latest reading: a white dot, as the reference app ends its line (health-01, dashboard-08). */}
+        {/* The latest reading: a white dot, as the reference app ends its line (health-stress-card-upgrade-promo, dashboard-tiles-new-metrics). */}
         {latest?.value != null && <ReferenceDot x={latest.t} y={latest.value} r={full ? 4 : 3} fill="var(--foreground)" stroke="none" />}
       </ComposedChart>
     </ChartFigure>

@@ -1,0 +1,23 @@
+{
+  "name": "pulse-mobile",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "sync": "cap sync",
+    "android": "cap open android",
+    "ios": "cap open ios",
+    "apk": "cap sync android && cd android && ./gradlew assembleRelease",
+    "apk:debug": "cap sync android && cd android && ./gradlew assembleDebug",
+    "assets": "python3 scripts/gen-assets.py && capacitor-assets generate --android --ios --iconBackgroundColor '#101518' --iconBackgroundColorDark '#101518' --splashBackgroundColor '#101518' --splashBackgroundColorDark '#101518'"
+  },
+  "packageManager": "pnpm@11.17.0",
+  "dependencies": {
+    "@capacitor/android": "8.5.3",
+    "@capacitor/core": "8.5.3",
+    "@capacitor/ios": "8.5.3"
+  },
+  "devDependencies": {
+    "@capacitor/assets": "3.0.5",
+    "@capacitor/cli": "8.5.3"
+  }
+}

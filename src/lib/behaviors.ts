@@ -1,4 +1,4 @@
-// The journal's behaviour catalogue (journal-04..09): every behaviour a person can add to the daily journal, with the
+// The journal's behaviour catalogue (journal-behavior-picker-*): every behaviour a person can add to the daily journal, with the
 // sentence the journal asks, its Select Behaviors category and the journal section it sits in. Keys are stored in
 // journal_tags and journal_entries; never rename one. The nine defaults keep their original keys.
 
@@ -13,7 +13,7 @@ export const BEHAVIOR_CATEGORIES = [
 ] as const
 export type BehaviorCategory = (typeof BEHAVIOR_CATEGORIES)[number]["key"]
 
-/** The journal's sections (journal-01): when in the day the question is about. Custom behaviours sit under "custom". */
+/** The journal's sections (journal-daily-questions-today): when in the day the question is about. Custom behaviours sit under "custom". */
 export const JOURNAL_SECTIONS = [
   { key: "daytime", title: "Daytime" },
   { key: "nighttime", title: "Nighttime" },
@@ -23,7 +23,7 @@ export const JOURNAL_SECTIONS = [
 export type JournalSection = (typeof JOURNAL_SECTIONS)[number]["key"]
 
 /**
- * A follow-up asked once the answer is yes (journal-12): a slider whose value is stored beside the answer.
+ * A follow-up asked once the answer is yes (journal-follow-up-slider-open): a slider whose value is stored beside the answer.
  * "clock" is minutes after midnight in 30-minute steps; "count" a whole number.
  */
 export type FollowUp = { question: string; kind: "clock" | "count"; min: number; max: number; step: number }

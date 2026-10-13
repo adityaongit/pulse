@@ -27,7 +27,7 @@ export type ZoneBarsProps =
       data: Metric<ZoneRow[]> | null | undefined
       /** Where the zones came from, under the rows. */
       note?: string
-      /** A link after the note (activity-02's "View HR Settings"). */
+      /** A link after the note (activity-weightlifting-hr-zones's "View HR Settings"). */
       noteLink?: { label: string; href: string }
       emptyCopy?: string
     }
@@ -97,7 +97,7 @@ function Rows({ zones, note, noteLink }: { zones: ZoneRow[]; note?: string; note
               <div aria-hidden className="flex items-baseline gap-2">
                 <span className={cn(LABEL, "font-bold uppercase")}>{z.label}</span>
                 <span className={cn(LABEL, "font-numeric text-muted-foreground uppercase")}>{range}</span>
-                {/* The share in the zone's colour, 0% included; Zones 0 and 1 stay white (activity-02, activity-05). */}
+                {/* The share in the zone's colour, 0% included; Zones 0 and 1 stay white (activity-weightlifting-hr-zones, activity-running-detail-top). */}
                 <span className={cn(LABEL, "font-numeric tabular-nums", color && z.zone > 1 ? color.text : "text-foreground")}>{sh}</span>
                 <span className="ml-auto font-numeric text-lg leading-6 font-bold tabular-nums">
                   {hmm(minutes)}

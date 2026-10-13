@@ -11,7 +11,7 @@ import type { HomeVM } from "@/server/queries/types"
 type PlanVM = NonNullable<HomeVM["plan"]>
 
 /**
- * "My Plan": one collapsible plan card with days left and a progress bar (the reference app, home-11). Built for when
+ * "My Plan": one collapsible plan card with days left and a progress bar (the reference app, home-my-plan-card-top). Built for when
  * Pulse has a plan source; Home renders it only behind `FEATURES.myPlan`.
  */
 export function MyPlan({ plan, children }: { plan: PlanVM; children?: React.ReactNode }) {

@@ -25,7 +25,7 @@ import { CAPTION, hrSeries, LABEL, statProps, TodayVsLegend } from "../_lib/view
 
 export const metadata = { title: "Strain", description: "Day Strain, your Strain Target, heart-rate zones, activities, calories burned and workout time." }
 
-/** Weekly Trends in the reference app's order (strain-25..38). */
+/** Weekly Trends in the reference app's order (strain-weekly-trends-*). */
 const WEEKLY: readonly TrendViewKey[] = ["strain", "zones13", "zones45", "steps", "calories", "strength"]
 
 /** Strain `/strain?d=` (spec §7.3). */

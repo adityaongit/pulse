@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Can’t reach Pulse</title>
+<style>
+  :root { color-scheme: dark light; --bg: #101518; --fg: #f6f8f9; --muted: #9aa7ad; --line: #2c373c; }
+  @media (prefers-color-scheme: light) { :root { --bg: #f6f8f9; --fg: #101518; --muted: #5d6a70; --line: #d5dcdf; } }
+  html, body { height: 100%; margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.4 system-ui, -apple-system, sans-serif; -webkit-text-size-adjust: 100%; }
+  main { box-sizing: border-box; min-height: 100%; display: grid; place-content: center; justify-items: center; gap: 12px; padding: max(24px, env(safe-area-inset-top)) 24px max(24px, env(safe-area-inset-bottom)); text-align: center; }
+  svg { width: 56px; height: 56px; }
+  h1 { margin: 8px 0 0; font-size: 20px; }
+  p { margin: 0; max-width: 34ch; color: var(--muted); }
+  .actions { display: grid; gap: 10px; width: min(340px, calc(100vw - 48px)); margin-top: 12px; }
+  button { min-height: 48px; padding: 0 24px; border: 0; border-radius: 999px; background: #00f19f; color: #101518; font: inherit; font-weight: 600; }
+  button.quiet { background: transparent; color: var(--fg); border: 1px solid var(--line); }
+</style>
+</head>
+<body>
+<main>
+  <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6.9" y="4.5" width="4.2" height="11" rx="2.1" fill="#00f19f"/><rect x="12.9" y="8.5" width="4.2" height="11" rx="2.1" fill="#1fa0f0"/></svg>
+  <h1>Can’t reach Pulse</h1>
+  <p id="detail">Check your connection, or whether the server is up.</p>
+  <div class="actions">
+    <button id="retry" type="button">Try again</button>
+    <button id="change" class="quiet" type="button">Change server</button>
+  </div>
+</main>
+<script>
+  const server = Capacitor.Plugins.PulseServer;
+  let current = null;
+  const webview = new URLSearchParams(location.search).get("reason") === "webview";
+  server.get().then(({ url }) => {
+    current = url ?? null;
+    const detail = document.getElementById("detail");
+    if (webview) detail.textContent = "This phone’s Android System WebView is too old to open your server safely. Update it from the Play Store, then try again.";
+    else if (current) detail.textContent = `${new URL(current).host} didn’t answer. Check your connection, or whether the server is up.`;
+  });
+  const retry = () => (current ? server.set({ url: current }) : server.pick());
+  document.getElementById("retry").addEventListener("click", retry);
+  document.getElementById("change").addEventListener("click", () => server.pick());
+  if (!webview) addEventListener("online", retry);
+</script>
+</body>
+</html>

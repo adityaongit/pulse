@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, MENU_ITEM, MENU_PANEL } from "@/components/ui/dropdown-menu"
 
-/** The activity's "..." (activity-01): the day's Strain and the heart-rate settings its zones come from. Pulse can't edit an imported workout. */
+/** The activity's "..." (activity-weightlifting-detail-top): the day's Strain and the heart-rate settings its zones come from. Pulse can't edit an imported workout. */
 export function ActivityMenu({ strainHref, settingsHref }: { strainHref: string; settingsHref: string }) {
   return (
     <DropdownMenu modal={false}>

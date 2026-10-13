@@ -15,7 +15,7 @@ import { useTabNavigate } from "./AppNavigation"
 import { useShellCalendar, useShellStatus } from "./ShellStatus"
 import { DemoChip } from "./TopBar"
 
-/** The reference app's Home glyph: a house outline framing a rising line chart (home-01). Lucide's house, door swapped for a chart. */
+/** The reference app's Home glyph: a house outline framing a rising line chart (home-today-overview-top). Lucide's house, door swapped for a chart. */
 const HomeChart = createLucideIcon("home-chart", [
   ["path", { d: "M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z", key: "frame" }],
   ["path", { d: "m7 16 3-3 2.5 2.5L17 11", key: "chart" }],

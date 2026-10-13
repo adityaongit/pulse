@@ -1,0 +1,22 @@
+{
+  "appId": "io.github.adityaongit.pulse",
+  "appName": "Pulse",
+  "webDir": "www",
+  "backgroundColor": "#101518",
+  "appendUserAgent": "PulseApp",
+  "server": {
+    "errorPath": "error.html"
+  },
+  "android": {
+    "allowMixedContent": false
+  },
+  "ios": {
+    "contentInset": "never",
+    "limitsNavigationsToAppBoundDomains": false
+  },
+  "plugins": {
+    "SystemBars": {
+      "initialViewportFitValueHint": "cover"
+    }
+  }
+}

@@ -1,0 +1,82 @@
+# Builds the Android app in mobile/ (docs/mobile.md). Pull requests get an unsigned-release check build; main and
+# workflow_dispatch get a signed APK as an artifact when the signing secrets are set; a mobile-v* tag also publishes
+# it on a GitHub release.
+name: Mobile
+
+on:
+  pull_request:
+    paths: [mobile/**, .github/workflows/mobile.yml]
+  push:
+    branches: [main]
+    paths: [mobile/**, .github/workflows/mobile.yml]
+    tags: [mobile-v*]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mobile-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  android:
+    name: android
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write
+    defaults:
+      run:
+        working-directory: mobile
+    env:
+      SIGNED: ${{ github.event_name != 'pull_request' && secrets.PULSE_KEYSTORE_BASE64 != '' }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@v6
+        with:
+          package_json_file: mobile/package.json
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+          cache-dependency-path: mobile/pnpm-lock.yaml
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: gradle
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec cap sync android
+      - name: unit tests
+        working-directory: mobile/android
+        run: ./gradlew testDebugUnitTest --no-daemon
+      - name: keystore
+        if: env.SIGNED == 'true'
+        run: echo "${{ secrets.PULSE_KEYSTORE_BASE64 }}" | base64 -d > "$RUNNER_TEMP/pulse.jks"
+      - name: assemble
+        working-directory: mobile/android
+        run: ./gradlew assembleRelease --no-daemon
+        env:
+          PULSE_KEYSTORE_FILE: ${{ env.SIGNED == 'true' && format('{0}/pulse.jks', runner.temp) || '' }}
+          PULSE_KEYSTORE_PASSWORD: ${{ secrets.PULSE_KEYSTORE_PASSWORD }}
+          PULSE_KEY_ALIAS: ${{ secrets.PULSE_KEY_ALIAS }}
+          PULSE_KEY_PASSWORD: ${{ secrets.PULSE_KEY_PASSWORD }}
+          PULSE_VERSION_CODE: ${{ github.run_number }}
+          PULSE_VERSION_NAME: ${{ startsWith(github.ref, 'refs/tags/mobile-v') && github.ref_name || '0.1.0' }}
+      - name: rename
+        if: env.SIGNED == 'true'
+        run: mv android/app/build/outputs/apk/release/app-release.apk "pulse-${{ github.ref_name }}.apk"
+      - uses: actions/upload-artifact@v7
+        if: env.SIGNED == 'true'
+        with:
+          name: pulse-android
+          path: mobile/pulse-*.apk
+          retention-days: 30
+      - name: release
+        if: env.SIGNED == 'true' && startsWith(github.ref, 'refs/tags/mobile-v')
+        run: gh release create "${{ github.ref_name }}" pulse-*.apk --repo "${{ github.repository }}" --title "Pulse for Android ${{ github.ref_name }}" --notes "Sideload this APK on Android; see docs/mobile.md."
+        env:
+          GH_TOKEN: ${{ github.token }}

@@ -12,7 +12,7 @@ import { Label } from "@/components/ui/label"
 import { BehaviorPicker, saveSelection, shownOf } from "./SelectBehaviors"
 
 /**
- * More › Behaviours (U21, journal-04..09): choose what the journal asks from the catalogue and your own behaviours,
+ * More › Behaviours (U21, journal-behavior-picker-*): choose what the journal asks from the catalogue and your own behaviours,
  * then save; add your own. A behaviour left out keeps its past answers, which still count in insights.
  */
 export function Behaviours({ vm }: { vm: BehavioursVM }) {

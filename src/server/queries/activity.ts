@@ -34,7 +34,7 @@ export async function getActivity(id: string, ctx: QueryCtx): Promise<ActivityVM
     .where(and(eq(x.userId, ctx.userId), eq(x.id, id)));
   if (!e) return null;
   const kind = activityKind(e.type);
-  // Steps inside the workout for the kinds that walk or run (activity-05), and the same for earlier ones of that kind.
+  // Steps inside the workout for the kinds that walk or run (activity-running-detail-top), and the same for earlier ones of that kind.
   const stepping = kind === "run" || kind === "walk";
   const [rows, recent, series] = await Promise.all([
     loadDays(ctx, addDays(e.day, -30), e.day),
@@ -68,7 +68,7 @@ export async function getActivity(id: string, ctx: QueryCtx): Promise<ActivityVM
         ...(kind === "ride" ? [] : [{ ...tile("pace", "Pace", here.paceS, "/km", same.map((x) => distanceOf(x).paceS), "no_data"), format: "pace" as const }]),
       ]
     : [];
-  // The reference app's order (activity-03): calories, heart rate, then duration; distance and pace after.
+  // The reference app's order (activity-weightlifting-key-stats): calories, heart rate, then duration; distance and pace after.
   const stats = [
     tile("calories", "Calories", e.calories, "kcal", same.map((x) => x.calories), "no_data"),
     tile("avgHr", "Average heart rate", a?.avgHr, "bpm", same.map((x) => statOf(x)?.avgHr)),

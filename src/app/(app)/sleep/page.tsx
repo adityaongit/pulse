@@ -28,7 +28,7 @@ const STATUS_LEGEND = [
   ["bg-optimal", "Optimal"],
 ] as const
 
-/** Weekly Trends, in the reference app's order (sleep-28..34). */
+/** Weekly Trends, in the reference app's order (sleep-weekly-trends-*). */
 const WEEKLY: readonly TrendViewKey[] = ["sleep", "hours", "hours_need", "restorative", "consistency", "time_in_bed", "efficiency"]
 
 export default async function SleepPage({ searchParams }: PageProps<"/sleep">) {

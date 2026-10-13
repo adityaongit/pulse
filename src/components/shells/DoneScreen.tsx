@@ -7,8 +7,8 @@ import { Check } from "lucide-react"
 export const DONE_MS = 1600
 
 /**
- * The reference app's confirmation after a full-screen task saves ("SAVED / Have a great day!", journal-03;
- * "SUCCESS", dashboard-06): a green ring with a check, a caps title and one line. It closes itself after `DONE_MS`.
+ * The reference app's confirmation after a full-screen task saves ("SAVED / Have a great day!", journal-saved-confirmation;
+ * "SUCCESS", dashboard-customize-saved): a green ring with a check, a caps title and one line. It closes itself after `DONE_MS`.
  */
 export function DoneScreen({ title, body, onDone }: { title: string; body: string; onDone: () => void }) {
   const done = React.useRef(onDone)

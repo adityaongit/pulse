@@ -18,7 +18,7 @@ const GLYPH =
 
 /**
  * My Day's "+": a white key that opens the action menu under it and turns into an X while open
- * (the reference app, home-08). Entries without a data source in Pulse are built but stay off (`FEATURES`).
+ * (the reference app, home-plus-menu-open). Entries without a data source in Pulse are built but stay off (`FEATURES`).
  */
 export function PlusMenu({ label }: { label: string }) {
   const [info, setInfo] = React.useState(false)

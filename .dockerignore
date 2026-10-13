@@ -16,3 +16,4 @@ e2e
 playwright.config.ts
 .github
 site
+mobile

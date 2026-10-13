@@ -21,7 +21,7 @@ function CoachGlyph() {
 type State = { text: string | null; failed: boolean }
 
 /**
- * activity-01's coach pill: "Analyzing…" while the coach reads the workout, then its one-line take; tapping opens the
+ * activity-weightlifting-detail-top's coach pill: "Analyzing…" while the coach reads the workout, then its one-line take; tapping opens the
  * coach with a question about this workout. Pinned over the page's foot, clear of the round action. One request per
  * workout per tab session (kept in sessionStorage); a failure hides the pill.
  */

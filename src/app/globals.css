@@ -245,9 +245,9 @@
   --outlook-to: #2f4a5e;
   --outlook-accent: #e8d6b4;
   /* The "+" action menu: a blue-violet panel, lighter at its top edge */
-  /* The Journal's sand glow at the top of its screen (journal-01). */
+  /* The Journal's sand glow at the top of its screen (journal-daily-questions-today). */
   --glow-sand: #8c7a63;
-  /* A journal "yes" (journal-01's blue check), and the ink drawn on any data-coloured fill (that check, a done badge). */
+  /* A journal "yes" (journal-daily-questions-today's blue check), and the ink drawn on any data-coloured fill (that check, a done badge). */
   --answer-yes: var(--recovery-blue);
   --on-color: #101518;
   /* Type on a strain-blue fill (Start Activity's heart-rate circle), white in both themes. */
@@ -278,7 +278,7 @@
   --strain-band-3: color-mix(in srgb, var(--strain) 58%, var(--card));
   --strain-band-4: color-mix(in srgb, var(--strain) 40%, var(--card));
 
-  /* Sleep stages in the reference app's 2026 hues (sleep-17, sleep-18; spec §11 R33): awake near-white, light lavender,
+  /* Sleep stages in the reference app's 2026 hues (sleep-last-night-hr-stages, sleep-last-night-stages; spec §11 R33): awake near-white, light lavender,
      SWS (deep) pink, REM purple. Bars, labels, the hypnogram and the restorative stack share them. */
   --stage-awake: #dfe3e8;
   --stage-rem: #a35cf0;
