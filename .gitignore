@@ -54,3 +54,6 @@ npm-debug.log*
 
 # This machine's compose additions (scripts/deploy.sh loads it when present)
 compose.override.yaml
+
+# Vercel CLI project link
+.vercel

@@ -14,6 +14,26 @@ describe("parseConfig", () => {
     expect(c.authSecret).toBeNull();
   });
 
+  it("DB_POOL_MAX: 10 by default, 2 on Vercel, else as set; DATABASE_SSL_CA as PEM, escaped PEM or base64", () => {
+    expect(parseConfig({}).dbPoolMax).toBe(10);
+    expect(parseConfig({ VERCEL: "1" }).dbPoolMax).toBe(2);
+    expect(parseConfig({ VERCEL: "1", DB_POOL_MAX: "1" }).dbPoolMax).toBe(1);
+    expect(() => parseConfig({ DB_POOL_MAX: "0" })).toThrow(/DB_POOL_MAX/);
+    const pem = "-----BEGIN CERTIFICATE-----\nABC\n-----END CERTIFICATE-----";
+    expect(parseConfig({}).databaseSslCa).toBeNull();
+    expect(parseConfig({ DATABASE_SSL_CA: pem }).databaseSslCa).toBe(pem);
+    expect(parseConfig({ DATABASE_SSL_CA: pem.replace(/\n/g, "\\n") }).databaseSslCa).toBe(pem);
+    expect(parseConfig({ DATABASE_SSL_CA: Buffer.from(pem).toString("base64") }).databaseSslCa).toBe(pem);
+  });
+
+  it("APP_URL defaults to the Vercel production domain, on production deployments only; APP_URL wins", () => {
+    const vercel = { VERCEL: "1", VERCEL_PROJECT_PRODUCTION_URL: "pulse-x.vercel.app" };
+    expect(parseConfig({ ...vercel, VERCEL_ENV: "production" }).appUrl).toBe("https://pulse-x.vercel.app");
+    expect(parseConfig({ ...google, ...vercel, DATA_SOURCE: "google", VERCEL_ENV: "production" }).google?.appUrl).toBe("https://pulse-x.vercel.app");
+    expect(parseConfig({ ...vercel, VERCEL_ENV: "preview" }).appUrl).toBeNull();
+    expect(parseConfig({ ...vercel, VERCEL_ENV: "production", APP_URL: "https://pulse.example.com/" }).appUrl).toBe("https://pulse.example.com");
+  });
+
   it("Google mode exposes the client, with no APP_URL by default", () => {
     const c = parseConfig({ ...google, DATA_SOURCE: "google" });
     expect(c.google).toEqual({ clientId: "id", clientSecret: "secret", appUrl: null });

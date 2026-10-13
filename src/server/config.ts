@@ -11,6 +11,13 @@ const Env = z
     DATA_SOURCE: z.enum(["demo", "google"], "must be demo or google").default("demo"),
     /** Postgres. Unset: the local dev database from compose.dev.yaml. */
     DATABASE_URL: z.string().regex(/^postgres(ql)?:\/\//, "must be a postgres:// URL").optional(),
+    /**
+     * The database's CA certificate (PEM, or the PEM base64-encoded), for a server whose certificate isn't signed by a
+     * public CA (Aiven). Set: the connection uses TLS verified against it, and DATABASE_URL's ssl* parameters are ignored.
+     */
+    DATABASE_SSL_CA: z.string().optional(),
+    /** Connections in the pool. Unset: 10, or 2 on Vercel (one function instance each, against a free plan's limit). */
+    DB_POOL_MAX: z.coerce.number("must be a number").int().min(1).max(100).optional(),
     /** Signs sessions and auth tokens (better-auth). Required in production: `openssl rand -base64 32`. */
     BETTER_AUTH_SECRET: z.string().min(32, "use at least 32 characters (openssl rand -base64 32)").optional(),
     /** Who resets forgotten passwords (shown on /forgot as an email button). Unset: "ask whoever runs this server". */
@@ -84,11 +91,17 @@ export function parseConfig(env: Record<string, string | undefined>) {
     throw new ConfigError(`Invalid configuration:\n${lines.join("\n")}`);
   }
   const e = r.data;
+  // On a Vercel production deployment with no APP_URL: its production domain (set by Vercel), so a one-click deploy
+  // signs in and connects Google without knowing its URL up front. Previews keep the request's own host.
+  const vercelUrl = env.VERCEL_ENV === "production" && env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${env.VERCEL_PROJECT_PRODUCTION_URL}` : undefined;
+  const appUrl = (e.APP_URL ?? vercelUrl)?.replace(/\/$/, "") ?? null;
   return {
     dataSource: e.DATA_SOURCE,
     databaseUrl: e.DATABASE_URL ?? "postgres://pulse:pulse@localhost:5432/pulse",
+    databaseSslCa: e.DATABASE_SSL_CA ? pem(e.DATABASE_SSL_CA) : null,
+    dbPoolMax: e.DB_POOL_MAX ?? (env.VERCEL ? 2 : 10),
     authSecret: e.BETTER_AUTH_SECRET ?? null,
-    appUrl: e.APP_URL?.replace(/\/$/, "") ?? null,
+    appUrl,
     /** The starting sign-up mode; the admin panel's choice (server_settings) wins once made. */
     signup: e.DISABLE_SIGNUP ? ("closed" as const) : e.SIGNUP,
     adminEmails: e.ADMIN_EMAILS ?? [],
@@ -104,10 +117,16 @@ export function parseConfig(env: Record<string, string | undefined>) {
           clientId: e.GOOGLE_CLIENT_ID!,
           clientSecret: e.GOOGLE_CLIENT_SECRET!,
           /** Pins the OAuth redirect host (behind a proxy). Unset: the host the request came in on. */
-          appUrl: e.APP_URL?.replace(/\/$/, "") ?? null,
+          appUrl,
         }
       : null,
   };
+}
+
+/** A PEM as pasted (literal `\\n` escapes allowed, as some dashboards keep a value on one line), or base64 of one. */
+function pem(v: string) {
+  const s = v.trim();
+  return s.includes("-----BEGIN") ? s.replace(/\\n/g, "\n") : Buffer.from(s, "base64").toString("utf8");
 }
 
 export type Config = ReturnType<typeof parseConfig>;

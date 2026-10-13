@@ -1,7 +1,7 @@
 # Other ways to reach Pulse
 
 [setup.md](setup.md) puts Pulse on HTTPS with Tailscale, so only your own devices can open it. This page sketches the
-alternatives. Follow [setup.md](setup.md) for everything else, and swap its Tailscale steps (3 and 6.2) for one of
+alternatives (for Vercel with a hosted Postgres, see [vercel.md](vercel.md)). Follow [setup.md](setup.md) for everything else, and swap its Tailscale steps (3 and 6.2) for one of
 these.
 
 Whichever you pick:

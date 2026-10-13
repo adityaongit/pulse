@@ -117,6 +117,9 @@ list of what's wrong.
 | `DATA_SOURCE` | no (`demo`) | `demo`: generated data for one shared demo user; `google`: real data, accounts, each user connects Google |
 | `POSTGRES_PASSWORD` | with compose | The database password; compose builds `DATABASE_URL` from it |
 | `DATABASE_URL` | outside compose | Defaults to `postgres://pulse:pulse@localhost:5432/pulse` (compose.dev.yaml) |
+| `DATABASE_SSL_CA` | no | The database's CA certificate (PEM or base64), for a server signed by its own CA such as Aiven; the URL's `ssl*` parameters are then ignored |
+| `DB_POOL_MAX` | no (10; 2 on Vercel) | Connections in the database pool |
+| `CRON_SECRET` | on Vercel | The secret `/api/cron` checks; it refuses every request without it ([docs/vercel.md](vercel.md)) |
 | `BETTER_AUTH_SECRET` | in production | Signs sessions; `openssl rand -base64 32` |
 | `ADMIN_EMAILS` | with Google | Comma-separated owner emails: they open the admin panel; on a server with no accounts, they sign up without an invite |
 | `SIGNUP` | no (`invite`) | The starting sign-up mode (`invite`, `open` or `closed`) until an admin changes it in the panel |
@@ -126,7 +129,7 @@ list of what's wrong.
 | `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT` | no | Turns on notifications ("Recovery ready", "Pulse can't sync", and the coach's optional "Your brief is ready"). Make the keys with `npx web-push generate-vapid-keys`; the subject is `mailto:you@example.com`. Set all three or none |
 | `ANDROID_PACKAGE_NAME`, `ANDROID_CERT_SHA256` | no | Your Android APK's package and signing key fingerprints, served as `/.well-known/assetlinks.json` so the APK opens without a URL bar ([docs/pwa.md](pwa.md#android-apk-with-pwabuilder)). Set both or neither |
 | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | with Google | The OAuth client |
-| `APP_URL` | no (recommended behind a proxy) | The public URL; it pins the OAuth redirect and is the trusted origin for sign-in ([below](#app_url)) |
+| `APP_URL` | no (recommended behind a proxy) | The public URL; it pins the OAuth redirect and is the trusted origin for sign-in ([below](#app_url)). On a Vercel production deployment it defaults to the project's production domain |
 | `AVATAR_URL` | no | A default avatar photo; a user's Google photo or upload wins |
 
 Each user's time zone is set in onboarding and Settings › Profile, not in the environment.
