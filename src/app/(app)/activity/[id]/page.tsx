@@ -81,7 +81,7 @@ export default async function ActivityPage({ params }: PageProps<"/activity/[id]
       secondary={[
         tiles.length > 0 && (
           <SectionShell key="stats" variant="section" title="Key statistics" aside="vs. 30-day average" level={2} className={cn("flex flex-col", noHr && "xl:col-span-2")}>
-            {/* Phone: one scrolling row, the next tile peeking at the edge (activity-03), bleeding to the edges. From md the
+            {/* Phone: one scrolling row, the next tile peeking at the edge (activity-weightlifting-key-stats), bleeding to the edges. From md the
                 tiles wrap into a grid instead, so a half-width column never hides a tile behind a scrollbar-less scroll. */}
             <ul className="-mx-4 flex flex-1 snap-x snap-mandatory scroll-px-4 gap-3 overflow-x-auto overscroll-x-contain px-4 pb-1 [scrollbar-width:none] md:mx-0 md:grid md:grid-cols-[repeat(auto-fit,minmax(11rem,1fr))] md:overflow-visible md:px-0 md:pb-0">
               {tiles.map((k) => (
@@ -102,7 +102,7 @@ export default async function ActivityPage({ params }: PageProps<"/activity/[id]
           </SectionShell>
         ),
       ].filter(Boolean)}
-      // With the coach set up, its pill takes the insight's place (activity-01, spec §11 R44); without it, the templated insight.
+      // With the coach set up, its pill takes the insight's place (activity-weightlifting-detail-top, spec §11 R44); without it, the templated insight.
       footer={coach ? <CoachGlance id={vm.id} question={`Tell me about my ${vm.name.toLowerCase()} on ${dayLabel(vm.day, today).toLowerCase()}.`} /> : vm.insight && <InsightCard body={vm.insight} />}
     />
   )
@@ -113,7 +113,7 @@ const STAT_LABEL = "text-xs leading-4 font-bold tracking-[0.1em] text-foreground
 const HR_SETTINGS = "/settings?s=account"
 
 /**
- * The activity hero (activity-01, activity-05): strain in blue with a chip of this kind's 30-day average, then the steps
+ * The activity hero (activity-weightlifting-detail-top, activity-running-detail-top): strain in blue with a chip of this kind's 30-day average, then the steps
  * in the workout for runs and walks, or the cardio / muscular split once a source estimates it (FEATURES.muscularLoad).
  */
 function Hero({ vm }: { vm: ActivityVM }) {
@@ -152,7 +152,7 @@ function HeroStat({ label, value, raw, average, format, valueClass }: { label: s
   )
 }
 
-/** activity-01's split: Cardio and Muscular over one bar with a white divider at the split, the shares under it. */
+/** activity-weightlifting-detail-top's split: Cardio and Muscular over one bar with a white divider at the split, the shares under it. */
 function CardioMuscular({ split }: { split: NonNullable<ActivityVM["split"]> }) {
   const cardio = Math.round(split.cardio * 100)
   return (

@@ -222,7 +222,7 @@ function Wakes({ wakes, className }: { wakes: { at: number; width: number }[]; c
 }
 
 /**
- * The reference app's Sleep Efficiency card (sleep-24, sleep-25): the share with its arrow and prior mean, an asleep bar
+ * The reference app's Sleep Efficiency card (sleep-consistency-efficiency-cards, sleep-efficiency-card): the share with its arrow and prior mean, an asleep bar
  * cut where each spell awake fell, an awake bar on the hatched track marked at the same places, then the wake events.
  */
 export function SleepEfficiency({ vm }: { vm: SleepVM }) {
@@ -260,7 +260,7 @@ export function SleepEfficiency({ vm }: { vm: SleepVM }) {
 const LEVELS: StressLevel[] = ["high", "medium", "low"]
 
 /**
- * The reference app's Sleep Stress card (sleep-26, sleep-27): the share of the night in high stress against the prior
+ * The reference app's Sleep Stress card (sleep-stress-card, sleep-stress-card-2): the share of the night in high stress against the prior
  * 30 nights, the night's 0-3 line, then a row per level with its share, time and a filled hatched track. Built and off
  * (`FEATURES.sleepStress`) until Pulse scores stress during sleep.
  */

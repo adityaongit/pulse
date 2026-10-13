@@ -347,7 +347,7 @@ export const journalEntries = pgTable(
   (t) => [primaryKey({ columns: [t.userId, t.day, t.tag] })],
 );
 
-/** The journal's free-text note for a day (journal-02). No row means no note. */
+/** The journal's free-text note for a day (journal-daily-questions-notes). No row means no note. */
 export const journalNotes = pgTable(
   "journal_notes",
   {

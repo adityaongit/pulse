@@ -39,7 +39,7 @@ const SPAN_COLOR = { workout: "var(--strain)", sleep: "var(--sleep)" } as const
 
 /**
  * A marked stretch's header: a 2 px accent along its top edge, and an icon with its name centred above it (WHOOP's day
- * chart). `iconOnly`: the Stress Monitor's moon and walker, drawn over even a narrow stretch (dashboard-08).
+ * chart). `iconOnly`: the Stress Monitor's moon and walker, drawn over even a narrow stretch (dashboard-tiles-new-metrics).
  */
 function SpanMark({ viewBox, kind, text, iconOnly }: { viewBox?: { x?: number; y?: number; width?: number }; kind: ChartSpan["kind"]; text: string; iconOnly?: boolean }) {
   const { x = 0, y = 0, width = 0 } = viewBox ?? {}
@@ -148,7 +148,7 @@ function Chart({ hr, variant }: { hr: HrSeries; variant: "day" | "activity" }) {
   const hotTop = hot.length ? Math.max(...hot) : 0
   const hotBottom = hot.length ? Math.min(...hot) : 0
   const bands = zoneBands(hr.zones ?? [])
-  // An activity marks its start and end with dashed lines and bold times under them (activity-01, activity-05).
+  // An activity marks its start and end with dashed lines and bold times under them (activity-weightlifting-detail-top, activity-running-detail-top).
   const workout = variant === "activity" ? workouts[0] : undefined
 
   return (

@@ -279,7 +279,7 @@ function statSpecs(row: DayRow | undefined, isToday: boolean, rows: Map<string, 
     skin: spec(skin, maybe(row && skin(row), skinReason), "°C", "toward_zero", metricHref("skin")),
     stress: spec((r) => r.stress?.average, maybe(row?.stress?.average, dailyReason), undefined, "down", "/health/stress", "decimal1"),
   } as Record<DashboardKey, StatSpec>;
-  // The reference app's rows (dashboard-03..09); each opens its Trend View, or its screen where it has none.
+  // The reference app's rows (dashboard-customize-*, dashboard-tiles-new-metrics*); each opens its Trend View, or its screen where it has none.
   const sleepMain = (r: DayRow) => r.sleep?.main;
   const restorative = (r: DayRow) => {
     const s = sleepMain(r);

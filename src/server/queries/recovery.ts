@@ -184,7 +184,7 @@ const ADVICE: Record<ReturnType<typeof recoveryBand>, string> = {
 };
 
 /**
- * The Recovery screen's insight, in the reference app's shape (recovery-05, spec §11 R34): the input that moved the score
+ * The Recovery screen's insight, in the reference app's shape (recovery-score-insight-card, spec §11 R34): the input that moved the score
  * most, its value against its typical range (baseline ± 1 SD), the band it led to, then the day's advice.
  */
 export function screenInsight(cs: Contributor[], score: number): string {

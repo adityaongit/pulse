@@ -20,7 +20,7 @@ export type SleepAlarmVM = { at: number; mode: "exact" | "window" }
 
 /**
  * Home's "Tonight's sleep" body: bedtime for the chosen goal, typical wake, goal toggle (spec §7.1, journey 4). With an
- * alarm (the reference app, home-09) the right block is the alarm and an "Edit alarm" button closes the card.
+ * alarm (the reference app, home-tonights-sleep-card-scrolled) the right block is the alarm and an "Edit alarm" button closes the card.
  */
 export function TonightPlan({ plan, timeZone, alarm }: { plan: SleepPlanVM; timeZone: string; alarm?: SleepAlarmVM | null }) {
   const wake = FEATURES.sleepAlarm && alarm ? alarm : null

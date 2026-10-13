@@ -36,7 +36,7 @@ const SHOW: Record<string, { format: FormatKey; unit?: string; scale?: number }>
 const withUnit = (text: string, unit?: string) => (unit ? `${text}${isSymbolUnit(unit) ? "" : NBSP}${unit}` : text)
 
 /**
- * A Healthspan group (Sleep, Strain, Fitness): one row per factor that opens in place (health-03), showing how the
+ * A Healthspan group (Sleep, Strain, Fitness): one row per factor that opens in place (health-whoop-age-sleep-factors), showing how the
  * factor stands ("Outperforming"), the target for your age, the evidence and VIEW TREND. `?contributor=` opens a row
  * on arrival.
  */

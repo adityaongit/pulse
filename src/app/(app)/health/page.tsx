@@ -44,7 +44,7 @@ function paceChip(delta: number | null) {
 }
 
 /**
- * The hub's age block (health-02, health-04): the orb on the page with no card around it, then the Pace of Aging card
+ * The hub's age block (health-whoop-age-hero, health-monitor-card-labs): the orb on the page with no card around it, then the Pace of Aging card
  * (the ruler and its week-on-week chip) ending in GO TO HEALTHSPAN. On laptop the orb sits beside the card.
  */
 function AgeBlock({ m }: { m: HealthHubVM["healthspan"] }) {
@@ -112,7 +112,7 @@ function AgeBlock({ m }: { m: HealthHubVM["healthspan"] }) {
 }
 
 /**
- * health-01's Blood Pressure Insights (Beta), built and off (FEATURES.bloodPressure): Pulse reads no blood pressure.
+ * health-stress-card-upgrade-promo's Blood Pressure Insights (Beta), built and off (FEATURES.bloodPressure): Pulse reads no blood pressure.
  * The card says what it would show; the page renders it only when the flag is on.
  */
 function BloodPressure() {
@@ -259,7 +259,7 @@ export default async function HealthPage() {
   const vm = await getHealthHub(await userCtx())
   return (
     <PageShell title="Health">
-      {/* The reference app's order (health-01, 02, 04): Stress Monitor, the age block, then Health Monitor; Pulse's
+      {/* The reference app's order (health-stress-card-upgrade-promo, health-whoop-age-hero, health-monitor-card-labs): Stress Monitor, the age block, then Health Monitor; Pulse's
           Fitness and Heart rate follow. */}
       <HealthCards>
         <SectionShell variant="card" level={2} title="Stress Monitor" info={false} href="/health/stress" className="xl:col-span-2">

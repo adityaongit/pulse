@@ -24,7 +24,7 @@ const RECENT_TYPE: Partial<Record<ActivityKind, string>> = { walk: "walking", ru
 type Tab = "all" | ActivityCategory
 
 /**
- * Select Activity (activity-07, activity-09): search, All / Strain / Recovery / Sleep, then "Most recent" (the kinds of
+ * Select Activity (activity-add-type-picker, activity-start-type-picker): search, All / Strain / Recovery / Sleep, then "Most recent" (the kinds of
  * the last 30 days' workouts) over "All A-Z", each a card with the activity's icon and its name in caps.
  */
 export function SelectActivity({ recent, onSelect }: { recent: ActivityKind[]; onSelect: (key: string) => void }) {
@@ -101,7 +101,7 @@ export function SelectActivity({ recent, onSelect }: { recent: ActivityKind[]; o
 const localInput = (d: Date) => new Date(d.getTime() - d.getTimezoneOffset() * 60_000).toISOString().slice(0, 16)
 
 /**
- * Add Activity (activity-06): the activity, its start and end, and Save once the times make sense. Pulse can't write a
+ * Add Activity (activity-add-form-empty): the activity, its start and end, and Save once the times make sense. Pulse can't write a
  * workout to Google Health, so it stays off (FEATURES.logActivity) and `onSave` has no caller yet; the wear-location
  * question has no Fitbit counterpart and is left out.
  */
@@ -199,7 +199,7 @@ function AddActivitySheet({ open, onOpenChange, recent, onSave }: { open: boolea
 }
 
 /**
- * Start Activity (activity-08): the activity with a picker, Track route, the live heart rate in a large strain-blue
+ * Start Activity (activity-start-live-map): the activity with a picker, Track route, the live heart rate in a large strain-blue
  * circle, today's Strain Target with its toggle, and Start activity. Pulse has no live heart rate or location while
  * recording, so it stays off (FEATURES.startActivity), the heart rate reads "--" and `onStart` has no caller yet.
  */

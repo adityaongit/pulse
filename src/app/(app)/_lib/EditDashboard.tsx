@@ -18,7 +18,7 @@ export type EditDashboardProps = {
   empty?: DashboardKey[]
 }
 
-/** dashboard-03: each metric a card with its icon and caps name. */
+/** dashboard-customize-reorder: each metric a card with its icon and caps name. */
 const CARD = "flex min-h-14 items-center gap-3 rounded-xl bg-foreground/[0.07] pl-4"
 const NAME = "min-w-0 flex-1 text-[13px] leading-4 font-bold tracking-[0.1em] text-balance uppercase"
 const ICON = "grid size-5 shrink-0 place-items-center text-muted-foreground [&_svg]:size-5 [&_svg]:stroke-[1.75]"
@@ -30,7 +30,7 @@ const moveTo = <T,>(items: T[], from: number, to: number) => {
 }
 
 /**
- * Home › My Dashboard's CUSTOMIZE (dashboard-03..06, spec §11 CD1, CD2, R41): the reference app's full-screen editor.
+ * Home › My Dashboard's CUSTOMIZE (dashboard-customize-*, spec §11 CD1, CD2, R41): the reference app's full-screen editor.
  * "My Dashboard" holds the shown metrics in order, each dragged by its handle (or moved with the arrow keys on it) and
  * removed with its minus; "Add to My Dashboard" holds the rest by group with a search field, and a tap adds one at the
  * end. SAVE stores the list and shows Success.
@@ -108,7 +108,7 @@ export function EditDashboard({ keys, empty = [] }: EditDashboardProps) {
 
   return (
     <>
-      {/* the reference app's "CUSTOMIZE" with a pencil at the section header's right (home-12). */}
+      {/* the reference app's "CUSTOMIZE" with a pencil at the section header's right (home-my-plan-card-scroll-up). */}
       <Button
         variant="ghost"
         aria-label="Customize My Dashboard"
@@ -150,7 +150,7 @@ export function EditDashboard({ keys, empty = [] }: EditDashboardProps) {
                     {STAT_ICON[key]}
                   </span>
                   <span className={NAME}>{label}</span>
-                  {/* dashboard-03: the chart tile carries a small bar-chart glyph. */}
+                  {/* dashboard-customize-reorder: the chart tile carries a small bar-chart glyph. */}
                   {key === "stress" && <ChartNoAxesColumn aria-hidden strokeWidth={1.5} className="size-5 shrink-0 text-muted-foreground" />}
                   {/* the reference app hides removal behind a swipe that members could not find; Pulse shows it (spec §11 CD2). */}
                   <Button id={`dashboard-remove-${key}`} variant="ghost" size="icon-touch" aria-label={`Remove ${label}`} onClick={() => remove(i)} className="text-foreground-secondary hover:text-foreground">

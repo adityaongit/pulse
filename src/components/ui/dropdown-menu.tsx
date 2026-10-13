@@ -249,7 +249,7 @@ function DropdownMenuSubContent({
   )
 }
 
-/** The reference app's menu (home-08): a blue-violet panel of caps rows. Add the width per menu. */
+/** The reference app's menu (home-plus-menu-open): a blue-violet panel of caps rows. Add the width per menu. */
 const MENU_PANEL = "rounded-2xl bg-popover p-1.5 text-foreground shadow-overlay ring-1 ring-foreground/10"
 const MENU_ITEM = "h-12 gap-3 rounded-xl px-3 text-[13px] leading-4 font-bold tracking-[0.1em] uppercase focus:bg-foreground/10 focus:text-foreground"
 

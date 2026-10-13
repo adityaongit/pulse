@@ -201,7 +201,7 @@ const HS_META: Record<string, Omit<HealthspanContributor, "metric" | "recent" | 
   },
 };
 const HS_ORDER = ["sleepHours", "sri", "zone13", "zone45", "strength", "steps", "vo2max", "restingHr", "leanMass"];
-/** Each factor's Trend View (health-03's VIEW TREND). */
+/** Each factor's Trend View (health-whoop-age-sleep-factors's VIEW TREND). */
 const HS_TREND: Record<string, TrendViewKey> = {
   sleepHours: "hours",
   sri: "consistency",

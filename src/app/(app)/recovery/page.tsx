@@ -14,7 +14,7 @@ import { statProps, TodayVsLegend } from "../_lib/view"
 
 export const metadata = { title: "Recovery", description: "Your Recovery and what shaped it: HRV, resting heart rate, breathing and sleep against the last 30 days." }
 
-/** Weekly Trends: Recovery and HRV as captured (recovery-12..15), then the other contributors in row order. */
+/** Weekly Trends: Recovery and HRV as captured (recovery-weekly-trends-*), then the other contributors in row order. */
 const WEEKLY: readonly TrendViewKey[] = ["recovery", "hrv", "rhr", "resp", "sleep"]
 
 /** Recovery `/recovery?d=` (spec §7.2, §11 R34): the ring, today's inputs against the last 30 days, behaviours, trends. */

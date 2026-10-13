@@ -257,7 +257,7 @@ export function ScoreDial(props: ScoreDialProps) {
 
       {/* The hole: the square inside the stroke. One centred column whose type and gaps scale with the inner
           diameter, so wordmark, value, label and tags keep the same clearance from the ring at every size (spec §11 F23).
-          Gaps follow the reference app's dials (recovery-01, sleep-01): about 8.5% of the ring's width over the value
+          Gaps follow the reference app's dials (recovery-score-dial-top, sleep-performance-dial-top): about 8.5% of the ring's width over the value
           and 8% under it, 10 and 9 cqi of the hole. */}
       <div className="absolute @container grid place-content-center justify-items-center text-center" style={{ inset: radii.hole }}>
         {lg && (!empty || loading) && !gauge && (

@@ -7,7 +7,7 @@ const TONE = { up: "optimal", down: "warning", neutral: "neutral" } as const
 const DIR = { up: "up", down: "down", neutral: "flat" } as const
 
 /**
- * The reference app's Behavior Insights card on Recovery (recovery-11, spec §11 R34): a lightbulb title linking to
+ * The reference app's Behavior Insights card on Recovery (recovery-behavior-insights-card, spec §11 R34): a lightbulb title linking to
  * Journal insights, one line of copy, then a chip per behaviour from the day before, green up when it has gone with a
  * higher next-day Recovery, orange down when lower, grey when no clear effect.
  */

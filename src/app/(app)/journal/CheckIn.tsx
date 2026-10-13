@@ -29,7 +29,7 @@ import { Slider } from "@/components/ui/slider"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { SelectBehaviorsSheet } from "../more/behaviours/SelectBehaviors"
 
-/** journal-01's answer keys: a grey square each; "no" lights white, "yes" blue. 44 px for touch. */
+/** journal-daily-questions-today's answer keys: a grey square each; "no" lights white, "yes" blue. 44 px for touch. */
 const ANSWER =
   "size-11 rounded-[10px] bg-foreground/10 text-foreground/80 transition-[background-color,color,scale] duration-150 ease-standard hover:bg-foreground/15 active:scale-[0.96] [&_svg]:size-[18px]"
 export const TAG_CLASS = "h-7 rounded-full px-3 text-[13px] font-semibold"
@@ -114,7 +114,7 @@ const heading = (day: string, today: string) =>
     : `What happened on ${formatDay(day, { weekday: "long", month: "long", day: "numeric" })}?`
 
 /**
- * The Journal (spec §7.11, journal-01..15), mounted once in the app layout: `?checkin=1` opens it full screen over
+ * The Journal (spec §7.11, journal-*), mounted once in the app layout: `?checkin=1` opens it full screen over
  * whatever screen is showing, for that screen's day (`?d=`); the strip and arrows inside move between days. Closing it
  * (X, Back, Save) leaves that screen as it was (spec §11 UX2).
  */
@@ -232,7 +232,7 @@ export function CheckInSheet() {
       load(to)
     } else finish()
   }
-  // The reference app asks on every X (journal-15) until "Don't show me this message again"; a day switch asks only
+  // The reference app asks on every X (journal-dismiss-dialog) until "Don't show me this message again"; a day switch asks only
   // when it would drop answers.
   const close = (next: boolean) => {
     if (next || saving) return
@@ -333,7 +333,7 @@ export function CheckInSheet() {
           </>
         }
       >
-        {/* ‹ TODAY ›: a day back or forward; never past today (journal-01). */}
+        {/* ‹ TODAY ›: a day back or forward; never past today (journal-daily-questions-today). */}
         <nav aria-label="Journal day" className="flex items-center justify-center gap-2">
           <Button variant="ghost" size="icon-touch" aria-label={`Previous day, ${formatDay(prev, DAY.long)}`} onClick={() => go(prev)}>
             <ChevronLeft aria-hidden strokeWidth={2} className="size-5" />
@@ -398,7 +398,7 @@ export function CheckInSheet() {
                             </ToggleGroupItem>
                           </ToggleGroup>
                         </div>
-                        {/* journal-12: a "yes" opens its follow-up; "--" until the slider moves. */}
+                        {/* journal-follow-up-slider-open: a "yes" opens its follow-up; "--" until the slider moves. */}
                         {f && v !== undefined && v > 0 && (
                           <div className="border-t border-border pt-3 pb-1">
                             <div className="flex items-baseline justify-between gap-3 px-2">
@@ -480,7 +480,7 @@ export function CheckInSheet() {
 
       <SelectBehaviorsSheet open={picking} onOpenChange={setPicking} onSaved={() => setRequest((r) => ({ day, n: (r?.n ?? 0) + 1, keep: true }))} />
 
-      {/* journal-15. */}
+      {/* journal-dismiss-dialog. */}
       <Dialog open={!!confirm} onOpenChange={(o) => !o && keepEditing()}>
         <DialogContent className="gap-5 bg-linear-to-b from-popover-top to-popover p-6 ring-1 ring-border sm:max-w-sm">
           <DialogHeader className="items-center pt-4 text-center">
