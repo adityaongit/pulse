@@ -144,15 +144,16 @@ const schema = [softwareApp(Astro.site!, description), faqPage(faq)]
 ---
 
 <Base title={title} description={description} schema={schema} keywords={keywords}>
-  <!-- Hero: one message, two actions, then the product rising out of the page. -->
+  <!-- Hero: one message, the two ways to run it (a server or the Android app), then the product rising out of the page. -->
   <section class="hero" aria-labelledby="hero-h">
     <div class="wrap hero-copy">
       <h1 id="hero-h">Recovery, strain and sleep from your Google&nbsp;Health data.</h1>
-      <p class="sub">Pulse turns what your Fitbit or Pixel Watch syncs to Google Health into daily scores, on a server you own. Built on Fitbit Air. Free and self-hosted.</p>
+      <p class="sub">Pulse turns what your Fitbit or Pixel Watch syncs to Google Health into daily scores, on a server you own or right on your Android phone. Built on Fitbit Air. Free.</p>
       <div class="actions">
-        <a class="button button-primary" href={SETUP_GUIDE}>Self-host Pulse</a>
-        <a class="button button-quiet" href="#features">See the features</a>
+        <a class="button button-primary" href={SETUP_GUIDE}><Icon name="server" stroke={2} />Self-host Pulse</a>
+        <a class="button button-light" href={MOBILE_DOWNLOAD}><Icon name="smartphone" stroke={2} />Get the Android app</a>
       </div>
+      <p class="hero-note">The Android app needs no server or account: it scores your Fitbit data on the phone, from Health Connect. <a href={MOBILE_REPO}>Pulse Mobile on GitHub</a></p>
     </div>
     <div class="stage">
       <div class="glow" aria-hidden="true"></div>
@@ -420,9 +421,10 @@ const schema = [softwareApp(Astro.site!, description), faqPage(faq)]
   <section class="wrap sec" aria-labelledby="cta-h">
     <div class="cta panel" data-reveal>
       <h2 id="cta-h">See what your Google Health data already knows.</h2>
-      <p class="lede">Free for personal use. Your server, your data.</p>
+      <p class="lede">Free for personal use. Your server or your phone, your data.</p>
       <div class="actions">
-        <a class="button button-primary" href={SETUP_GUIDE}>Self-host Pulse</a>
+        <a class="button button-primary" href={SETUP_GUIDE}><Icon name="server" stroke={2} />Self-host Pulse</a>
+        <a class="button button-light" href={MOBILE_DOWNLOAD}><Icon name="smartphone" stroke={2} />Get the Android app</a>
         <a class="button button-quiet" href={REPO}><GitHubMark class="b-icon" />View source</a>
       </div>
     </div>
@@ -539,6 +541,18 @@ const schema = [softwareApp(Astro.site!, description), faqPage(faq)]
     font-weight: 680;
     line-height: 0.98;
     letter-spacing: -0.045em;
+  }
+  .hero-note {
+    margin-top: 16px;
+    max-width: 52ch;
+    color: var(--muted-foreground);
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+  .hero-note a {
+    color: var(--foreground);
+    font-weight: 600;
+    white-space: nowrap;
   }
   .sub {
     margin-top: 24px;

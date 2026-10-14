@@ -247,6 +247,17 @@
     background: #3df5b5;
   }
 
+  /* The second way in, as strong as the first: white with ink on it, so the two read as a choice, not a ranking. */
+  .button-light {
+    background: var(--foreground);
+    color: var(--background);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.6), 0 8px 24px -8px rgb(255 255 255 / 0.25);
+  }
+
+  .button-light:hover {
+    background: #e6eaec;
+  }
+
   .button-quiet {
     color: var(--foreground);
     background: rgb(255 255 255 / 0.04);
