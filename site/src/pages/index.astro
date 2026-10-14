@@ -4,6 +4,7 @@ import Faq from "../components/Faq.astro"
 import Device from "../components/Device.astro"
 import Icon from "../components/Icon.astro"
 import GitHubMark from "../components/GitHubMark.astro"
+import AndroidMark from "../components/AndroidMark.astro"
 import { METRICS, metricPath, metricByAppSlug } from "../data/metrics"
 import { COMPARISONS } from "../data/compare"
 import { REPO, SETUP_GUIDE, LICENSE_URL, CONTACT_EMAIL, MOBILE_REPO, MOBILE_DOWNLOAD } from "../config"
@@ -151,7 +152,7 @@ const schema = [softwareApp(Astro.site!, description), faqPage(faq)]
       <p class="sub">Pulse turns what your Fitbit or Pixel Watch syncs to Google Health into daily scores, on a server you own or right on your Android phone. Built on Fitbit Air. Free.</p>
       <div class="actions">
         <a class="button button-primary" href={SETUP_GUIDE}><Icon name="server" stroke={2} />Self-host Pulse</a>
-        <a class="button button-light" href={MOBILE_DOWNLOAD}><Icon name="smartphone" stroke={2} />Get the Android app</a>
+        <a class="button button-light" href={MOBILE_DOWNLOAD}><AndroidMark />Get the Android app</a>
       </div>
       <p class="hero-note">The Android app needs no server or account: it scores your Fitbit data on the phone, from Health Connect. <a href={MOBILE_REPO}>Pulse Mobile on GitHub</a></p>
     </div>
@@ -424,7 +425,7 @@ const schema = [softwareApp(Astro.site!, description), faqPage(faq)]
       <p class="lede">Free for personal use. Your server or your phone, your data.</p>
       <div class="actions">
         <a class="button button-primary" href={SETUP_GUIDE}><Icon name="server" stroke={2} />Self-host Pulse</a>
-        <a class="button button-light" href={MOBILE_DOWNLOAD}><Icon name="smartphone" stroke={2} />Get the Android app</a>
+        <a class="button button-light" href={MOBILE_DOWNLOAD}><AndroidMark />Get the Android app</a>
         <a class="button button-quiet" href={REPO}><GitHubMark class="b-icon" />View source</a>
       </div>
     </div>
