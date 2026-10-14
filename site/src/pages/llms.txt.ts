@@ -2,7 +2,7 @@ import type { APIRoute } from "astro"
 import { METRICS, metricPath } from "../data/metrics"
 import { COMPARISONS } from "../data/compare"
 import { markdownPath } from "../lib/markdown"
-import { REPO, SETUP_GUIDE } from "../config"
+import { MOBILE_REPO, REPO, SETUP_GUIDE } from "../config"
 import { getPosts, postPath } from "../lib/posts"
 
 // Format from https://llmstxt.org: an H1, a blockquote summary, then H2 sections of link lists.
@@ -28,6 +28,7 @@ export const GET: APIRoute = async ({ site }) => {
     section("Optional", [
       link("Everything in one file", "/llms-full.txt", "Every page above as Markdown, concatenated."),
       link("Source code", REPO, "Implementation, tests and license."),
+      link("Pulse Mobile", MOBILE_REPO, "The separate Android app: scores Health Connect data on the phone, no server."),
       link("Privacy policy", "/privacy/", "Public website and self-hosted app data handling."),
       link("Terms", "/terms/", "License and use of Pulse."),
     ]),

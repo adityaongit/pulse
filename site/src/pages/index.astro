@@ -6,7 +6,7 @@ import Icon from "../components/Icon.astro"
 import GitHubMark from "../components/GitHubMark.astro"
 import { METRICS, metricPath, metricByAppSlug } from "../data/metrics"
 import { COMPARISONS } from "../data/compare"
-import { REPO, SETUP_GUIDE, LICENSE_URL, CONTACT_EMAIL } from "../config"
+import { REPO, SETUP_GUIDE, LICENSE_URL, CONTACT_EMAIL, MOBILE_REPO, MOBILE_DOWNLOAD } from "../config"
 import { faqPage, softwareApp } from "../lib/schema"
 import type { Shot } from "../data/metrics"
 import type { Part } from "../lib/screens"
@@ -105,6 +105,10 @@ const faq = [
   {
     q: "What do I need to run it?",
     a: `A wearable that syncs to the Google Health app (Pulse is built and tested on the Fitbit Air), a Google Cloud project for the OAuth client, and any machine that runs Docker: a home server, a NAS or a small cloud VM. To reach it from your phone, give it an HTTPS address with a tunnel or reverse proxy. The <a href="${SETUP_GUIDE}">setup guide</a> covers each step.`,
+  },
+  {
+    q: "Is there an Android app that needs no server?",
+    a: `Yes: <a href="${MOBILE_REPO}">Pulse Mobile</a>, a separate Android app. It reads your Fitbit data from Health Connect and scores and stores it on the phone, with no server, no Google Cloud project and no account. It imports what Health Connect holds, up to the last 180 days, and does not share a Pulse server’s history. <a href="${MOBILE_DOWNLOAD}">Download the APK</a>.`,
   },
   {
     q: "Can I try it before connecting my Google account?",
@@ -365,7 +369,10 @@ const schema = [softwareApp(Astro.site!, description), faqPage(faq)]
         <p>Put a tunnel or HTTPS reverse proxy in front, create your account, then invite people from /admin.</p>
       </div>
     </div>
-    <a class="more-link" href={SETUP_GUIDE}>Read the setup guide<Icon name="arrow-right" class="ml-icon" stroke={2} /></a>
+    <div class="start-links">
+      <a class="more-link" href={SETUP_GUIDE}>Read the setup guide<Icon name="arrow-right" class="ml-icon" stroke={2} /></a>
+      <a class="more-link" href={MOBILE_REPO}>No server? Get Pulse Mobile for Android<Icon name="arrow-right" class="ml-icon" stroke={2} /></a>
+    </div>
   </section>
 
   <!-- Questions, then the project. -->
@@ -1125,6 +1132,11 @@ const schema = [softwareApp(Astro.site!, description), faqPage(faq)]
     translate: 3px 0;
   }
 
+  .start-links {
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: 32px;
+  }
   /* Get started: two terminal cards */
   .terms {
     display: grid;

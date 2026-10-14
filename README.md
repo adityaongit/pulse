@@ -1,6 +1,8 @@
 # Pulse
 
 A personal recovery, strain and sleep app for the Fitbit Air: one Next.js app (frontend, sync worker and scoring) on Postgres. The server's admins invite people (or open sign-up); each person connects their own Google account and sees only their own data.
+
+> No server? [Pulse Mobile](https://github.com/adityaongit/pulse-mobile) is the Android app that does it all on your phone, from Health Connect. See [below](#no-server-pulse-mobile).
 See `docs/plans/` for the plan.
 
 ## Screenshots
@@ -40,6 +42,20 @@ PWABuilder. Notifications, the offline page, launch screens and how to rebrand t
 
 There is also a native Android and iOS app (`mobile/`, Capacitor) that connects to any Pulse server you enter on first
 launch: [docs/mobile.md](docs/mobile.md).
+
+### No server? Pulse Mobile
+
+[Pulse Mobile](https://github.com/adityaongit/pulse-mobile) is a separate Android app with no server and no account. It
+reads your Fitbit data from Health Connect and scores and stores it on the phone. It imports what Health Connect holds,
+up to the last 180 days, and does not share a Pulse server's history.
+[Download the APK](https://github.com/adityaongit/pulse-mobile/releases/latest).
+
+| | Pulse (this repo) | Pulse Mobile |
+|---|---|---|
+| Runs | On your server, in the browser or the app shell above | On your Android phone |
+| Data | On your server | Only on the phone |
+| Source | The Google Health API | Fitbit through Health Connect |
+| Accounts | One server, many users | None: one install is one person |
 
 ## Deploy
 

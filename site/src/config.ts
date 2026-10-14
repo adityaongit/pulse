@@ -2,6 +2,9 @@
 export const REPO = "https://github.com/adityaongit/pulse"
 export const SETUP_GUIDE = `${REPO}/blob/main/docs/setup.md`
 export const LICENSE_URL = `${REPO}/blob/main/LICENSE`
+// Pulse Mobile: the separate Android app that scores on the phone from Health Connect, no server.
+export const MOBILE_REPO = "https://github.com/adityaongit/pulse-mobile"
+export const MOBILE_DOWNLOAD = `${MOBILE_REPO}/releases/latest`
 export const ALGORITHMS_DIR = `${REPO}/tree/main/docs/algorithms`
 
 export const SITE_NAME = "Pulse"
