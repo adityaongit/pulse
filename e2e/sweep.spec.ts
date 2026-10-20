@@ -12,6 +12,7 @@ const OTHER_ROUTES = [
   "/reports/month",
   "/more",
   "/settings",
+  "/settings?s=agents",
   "/reports",
   "/activities",
   "/trends",

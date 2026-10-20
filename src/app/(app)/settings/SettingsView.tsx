@@ -2,6 +2,7 @@ import { Check, ChevronDown, CircleAlert, Minus, TriangleAlert } from "lucide-re
 import { cn } from "@/lib/utils"
 import { ago, DAY, formatDay } from "@/lib/format"
 import { HEALTH_SIGNUP_URL } from "@/lib/google"
+import type { TokenRow } from "@/server/mcp/tokens"
 import type { SettingsVM } from "@/server/queries/types"
 import { SectionShell } from "@/components/shells/SectionShell"
 import { SyncNowButton } from "@/components/shells/SyncNowButton"
@@ -10,6 +11,7 @@ import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { GoogleFit } from "@/components/brand/GoogleFit"
 import { Mark } from "@/components/brand/Mark"
+import { AgentSettings } from "./AgentSettings"
 import { AppSettings, SignOutForm } from "./AppSettings"
 import { AvatarButtons, ChangePasswordButton, DeleteAccountButton, DisconnectButton, EditProfileButton, SwitchGoogleButton, ThemePicker } from "./SettingsClient"
 import { SettingsLayout, type SettingsSection } from "./SettingsLayout"
@@ -265,9 +267,9 @@ export function Profile({ profile }: { profile: SettingsVM["profile"] }) {
 
 /**
  * Settings body: configuration only (U21), one section at a time (SettingsLayout): Account (with profile), Data source (with sync),
- * App (appearance, install, notifications) and, with coach access, Coach. About, reports, exports and help live in More.
+ * App (appearance, install, notifications), Agents (MCP access tokens) and, with coach access, Coach. About, reports, exports and help live in More.
  */
-export function SettingsView({ vm, now, account, coach, pushKey = null, initial }: { vm: SettingsVM; now: number; account: SettingsAccount; coach?: React.ReactNode; pushKey?: string | null; initial?: string | null }) {
+export function SettingsView({ vm, now, account, coach, tokens = [], pushKey = null, initial }: { vm: SettingsVM; now: number; account: SettingsAccount; coach?: React.ReactNode; tokens?: TokenRow[]; pushKey?: string | null; initial?: string | null }) {
   const sections: SettingsSection[] = [
     {
       id: "account",
@@ -300,6 +302,7 @@ export function SettingsView({ vm, now, account, coach, pushKey = null, initial 
       ),
     },
     ...(coach ? [{ id: "coach" as const, label: "Coach", node: coach }] : []),
+    { id: "agents", label: "Agents", node: <AgentSettings tokens={tokens} now={now} /> },
   ]
   // Keyed by the section asked for, so a link to another one (?s=) opens it even on this page.
   return <SettingsLayout key={initial ?? ""} sections={sections} initial={initial} />

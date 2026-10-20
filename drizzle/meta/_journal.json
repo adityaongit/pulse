@@ -71,6 +71,13 @@
       "when": 1791569456392,
       "tag": "0009_black_kid_colt",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1792471179240,
+      "tag": "0010_demonic_silvermane",
+      "breakpoints": true
     }
   ]
 }

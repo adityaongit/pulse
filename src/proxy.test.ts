@@ -19,10 +19,10 @@ describe("proxy", () => {
     for (const c of [SESSION, `__Secure-${SESSION}`]) for (const p of ["/", "/settings", "/login", "/signup"]) expect(go(p, c), p).toBe("pass");
   });
 
-  it("the matcher leaves better-auth, Google's redirect, the health check, build assets and public files open", () => {
+  it("the matcher leaves better-auth, the MCP endpoint, Google's redirect, the health check, build assets and public files open", () => {
     const re = new RegExp(`^${config.matcher[0]}$`);
-    for (const p of ["/api/auth/sign-in/email", "/oauth/callback", "/oauth/start", "/healthz", "/_next/static/x.js", "/icon.svg", "/manifest.webmanifest", "/icons/oauth-logo-120.png", "/sw.js", "/offline.html", "/splash/apple-splash-dark-1179-2556.png", "/screenshots/phone-home.webp", "/.well-known/assetlinks.json"])
+    for (const p of ["/api/auth/sign-in/email", "/api/mcp", "/oauth/callback", "/oauth/start", "/healthz", "/_next/static/x.js", "/icon.svg", "/manifest.webmanifest", "/icons/oauth-logo-120.png", "/sw.js", "/offline.html", "/splash/apple-splash-dark-1179-2556.png", "/screenshots/phone-home.webp", "/.well-known/assetlinks.json"])
       expect(re.test(p), p).toBe(false);
-    for (const p of ["/", "/settings", "/login", "/onboarding", "/strain/2026-10-01", "/activity/a.b", "/metric/x.json"]) expect(re.test(p), p).toBe(true);
+    for (const p of ["/", "/settings", "/login", "/onboarding", "/strain/2026-10-01", "/activity/a.b", "/metric/x.json", "/api/coach", "/api/mcp/x"]) expect(re.test(p), p).toBe(true);
   });
 });

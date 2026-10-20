@@ -1,13 +1,13 @@
 "use client"
 
 import * as React from "react"
-import { Palette, PanelLeftClose, PanelLeftOpen, Plug, UserRound, BotMessageSquare } from "lucide-react"
+import { Cable, Palette, PanelLeftClose, PanelLeftOpen, Plug, UserRound, BotMessageSquare } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { GLASS } from "@/components/shells/AppNav"
 import { panelStore } from "@/components/shells/panelStore"
 import { Button } from "@/components/ui/button"
 
-export type SectionId = "account" | "source" | "app" | "coach"
+export type SectionId = "account" | "source" | "app" | "coach" | "agents"
 export type SettingsSection = { id: SectionId; label: string; node: React.ReactNode }
 
 const ICON: Record<SectionId, React.ComponentType<{ "aria-hidden"?: boolean; strokeWidth?: number; className?: string }>> = {
@@ -15,6 +15,7 @@ const ICON: Record<SectionId, React.ComponentType<{ "aria-hidden"?: boolean; str
   source: Plug,
   app: Palette,
   coach: BotMessageSquare,
+  agents: Cable,
 }
 /** Older names: ?s=sync, ?s=appearance, ?s=profile. */
 const ALIAS: Record<string, SectionId> = { sync: "source", appearance: "app", profile: "account" }
