@@ -564,6 +564,23 @@ export const pushSubscriptions = pgTable(
   (t) => [primaryKey({ columns: [t.userId, t.endpoint] })],
 );
 
+/**
+ * Personal access tokens for the MCP endpoint (/api/mcp): one row per token a person made in Settings. Only the SHA-256
+ * of the token is stored (it is shown once, at creation); `last_used_at` is when an agent last authenticated with it.
+ */
+export const mcpTokens = pgTable(
+  "mcp_tokens",
+  {
+    userId: userId(),
+    id: serial("id").notNull(),
+    name: text("name").notNull(),
+    tokenHash: text("token_hash").notNull(),
+    createdAt: ts("created_at").notNull(),
+    lastUsedAt: ts("last_used_at"),
+  },
+  (t) => [primaryKey({ columns: [t.userId, t.id] }), unique("mcp_tokens_hash").on(t.tokenHash)],
+);
+
 /** Tables holding a user's synced Google data and what was computed from it (cleared on a Google account switch). */
 export const SYNCED_TABLES = [
   syncState, rawPayloads, hrDays, stepsDays, dailyMetrics, sleepSegments, sleepSessions, exercises, dailyValues,

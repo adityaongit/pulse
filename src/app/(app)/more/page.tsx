@@ -1,5 +1,5 @@
 import { connection } from "next/server"
-import { Archive, BookOpen, CalendarDays, CalendarRange, ChartLine, Database, ListChecks, Palette, Plug, UserRound, BotMessageSquare } from "lucide-react"
+import { Archive, BookOpen, Cable, CalendarDays, CalendarRange, ChartLine, Database, ListChecks, Palette, Plug, UserRound, BotMessageSquare } from "lucide-react"
 import { formatDay, rangeLabel } from "@/lib/format"
 import { coachAccess } from "@/server/coach/store"
 import { userCtx } from "@/server/queries/common"
@@ -22,6 +22,7 @@ export default async function MorePage() {
     { icon: Plug, label: "Data source", href: "/settings?s=source" },
     { icon: Palette, label: "App", href: "/settings?s=app" },
     ...(coach ? [{ icon: BotMessageSquare, label: "Coach", href: "/settings?s=coach" }] : []),
+    { icon: Cable, label: "Agents", href: "/settings?s=agents" },
   ]
   const reports: LinkListRow[] = [
     ...(vm.latestWeek
