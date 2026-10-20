@@ -53,5 +53,6 @@ it("revokes the caller's own token and cannot touch another person's", async () 
   expect(await userForToken(db, theirs)).toBe(other);
   expect(await revokeMcpTokenAction((await listTokens(db, USER))[0].id)).toEqual({ ok: true, data: undefined });
   expect(await userForToken(db, mine)).toBeNull();
-  expect(await revokeMcpTokenAction(1.5)).toMatchObject({ ok: false });
+  // Not a database id: refused before the query, which would otherwise fail on an integer column.
+  for (const id of [1.5, Number.NaN, 2 ** 31]) expect(await revokeMcpTokenAction(id), String(id)).toMatchObject({ ok: false });
 });

@@ -11,8 +11,17 @@ import * as route from "./route";
 
 const { POST } = route;
 
+const h = vi.hoisted(() => ({ ctxFails: false, saveFails: false }));
 vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
 vi.mock("@/server/worker", () => ({ requestSync: vi.fn() }));
+vi.mock("@/server/queries/common", async (orig) => {
+  const real = await orig<typeof import("@/server/queries/common")>();
+  return { ...real, ctxOf: (...a: Parameters<typeof real.ctxOf>) => (h.ctxFails ? Promise.reject(new Error("connection lost")) : real.ctxOf(...a)) };
+});
+vi.mock("@/server/logging", async (orig) => {
+  const real = await orig<typeof import("@/server/logging")>();
+  return { ...real, logFor: (...a: Parameters<typeof real.logFor>) => (h.saveFails ? Promise.reject(new Error("insert into logged_entries … params: secret-value")) : real.logFor(...a)) };
+});
 
 const HEADERS = { "content-type": "application/json", accept: "application/json, text/event-stream" };
 const call = (token: string | null, method: string, params?: unknown, id = 1) =>
@@ -60,6 +69,15 @@ describe("authentication", () => {
     const bare = await createToken(db, await addUser(db, "bare@pulse.test"), "bare");
     expect((await call(bare, "tools/list")).status).toBe(409);
   });
+
+  it("a failing database is a server error, not a request to finish setting up the profile", async () => {
+    h.ctxFails = true;
+    try {
+      await expect(call(mine, "tools/list")).rejects.toThrow("connection lost");
+    } finally {
+      h.ctxFails = false;
+    }
+  });
 });
 
 describe("protocol", () => {
@@ -98,6 +116,18 @@ describe("protocol", () => {
     expect(await names(theirs)).toContain("log_period");
   });
 
+  it("a tool that throws answers a generic error: nothing of the exception reaches the agent, and the log gets its name only", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    h.saveFails = true;
+    try {
+      expect(await tool(mine, "log_water", { ml: 250 })).toMatchObject({ isError: true, text: "The tool failed. Try again." });
+      expect(warn.mock.calls).toEqual([["[mcp] log_water failed: Error"]]);
+    } finally {
+      h.saveFails = false;
+      warn.mockRestore();
+    }
+  });
+
   it("an unknown tool and bad arguments are errors, not crashes", async () => {
     const unknown = await (await call(mine, "tools/call", { name: "delete_everything", arguments: {} })).json();
     expect(unknown.result?.isError ?? !!unknown.error).toBe(true);
@@ -120,9 +150,9 @@ describe("one request, one user", () => {
     expect(theirSleep.json.timeZone).toBe("America/New_York");
     expect(theirSleep.json.asleepMinutes.value).toBeNull();
     for (const name of ["get_day", "get_activities", "get_health", "get_report"] as const) {
-      const out = (await tool(theirs, name)).text;
-      expect(out, name).not.toContain("RUNNING");
-      expect((await tool(theirs, name)).isError, name).toBe(false);
+      const out = await tool(theirs, name);
+      expect(out.isError, name).toBe(false);
+      expect(out.text, name).not.toContain("RUNNING");
     }
     expect((await tool(theirs, "get_activities", { days: 90 })).json.workouts).toEqual([]);
     // The seeded user does have workouts, and their ids don't open for the other user.

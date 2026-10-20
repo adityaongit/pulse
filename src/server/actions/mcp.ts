@@ -8,6 +8,7 @@ import { getDb } from "../db";
 import { createToken, listTokens, MAX_NAME, MAX_TOKENS, revokeToken } from "../mcp/tokens";
 import type { ActionResult } from "./journal";
 
+const Id = z.int32().positive();
 const Name = z.string().trim().min(1, "Name the agent that will use it").max(MAX_NAME, `Use at most ${MAX_NAME} characters`);
 
 /** Returns the new token: the only time it is shown. */
@@ -26,8 +27,10 @@ export async function createMcpTokenAction(name: string): Promise<ActionResult<s
 export async function revokeMcpTokenAction(id: number): Promise<ActionResult> {
   const me = await currentUser();
   if (!me) return SIGNED_OUT;
-  if (!Number.isInteger(id)) return { ok: false, error: "That token doesn’t exist." };
-  await revokeToken(getDb(), me.userId, id);
+  // A serial column: anything else would reach Postgres as an out-of-range integer and throw.
+  const r = Id.safeParse(id);
+  if (!r.success) return { ok: false, error: "That token doesn’t exist." };
+  await revokeToken(getDb(), me.userId, r.data);
   revalidatePath("/settings");
   return { ok: true, data: undefined };
 }

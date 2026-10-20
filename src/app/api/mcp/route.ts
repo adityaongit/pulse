@@ -17,7 +17,11 @@ export async function POST(req: Request) {
   const db = getDb();
   const userId = token?.startsWith(TOKEN_PREFIX) ? await userForToken(db, token) : null;
   if (userId === null) return rpcError(401, "Unauthorized: send a Pulse access token as 'Authorization: Bearer pulse_…'.", { "WWW-Authenticate": "Bearer" });
-  const ctx = await ctxOf(db, userId).catch(() => null);
+  // Only a missing profile is the caller's to fix; any other failure (the database) is ours and stays a 500.
+  const ctx = await ctxOf(db, userId).catch((e: unknown) => {
+    if (e instanceof Error && e.message === "profile_missing") return null;
+    throw e;
+  });
   if (!ctx) return rpcError(409, "Finish setting up your Pulse profile first.");
 
   // Stateless: a server and transport per request, closed when it is answered.

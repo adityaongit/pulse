@@ -1,4 +1,5 @@
 import { createHash } from "node:crypto";
+import { eq } from "drizzle-orm";
 import { beforeEach, describe, expect, it } from "vitest";
 import type { Db } from "../db";
 import { mcpTokens, user } from "../db/schema";
@@ -50,7 +51,7 @@ describe("personal access tokens", () => {
 
   it("go with the account", async () => {
     await createToken(db, other, "Theirs");
-    await db.delete(user).where((await import("drizzle-orm")).eq(user.id, other));
+    await db.delete(user).where(eq(user.id, other));
     expect(await db.select().from(mcpTokens)).toEqual([]);
   });
 });
