@@ -54,7 +54,7 @@ docker compose -f compose.dev.yaml up -d && pnpm dev    # http://localhost:3000
 
 ## Documentation
 
-[Setup](docs/setup.md) · [Other setups](docs/other-setups.md) · [Admin](docs/admin.md) · [PWA](docs/pwa.md) ·
+[Setup](docs/setup.md) · [Other setups](docs/other-setups.md) · [Admin](docs/admin.md) · [MCP](docs/mcp.md) · [PWA](docs/pwa.md) ·
 [App shell](docs/mobile.md) · [Technical details](docs/technical-details.md) · [Contributing](CONTRIBUTING.md) ·
 [AGENTS.md](AGENTS.md)
 

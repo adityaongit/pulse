@@ -5,6 +5,8 @@ import { currentUser, DEMO_EMAIL } from "@/server/auth"
 import { avatarSrc, connectedGoogleEmail } from "@/server/avatar"
 import { providerLabel, providerOptions } from "@/server/coach/options"
 import { coachAccess, coachSetup } from "@/server/coach/store"
+import { listOAuthGrants } from "@/server/mcp/oauth"
+import { listTokens } from "@/server/mcp/tokens"
 import { pushPublicKey } from "@/server/push"
 import { userCtx } from "@/server/queries/common"
 import { CoachSettings } from "../coach/CoachSettings"
@@ -26,13 +28,15 @@ export default async function SettingsPage({ searchParams }: PageProps<"/setting
   await connection()
   const { s } = await searchParams
   const ctx = await userCtx()
-  const [vm, user, avatar, googleEmail, coach, coachState] = await Promise.all([
+  const [vm, user, avatar, googleEmail, coach, coachState, tokens, grants] = await Promise.all([
     getSettings(ctx),
     currentUser(),
     avatarSrc(ctx.db, ctx.userId),
     connectedGoogleEmail(ctx.db, ctx.userId),
     coachAccess(ctx.db, ctx.userId),
     coachSetup(ctx.db, ctx.userId),
+    listTokens(ctx.db, ctx.userId),
+    listOAuthGrants(ctx.db, ctx.userId),
   ])
   // Same rule as the admin gate: only a Google instance has an admin panel.
   const admin = getConfig().dataSource === "google" && (await isAdmin(ctx.db, ctx.userId))
@@ -48,6 +52,8 @@ export default async function SettingsPage({ searchParams }: PageProps<"/setting
             vm={vm}
             now={requestTime()}
             pushKey={pushPublicKey()}
+            tokens={tokens}
+            grants={grants}
             coach={coach && <CoachSettings setup={coachState} providers={providerOptions()} providerLabel={providerLabel(coachState.provider)} notifications={pushPublicKey() !== null} />}
             account={{
               email: user?.email ?? null,

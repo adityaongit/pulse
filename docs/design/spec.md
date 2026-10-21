@@ -2722,6 +2722,7 @@ flowchart LR
 
 | # | Plan says | Spec does | Why |
 |---|---|---|---|
+| OAUTH1 | MCP uses personal access tokens | ChatGPT connects through browser consent in `AuthShell`, with Allow/Deny buttons and immediate-log wording. Settings › Agents lists OAuth clients by name with Revoke beside the existing personal tokens | OAuth clients need explicit consent and a way to withdraw access; reuse the existing shell, buttons and section tokens (2026-10-21) |
 | D1 | Home: "Recovery is the hero and is larger" | Three equal `md` dials (Sleep, Recovery, Strain), as in the reference app's Home | User decision 2026-10-02: match the reference app's equal-sized row exactly |
 | D2 | AppShell owns the top bar | AppShell owns the frame and status (`ShellStatus` context); PageShell renders `TopBar` and DetailShell renders `DetailHeader` in the same sticky slot | A layout cannot receive per-page title/date props; detail screens need back and info instead of the global items, as in the reference app |
 | D3 | Fonts: "a condensed numeric display face" | Barlow at regular width (+ `tabular-nums`) | Measured the reference app numerals are DIN 2014 regular width (advance ÷ cap 0.775); Barlow matches to 1%, the semi-condensed cut does not |

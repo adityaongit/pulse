@@ -78,6 +78,13 @@
       "when": 1792398584108,
       "tag": "0010_colossal_xavin",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1792594229743,
+      "tag": "0011_eager_swordsman",
+      "breakpoints": true
     }
   ]
 }

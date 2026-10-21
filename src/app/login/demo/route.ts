@@ -1,3 +1,4 @@
+import { loginReturn } from "@/lib/login-return";
 import { DEMO_EMAIL, DEMO_PASSWORD, getAuth } from "@/server/auth";
 import { getConfig } from "@/server/config";
 import { getDb } from "@/server/db";
@@ -11,7 +12,8 @@ export async function POST(request: Request) {
   const signIn = await getAuth().api.signInEmail({ body: { email: DEMO_EMAIL, password: DEMO_PASSWORD }, headers: request.headers, asResponse: true });
   if (!signIn.ok) return new Response("Demo sign-in failed", { status: 500 });
   // Relative, like /logout: request.url is the container's address behind a tunnel.
-  const res = new Response(null, { status: 303, headers: { Location: "/" } });
+  const form = request.headers.get("content-type")?.includes("application/x-www-form-urlencoded") ? await request.formData() : new FormData();
+  const res = new Response(null, { status: 303, headers: { Location: loginReturn(form.get("next")) } });
   for (const c of signIn.headers.getSetCookie()) res.headers.append("set-cookie", c);
   return res;
 }

@@ -1,3 +1,4 @@
+import { loginReturn } from "@/lib/login-return"
 import type { Metadata } from "next"
 import Link from "next/link"
 import { connection } from "next/server"
@@ -18,9 +19,10 @@ export const metadata: Metadata = { title: "Sign in" }
  * connected from inside), and links to sign-up while it is open (or points invitees to their link). A demo instance
  * offers the demo only.
  */
-export default async function LoginPage() {
+export default async function LoginPage({ searchParams }: PageProps<"/login">) {
   await connection()
-  if (await currentUser()) redirect("/")
+  const next = loginReturn((await searchParams).next)
+  if (await currentUser()) redirect(next)
   const { dataSource } = getConfig()
 
   if (dataSource !== "google") {
@@ -28,7 +30,7 @@ export default async function LoginPage() {
       <AuthShell
         actions={
           <>
-            <DemoSignIn />
+            <DemoSignIn next={next} />
             <p className={AUTH_FOOTNOTE}>
               This server runs on generated data. To use your own, set up a Google OAuth client (see <span translate="no">docs/setup.md</span>).
             </p>
@@ -47,7 +49,7 @@ export default async function LoginPage() {
     <AuthShell>
       <AuthHero compact title="Welcome back" body="Sign in to see today’s Recovery, Strain and Sleep." />
       <div className="mt-8 space-y-5">
-        <LoginForm />
+        <LoginForm next={next} />
         <p className={AUTH_FOOTNOTE}>
           {mode === "closed" && !first ? (
             "Your data stays on this server."

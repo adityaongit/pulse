@@ -19,10 +19,11 @@ const Spinner = () => <LoaderCircle aria-hidden className="animate-spin motion-r
 
 
 /** "Continue with demo data": posts to /login/demo, which sets a demo session and lands on Home. */
-export function DemoSignIn() {
+export function DemoSignIn({ next = "/" }: { next?: string }) {
   const [pending, start] = usePending()
   return (
     <form method="post" action="/login/demo" onSubmit={start}>
+      <input type="hidden" name="next" value={next} />
       <Button type="submit" size="sheet" disabled={pending} aria-busy={pending || undefined} className="normal-case tracking-normal text-[16px]">
         {pending && <Spinner />}
         {pending ? "Loading demo…" : "Continue with demo data"}

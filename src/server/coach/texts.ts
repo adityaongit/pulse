@@ -57,7 +57,9 @@ const START: Param = { type: "date (YYYY-MM-DD), optional", description: "Inclus
 const AT: Param = { type: "local date and time (YYYY-MM-DDTHH:mm), optional", description: "When it happened, in the user's local time. Omit for now. Never a future time or more than a year back." };
 const END: Param = { type: "date (YYYY-MM-DD), optional", description: "Inclusive last local day; omit for today. Use with start for a historical comparison." };
 
-const LOG = "Waits for the user to confirm in the app before saving; returns logged: true, or logged: false with an error to explain.";
+/** The log tools' approval clause: in the chat the user taps Log first. The MCP server has no such step and words it as it is. */
+export const LOG_WAITS = "Waits for the user to confirm in the app before saving";
+const LOG = `${LOG_WAITS}; returns logged: true, or logged: false with an error to explain.`;
 
 export const TOOL_DOCS: Record<string, ToolDoc> = {
   get_day: {

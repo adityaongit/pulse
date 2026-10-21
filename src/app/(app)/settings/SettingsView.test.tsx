@@ -7,6 +7,7 @@ import { SettingsView } from "./SettingsView"
 vi.mock("./actions", () => ({ disconnectGoogle: vi.fn() }))
 vi.mock("@/server/actions/profile", () => ({ saveProfileAction: vi.fn() }))
 vi.mock("@/server/actions/avatar", () => ({ uploadAvatar: vi.fn(), removeAvatar: vi.fn() }))
+vi.mock("@/server/actions/mcp", () => ({ createMcpTokenAction: vi.fn(), revokeMcpTokenAction: vi.fn() }))
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: vi.fn() }), usePathname: () => "/settings", useSearchParams: () => new URLSearchParams() }))
 
 const NOW = Date.parse("2026-10-02T10:00:00Z")
@@ -117,6 +118,11 @@ describe("Settings view", () => {
   it("account holds the profile too", () => {
     render(<SettingsView initial="account" vm={base} now={NOW} account={account} />)
     expect(screen.getByRole("region", { name: "Profile" })).toBeInTheDocument()
+  })
+
+  it("agents is a section of its own, with the account's tokens", () => {
+    render(<SettingsView initial="agents" vm={base} now={NOW} account={account} tokens={[{ id: 1, name: "Hermes", createdAt: 1, lastUsedAt: null }]} />)
+    expect(within(screen.getByRole("region", { name: "Agents" })).getByText("Hermes")).toBeInTheDocument()
   })
 
   it("the account can sign out with a plain form post", () => {

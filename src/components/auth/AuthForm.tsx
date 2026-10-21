@@ -87,7 +87,7 @@ const OFFLINE = "Couldn’t reach Pulse. Check your connection and try again."
 const settle = (p: Promise<{ error: AuthError }>) => p.then((r) => r.error ?? null, () => ({ status: 0 }) as AuthError)
 
 /** Sign in with an email or a username (an "@" decides which) and a password. Never says which of the two was wrong. */
-export function LoginForm() {
+export function LoginForm({ next = "/" }: { next?: string }) {
   const router = useRouter()
   const password = React.useRef<HTMLInputElement>(null)
   const [pending, setPending] = React.useState(false)
@@ -103,7 +103,7 @@ export function LoginForm() {
       id.includes("@") ? authClient.signIn.email({ email: id, password: pw }) : authClient.signIn.username({ username: id.toLowerCase(), password: pw }),
     )
     if (!err) {
-      router.replace("/")
+      router.replace(next)
       router.refresh()
       return
     }

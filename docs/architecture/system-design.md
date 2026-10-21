@@ -117,7 +117,7 @@ Source: `scripts/deploy.sh:49-61` (fetch and skip), `:63-72` (dump), `:74-82` (b
 | Signed out | `login`, `signup`, `forgot`, `onboarding` | `onboarding` is outside `(app)` but is entered from the `(app)` layout's redirect. |
 | Admin | `src/app/admin/*` with its own `layout.tsx` | Own frame, not the app shell (`AGENTS.md`, Admin dashboard rule). Gate: `src/app/admin/gate.ts:12-18`. |
 | Dev only | `src/app/dev/*` | `notFound()` unless `NODE_ENV === "development"` (`src/app/dev/kit/layout.tsx:9-10`). I read only the kit layout; the `dev/brand` pages were not checked. |
-| Route handlers | `sync`, `status`, `heart-rate`, `push`, `avatar`, `healthz`, `logout`, `login/demo`, `oauth/start`, `oauth/callback`, `export/{daily,journal,coach}`, `api/coach`, `api/auth/[...all]`, `.well-known/assetlinks.json`, `manifest.ts` | Counted from the file list: 16 `route.ts` files (non-test) plus `manifest.ts`. |
+| Route handlers | `sync`, `status`, `heart-rate`, `push`, `avatar`, `healthz`, `logout`, `login/demo`, `oauth/start`, `oauth/callback`, `export/{daily,journal,coach}`, `api/coach`, `api/mcp`, `oauth/mcp/{authorize,token}`, `api/auth/[...all]`, `.well-known/{assetlinks.json,oauth-authorization-server,oauth-protected-resource,oauth-protected-resource/api/mcp}`, `manifest.ts` | Counted from the file list: 23 `route.ts` files (non-test) plus `manifest.ts`. |
 
 Counts (from `find` and `grep` on the tree): 40 `page.tsx`, 26 `loading.tsx`, 94 non-test files that start with `"use client"`,
 9 files with `"use server"`: `src/app/(app)/settings/actions.ts` and `src/server/actions/{admin,calendar,avatar,log,coach,dashboard,profile,journal}.ts`.
