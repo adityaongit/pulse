@@ -359,3 +359,9 @@ The spread is in noop's abs-dev units, so σ = 1.253 × spread. The figures are 
 | Energy Bank at the end of the day | 168 | 6.0 | 14.7 | 28.3 | 38.2 | 47.3 |
 
 87 of the 168 days end the Energy Bank inside its 15–40 target. U8 tuned its constants with Recovery fixed at 60. With real Recovery, the red days of the training block and the short-sleep week start lower and end below 15, and quiet green weekends end above 40. Retune `energyBankConfig` if that spread looks wrong on real data.
+
+## Duplicate exercise records
+
+Google exercise IDs remain stored separately so re-fetches, edits and deletions can reconcile against the original source records. Activity queries and both scoring stages use one shared selection rule: records must have the same local day and exact exercise type, last at least five minutes, start and end within 30 seconds of one another, and both record positive distances within 10 metres or 1% of the shorter distance, whichever is larger. The bytewise smallest ID wins, independent of page order. Matching is against retained records, so a chain of near-matches cannot merge activities outside the tolerance.
+
+This also handles previously imported duplicates without deleting data or reimporting history. Old detail links resolve to the retained activity. Scoring version 11 triggers the usual recomputation on the next worker run. Short activities and records without distance stay separate because the available evidence is insufficient to merge them safely. Separate activities that happen to meet every threshold can still be combined; the rule deliberately requires close agreement on both endpoints and distance.

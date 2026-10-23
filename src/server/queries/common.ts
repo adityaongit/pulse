@@ -1,4 +1,5 @@
 // Shared by the screen queries: the query context, batched day loaders and the Metric builders.
+import { uniqueExercises } from "../exercises";
 import type { ExtraKey } from "@/lib/extraMetrics";
 import { getConfig } from "../config";
 import { and, eq, gte, lte, min } from "drizzle-orm";
@@ -297,13 +298,14 @@ export const ACTIVITY_NAME: Record<ActivityKind, string> = {
 
 export type ExerciseRow = { id: string; day: string; startTs: number; endTs: number; type: string; name: string | null; calories: number | null; distanceM: number | null };
 
-export function exercisesBetween(ctx: QueryCtx, from: string, to: string): Promise<ExerciseRow[]> {
+export async function exercisesBetween(ctx: QueryCtx, from: string, to: string): Promise<ExerciseRow[]> {
   const e = exercises;
-  return ctx.db
+  const rows = await ctx.db
     .select({ id: e.id, day: e.day, startTs: e.startTs, endTs: e.endTs, type: e.type, name: e.name, calories: e.calories, distanceM: e.distanceM })
     .from(e)
     .where(and(eq(e.userId, ctx.userId), gte(e.day, from), lte(e.day, to)))
     .orderBy(e.startTs, e.id);
+  return uniqueExercises(rows);
 }
 
 export function activityItem(e: ExerciseRow, row: DayRow | undefined): Extract<TimelineItem, { kind: "activity" }> {

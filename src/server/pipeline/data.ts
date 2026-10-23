@@ -1,4 +1,5 @@
 // Loading: the daily rows, sessions and exercises both stages fold over, and small shared helpers.
+import { uniqueExercises } from "../exercises";
 import { createHash } from "node:crypto";
 import { eq, sql } from "drizzle-orm";
 import type { AnyPgColumn } from "drizzle-orm/pg-core";
@@ -22,7 +23,7 @@ export type Session = {
   lightMin: number | null;
   remMin: number | null;
 };
-export type Exercise = { id: string; day: string; startTs: number; endTs: number; type: string; name: string | null; calories: number | null };
+export type Exercise = { id: string; day: string; startTs: number; endTs: number; type: string; name: string | null; calories: number | null; distanceM: number | null };
 export type Metrics = {
   day: string;
   hrvMs: number | null;
@@ -69,7 +70,7 @@ export async function load(db: Db, { userId, timeZone: tz }: PipelineOptions) {
   const m = dailyMetrics;
   const s = sleepSessions;
   const e = exercisesTable;
-  const [metrics, sessions, exercises, hrSpan] = await Promise.all([
+  const [metrics, sessions, exerciseRows, hrSpan] = await Promise.all([
     db
       .select({
         day: m.day, hrvMs: m.hrvMs, rhrBpm: m.rhrBpm, respBpm: m.respBpm, nightlyTempC: m.nightlyTempC, spo2Pct: m.spo2Pct,
@@ -90,12 +91,13 @@ export async function load(db: Db, { userId, timeZone: tz }: PipelineOptions) {
       .where(eq(s.userId, userId))
       .orderBy(s.startTs, byteOrder(s.id)) as Promise<Session[]>,
     db
-      .select({ id: e.id, day: e.day, startTs: e.startTs, endTs: e.endTs, type: e.type, name: e.name, calories: e.calories })
+      .select({ id: e.id, day: e.day, startTs: e.startTs, endTs: e.endTs, type: e.type, name: e.name, calories: e.calories, distanceM: e.distanceM })
       .from(e)
       .where(eq(e.userId, userId))
       .orderBy(e.startTs, byteOrder(e.id)) as Promise<Exercise[]>,
     sampleRange(db, "hr", userId),
   ]);
+  const exercises = uniqueExercises(exerciseRows);
   const candidates = [
     ...metrics.map((m) => m.day),
     ...sessions.map((s) => s.day),

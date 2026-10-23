@@ -1,3 +1,4 @@
+import { sameExercise } from "../exercises";
 import { and, eq } from "drizzle-orm";
 import { zoneShareRanges } from "@/core/algorithms/zoneTypical";
 import { exercises } from "../db/schema";
@@ -28,17 +29,19 @@ import type { ActivityVM, KeyStat, ZoneRow } from "./types";
 /** Activity `/activity/[id]` (spec §7.4); null for an unknown id. */
 export async function getActivity(id: string, ctx: QueryCtx): Promise<ActivityVM | null> {
   const x = exercises;
-  const [e] = await ctx.db
+  const [stored] = await ctx.db
     .select({ id: x.id, day: x.day, startTs: x.startTs, endTs: x.endTs, type: x.type, name: x.name, calories: x.calories, distanceM: x.distanceM })
     .from(x)
     .where(and(eq(x.userId, ctx.userId), eq(x.id, id)));
-  if (!e) return null;
+  if (!stored) return null;
+  const recent = await exercisesBetween(ctx, addDays(stored.day, -30), stored.day);
+  const e = [...recent].sort((a, b) => a.id < b.id ? -1 : a.id > b.id ? 1 : 0).find((candidate) => sameExercise(candidate, stored)) ?? stored;
+  id = e.id;
   const kind = activityKind(e.type);
   // Steps inside the workout for the kinds that walk or run (activity-running-detail-top), and the same for earlier ones of that kind.
   const stepping = kind === "run" || kind === "walk";
-  const [rows, recent, series] = await Promise.all([
+  const [rows, series] = await Promise.all([
     loadDays(ctx, addDays(e.day, -30), e.day),
-    exercisesBetween(ctx, addDays(e.day, -30), e.day),
     loadSeries(ctx, e.day, "hr"),
   ]);
   const row = rows.get(e.day);
