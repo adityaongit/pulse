@@ -58,6 +58,16 @@ export async function coachSetup(db: Db, userId: number): Promise<CoachSetup> {
   return { provider: r?.provider ?? null, model: r?.model ?? null, last4: r?.keyLast4 ?? null, consent: r?.consentAt != null, instructions: r?.customInstructions ?? null, briefMinute: r?.briefMinute ?? null };
 }
 
+/** The user's decrypted API key for their current provider, or null if not configured or unreadable. */
+export async function savedApiKey(db: Db, userId: number): Promise<{ provider: string; apiKey: string } | null> {
+  const [r] = await db.select({ provider: coachSettings.provider, keyCiphertext: coachSettings.keyCiphertext }).from(coachSettings).where(eq(coachSettings.userId, userId));
+  if (!r?.provider || !r.keyCiphertext) return null;
+  const secret = getConfig().authSecret;
+  if (!secret) return null;
+  const key = decryptKey(r.keyCiphertext, secret);
+  return key ? { provider: r.provider, apiKey: key } : null;
+}
+
 export async function setConsent(db: Db, userId: number, on: boolean): Promise<void> {
   const consentAt = on ? now() : null;
   await db
@@ -73,14 +83,16 @@ export async function setPreferences(db: Db, userId: number, p: { instructions?:
 }
 
 /** Stores the provider and model, and the key encrypted (null for the owner's local model, which needs none). */
-export async function saveProvider(db: Db, userId: number, provider: string, model: string, apiKey: string | null): Promise<void> {
+export async function saveProvider(db: Db, userId: number, provider: string, model: string, apiKey?: string | null): Promise<void> {
   const secret = getConfig().authSecret;
-  if (apiKey !== null && !secret) throw new Error("no_secret");
+  if (apiKey !== undefined && apiKey !== null && !secret) throw new Error("no_secret");
   const values = {
     provider,
     model,
-    keyCiphertext: apiKey === null ? null : encryptKey(apiKey, secret!),
-    keyLast4: apiKey === null ? null : apiKey.slice(-4),
+    ...(apiKey !== undefined && {
+      keyCiphertext: apiKey === null ? null : encryptKey(apiKey, secret!),
+      keyLast4: apiKey === null ? null : apiKey.slice(-4),
+    }),
     updatedAt: now(),
   };
   await db.insert(coachSettings).values({ userId, ...values }).onConflictDoUpdate({ target: coachSettings.userId, set: values });

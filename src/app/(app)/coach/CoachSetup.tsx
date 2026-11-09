@@ -45,13 +45,14 @@ export function Consent() {
 }
 
 /** Pick a provider, paste a key, pick a model; saved only after a test call works. */
-export function ProviderForm({ providers, current, onSaved }: { providers: ProviderOption[]; current: { provider: string | null; model: string | null }; onSaved?: () => void }) {
+export function ProviderForm({ providers, current, onSaved }: { providers: ProviderOption[]; current: { provider: string | null; model: string | null; last4?: string | null }; onSaved?: () => void }) {
   const router = useRouter()
   const [id, setId] = React.useState(current.provider && providers.some((p) => p.id === current.provider) ? current.provider : providers[0].id)
   const p = providers.find((x) => x.id === id)!
   const [model, setModel] = React.useState(current.provider === id && current.model ? current.model : p.model)
   const [pending, start] = React.useTransition()
   const [error, setError] = React.useState<string | null>(null)
+  const hasSavedKey = current.provider === id && !!current.last4
   const pick = (v: string) => {
     if (!v) return
     setId(v)
@@ -60,7 +61,8 @@ export function ProviderForm({ providers, current, onSaved }: { providers: Provi
   }
   const submit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    const apiKey = p.needsKey ? String(new FormData(e.currentTarget).get("apiKey") ?? "") : null
+    const rawKey = p.needsKey ? String(new FormData(e.currentTarget).get("apiKey") ?? "").trim() : null
+    const apiKey = rawKey || null
     setError(null)
     start(async () => {
       const r = await saveProviderAction({ provider: id, model, apiKey }).catch(() => ({ ok: false as const, error: "Couldn’t reach Pulse. Try again." }))
@@ -94,11 +96,12 @@ export function ProviderForm({ providers, current, onSaved }: { providers: Provi
           name="apiKey"
           type="password"
           autoComplete="off"
-          required
+          required={!hasSavedKey}
+          placeholder={hasSavedKey ? `••••${current.last4} (leave blank to keep)` : undefined}
           maxLength={500}
           hint={
             <>
-              Encrypted on this server and never shown again.{" "}
+              {hasSavedKey ? "Leave blank to keep your current key, or paste a new one. " : "Encrypted on this server and never shown again. "}
               {p.keyUrl && (
                 <a href={p.keyUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-0.5 font-semibold text-coach-text underline-offset-4 hover:underline">
                   Get a {p.label} key

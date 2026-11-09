@@ -8,7 +8,7 @@ import { parseConfig, type Config } from "../config";
 import type { Db } from "../db";
 import { coachChats, coachSettings, user } from "../db/schema";
 import { addUser, ctxFor, freshDb, seeded, USER } from "../testing";
-import { allowRequest, coachAccess, coachModel, coachSetup, listChats, loadChat, saveChat, saveProvider, setCoachAllowed, setCoachMode, setConsent, titleOf } from "./store";
+import { allowRequest, coachAccess, coachModel, coachSetup, listChats, loadChat, saveChat, saveProvider, savedApiKey, setCoachAllowed, setCoachMode, setConsent, titleOf } from "./store";
 import { coachInstructions } from "./instructions";
 import { coachTexts, DEFAULTS, saveText, TOOL_DOCS } from "./texts";
 import { coachTools, dayDigest } from "./tools";
@@ -58,9 +58,18 @@ describe("access, keys and chats", () => {
     expect(JSON.stringify(await coachSetup(db, member))).not.toContain("sk-secret");
     expect("model" in (await coachModel(db, member))).toBe(true);
 
+    // Updating only the model without passing a key preserves the encrypted key and last4
+    await saveProvider(db, member, "openai", "gpt-5.4-nano");
+    const [updatedRow] = await db.select().from(coachSettings).where(eq(coachSettings.userId, member));
+    expect(updatedRow.model).toBe("gpt-5.4-nano");
+    expect(updatedRow.keyLast4).toBe("1234");
+    expect(updatedRow.keyCiphertext).toEqual(row.keyCiphertext);
+    expect(await savedApiKey(db, member)).toEqual({ provider: "openai", apiKey: "sk-secret-key-1234" });
+
     // A rotated BETTER_AUTH_SECRET can't read the old key: the user is asked again, nothing is guessed.
     h.cfg = google({ BETTER_AUTH_SECRET: "y".repeat(32) });
     expect(await coachModel(db, member)).toEqual({ problem: "key_unreadable" });
+    expect(await savedApiKey(db, member)).toBeNull();
   });
 
   it("chats belong to one user: same id, other user, nothing loads; titles come from the first question", async () => {
