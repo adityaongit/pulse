@@ -31,8 +31,9 @@ const googleCfg = parseConfig({ DATA_SOURCE: "google", GOOGLE_CLIENT_ID: "cid", 
 const files = (pattern: string) => fs.globSync(pattern, { cwd: ROOT }).filter((f) => !/\.test\.tsx?$/.test(f)).sort();
 const actionFiles = files("src/**/*.{ts,tsx}").filter((f) => /^\s*["']use server["']/.test(fs.readFileSync(path.join(ROOT, f), "utf8")));
 const routeFiles = files("src/app/**/route.ts");
-/** `src/app/(group)/a/b/route.ts` → `/a/b`. */
-const urlOf = (f: string) => f.replace(/^src\/app/, "").replace(/\/route\.ts$/, "").replace(/\/\([^)]+\)/g, "") || "/";
+/** `src/app/(group)/a/b/route.ts` → `/a/b` (glob returns backslashes on Windows). */
+const urlOf = (f: string) =>
+  f.replaceAll("\\", "/").replace(/^src\/app/, "").replace(/\/route\.ts$/, "").replace(/\/\([^)]+\)/g, "") || "/";
 
 type Fn = (...args: unknown[]) => Promise<unknown>;
 let actions: { name: string; fn: Fn }[] = [];
