@@ -7,7 +7,7 @@ import { z } from "zod";
 import { currentUser, SIGNED_OUT } from "../auth";
 import { MAX_NOTES } from "../coach/instructions";
 import { providerOf } from "../coach/providers";
-import { coachAccess, deleteAllChats, deleteChat, groupChats, listChats, modelFor, removeProvider, saveProvider, setConsent, setPreferences, type ChatCursor, type ChatGroup } from "../coach/store";
+import { coachAccess, deleteAllChats, deleteChat, groupChats, listChats, modelFor, removeProvider, saveProvider, savedApiKey, setConsent, setPreferences, type ChatCursor, type ChatGroup } from "../coach/store";
 import { ctxOf } from "../queries/common";
 import { getConfig } from "../config";
 import { getDb } from "../db";
@@ -32,10 +32,11 @@ export async function setConsentAction(on: boolean): Promise<ActionResult> {
   return DONE;
 }
 
+const KeySchema = z.string().trim().min(8, "That key looks too short.").max(500);
 const Provider = z.object({
   provider: z.string().max(32),
   model: z.string().trim().min(1, "Enter a model.").max(120).regex(/^[\w.:/@-]+$/, "That model id has characters no provider uses."),
-  apiKey: z.string().trim().min(8, "That key looks too short.").max(500).nullable(),
+  apiKey: z.preprocess((v) => (typeof v === "string" && v.trim() === "" ? null : v), KeySchema.nullable().optional()),
 });
 
 /** Saves the provider and key after one tiny test request works, so a bad key is never stored. */
@@ -48,8 +49,17 @@ export async function saveProviderAction(input: z.input<typeof Provider>): Promi
   const cfg = getConfig();
   const keyless = (provider === "local" && !!cfg.coachLocal) || (provider === "mock" && cfg.coachMock);
   if (!keyless && !providerOf(provider)) return { ok: false, error: "Pick a provider." };
-  const apiKey = keyless ? null : r.data.apiKey;
-  if (!keyless && !apiKey) return { ok: false, error: "Paste your API key." };
+  let apiKey = keyless ? null : (r.data.apiKey ?? null);
+  let isReusing = false;
+  if (!keyless && !apiKey) {
+    const saved = await savedApiKey(getDb(), me);
+    if (saved && saved.provider === provider) {
+      apiKey = saved.apiKey;
+      isReusing = true;
+    } else {
+      return { ok: false, error: "Paste your API key." };
+    }
+  }
   if (apiKey && !cfg.authSecret) return { ok: false, error: "This server has no BETTER_AUTH_SECRET, so it can’t store keys safely. Ask whoever runs it." };
   const usedModel = provider === "local" ? cfg.coachLocal!.model : model;
   const m = modelFor(provider, usedModel, apiKey);
@@ -60,7 +70,7 @@ export async function saveProviderAction(input: z.input<typeof Provider>): Promi
     console.warn(`[coach] key test failed for ${provider}: ${e instanceof Error ? e.name : "error"}`);
     return { ok: false, error: "That didn’t work: check the key and the model id, and that your account has credit." };
   }
-  await saveProvider(getDb(), me, provider, usedModel, apiKey);
+  await saveProvider(getDb(), me, provider, usedModel, isReusing ? undefined : apiKey);
   revalidatePath("/coach");
   revalidatePath("/settings");
   return DONE;
