@@ -1,7 +1,7 @@
 import { beforeAll, describe, expect, it } from "vitest";
 import type { Db } from "../db";
 import { ctxFor, dayAt, seeded } from "../testing";
-import { dayStartOf, daySpans, loadDays, ms } from "./common";
+import { activityItem, dayStartOf, daySpans, type ExerciseRow, loadDays, ms } from "./common";
 import { getStress } from "./health";
 import { hrChart } from "./strain";
 
@@ -45,5 +45,57 @@ describe("daySpans", () => {
     const start = dayStartOf(ctx, day);
     const hr = (await hrChart(ctx, rows.get(day), day, false, start, start + 86_400)).value;
     expect(hr?.spans.every((s) => s.kind === "workout")).toBe(true);
+  });
+});
+
+describe("activityItem", () => {
+  it("uses the stored exercise name when present", () => {
+    const e: ExerciseRow = {
+      id: "ex-run",
+      day: "2026-10-01",
+      startTs: 1727780000,
+      endTs: 1727783600,
+      type: "RUNNING",
+      name: "Treadmill Run",
+      calories: 300,
+      distanceM: 5000,
+    };
+    const item = activityItem(e, undefined);
+    expect(item.name).toBe("Treadmill Run");
+  });
+
+  it("uses the stored exercise name for strength workouts", () => {
+    const e: ExerciseRow = {
+      id: "ex-core",
+      day: "2026-10-01",
+      startTs: 1727780000,
+      endTs: 1727783600,
+      type: "STRENGTH_TRAINING",
+      name: "Core Training",
+      calories: 200,
+      distanceM: null,
+    };
+    const item = activityItem(e, undefined);
+    expect(item.name).toBe("Core Training");
+  });
+
+  it("falls back to the generic activity name when name is null or whitespace", () => {
+    const eNull: ExerciseRow = {
+      id: "ex-null",
+      day: "2026-10-01",
+      startTs: 1727780000,
+      endTs: 1727783600,
+      type: "RUNNING",
+      name: null,
+      calories: 300,
+      distanceM: 5000,
+    };
+    expect(activityItem(eNull, undefined).name).toBe("Running");
+
+    const eBlank: ExerciseRow = {
+      ...eNull,
+      name: "   ",
+    };
+    expect(activityItem(eBlank, undefined).name).toBe("Running");
   });
 });
