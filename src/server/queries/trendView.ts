@@ -346,7 +346,7 @@ const wholeMonths = (segs: MonthSegment[]) => {
 const PRIOR_WORD: Record<TrendViewRange, string> = { w: "week", m: "month", "6m": "6 months" };
 export const priorLabel = (r: TrendViewRange) => `vs. prior ${PRIOR_WORD[r]}`;
 
-const typeName = (e: ExerciseRow) => e.name ?? e.type.toLowerCase().replace(/(^|_)(\w)/g, (_, s: string, c: string) => `${s ? " " : ""}${c.toUpperCase()}`);
+const typeName = (e: ExerciseRow) => e.name?.trim() || e.type.toLowerCase().replace(/(^|_)(\w)/g, (_, s: string, c: string) => `${s ? " " : ""}${c.toUpperCase()}`);
 
 export async function getTrendView(key: TrendViewKey, end: string, range: TrendViewRange, offset: number, ctx: QueryCtx): Promise<TrendViewVM> {
   const m = def(key);
