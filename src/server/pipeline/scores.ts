@@ -233,7 +233,9 @@ export function scoreRecovery(f: Fold, d: Day, sleep: SleepRow): RecoveryRow {
   let drivers: ChargeDriver[] = [];
   if (!mainSession) reason = "band_not_worn";
   else if (!mainSession.processed) reason = "awaiting_sleep_sync";
-  else if (mainSession.stagesStatus !== "SUCCEEDED" || hrv == null) reason = "no_hrv_last_night";
+  // A staged hypnogram is not a Recovery input: Google can send a processed night as CLASSIC (no stages) and still
+  // send that night's HRV. Only the HRV itself gates the score (spec §7.2: HRV and processed sleep).
+  else if (hrv == null) reason = "no_hrv_last_night";
   else {
     const g = hrvB
       ? gatedRecovery({ hrv, rhr, resp, hrvBaseline: hrvB, rhrBaseline: rhrUsable, respBaseline: respUsable, sleepPerf, skinTempDev })
