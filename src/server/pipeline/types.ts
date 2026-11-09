@@ -25,8 +25,10 @@ import type { StrainTarget } from "@/core/algorithms/strainTarget";
  * 10: each Healthspan factor keeps its 30-day mean beside the 6-month one (health-whoop-age-sleep-factors's two markers).
  * 11: Recovery needs a processed night and HRV, not a staged hypnogram: Google's CLASSIC nights (no stages) still
  * carry HRV and score.
+ * 12: sleep performance drops a missing restorative or consistency term and renormalises the weights, so a CLASSIC
+ * night is not scored as zero restorative sleep and a night without consistency is not scored as a neutral 50.
  */
-export const SCORING_VERSION = 11;
+export const SCORING_VERSION = 12;
 
 export type PipelineOptions = {
   /** Whose data: every read and write is scoped to this user. */

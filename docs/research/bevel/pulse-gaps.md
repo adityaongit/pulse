@@ -70,7 +70,7 @@ See [sleep.md](sleep.md#sleep-score).
 
 | Bevel input | Pulse status | Retain or derive | Algorithm differences |
 |---|---|---|---|
-| Stage seconds (asleep, deep, rem, awake interruptions) of the PRIMARY session with awake edges trimmed; sleep need seconds | Segments with light/deep/rem/awake (`map.ts:240-300`) | Keep `asleepUnspecified` and every awake segment (no minimum duration) | Bevel: six components with exponents (3,2,2,3,15,10), weights (.35,.2,.2,.1,.075,.075), targets by age/sex, drop of missing components with renormalization, nil when asleepRatio is 0. Pulse: .5 duration / .2 efficiency / .2 restorative / .1 consistency (`sleep.ts:67-70,106-127`), missing consistency neutral 0.5. |
+| Stage seconds (asleep, deep, rem, awake interruptions) of the PRIMARY session with awake edges trimmed; sleep need seconds | Segments with light/deep/rem/awake (`map.ts:240-300`) | Keep `asleepUnspecified` and every awake segment (no minimum duration) | Bevel: six components with exponents (3,2,2,3,15,10), weights (.35,.2,.2,.1,.075,.075), targets by age/sex, drop of missing components with renormalization, nil when asleepRatio is 0. Pulse: .5 duration / .2 efficiency / .2 restorative / .1 consistency (`sleep.ts:67-70,106-127`), missing terms drop and the rest renormalise. |
 | HR dip: mean HR in sleep samples vs 60-day inactive-HR baseline (awake histogram) | none | HR samples tagged by stage; awake baseline | not present |
 | Sex, age (age now, not at the scored day) | profile age/sex | profile birthday | Bevel has `other`/nil defaults (deep .125, HR dip .255). |
 

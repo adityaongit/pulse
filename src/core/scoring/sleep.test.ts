@@ -58,32 +58,44 @@ describe("ChargeEffortRestScoringTest: Rest", () => {
     expect(rest(0, 0.9, 0, 0)).toBeNull();
   });
 
-  it("no consistency uses a neutral 50 at full weight", () => {
-    expect(rest(8 * H, 0.92, 1.5 * H, 2 * H)).toBeCloseTo(100 * 0.5 + 92 * 0.2 + 87.5 * 0.2 + 50 * 0.1, EPS);
+  it("missing consistency drops the term and renormalises the rest", () => {
+    expect(rest(8 * H, 0.92, 1.5 * H, 2 * H)).toBe(95.44);
   });
 
   it("the consistency term is included", () => {
-    expect(rest(8 * H, 0.92, 1.5 * H, 2 * H, null, 0.8)).toBeCloseTo(100 * 0.5 + 92 * 0.2 + 87.5 * 0.2 + 80 * 0.1, EPS);
+    expect(rest(8 * H, 0.92, 1.5 * H, 2 * H, null, 0.8)).toBe(93.9);
+  });
+
+  it("missing stages drop the restorative term instead of scoring it as zero", () => {
+    // The same night as above, but Google sent it as CLASSIC (no stage minutes). The remaining terms renormalise.
+    expect(rest(8 * H, 0.92, null, null, null, 0.8)).toBe(95.5);
+  });
+
+  it("a summary that names only one stage counts the other as zero minutes", () => {
+    expect(rest(8 * H, 0.9, null, 4 * H)).toBe(rest(8 * H, 0.9, 0, 4 * H));
+    expect(rest(8 * H, 0.9, 0, null)).toBe(rest(8 * H, 0.9, 0, 0));
   });
 
   it("duration dominates a short night", () => {
-    expect(rest(4 * H, 0.95, H, H)).toBeCloseTo(50 * 0.5 + 95 * 0.2 + 100 * 0.2 + 50 * 0.1, EPS);
+    expect(rest(4 * H, 0.95, H, H)).toBe(71.11);
   });
 
   it("a refined lower need raises duration; oversleep clamps at 100", () => {
     expect(rest(6 * H, 0.9, H, 1.5 * H, 6)!).toBeGreaterThan(rest(6 * H, 0.9, H, 1.5 * H)!);
-    const share = (2 + 2.5) / 10;
-    expect(rest(10 * H, 0.9, 2 * H, 2.5 * H)).toBeCloseTo(100 * 0.5 + 90 * 0.2 + (share / 0.5) * 100 * 0.2 + 50 * 0.1, EPS);
+    expect(rest(10 * H, 0.9, 2 * H, 2.5 * H)).toBe(95.56);
   });
 
   it("low deep share scales the restorative term down to half", () => {
     // 8 h, no deep, 4 h REM: share 0.5 → 100, deep factor 0.5 → 50.
-    expect(rest(8 * H, 0.9, 0, 4 * H)).toBeCloseTo(100 * 0.5 + 90 * 0.2 + 50 * 0.2 + 50 * 0.1, EPS);
+    expect(rest(8 * H, 0.9, 0, 4 * H)).toBe(86.67);
   });
 
   it("restFromTotals reads a night's stored minutes", () => {
     expect(restFromTotals({ totalSleepMin: 420, efficiency: 0.85, deepMin: 80, remMin: 90 })).toBe(
       rest(420 * 60, 0.85, 80 * 60, 90 * 60, null, null),
+    );
+    expect(restFromTotals({ totalSleepMin: 420, efficiency: 0.85, deepMin: null, remMin: null })).toBe(
+      rest(420 * 60, 0.85, null, null, null, null),
     );
     expect(restFromTotals({ totalSleepMin: null, efficiency: 0.85, deepMin: 80, remMin: 90 })).toBeNull();
     expect(restFromTotals({ totalSleepMin: 0, efficiency: 0.85, deepMin: null, remMin: null })).toBeNull();

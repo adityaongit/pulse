@@ -3,6 +3,7 @@ title: "Garmin sleep score explained, and a published alternative"
 description: "Garmin's 0-100 sleep score blends duration, quality and HRV-based stress, with unpublished weights. The bands, a typical score, and a published alternative."
 published: "2026-08-06"
 checked: "2026-10-09"
+updated: "2026-11-09"
 tags: [garmin, sleep]
 keywords: ["garmin sleep score explained", "garmin sleep score always low", "what is a good garmin sleep score", "how does garmin calculate sleep score", "garmin sleep score 71"]
 ---
@@ -63,7 +64,7 @@ It also helps to separate the two things the score is mixing. Duration is someth
 
 ## A published alternative
 
-If you would prefer a score where every weight is visible, Pulse, a free app you host yourself, computes Sleep Performance from Google Health sleep data: hours against your own sleep need (50%), efficiency (20%), restorative sleep as deep plus REM (20%) and consistency over the last 7 days (10%). It scores 85 to 100% as optimal, 70 to 84% as sufficient and anything below as poor ([how Sleep Performance works](/metrics/sleep-performance/)). Pulse scores the main sleep only, once Fitbit has processed it, and a night without deep and REM totals scores its restorative part as zero. That does not make it more accurate than Garmin's. The stage data still comes from a wrist sensor, and Pulse is tested with the Fitbit Air only, not with Garmin watches. The difference is that you can check the arithmetic.
+If you would prefer a score where every weight is visible, Pulse, a free app you host yourself, computes Sleep Performance from Google Health sleep data: hours against your own sleep need (50%), efficiency (20%), restorative sleep as deep plus REM (20%) and consistency over the last 7 days (10%). It scores 85 to 100% as optimal, 70 to 84% as sufficient and anything below as poor ([how Sleep Performance works](/metrics/sleep-performance/)). Pulse scores the main sleep only, once Fitbit has processed it, and a night without deep and REM totals leaves the restorative part out and rescales the rest. That does not make it more accurate than Garmin's. The stage data still comes from a wrist sensor, and Pulse is tested with the Fitbit Air only, not with Garmin watches. The difference is that you can check the arithmetic.
 
 ```sketch
 {"kind": "flow", "alt": "Pulse's Sleep Performance combines hours against need at 50%, efficiency at 20%, restorative sleep at 20% and consistency at 10%.", "inputs": [{"label": "Hours vs your sleep need", "note": "50%"}, {"label": "Efficiency", "note": "20%"}, {"label": "Deep plus REM", "note": "20%"}, {"label": "Consistency, last 7 days", "note": "10%"}], "output": "Sleep Performance", "tone": "sleep", "caption": "Pulse's published weights."}

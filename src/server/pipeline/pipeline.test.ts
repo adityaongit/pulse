@@ -1,4 +1,5 @@
 import { beforeAll, describe, expect, it } from "vitest";
+import { rest } from "@/core/scoring/sleep";
 import { type Db, rows, sql } from "../db";
 import {
   type HealthMonitorRow,
@@ -253,15 +254,28 @@ describe("recovery gating on the seed", () => {
   it("scores a processed night with HRV even when Google sent no sleep stages", async () => {
     const unstaged = await copyDb(db);
     const day = dayAt(160);
-    // What Google sends for a CLASSIC night: the session and its summary minutes, no hypnogram.
-    await unstaged.execute(sql`update sleep_sessions set stages_status = 'FAILED' where user_id = ${USER} and day = ${day} and is_main`);
+    // What Google sends for a CLASSIC night: the session and its summary minutes, no hypnogram and no stage minutes.
+    await unstaged.execute(
+      sql`update sleep_sessions set stages_status = 'FAILED', deep_min = null, light_min = null, rem_min = null
+        where user_id = ${USER} and day = ${day} and is_main`,
+    );
     await unstaged.execute(
       sql`delete from sleep_segments where user_id = ${USER} and session_id in (select id from sleep_sessions where user_id = ${USER} and day = ${day})`,
     );
     await unstaged.execute(sql`insert into intraday_dirty (user_id, day) values (${USER}, ${day})`);
     await recompute(unstaged, OPTS);
     expect(metrics.get(day)!.hrv_ms).toBeTypeOf("number");
-    expect((await json<SleepRow>(unstaged, "sleep", day)).main?.staged).toBe(false);
+    const sleep = await json<SleepRow>(unstaged, "sleep", day);
+    expect(sleep.main?.staged).toBe(false);
+    expect(sleep.main?.deepMin).toBeNull();
+    expect(sleep.main?.remMin).toBeNull();
+    expect(sleep.performance).toBeTypeOf("number");
+    // The missing restorative term drops out; passing the null stage minutes as 0 would score this night lower.
+    const consistency = sleep.consistency == null ? null : sleep.consistency / 100;
+    expect(sleep.performance).toBe(rest(sleep.main!.asleepMin * 60, sleep.main!.efficiency, null, null, sleep.needHours, consistency));
+    expect(sleep.performance!).toBeGreaterThan(
+      rest(sleep.main!.asleepMin * 60, sleep.main!.efficiency, 0, 0, sleep.needHours, consistency)!,
+    );
     const rec = await json<RecoveryRow>(unstaged, "recovery", day);
     expect(rec.reason).toBeNull();
     expect(rec.value).toBeTypeOf("number");

@@ -214,7 +214,7 @@ export const SCORE_DOCS: ScoreDoc[] = [
       {
         title: "Limits",
         paragraphs: [
-          "Sleep Performance scores the main sleep only, once Fitbit has processed it. A night without deep and REM totals scores its restorative part as zero, so it reads lower. Without a consistency reading, that part counts as 50%. Sleep stages come from a wrist sensor and are an estimate.",
+          "Sleep Performance scores the main sleep only, once Fitbit has processed it. A night without deep and REM totals leaves the restorative part out and rescales the rest, and a night without a consistency reading does the same for that part. Sleep stages come from a wrist sensor and are an estimate.",
         ],
       },
     ],

@@ -4,6 +4,9 @@ Read-only audit from 2026-10-06, against noop at commit `9f98f81` (2026-10-04, <
 Kotlin engine (`android/app/src/main/java/com/noop/analytics/`) was the reference; its Swift twin mirrors it. The
 audit asks three things: is each score a faithful port, does Pulse actually call it, and what did Pulse leave out?
 
+Since `SCORING_VERSION` 12, Rest intentionally differs from noop when a term is missing: the term drops out and the
+remaining weights renormalise (see [sleep.md](sleep.md) finding 1).
+
 ```mermaid
 flowchart LR
   subgraph Same["Ported faithfully and used"]
@@ -32,10 +35,10 @@ flowchart LR
 
 ## Summary
 
-- **The formulas are faithful.** Recovery, the baseline fold, sleep performance (Rest), sleep need, the sleep-debt
-  ledger, Strain (Edwards), training load, heart-rate recovery and the illness signal all match noop constant for
-  constant.
-- **Where Pulse differs, it is in the wiring:** which nights feed a baseline, which need and consistency go into the
+- **The formulas were faithful at the audit date.** Recovery, the baseline fold, sleep performance (Rest), sleep need, the sleep-debt
+  ledger, Strain (Edwards), training load, heart-rate recovery and the illness signal all matched noop constant for
+  constant. Sleep performance now intentionally differs when a term is missing (see above).
+- **Where Pulse differs, it is in the wiring** (and, since 12, the missing-term renormalisation): which nights feed a baseline, which need and consistency go into the
   displayed sleep score, and which day a nap counts for.
 - **Several pieces are Pulse's own on purpose:** Strain Target, Stress, Energy Bank, the Pulse Age curves, the sleep
   planner, the zones on heart-rate reserve, and preferring Google's inputs.
@@ -45,7 +48,7 @@ flowchart LR
 
 | Item | Verdict | Notes |
 |---|---|---|
-| Rest composite (sleep performance) | MATCH | `sleep.ts:106-127` = `AnalyticsEngine.kt:1600-1636`: 50% duration vs need, 20% efficiency, 20% restorative × deep factor, 10% consistency (0.5 when missing) |
+| Rest composite (sleep performance) | **DIFF (intentional since 12)** | Was a constant-for-constant match with `AnalyticsEngine.kt:1600-1636`: 50% duration vs need, 20% efficiency, 20% restorative × deep factor, 10% consistency. Since 12, a missing restorative or consistency term drops out and the remaining weights renormalise; noop still scores missing stages as zero and missing consistency as 0.5 |
 | Inputs to the displayed score | **DIFF** | noop *displays* `restFromDaily`: a flat 8 h need and a neutral 0.5 consistency (`AnalyticsEngine.kt:1729-1741`). Its personalised need and 1−CV consistency feed only the internal pass-1 Charge input. Pulse displays the personalised path (need from the last 28 nights, SRI consistency). Pulse's port `restFromTotals` has no callers |
 | personalizedNeedHours | MATCH | Upper quartile of nightly hours, floored at 8 h (9 h under 18), capped at 9.5 h, 8 h under 7 nights. Pulse: trailing 28 nights excluding tonight. noop: a 21-day window including tonight |
 | Strain or debt in the need | none in either | The sleep score is judged against the baseline need only, in both. Pulse adds Strain and debt only in its own sleep planner |

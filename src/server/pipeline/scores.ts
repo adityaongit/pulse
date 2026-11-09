@@ -159,7 +159,14 @@ export function scoreSleep(data: Data, inputs: Inputs, f: Fold, d: Day, tz: stri
   const consistency = sriConsistency(sri);
   const performance =
     main && main.asleepMin > 0
-      ? rest(main.asleepMin * 60, main.efficiency, (main.deepMin ?? 0) * 60, (main.remMin ?? 0) * 60, needHours, consistency)
+      ? rest(
+          main.asleepMin * 60,
+          main.efficiency,
+          main.deepMin == null ? null : main.deepMin * 60,
+          main.remMin == null ? null : main.remMin * 60,
+          needHours,
+          consistency,
+        )
       : null;
   const yesterdayNaps = (data.sessionsByDay.get(addDays(day, -1)) ?? []).filter((s) => !s.isMain);
   const creditedMin = creditedSleepMin(main?.asleepMin ?? null, yesterdayNaps.reduce((a, s) => a + (s.asleepMin ?? 0), 0));

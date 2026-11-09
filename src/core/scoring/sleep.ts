@@ -75,8 +75,6 @@ export const maxNeedHours = 9.5;
 export const restorativeTargetShare = 0.5;
 export const deepShareTarget = 0.13;
 export const deepFloorFactor = 0.5;
-/** Used when no consistency signal is supplied (noop adds a neutral term, it does not renormalize). */
-export const NEUTRAL_CONSISTENCY = 0.5;
 
 const clamp = (x: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, x));
 
@@ -100,30 +98,42 @@ export function personalizedNeedHours(nightlyHours: number[], age: number | null
 
 /**
  * Rest composite in [0, 100] (2 dp), or null with no asleep time.
+ *
+ * Missing terms drop out and the remaining weights renormalise. A CLASSIC night has no stage minutes, and a
+ * night with too little HR coverage has no consistency value; neither is a bad measurement, so neither is
+ * scored as one. A summary that names only one of deep or REM counts the omitted stage as zero minutes.
  * @param efficiency asleep / in-bed in [0, 1].
- * @param consistency sleep regularity in [0, 1]; null → NEUTRAL_CONSISTENCY.
+ * @param deepSeconds deep-sleep seconds, or null when that stage was not measured.
+ * @param remSeconds REM seconds, or null when that stage was not measured.
+ * @param consistency sleep regularity in [0, 1]; null drops the term.
  */
 export function rest(
   asleepSeconds: number,
   efficiency: number,
-  deepSeconds: number,
-  remSeconds: number,
+  deepSeconds: number | null,
+  remSeconds: number | null,
   sleepNeedHours: number | null = null,
   consistency: number | null = null,
 ): number | null {
   if (asleepSeconds <= 0.0) return null;
   const asleepHours = asleepSeconds / 3600.0;
   const needHours = Math.max(sleepNeedHours ?? defaultSleepNeedHours, 0.1);
-  const durationScore = Math.min(100.0, (asleepHours / needHours) * 100.0);
-  const efficiencyScore = clamp(efficiency * 100.0, 0.0, 100.0);
-  const restorativeShare = (deepSeconds + remSeconds) / asleepSeconds;
-  const deepAdequacy = clamp(deepSeconds / asleepSeconds / deepShareTarget, 0.0, 1.0);
-  const deepFactor = deepFloorFactor + (1.0 - deepFloorFactor) * deepAdequacy;
-  const restorativeScore = Math.min(100.0, (restorativeShare / restorativeTargetShare) * 100.0) * deepFactor;
-  const consistencyScore = clamp((consistency ?? NEUTRAL_CONSISTENCY) * 100.0, 0.0, 100.0);
-  const weighted =
-    wDuration * durationScore + wEfficiency * efficiencyScore + wRestorative * restorativeScore + wConsistency * consistencyScore;
-  return Math.round(weighted * 100.0) / 100.0;
+  const terms: [weight: number, score: number][] = [
+    [wDuration, Math.min(100.0, (asleepHours / needHours) * 100.0)],
+    [wEfficiency, clamp(efficiency * 100.0, 0.0, 100.0)],
+  ];
+  if (deepSeconds != null || remSeconds != null) {
+    const deep = deepSeconds ?? 0.0;
+    const rem = remSeconds ?? 0.0;
+    const restorativeShare = (deep + rem) / asleepSeconds;
+    const deepAdequacy = clamp(deep / asleepSeconds / deepShareTarget, 0.0, 1.0);
+    const deepFactor = deepFloorFactor + (1.0 - deepFloorFactor) * deepAdequacy;
+    terms.push([wRestorative, Math.min(100.0, (restorativeShare / restorativeTargetShare) * 100.0) * deepFactor]);
+  }
+  if (consistency != null) terms.push([wConsistency, clamp(consistency * 100.0, 0.0, 100.0)]);
+  const totalWeight = terms.reduce((a, [weight]) => a + weight, 0);
+  const weighted = terms.reduce((a, [weight, score]) => a + weight * score, 0);
+  return Math.round((weighted / totalWeight) * 100.0) / 100.0;
 }
 
 /** Rest from a night's stored totals (noop's restFromDaily, at the default need). */
@@ -133,7 +143,14 @@ export function restFromTotals(
 ): number | null {
   const { totalSleepMin, efficiency } = night;
   if (totalSleepMin == null || efficiency == null || totalSleepMin <= 0.0) return null;
-  return rest(totalSleepMin * 60.0, efficiency, (night.deepMin ?? 0.0) * 60.0, (night.remMin ?? 0.0) * 60.0, null, consistency);
+  return rest(
+    totalSleepMin * 60.0,
+    efficiency,
+    night.deepMin == null ? null : night.deepMin * 60.0,
+    night.remMin == null ? null : night.remMin * 60.0,
+    null,
+    consistency,
+  );
 }
 
 /**
