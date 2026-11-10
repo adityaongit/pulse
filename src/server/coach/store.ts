@@ -9,7 +9,7 @@ import { coachChats, coachSettings, serverSettings, user } from "../db/schema";
 import { decryptKey, encryptKey } from "./crypto";
 import { mockModel } from "./mock";
 import { daysBetween, localDay } from "../time";
-import { localModel, providerOf } from "./providers";
+import { customModel, localModel, providerOf } from "./providers";
 
 const now = () => Math.floor(Date.now() / 1000);
 
@@ -44,7 +44,7 @@ export async function setCoachAllowed(db: Db, userId: number, allowed: boolean):
 // ── Provider, key and consent ────────────────────────────────────────────────
 
 /** What the browser may know about the user's setup: never the key itself. */
-export type CoachSetup = { provider: string | null; model: string | null; last4: string | null; consent: boolean; instructions: string | null; briefMinute: number | null };
+export type CoachSetup = { provider: string | null; model: string | null; baseUrl: string | null; last4: string | null; consent: boolean; instructions: string | null; briefMinute: number | null };
 
 /** Access, consent and a provider: the coach can answer without a set-up step. */
 export async function coachReady(db: Db, userId: number): Promise<boolean> {
@@ -55,7 +55,7 @@ export async function coachReady(db: Db, userId: number): Promise<boolean> {
 
 export async function coachSetup(db: Db, userId: number): Promise<CoachSetup> {
   const [r] = await db.select().from(coachSettings).where(eq(coachSettings.userId, userId));
-  return { provider: r?.provider ?? null, model: r?.model ?? null, last4: r?.keyLast4 ?? null, consent: r?.consentAt != null, instructions: r?.customInstructions ?? null, briefMinute: r?.briefMinute ?? null };
+  return { provider: r?.provider ?? null, model: r?.model ?? null, baseUrl: r?.baseUrl ?? null, last4: r?.keyLast4 ?? null, consent: r?.consentAt != null, instructions: r?.customInstructions ?? null, briefMinute: r?.briefMinute ?? null };
 }
 
 export async function setConsent(db: Db, userId: number, on: boolean): Promise<void> {
@@ -72,13 +72,14 @@ export async function setPreferences(db: Db, userId: number, p: { instructions?:
   await db.insert(coachSettings).values({ userId, ...values }).onConflictDoUpdate({ target: coachSettings.userId, set: values });
 }
 
-/** Stores the provider and model, and the key encrypted (null for the owner's local model, which needs none). */
-export async function saveProvider(db: Db, userId: number, provider: string, model: string, apiKey: string | null): Promise<void> {
+/** Stores the provider and model, and the key encrypted (null for local/custom models that need none). */
+export async function saveProvider(db: Db, userId: number, provider: string, model: string, apiKey: string | null, baseUrl?: string | null): Promise<void> {
   const secret = getConfig().authSecret;
   if (apiKey !== null && !secret) throw new Error("no_secret");
   const values = {
     provider,
     model,
+    ...(baseUrl !== undefined && { baseUrl }),
     keyCiphertext: apiKey === null ? null : encryptKey(apiKey, secret!),
     keyLast4: apiKey === null ? null : apiKey.slice(-4),
     updatedAt: now(),
@@ -87,16 +88,17 @@ export async function saveProvider(db: Db, userId: number, provider: string, mod
 }
 
 export async function removeProvider(db: Db, userId: number): Promise<void> {
-  await db.update(coachSettings).set({ provider: null, model: null, keyCiphertext: null, keyLast4: null, updatedAt: now() }).where(eq(coachSettings.userId, userId));
+  await db.update(coachSettings).set({ provider: null, model: null, baseUrl: null, keyCiphertext: null, keyLast4: null, updatedAt: now() }).where(eq(coachSettings.userId, userId));
 }
 
 export type ModelProblem = "no_access" | "no_consent" | "no_key" | "key_unreadable";
 
-/** The model to answer with: the user's provider and key, the owner's local model, or the mock in e2e. */
-export function modelFor(provider: string, model: string, apiKey: string | null): LanguageModel | null {
+/** The model to answer with: the user's provider and key, the owner's local model, a custom endpoint, or the mock in e2e. */
+export function modelFor(provider: string, model: string, apiKey: string | null, baseUrl?: string | null): LanguageModel | null {
   const cfg = getConfig();
   if (provider === "local") return cfg.coachLocal ? localModel(cfg.coachLocal.url, cfg.coachLocal.model) : null;
   if (provider === "mock") return cfg.coachMock ? mockModel() : null;
+  if (provider === "custom") return baseUrl ? customModel(baseUrl, model, apiKey) : null;
   const p = providerOf(provider);
   return p && apiKey ? p.create(apiKey, model) : null;
 }
@@ -112,7 +114,7 @@ export async function coachModel(db: Db, userId: number): Promise<{ model: Langu
     key = secret ? decryptKey(r.keyCiphertext, secret) : null;
     if (key === null) return { problem: "key_unreadable" };
   }
-  const model = modelFor(r.provider, r.model, key);
+  const model = modelFor(r.provider, r.model, key, r.baseUrl);
   return model ? { model, provider: r.provider, instructions: r.customInstructions } : { problem: "no_key" };
 }
 

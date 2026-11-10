@@ -74,6 +74,12 @@ export function CoachSettings({ setup, providers, providerLabel, notifications }
                 <span className="truncate text-right font-numeric text-[15px] leading-[22px] text-foreground-secondary">{setup.model}</span>
               </div>
             )}
+            {setup.baseUrl && (
+              <div className={ROW}>
+                <span className="text-[15px] leading-[22px]">Endpoint URL</span>
+                <span className="truncate text-right font-numeric text-[15px] leading-[22px] text-foreground-secondary">{setup.baseUrl}</span>
+              </div>
+            )}
             {setup.last4 && (
               <div className={ROW}>
                 <span className="text-[15px] leading-[22px]">API key</span>

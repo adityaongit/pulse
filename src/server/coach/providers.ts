@@ -61,3 +61,7 @@ export const providerOf = (id: string) => PROVIDERS.find((p) => p.id === id) ?? 
 
 /** The owner's local model from COACH_LOCAL_URL / COACH_LOCAL_MODEL (Ollama, LM Studio, vLLM). */
 export const localModel = (url: string, model: string) => createOpenAICompatible({ name: "local", baseURL: url })(model);
+
+/** A custom or local OpenAI-compatible endpoint (Ollama, LM Studio, vLLM, custom proxy). */
+export const customModel = (url: string, model: string, apiKey?: string | null) =>
+  createOpenAICompatible({ name: "custom", baseURL: url, ...(apiKey ? { apiKey } : {}) })(model);

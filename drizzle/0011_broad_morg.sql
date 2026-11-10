@@ -1,0 +1,1 @@
+ALTER TABLE "coach_settings" ADD COLUMN "base_url" text;

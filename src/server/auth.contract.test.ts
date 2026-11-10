@@ -28,7 +28,12 @@ const demoCfg = parseConfig({});
 // Open sign-up: these test better-auth itself; the invite gate has its own tests in auth.test.ts.
 const googleCfg = parseConfig({ DATA_SOURCE: "google", GOOGLE_CLIENT_ID: "cid", GOOGLE_CLIENT_SECRET: "cs", SIGNUP: "open" });
 
-const files = (pattern: string) => fs.globSync(pattern, { cwd: ROOT }).filter((f) => !/\.test\.tsx?$/.test(f)).sort();
+const files = (pattern: string) =>
+  fs
+    .globSync(pattern, { cwd: ROOT })
+    .map((f) => f.replaceAll("\\", "/"))
+    .filter((f) => !/\.test\.tsx?$/.test(f))
+    .sort();
 const actionFiles = files("src/**/*.{ts,tsx}").filter((f) => /^\s*["']use server["']/.test(fs.readFileSync(path.join(ROOT, f), "utf8")));
 const routeFiles = files("src/app/**/route.ts");
 /** `src/app/(group)/a/b/route.ts` → `/a/b`. */
