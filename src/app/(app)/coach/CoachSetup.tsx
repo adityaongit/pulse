@@ -45,25 +45,39 @@ export function Consent() {
 }
 
 /** Pick a provider, paste a key, pick a model; saved only after a test call works. */
-export function ProviderForm({ providers, current, onSaved }: { providers: ProviderOption[]; current: { provider: string | null; model: string | null }; onSaved?: () => void }) {
+export function ProviderForm({
+  providers,
+  current,
+  onSaved,
+}: {
+  providers: ProviderOption[];
+  current: { provider: string | null; model: string | null; baseUrl?: string | null; last4?: string | null };
+  onSaved?: () => void;
+}) {
   const router = useRouter()
   const [id, setId] = React.useState(current.provider && providers.some((p) => p.id === current.provider) ? current.provider : providers[0].id)
   const p = providers.find((x) => x.id === id)!
   const [model, setModel] = React.useState(current.provider === id && current.model ? current.model : p.model)
+  const [baseUrl, setBaseUrl] = React.useState(current.provider === id && current.baseUrl ? current.baseUrl : p.defaultUrl ?? "")
   const [pending, start] = React.useTransition()
   const [error, setError] = React.useState<string | null>(null)
+  const hasSavedKey = current.provider === id && !!current.last4
   const pick = (v: string) => {
     if (!v) return
+    const nextP = providers.find((x) => x.id === v)!
     setId(v)
-    setModel(providers.find((x) => x.id === v)!.model)
+    setModel(current.provider === v && current.model ? current.model : nextP.model)
+    setBaseUrl(current.provider === v && current.baseUrl ? current.baseUrl : nextP.defaultUrl ?? "")
     setError(null)
   }
   const submit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    const apiKey = p.needsKey ? String(new FormData(e.currentTarget).get("apiKey") ?? "") : null
+    const rawKey = p.needsKey || p.needsUrl ? String(new FormData(e.currentTarget).get("apiKey") ?? "").trim() : null
+    const apiKey = rawKey || null
+    const submittedBaseUrl = p.needsUrl ? baseUrl.trim() : null
     setError(null)
     start(async () => {
-      const r = await saveProviderAction({ provider: id, model, apiKey }).catch(() => ({ ok: false as const, error: "Couldn’t reach Pulse. Try again." }))
+      const r = await saveProviderAction({ provider: id, model, apiKey, baseUrl: submittedBaseUrl }).catch(() => ({ ok: false as const, error: "Couldn’t reach Pulse. Try again." }))
       if (!r.ok) return setError(r.error)
       onSaved?.()
       router.refresh()
@@ -87,18 +101,38 @@ export function ProviderForm({ providers, current, onSaved }: { providers: Provi
           ))}
         </ToggleGroup>
       </div>
-      {p.needsKey && (
+      {p.needsUrl && (
+        <AuthField
+          key={`${id}-url`}
+          label="Endpoint URL"
+          name="baseUrl"
+          type="url"
+          value={baseUrl}
+          onChange={(e) => setBaseUrl(e.currentTarget.value)}
+          required
+          placeholder="http://localhost:11434/v1"
+          autoCapitalize="none"
+          spellCheck={false}
+          hint="Ollama (http://localhost:11434/v1), LM Studio (http://localhost:1234/v1), vLLM or any OpenAI-compatible API."
+        />
+      )}
+      {(p.needsKey || p.needsUrl) && (
         <AuthField
           key={id}
           label="API key"
           name="apiKey"
           type="password"
           autoComplete="off"
-          required
+          required={p.needsKey && !hasSavedKey}
+          placeholder={hasSavedKey ? `••••${current.last4} (leave blank to keep)` : p.needsUrl ? "(Optional) Leave blank if no key required" : undefined}
           maxLength={500}
           hint={
             <>
-              Encrypted on this server and never shown again.{" "}
+              {hasSavedKey
+                ? "Leave blank to keep your current key, or paste a new one. "
+                : p.needsUrl
+                  ? "Leave blank for local Ollama / LM Studio models, or enter your key if your proxy requires one. "
+                  : "Encrypted on this server and never shown again. "}
               {p.keyUrl && (
                 <a href={p.keyUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-0.5 font-semibold text-coach-text underline-offset-4 hover:underline">
                   Get a {p.label} key
@@ -109,7 +143,18 @@ export function ProviderForm({ providers, current, onSaved }: { providers: Provi
           }
         />
       )}
-      <AuthField label="Model" name="model" value={model} onChange={(e) => setModel(e.currentTarget.value)} required maxLength={120} autoCapitalize="none" spellCheck={false} hint={p.needsKey ? "Any model your provider offers." : "Set by whoever runs this server."} readOnly={!p.needsKey} />
+      <AuthField
+        label="Model"
+        name="model"
+        value={model}
+        onChange={(e) => setModel(e.currentTarget.value)}
+        required
+        maxLength={120}
+        autoCapitalize="none"
+        spellCheck={false}
+        hint={p.needsUrl ? "The model name served by your endpoint (e.g. llama3.2, mistral, deepseek-r1)." : p.needsKey ? "Any model your provider offers." : "Set by whoever runs this server."}
+        readOnly={!p.needsKey && !p.needsUrl}
+      />
       {error && (
         <p role="alert" className="px-1 text-[13px] leading-[18px] font-medium text-recovery-red-text">
           {error}
@@ -119,7 +164,7 @@ export function ProviderForm({ providers, current, onSaved }: { providers: Provi
         {pending && <LoaderCircle aria-hidden className="animate-spin motion-reduce:animate-none" />}
         {pending ? "Testing…" : "Test and save"}
       </Button>
-      {p.needsKey && <p className={BODY}>Pulse checks the key with one tiny request before saving it.</p>}
+      {(p.needsKey || p.needsUrl) && <p className={BODY}>Pulse checks the connection with one tiny request before saving it.</p>}
     </form>
   )
 }

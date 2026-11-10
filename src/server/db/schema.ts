@@ -510,6 +510,7 @@ export const coachSettings = pgTable("coach_settings", {
   consentAt: ts("consent_at"),
   provider: text("provider"),
   model: text("model"),
+  baseUrl: text("base_url"),
   keyCiphertext: bytea("key_ciphertext"),
   keyLast4: text("key_last4"),
   /** The user's own notes on how the coach should talk to them (max 500 characters); appended under the rules. */

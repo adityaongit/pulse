@@ -54,13 +54,46 @@ describe("access, keys and chats", () => {
     await saveProvider(db, member, "openai", "gpt-5.4-mini", "sk-secret-key-1234");
     const [row] = await db.select().from(coachSettings).where(eq(coachSettings.userId, member));
     expect(row.keyCiphertext!.includes(Buffer.from("sk-secret-key-1234"))).toBe(false);
-    expect(await coachSetup(db, member)).toEqual({ provider: "openai", model: "gpt-5.4-mini", last4: "1234", consent: true, instructions: null, briefMinute: null });
+    expect(await coachSetup(db, member)).toEqual({ provider: "openai", model: "gpt-5.4-mini", baseUrl: null, last4: "1234", consent: true, instructions: null, briefMinute: null });
     expect(JSON.stringify(await coachSetup(db, member))).not.toContain("sk-secret");
     expect("model" in (await coachModel(db, member))).toBe(true);
 
     // A rotated BETTER_AUTH_SECRET can't read the old key: the user is asked again, nothing is guessed.
     h.cfg = google({ BETTER_AUTH_SECRET: "y".repeat(32) });
     expect(await coachModel(db, member)).toEqual({ problem: "key_unreadable" });
+  });
+
+  it("custom / local models: support custom endpoint URL and optional API key", async () => {
+    await setCoachMode(db, "everyone");
+    await setConsent(db, member, true);
+
+    // Save with custom URL and no API key (e.g. Ollama)
+    await saveProvider(db, member, "custom", "llama3.2", null, "http://localhost:11434/v1");
+    expect(await coachSetup(db, member)).toEqual({
+      provider: "custom",
+      model: "llama3.2",
+      baseUrl: "http://localhost:11434/v1",
+      last4: null,
+      consent: true,
+      instructions: null,
+      briefMinute: null,
+    });
+    const resNoKey = await coachModel(db, member);
+    expect("model" in resNoKey).toBe(true);
+
+    // Save with custom URL and an API key (e.g. vLLM or custom proxy with auth)
+    await saveProvider(db, member, "custom", "llama3.2", "secret-token-1234", "https://ai.example.com/v1");
+    expect(await coachSetup(db, member)).toEqual({
+      provider: "custom",
+      model: "llama3.2",
+      baseUrl: "https://ai.example.com/v1",
+      last4: "1234",
+      consent: true,
+      instructions: null,
+      briefMinute: null,
+    });
+    const resWithKey = await coachModel(db, member);
+    expect("model" in resWithKey).toBe(true);
   });
 
   it("chats belong to one user: same id, other user, nothing loads; titles come from the first question", async () => {
@@ -74,7 +107,7 @@ describe("access, keys and chats", () => {
     await setConsent(db, member, true);
     await db.delete(user).where(eq(user.id, member));
     expect(await loadChat(db, member, "chat-0001")).toBeNull();
-    expect(await coachSetup(db, member)).toEqual({ provider: null, model: null, last4: null, consent: false, instructions: null, briefMinute: null });
+    expect(await coachSetup(db, member)).toEqual({ provider: null, model: null, baseUrl: null, last4: null, consent: false, instructions: null, briefMinute: null });
   });
 
   it("chats page 30 at a time, newest first, with no chat skipped or repeated even when times tie", async () => {
